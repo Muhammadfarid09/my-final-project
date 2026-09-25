@@ -12,11 +12,11 @@ if (!isset($_SESSION['member_id'])) {
 
 try {
     // ดึงข้อมูลสนามทั้งหมดที่เปิดใช้งาน
-    $stmt_court = $conn->query("SELECT * FROM COURT WHERE court_status != 'ปิดปรับปรุง'");
+    $stmt_court = $conn->query("SELECT * FROM Court WHERE court_status != 'ปิดปรับปรุง' ORDER BY court_id ASC");
     $courts = $stmt_court->fetchAll(PDO::FETCH_ASSOC);
 
     // ดึงข้อมูลสินค้าและอุปกรณ์เช่าที่มีในสต็อก (ดึงมาทุกคอลัมน์)
-    $stmt_prod = $conn->query("SELECT * FROM PRODUCT WHERE product_stock > 0 ORDER BY product_type DESC");
+    $stmt_prod = $conn->query("SELECT * FROM Product WHERE product_stock > 0 ORDER BY product_type DESC");
     $products = $stmt_prod->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
     die("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: " . $e->getMessage());
@@ -30,9 +30,153 @@ try {
     <title>จองสนาม - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.2">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .matrix-legend {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .legend-offpeak { background: #d4edda; border: 1px solid #c3e6cb; }
+        .legend-peak { background: #fff3cd; border: 1px solid #ffeeba; }
+        .legend-booked { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .legend-closed { background: #f1f5f9; border: 1px solid #cbd5e1; }
+
+        .btn-matrix-date {
+            padding: 6px 14px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-matrix-date.active, .btn-matrix-date:hover {
+            background: #1e3c72;
+            color: #ffffff;
+            border-color: #1e3c72;
+        }
+
+        .matrix-table-container {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            max-height: 480px;
+        }
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .matrix-table th, .matrix-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+        .matrix-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .matrix-court-col {
+            position: sticky;
+            left: 0;
+            background: #f8fafc;
+            font-weight: 600;
+            text-align: left !important;
+            min-width: 110px;
+            z-index: 3;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        }
+        .matrix-cell {
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            min-width: 75px;
+        }
+        .matrix-cell.cell-offpeak {
+            background: #d4edda;
+            color: #155724;
+        }
+        .matrix-cell.cell-offpeak:hover {
+            background: #c3e6cb;
+            transform: scale(1.04);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .matrix-cell.cell-peak {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .matrix-cell.cell-peak:hover {
+            background: #ffeeba;
+            transform: scale(1.04);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .matrix-cell.cell-booked {
+            background: #f8d7da;
+            color: #721c24;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .matrix-cell.cell-closed {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .matrix-cell.selected {
+            outline: 3px solid #1e3c72;
+            outline-offset: -3px;
+            box-shadow: inset 0 0 10px rgba(30, 60, 114, 0.4);
+            font-weight: bold;
+        }
+        .slot-time-header {
+            font-size: 11px;
+        }
+        .slot-peak-tag {
+            font-size: 9px;
+            background: #f59e0b;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .slot-offpeak-tag {
+            font-size: 9px;
+            background: #10b981;
+            color: #fff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+    </style>
 </head>
 <body style="background-color: #f4f6f9;">
 
@@ -42,7 +186,7 @@ try {
     <div class="booking-wrapper">
         <div class="booking-header">
             <h2><i class="fas fa-calendar-check"></i> จองสนามแบดมินตัน</h2>
-            <p>กรุณาเลือกวัน เวลา สนาม และอุปกรณ์ที่คุณต้องการ (ขั้นต่ำ 1 ชั่วโมง)</p>
+            <p>กรุณาเลือกวัน เวลา สนาม และอุปกรณ์ที่คุณต้องการ (คิดราคาตามช่วงเวลา Peak / Off-peak อัตโนมัติ)</p>
         </div>
 
         <?php if (isset($_SESSION['error'])): ?>
@@ -50,6 +194,45 @@ try {
                 <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
+
+        <!-- ============================================== -->
+        <!-- ส่วนตารางความพร้อมของสนาม (Time-Slot Matrix) -->
+        <!-- ============================================== -->
+        <div class="booking-card" style="margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-th" style="color: #1e3c72;"></i> ตารางความพร้อมของสนาม (Court Availability Matrix)
+                    </h3>
+                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">
+                        คลิกเลือกช่องเวลาที่ว่างเพื่อเลือกลงฟอร์มจองได้ทันที
+                    </p>
+                </div>
+
+                <!-- ตัวเลือกวันที่สำหรับตาราง Matrix -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" class="btn-matrix-date active" onclick="setMatrixDate('today', this)">วันนี้</button>
+                    <button type="button" class="btn-matrix-date" onclick="setMatrixDate('tomorrow', this)">พรุ่งนี้</button>
+                    <input type="date" id="matrix_date_picker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" onchange="onMatrixDatePickerChange(this.value)">
+                </div>
+            </div>
+
+            <!-- แถบคำอธิบายสัญลักษณ์สี (Color Legend) -->
+            <div class="matrix-legend">
+                <div class="legend-item"><span class="legend-color legend-offpeak"></span> ว่าง: ช่วงทั่วไป (Off-peak: 09:00-17:00 น.)</div>
+                <div class="legend-item"><span class="legend-color legend-peak"></span> ว่าง: ช่วงยอดนิยม (Peak: 17:00-22:00 น.)</div>
+                <div class="legend-item"><span class="legend-color legend-booked"></span> ไม่ว่าง / มีผู้จองแล้ว</div>
+                <div class="legend-item"><span class="legend-color legend-closed"></span> นอกเวลาทำการ</div>
+            </div>
+
+            <!-- กล่องแสดงตาราง Matrix -->
+            <div class="matrix-table-container" id="matrixContainer">
+                <div style="text-align: center; padding: 40px; color: #64748b;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <p style="margin-top: 10px;">กำลังโหลดตารางความพร้อมของสนาม...</p>
+                </div>
+            </div>
+        </div>
 
         <!-- ฟอร์มส่งไปที่ actions/booking_db.php -->
         <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return validateBooking()">
@@ -61,15 +244,15 @@ try {
                         <h3>1. ระบุวันและเวลา (ขั้นต่ำ 1 ชม.)</h3>
                         <div class="form-group">
                             <label>วันที่จอง</label>
-                            <input type="date" name="booking_date" id="booking_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>" onchange="calculateSummary()">
+                            <input type="date" name="booking_date" id="booking_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" onchange="if(document.getElementById('matrix_date_picker')) document.getElementById('matrix_date_picker').value = this.value; loadCourtMatrix(this.value); calculateSummary();">
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>เวลาเริ่มต้น</label>
                                 <select name="start_time" id="start_time" class="form-control" required onchange="calculateSummary()">
                                     <option value="" disabled selected>เลือกเวลาเริ่ม</option>
-                                    <?php for($i=9; $i<=20; $i++): $time = sprintf("%02d:00", $i); ?>
-                                        <option value="<?php echo $time; ?>"><?php echo $time; ?> น.</option>
+                                    <?php for($i=9; $i<=21; $i++): $time = sprintf("%02d:00", $i); ?>
+                                        <option value="<?php echo $time; ?>"><?php echo $time; ?> น. <?php echo ($i >= 17) ? '(Peak)' : '(Off-peak)'; ?></option>
                                     <?php endfor; ?>
                                 </select>
                             </div>
@@ -91,11 +274,19 @@ try {
                         <div class="court-selector">
                             <?php foreach($courts as $court): ?>
                             <label class="court-option">
-                                <input type="radio" name="court_id" value="<?php echo $court['court_id']; ?>" data-price="<?php echo $court['court_price_per_hour']; ?>" required onchange="calculateSummary()">
+                                <input type="radio" name="court_id" value="<?php echo $court['court_id']; ?>" 
+                                       data-price="<?php echo $court['court_price_per_hour']; ?>" 
+                                       data-peak-price="<?php echo $court['court_peak_price']; ?>" 
+                                       data-offpeak-price="<?php echo $court['court_offpeak_price']; ?>" 
+                                       required onchange="calculateSummary()">
                                 <div class="court-box">
                                     <i class="fas fa-map-marked-alt fa-2x"></i>
                                     <h4><?php echo htmlspecialchars($court['court_name']); ?></h4>
-                                    <span class="price-tag"><?php echo number_format($court['court_price_per_hour']); ?> ฿/ชม.</span>
+                                    <div style="font-size: 11px; margin-top: 4px;">
+                                        <span style="color: #059669; font-weight: 600;">Off-peak: <?php echo number_format($court['court_offpeak_price']); ?> ฿</span> | 
+                                        <span style="color: #d97706; font-weight: 600;">Peak: <?php echo number_format($court['court_peak_price']); ?> ฿</span>
+                                    </div>
+                                    <span class="price-tag" style="margin-top: 6px; font-size: 11px;">ปกติ <?php echo number_format($court['court_price_per_hour']); ?> ฿/ชม.</span>
                                 </div>
                             </label>
                             <?php endforeach; ?>
@@ -131,7 +322,6 @@ try {
                                 <div class="prod-info">
                                     <strong><?php echo htmlspecialchars($prod['product_name']); ?></strong>
                                     
-                                    <!-- สำหรับสินค้าบริโภค แสดงแค่ยี่ห้อ (ถ้ามี) -->
                                     <div style="font-size: 11px; color: #666; margin-top: 2px;">
                                         <?php if(!empty($prod['product_brand'])): ?>
                                             <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
@@ -174,7 +364,6 @@ try {
                                 <div class="prod-info">
                                     <strong><?php echo htmlspecialchars($prod['product_name']); ?></strong>
                                     
-                                    <!-- แสดงรายละเอียด ยี่ห้อ และ รุ่น -->
                                     <div style="font-size: 11px; color: #666; margin-top: 2px;">
                                         <?php if(!empty($prod['product_brand'])): ?>
                                             <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
@@ -185,7 +374,6 @@ try {
                                         <?php endif; ?>
                                     </div>
 
-                                    <!-- แสดงรายละเอียด ระดับ และ ไซส์ -->
                                     <div style="font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 8px;">
                                         <?php if(!empty($prod['product_level'])): ?>
                                             <span class="badge-level <?php echo ($prod['product_level'] == 'มือโปร') ? 'level-gold' : 'level-silver'; ?>" style="font-size: 10px; padding: 2px 6px;">
@@ -257,6 +445,12 @@ try {
     </div>
 
     <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้าที่รวมโค้ดทั้งหมดไว้แล้ว -->
-    <script src="assets/js/member.js?v=1.3"></script>
+    <script src="assets/js/member.js?v=1.6"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let today = new Date().toISOString().split('T')[0];
+            loadCourtMatrix(today);
+        });
+    </script>
 </body>
 </html>

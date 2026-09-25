@@ -41,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // ========================================================
         // 2.5 Server-side Price Recalculation (ป้องกันการปลอมแปลงราคา)
+        // คำนวณราคาค่าบริการตามช่วงเวลาจริง (Dynamic Peak / Off-Peak)
         // ========================================================
         $hours = ($end_time_ts - $start_time_ts) / 3600;
         if ($hours < 1) {
@@ -51,14 +52,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $real_rental_price = 0;
         $real_product_price = 0;
 
-        // คำนวณค่าสนาม
-        $stmt_court = $conn->prepare("SELECT court_price_per_hour FROM Court WHERE court_id = :court_id");
+        // คำนวณค่าสนามแบบแยก Peak / Off-Peak
+        $stmt_court = $conn->prepare("SELECT court_price_per_hour, court_peak_price, court_offpeak_price FROM Court WHERE court_id = :court_id");
         $stmt_court->execute([':court_id' => $court_id]);
         $court_data = $stmt_court->fetch(PDO::FETCH_ASSOC);
         if (!$court_data) {
             throw new Exception("ไม่พบข้อมูลสนาม");
         }
-        $real_court_price = $court_data['court_price_per_hour'] * $hours;
+
+        $start_h = intval(date('H', $start_time_ts));
+        $end_h = intval(date('H', $end_time_ts));
+        $base_rate = floatval($court_data['court_price_per_hour']);
+        $peak_rate = floatval($court_data['court_peak_price']) > 0 ? floatval($court_data['court_peak_price']) : $base_rate;
+        $offpeak_rate = floatval($court_data['court_offpeak_price']) > 0 ? floatval($court_data['court_offpeak_price']) : $base_rate;
+
+        // วนลูปคำนวณราคาทีละ 1 ชั่วโมง
+        for ($h = $start_h; $h < $end_h; $h++) {
+            // ช่วง Peak: 17:00 - 22:00 น.
+            if ($h >= 17 && $h < 22) {
+                $real_court_price += $peak_rate;
+            } else {
+                $real_court_price += $offpeak_rate;
+            }
+        }
 
         // คำนวณค่าสินค้าและอุปกรณ์เช่า
         if (!empty($products)) {

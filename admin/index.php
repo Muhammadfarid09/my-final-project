@@ -60,6 +60,62 @@ try {
                        ORDER BY booking_count DESC";
     $occupation_data = $conn->query($sql_occupation)->fetchAll(PDO::FETCH_ASSOC);
 
+    // 10. Demographic Analytics: ช่วงอายุ (Demographic Age Groups)
+    $sql_age = "
+        SELECT 
+            CASE 
+                WHEN m.member_age IS NULL OR m.member_age = 0 THEN 'ไม่ระบุอายุ'
+                WHEN m.member_age < 18 THEN 'ต่ำกว่า 18 ปี'
+                WHEN m.member_age BETWEEN 18 AND 25 THEN '18 - 25 ปี'
+                WHEN m.member_age BETWEEN 26 AND 35 THEN '26 - 35 ปี'
+                WHEN m.member_age BETWEEN 36 AND 50 THEN '36 - 50 ปี'
+                ELSE 'มากกว่า 50 ปี'
+            END as age_group,
+            COUNT(b.booking_id) as booking_count
+        FROM Booking b
+        JOIN Member m ON b.member_id = m.member_id
+        WHERE b.booking_status = 'จองแล้ว'
+        GROUP BY age_group
+        ORDER BY 
+            CASE age_group
+                WHEN 'ต่ำกว่า 18 ปี' THEN 1
+                WHEN '18 - 25 ปี' THEN 2
+                WHEN '26 - 35 ปี' THEN 3
+                WHEN '36 - 50 ปี' THEN 4
+                WHEN 'มากกว่า 50 ปี' THEN 5
+                ELSE 6
+            END
+    ";
+    $age_data = $conn->query($sql_age)->fetchAll(PDO::FETCH_ASSOC);
+
+    // 11. Monthly Revenue Analytics: สรุปรายได้ย้อนหลัง 12 เดือน
+    $sql_monthly_rev = "
+        SELECT 
+            DATE_FORMAT(revenue_date, '%Y-%m') as rev_month,
+            SUM(revenue_total_amount) as month_total,
+            SUM(revenue_court_amount) as month_court,
+            SUM(revenue_rental_amount) as month_rental,
+            SUM(revenue_product_amount) as month_product
+        FROM Revenue
+        WHERE revenue_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY rev_month
+        ORDER BY rev_month ASC
+    ";
+    $monthly_rev_data = $conn->query($sql_monthly_rev)->fetchAll(PDO::FETCH_ASSOC);
+
+    // 12. Peak Usage Hours: ช่วงเวลาที่มีการจองหนาแน่นที่สุด (Top 5 Hours)
+    $sql_peak_hours = "
+        SELECT 
+            HOUR(booking_start_time) as b_hour,
+            COUNT(*) as booking_count
+        FROM Booking
+        WHERE booking_status = 'จองแล้ว'
+        GROUP BY b_hour
+        ORDER BY booking_count DESC, b_hour ASC
+        LIMIT 5
+    ";
+    $peak_hours_data = $conn->query($sql_peak_hours)->fetchAll(PDO::FETCH_ASSOC);
+
     // ==========================================
     // ส่วนดึงข้อมูลสำหรับสร้างกราฟ (Chart.js)
     // ==========================================
@@ -74,7 +130,7 @@ try {
     // กราฟแท่ง: รายรับย้อนหลัง 7 วัน
     $stmt_bar = $conn->query("SELECT revenue_date, SUM(revenue_total_amount) as daily_total FROM Revenue GROUP BY revenue_date ORDER BY revenue_date DESC LIMIT 7");
     $bar_data_raw = $stmt_bar->fetchAll(PDO::FETCH_ASSOC);
-    $bar_data_raw = array_reverse($bar_data_raw); // พลิกกลับให้เรียงจากเก่าไปใหม่เพื่อแสดงบนกราฟ
+    $bar_data_raw = array_reverse($bar_data_raw);
 
     $chart_dates = [];
     $chart_totals = [];
@@ -83,20 +139,51 @@ try {
         $chart_totals[] = (float)$row['daily_total'];
     }
 
-    // แปลงข้อมูลสำหรับกราฟเพศ
+    // ข้อมูลกราฟเพศ
     $gender_labels = [];
     $gender_counts = [];
     foreach($gender_data as $row) {
         $gender_labels[] = $row['member_gender'];
-        $gender_counts[] = $row['booking_count'];
+        $gender_counts[] = intval($row['booking_count']);
     }
 
-    // แปลงข้อมูลสำหรับกราฟอาชีพ
+    // ข้อมูลกราฟอาชีพ
     $occupation_labels = [];
     $occupation_counts = [];
     foreach($occupation_data as $row) {
         $occupation_labels[] = $row['occupation'] === '' ? 'ไม่ได้ระบุ' : $row['occupation'];
-        $occupation_counts[] = $row['booking_count'];
+        $occupation_counts[] = intval($row['booking_count']);
+    }
+
+    // ข้อมูลกราฟช่วงอายุ
+    $age_labels = [];
+    $age_counts = [];
+    foreach($age_data as $row) {
+        $age_labels[] = $row['age_group'];
+        $age_counts[] = intval($row['booking_count']);
+    }
+
+    // ข้อมูลกราฟรายได้รายเดือน 12 เดือน
+    $monthly_labels = [];
+    $monthly_totals = [];
+    $monthly_courts = [];
+    $monthly_rentals = [];
+    $monthly_products = [];
+
+    $thai_months = [
+        '01' => 'ม.ค.', '02' => 'ก.พ.', '03' => 'มี.ค.', '04' => 'เม.ย.',
+        '05' => 'พ.ค.', '06' => 'มิ.ย.', '07' => 'ก.ค.', '08' => 'ส.ค.',
+        '09' => 'ก.ย.', '10' => 'ต.ค.', '11' => 'พ.ย.', '12' => 'ธ.ค.'
+    ];
+
+    foreach ($monthly_rev_data as $row) {
+        $parts = explode('-', $row['rev_month']);
+        $m_name = ($thai_months[$parts[1]] ?? $parts[1]) . ' ' . (intval($parts[0]) + 543);
+        $monthly_labels[] = $m_name;
+        $monthly_totals[] = floatval($row['month_total']);
+        $monthly_courts[] = floatval($row['month_court']);
+        $monthly_rentals[] = floatval($row['month_rental']);
+        $monthly_products[] = floatval($row['month_product']);
     }
 
 } catch(PDOException $e) {
@@ -158,9 +245,9 @@ include 'includes/header.php';
 
 </div>
 
-<!-- กราฟสถิติ (Chart.js) -->
+<!-- กราฟสถิติรายวันและสัดส่วนรายได้ (Chart.js) -->
 <div class="chart-grid">
-    <!-- กราฟแท่ง (Bar Chart) -->
+    <!-- กราฟแท่ง (Bar Chart): รายรับ 7 วัน -->
     <div class="chart-card">
         <h4 class="section-header"><i class="fas fa-chart-bar"></i> รายรับย้อนหลัง 7 วัน</h4>
         <div class="chart-wrapper">
@@ -171,7 +258,7 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- กราฟวงกลมโดนัท (Doughnut Chart) -->
+    <!-- กราฟวงกลมโดนัท (Doughnut Chart): สัดส่วนรายได้ -->
     <div class="chart-card">
         <h4 class="section-header"><i class="fas fa-chart-pie"></i> สัดส่วนรายได้แยกหมวดหมู่</h4>
         <div class="chart-wrapper">
@@ -180,6 +267,66 @@ include 'includes/header.php';
                     data-rental="<?php echo $rev_rental; ?>"
                     data-product="<?php echo $rev_product; ?>">
             </canvas>
+        </div>
+    </div>
+</div>
+
+<!-- รายงานสรุปรายได้รายเดือน 12 เดือน และชั่วโมงยอดนิยม (Peak Usage Hours) -->
+<div class="chart-grid" style="grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;">
+    <!-- กราฟแท่งแบบ Stacked: รายได้รายเดือน 12 เดือน -->
+    <div class="chart-card">
+        <div class="header-between mb-10">
+            <h4 class="section-header mb-0"><i class="fas fa-calendar-alt text-primary"></i> รายงานสรุปรายได้รายเดือน (ย้อนหลัง 12 เดือน)</h4>
+            <span class="text-small-muted"><i class="fas fa-layer-group"></i> แยกตามค่าสนาม, เช่าอุปกรณ์, สินค้า</span>
+        </div>
+        <div class="chart-wrapper">
+            <canvas id="monthlyRevenueChart"
+                    data-labels='<?php echo json_encode($monthly_labels); ?>'
+                    data-courts='<?php echo json_encode($monthly_courts); ?>'
+                    data-rentals='<?php echo json_encode($monthly_rentals); ?>'
+                    data-products='<?php echo json_encode($monthly_products); ?>'>
+            </canvas>
+        </div>
+    </div>
+
+    <!-- การ์ดช่วงเวลายอดนิยม (Peak Usage Hours) -->
+    <div class="chart-card">
+        <h4 class="section-header"><i class="fas fa-fire text-danger"></i> ชั่วโมงยอดนิยม (Peak Hours)</h4>
+        <p class="text-small-muted mt-0 mb-15">ช่วงเวลาที่มีการจองสนามหนาแน่นที่สุด</p>
+        <div style="overflow-x: auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>อันดับ</th>
+                        <th>ช่วงเวลา</th>
+                        <th class="text-center">จำนวนการจอง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($peak_hours_data)): ?>
+                        <?php $rank = 1; foreach ($peak_hours_data as $ph): ?>
+                        <tr>
+                            <td>
+                                <span class="badge <?php echo $rank == 1 ? 'badge-danger' : ($rank == 2 ? 'badge-warning' : 'badge-secondary'); ?>">
+                                    #<?php echo $rank++; ?>
+                                </span>
+                            </td>
+                            <td>
+                                <strong><?php echo sprintf("%02d:00 - %02d:00", $ph['b_hour'], $ph['b_hour'] + 1); ?> น.</strong>
+                                <?php if ($ph['b_hour'] >= 17 && $ph['b_hour'] < 22): ?>
+                                    <span class="badge badge-warning" style="font-size: 10px; padding: 1px 5px;">Peak</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <strong class="text-primary"><?php echo number_format($ph['booking_count']); ?></strong> ครั้ง
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="3" class="text-center text-muted">ยังไม่มีข้อมูลการจอง</td></tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -312,8 +459,8 @@ include 'includes/header.php';
 
 </div>
 
-<!-- กราฟประชากรศาสตร์ (Demographic Analytics) -->
-<div class="chart-grid mt-20">
+<!-- กราฟประชากรศาสตร์ (Demographic Analytics: เพศ, ช่วงอายุ, อาชีพ) -->
+<div class="chart-grid-3 mt-20" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px;">
     <!-- กราฟวงกลม: สัดส่วนเพศ -->
     <div class="chart-card">
         <h4 class="section-header"><i class="fas fa-venus-mars"></i> สัดส่วนการจองแบ่งตามเพศ</h4>
@@ -321,6 +468,17 @@ include 'includes/header.php';
             <canvas id="genderPieChart"
                     data-labels='<?php echo json_encode($gender_labels); ?>'
                     data-values='<?php echo json_encode($gender_counts); ?>'>
+            </canvas>
+        </div>
+    </div>
+
+    <!-- กราฟโดนัท: สัดส่วนช่วงอายุ (Demographic Age Groups) -->
+    <div class="chart-card">
+        <h4 class="section-header"><i class="fas fa-birthday-cake text-info"></i> สัดส่วนการจองแบ่งตามช่วงอายุ</h4>
+        <div class="chart-wrapper">
+            <canvas id="ageGroupChart"
+                    data-labels='<?php echo json_encode($age_labels); ?>'
+                    data-values='<?php echo json_encode($age_counts); ?>'>
             </canvas>
         </div>
     </div>

@@ -1,5 +1,5 @@
 /* =========================================
-   T.S. Pattani - Member/Frontend JavaScript (v1.0)
+   T.S. Pattani - Member/Frontend JavaScript (v1.5)
    ========================================= */
 
 // ฟังก์ชันตรวจสอบความถูกต้องของฟอร์มสมัครสมาชิก (register.php)
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 3000);
 });
+
 /* =========================================
    Navbar Controls
    ========================================= */
@@ -58,11 +59,12 @@ window.onclick = function(event) {
         }
     }
 }
+
 /* =========================================
    Booking Page Controls (หน้าจองสนาม)
    ========================================= */
 
-// ฟังก์ชันคำนวณยอดเงินและตรวจสอบเงื่อนไข (booking.php)
+// ฟังก์ชันคำนวณยอดเงินและตรวจสอบเงื่อนไข Dynamic Peak / Off-peak (booking.php)
 function calculateSummary() {
     let startTimeElement = document.getElementById('start_time');
     let endTimeElement = document.getElementById('end_time');
@@ -79,41 +81,59 @@ function calculateSummary() {
     let courtPriceTotal = 0;
     let rentTotal = 0;
     let prodTotal = 0;
+    let peakHours = 0;
+    let offpeakHours = 0;
+    let peakPriceTotal = 0;
+    let offpeakPriceTotal = 0;
 
-    // 1. คำนวณเวลา (แก้เป็นต้อง 1 ชม. ขึ้นไป)
+    // 1. คำนวณเวลา (ต้อง 1 ชม. ขึ้นไป)
     if (start && end) {
         let startHr = parseInt(start.split(':')[0]);
         let endHr = parseInt(end.split(':')[0]);
         hours = endHr - startHr;
 
-        // แก้ตรงนี้เป็น < 1
         if (hours < 1) {
-            timeError.style.display = "block";
-            btnSubmit.disabled = true;
+            if (timeError) timeError.style.display = "block";
+            if (btnSubmit) btnSubmit.disabled = true;
             document.getElementById('sum-hours').innerText = "เวลาไม่ถูกต้อง";
             return; 
         } else {
-            timeError.style.display = "none";
+            if (timeError) timeError.style.display = "none";
             document.getElementById('sum-hours').innerText = hours + " ชั่วโมง";
         }
     }
 
-    // 2. คำนวณค่าสนาม
+    // 2. คำนวณค่าสนามแบบ Dynamic Peak / Off-peak
     let selectedCourt = document.querySelector('input[name="court_id"]:checked');
-    // 🔴 แก้ตรงนี้: เปลี่ยนจาก hours >= 2 เป็น hours >= 1
     if (selectedCourt && hours >= 1) {
-        let pricePerHour = parseFloat(selectedCourt.getAttribute('data-price'));
-        courtPriceTotal = pricePerHour * hours;
+        let baseRate = parseFloat(selectedCourt.getAttribute('data-price')) || 0;
+        let peakRate = parseFloat(selectedCourt.getAttribute('data-peak-price')) || baseRate;
+        let offpeakRate = parseFloat(selectedCourt.getAttribute('data-offpeak-price')) || baseRate;
+
+        let startHr = parseInt(start.split(':')[0]);
+        let endHr = parseInt(end.split(':')[0]);
+
+        for (let h = startHr; h < endHr; h++) {
+            // ช่วง Peak: 17:00 - 22:00 น.
+            if (h >= 17 && h < 22) {
+                peakHours++;
+                peakPriceTotal += peakRate;
+            } else {
+                offpeakHours++;
+                offpeakPriceTotal += offpeakRate;
+            }
+        }
+        courtPriceTotal = peakPriceTotal + offpeakPriceTotal;
     }
 
     // 3. คำนวณค่าสินค้าและอุปกรณ์เช่า
     let qtyInputs = document.querySelectorAll('.qty-input');
     qtyInputs.forEach(input => {
         let qty = parseInt(input.value) || 0;
-        let price = parseFloat(input.getAttribute('data-price'));
+        let price = parseFloat(input.getAttribute('data-price')) || 0;
         let type = input.getAttribute('data-type');
         
-        if(qty > 0) {
+        if (qty > 0) {
             if (type === 'อุปกรณ์เช่า') {
                 rentTotal += (qty * price);
             } else {
@@ -123,7 +143,17 @@ function calculateSummary() {
     });
 
     // 4. สรุปยอดรวมและอัปเดตหน้าจอ
-    document.getElementById('sum-court').innerText = courtPriceTotal.toLocaleString() + " ฿";
+    let courtSummaryText = courtPriceTotal.toLocaleString() + " ฿";
+    if (hours > 0 && selectedCourt) {
+        let details = [];
+        if (offpeakHours > 0) details.push(`Off-peak: ${offpeakHours} ชม. (${offpeakPriceTotal.toLocaleString()} ฿)`);
+        if (peakHours > 0) details.push(`Peak: ${peakHours} ชม. (${peakPriceTotal.toLocaleString()} ฿)`);
+        if (details.length > 0) {
+            courtSummaryText += `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">${details.join(' | ')}</span>`;
+        }
+    }
+
+    document.getElementById('sum-court').innerHTML = courtSummaryText;
     document.getElementById('sum-rent').innerText = rentTotal.toLocaleString() + " ฿";
     document.getElementById('sum-product').innerText = prodTotal.toLocaleString() + " ฿";
     
@@ -136,12 +166,11 @@ function calculateSummary() {
     document.getElementById('input_product_price').value = prodTotal;
     document.getElementById('input_total_price').value = grandTotal;
 
-    // 🔴 แก้ตรงนี้: เปลี่ยนจาก hours >= 2 เป็น hours >= 1
     // ปลดล็อกปุ่มกดยืนยันถ้าเลือกสนามและเวลาถูกต้อง (ขั้นต่ำ 1 ชม.)
     if (hours >= 1 && selectedCourt) {
-        btnSubmit.disabled = false;
+        if (btnSubmit) btnSubmit.disabled = false;
     } else {
-        btnSubmit.disabled = true;
+        if (btnSubmit) btnSubmit.disabled = true;
     }
 }
 
@@ -157,6 +186,152 @@ function validateBooking() {
     }
     return confirm("ยอดชำระสุทธิ " + total.toLocaleString() + " บาท\nยืนยันการทำรายการจองใช่หรือไม่?");
 }
+
+/* =========================================
+   Time-Slot Matrix Controller (booking.php)
+   ========================================= */
+
+function loadCourtMatrix(dateStr) {
+    let container = document.getElementById('matrixContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #64748b;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p style="margin-top: 10px;">กำลังโหลดตารางความพร้อมของสนาม (${dateStr})...</p>
+        </div>
+    `;
+
+    fetch('actions/get_court_matrix.php?date=' + encodeURIComponent(dateStr))
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === 'success') {
+            renderCourtMatrix(res);
+        } else {
+            container.innerHTML = `<div style="text-align: center; padding: 30px; color: #dc3545;"><i class="fas fa-exclamation-circle fa-2x"></i><p>${res.message || 'ไม่สามารถโหลดข้อมูลได้'}</p></div>`;
+        }
+    })
+    .catch(err => {
+        console.error('Matrix error:', err);
+        container.innerHTML = `<div style="text-align: center; padding: 30px; color: #dc3545;"><i class="fas fa-exclamation-triangle fa-2x"></i><p>เกิดข้อผิดพลาดในการโหลดตารางสนาม</p></div>`;
+    });
+}
+
+function renderCourtMatrix(data) {
+    let container = document.getElementById('matrixContainer');
+    if (!container) return;
+
+    let html = `<table class="matrix-table"><thead><tr>`;
+    html += `<th class="matrix-court-col">สนาม / เวลา</th>`;
+
+    data.slots.forEach(slot => {
+        html += `<th>
+            <div class="slot-time-header">${slot.start} - ${slot.end}</div>
+            ${slot.is_peak ? '<span class="slot-peak-tag">Peak</span>' : '<span class="slot-offpeak-tag">Off-peak</span>'}
+        </th>`;
+    });
+    html += `</tr></thead><tbody>`;
+
+    data.courts.forEach(court => {
+        html += `<tr>`;
+        html += `<td class="matrix-court-col">
+            <strong>${court.court_name}</strong>
+        </td>`;
+
+        data.slots.forEach(slot => {
+            let slotInfo = court.slots[slot.start];
+            if (!slotInfo) {
+                html += `<td class="matrix-cell cell-closed">-</td>`;
+                return;
+            }
+
+            if (slotInfo.status === 'booked' || slotInfo.status === 'pending') {
+                let txt = slotInfo.status === 'pending' ? 'รอตรวจ' : 'จองแล้ว';
+                html += `<td class="matrix-cell cell-booked" title="ช่วงเวลานี้มีผู้จองแล้ว">${txt}</td>`;
+            } else if (slotInfo.status === 'closed') {
+                html += `<td class="matrix-cell cell-closed" title="นอกเวลาทำการ">ปิด</td>`;
+            } else {
+                let cellClass = slotInfo.is_peak ? 'cell-peak' : 'cell-offpeak';
+                html += `<td class="matrix-cell ${cellClass}" 
+                             data-court-id="${court.court_id}" 
+                             data-start="${slot.start}" 
+                             data-end="${slot.end}" 
+                             onclick="selectSlotFromMatrix(${court.court_id}, '${slot.start}', '${slot.end}', this)"
+                             title="คลิกเพื่อเลือกจองช่วง ${slot.start} - ${slot.end}">
+                             <div>ว่าง</div>
+                             <div style="font-weight: bold; font-size: 11px;">${slotInfo.price}฿</div>
+                         </td>`;
+            }
+        });
+
+        html += `</tr>`;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+function selectSlotFromMatrix(courtId, startStr, endStr, cellEl) {
+    // 1. ไฮไลต์ cell ที่เลือก
+    document.querySelectorAll('.matrix-cell.selected').forEach(el => el.classList.remove('selected'));
+    if (cellEl) cellEl.classList.add('selected');
+
+    // 2. ซิงค์กับ Form
+    let matrixDatePicker = document.getElementById('matrix_date_picker');
+    let bookingDateInput = document.getElementById('booking_date');
+    if (matrixDatePicker && bookingDateInput) {
+        bookingDateInput.value = matrixDatePicker.value;
+    }
+
+    // เลือกสนาม
+    let courtRadio = document.querySelector(`input[name="court_id"][value="${courtId}"]`);
+    if (courtRadio) {
+        courtRadio.checked = true;
+    }
+
+    // เลือกเวลา
+    let startTimeSelect = document.getElementById('start_time');
+    let endTimeSelect = document.getElementById('end_time');
+
+    if (startTimeSelect) startTimeSelect.value = startStr;
+    if (endTimeSelect) endTimeSelect.value = endStr;
+
+    // คำนวณสรุปยอดเงินทันที
+    calculateSummary();
+
+    // เลื่อนหน้าจอลงไปที่ฟอร์มอย่างนุ่มนวล
+    let bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function setMatrixDate(type, btnEl) {
+    document.querySelectorAll('.btn-matrix-date').forEach(b => b.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+
+    let targetDate = new Date();
+    if (type === 'tomorrow') {
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+    let dateStr = targetDate.toISOString().split('T')[0];
+
+    let picker = document.getElementById('matrix_date_picker');
+    if (picker) picker.value = dateStr;
+
+    let bookingDate = document.getElementById('booking_date');
+    if (bookingDate) bookingDate.value = dateStr;
+
+    loadCourtMatrix(dateStr);
+}
+
+function onMatrixDatePickerChange(val) {
+    document.querySelectorAll('.btn-matrix-date').forEach(b => b.classList.remove('active'));
+    let bookingDate = document.getElementById('booking_date');
+    if (bookingDate) bookingDate.value = val;
+    loadCourtMatrix(val);
+}
+
 /* =========================================
    Payment Countdown Timer (หน้าชำระเงิน)
    ========================================= */

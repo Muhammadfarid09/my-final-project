@@ -631,6 +631,103 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
+    // 5. โหลดกราฟประชากรศาสตร์: ช่วงอายุ (Doughnut Chart)
+    let ageCtxEl = document.getElementById('ageGroupChart');
+    if (ageCtxEl) {
+        let labels = JSON.parse(ageCtxEl.getAttribute('data-labels') || '[]');
+        let values = JSON.parse(ageCtxEl.getAttribute('data-values') || '[]');
+
+        new Chart(ageCtxEl.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.75)',  // เขียวมิ้นต์ (<18)
+                        'rgba(54, 162, 235, 0.75)',  // ฟ้า (18-25)
+                        'rgba(255, 206, 86, 0.75)',  // เหลือง (26-35)
+                        'rgba(255, 159, 64, 0.75)',  // ส้ม (36-50)
+                        'rgba(153, 102, 255, 0.75)', // ม่วง (>50)
+                        'rgba(201, 203, 207, 0.75)'  // เทา (ไม่ระบุ)
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    // 6. โหลดกราฟรายงานรายได้รายเดือน 12 เดือน (Stacked Bar Chart)
+    let monthlyCtxEl = document.getElementById('monthlyRevenueChart');
+    if (monthlyCtxEl) {
+        let labels = JSON.parse(monthlyCtxEl.getAttribute('data-labels') || '[]');
+        let courts = JSON.parse(monthlyCtxEl.getAttribute('data-courts') || '[]');
+        let rentals = JSON.parse(monthlyCtxEl.getAttribute('data-rentals') || '[]');
+        let products = JSON.parse(monthlyCtxEl.getAttribute('data-products') || '[]');
+
+        new Chart(monthlyCtxEl.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'ค่าสนาม',
+                        data: courts,
+                        backgroundColor: 'rgba(40, 167, 69, 0.75)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'ค่าเช่าอุปกรณ์',
+                        data: rentals,
+                        backgroundColor: 'rgba(255, 193, 7, 0.75)',
+                        borderColor: 'rgba(255, 193, 7, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'ค่าสินค้า',
+                        data: products,
+                        backgroundColor: 'rgba(23, 162, 184, 0.75)',
+                        borderColor: 'rgba(23, 162, 184, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true },
+                    y: { 
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(val) { return val.toLocaleString() + ' ฿'; }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + Number(context.raw).toLocaleString() + ' ฿';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 });
 
 /* =========================================
