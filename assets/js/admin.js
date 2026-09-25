@@ -29,10 +29,14 @@ document.addEventListener("DOMContentLoaded", function() {
    ========================================= */
 document.addEventListener('DOMContentLoaded', function() {
     let receiptTrigger = document.getElementById('trigger_receipt_id');
-    if (receiptTrigger) {
-        let posId = receiptTrigger.value;
-        // เปิดหน้าต่าง Popup สลิปใบเสร็จ
-        window.open('receipt.php?pos_id=' + posId, 'ReceiptWindow', 'width=400,height=600,scrollbars=yes');
+    let bookingTrigger = document.getElementById('trigger_booking_id');
+    if (receiptTrigger || bookingTrigger) {
+        let posId = receiptTrigger ? receiptTrigger.value : '';
+        let bookingId = bookingTrigger ? bookingTrigger.value : '';
+        let url = 'receipt.php?';
+        if (posId) url += 'pos_id=' + encodeURIComponent(posId);
+        if (bookingId) url += (posId ? '&' : '') + 'booking_id=' + encodeURIComponent(bookingId);
+        window.open(url, 'ReceiptWindow', 'width=420,height=650,scrollbars=yes');
     }
 });
 
@@ -123,15 +127,22 @@ function updateCartUI() {
             totalPrice += itemTotal;
 
             let tr = document.createElement('tr');
+            let qtyHtml = '';
+            if (item.is_court) {
+                qtyHtml = `<span style="font-size:12px; color:#1e3c72; font-weight:bold;">${item.hours || 1} ชม.</span>`;
+            } else {
+                qtyHtml = `
+                    <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                    <span style="margin: 0 5px;">${item.qty}</span>
+                    <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                `;
+            }
+
             tr.innerHTML = `
                 <td><div style="font-weight:bold; font-size: 12px; line-height: 1.2;">${item.name}</div><div style="color:#888; font-size:11px;">@${item.price.toFixed(2)}</div></td>
-                <td style="text-align: center; white-space: nowrap;">
-                    <button type="button" class="cart-qty-btn" onclick="updateQty(${item.id}, -1)">-</button>
-                    <span style="margin: 0 5px;">${item.qty}</span>
-                    <button type="button" class="cart-qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
-                </td>
+                <td style="text-align: center; white-space: nowrap;">${qtyHtml}</td>
                 <td style="text-align: right; color:#28a745; font-weight:bold;">${itemTotal.toFixed(2)}</td>
-                <td style="text-align: center;"><i class="fas fa-times cart-remove" onclick="removeFromCart(${item.id})"></i></td>
+                <td style="text-align: center;"><i class="fas fa-times cart-remove" onclick="removeFromCart('${item.id}')"></i></td>
             `;
             tbody.appendChild(tr);
         });

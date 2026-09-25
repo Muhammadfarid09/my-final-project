@@ -69,6 +69,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li>
+            <a href="equipment_returns.php" class="<?php echo ($current_page == 'equipment_returns.php') ? 'active' : ''; ?>">
+                <i class="fas fa-undo-alt"></i> <span>ตรวจรับคืนอุปกรณ์</span>
+            </a>
+        </li>
+        <li>
             <a href="purchases.php" class="<?php echo ($current_page == 'purchases.php' || $current_page == 'purchase_add.php') ? 'active' : ''; ?>">
                 <i class="fas fa-truck-loading"></i> <span>บันทึกจัดซื้อ (รับของเข้า)</span>
             </a>

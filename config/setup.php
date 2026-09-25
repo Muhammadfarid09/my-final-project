@@ -66,7 +66,7 @@ try {
     $sql_table_booking = "
         CREATE TABLE IF NOT EXISTS `Booking` (
             `booking_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `member_id` INT(11) NOT NULL,
+            `member_id` INT(11) NULL,
             `court_id` INT(11) NOT NULL,
             `booking_date` DATE NOT NULL,
             `booking_start_time` TIME NOT NULL,
@@ -227,7 +227,10 @@ try {
             `rental_quantity` INT(11) NOT NULL,
             `rental_start_time` DATETIME NOT NULL,
             `rental_return_time` DATETIME DEFAULT NULL,
-            `rental_status` ENUM('กำลังเช่า', 'คืนแล้ว') NOT NULL DEFAULT 'กำลังเช่า',
+            `rental_status` ENUM('รอตรวจสอบ', 'กำลังเช่า', 'คืนแล้ว', 'ชำรุด', 'สูญหาย') NOT NULL DEFAULT 'กำลังเช่า',
+            `rental_fine` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+            `rental_fine_reason` VARCHAR(255) DEFAULT NULL,
+            `rental_actual_return` DATETIME DEFAULT NULL,
             FOREIGN KEY (`booking_id`) REFERENCES `Booking`(`booking_id`) ON DELETE CASCADE,
             FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE RESTRICT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
