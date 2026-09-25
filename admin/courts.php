@@ -24,8 +24,8 @@ include 'includes/header.php';
                 <input type="text" name="court_name" class="form-control" placeholder="เช่น สนามที่ 1" required>
             </div>
             <div class="form-group">
-                <label>ราคาปกติ/ชม. (฿) <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" name="court_price_per_hour" class="form-control" placeholder="150.00" required>
+                <label>ราคาปกติ/ชม. (฿) (จ.-พ.-ศ.) <span class="text-danger">*</span></label>
+                <input type="number" step="0.01" name="court_price_per_hour" class="form-control" placeholder="เช่น 180.00" required>
             </div>
             <div class="form-group">
                 <label>เวลาเปิดสนาม</label>
@@ -39,12 +39,12 @@ include 'includes/header.php';
         
         <div class="form-row-2 form-box-highlight">
             <div class="form-group">
-                <label class="text-danger">ราคาช่วง Peak/ชม. (฿) (ทางเลือก)</label>
+                <label class="text-danger">ราคาวันหยุด ส.-อา./ชม. (฿) (Peak)</label>
                 <input type="number" step="0.01" name="court_peak_price" class="form-control" placeholder="เช่น 200.00">
             </div>
             <div class="form-group">
-                <label class="text-success">ราคาช่วง Off-peak/ชม. (฿) (ทางเลือก)</label>
-                <input type="number" step="0.01" name="court_offpeak_price" class="form-control" placeholder="เช่น 120.00">
+                <label class="text-success">ราคาวันโปรโมชั่น อ.-พฤ./ชม. (฿) (Off-peak)</label>
+                <input type="number" step="0.01" name="court_offpeak_price" class="form-control" placeholder="เช่น 150.00">
             </div>
         </div>
 
@@ -58,8 +58,8 @@ include 'includes/header.php';
             <tr>
                 <th>ID</th>
                 <th>ชื่อสนาม</th>
-                <th>ราคาปกติ</th>
-                <th>Peak / Off-peak</th>
+                <th>ปกติ (จ.-พ.-ศ.)</th>
+                <th>ส.-อา. / อ.-พฤ.</th>
                 <th>เวลาทำการ</th>
                 <th class="text-center">สถานะ</th>
                 <th class="text-center">จัดการ</th>
@@ -71,10 +71,10 @@ include 'includes/header.php';
                 <tr>
                     <td>#<?php echo $row['court_id']; ?></td>
                     <td><strong><?php echo htmlspecialchars($row['court_name']); ?></strong></td>
-                    <td><?php echo number_format($row['court_price_per_hour'], 2); ?> ฿</td>
+                    <td><span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 13px;"><?php echo number_format($row['court_price_per_hour'], 2); ?> ฿</span></td>
                     <td>
-                        <span class="text-danger text-small-muted"><i class="fas fa-arrow-up"></i> Peak: <?php echo $row['court_peak_price'] ? number_format($row['court_peak_price'], 2).' ฿' : '-'; ?></span><br>
-                        <span class="text-success text-small-muted"><i class="fas fa-arrow-down"></i> Off-peak: <?php echo $row['court_offpeak_price'] ? number_format($row['court_offpeak_price'], 2).' ฿' : '-'; ?></span>
+                        <span class="text-small-muted" style="color: #b45309;"><i class="fas fa-star"></i> ส.-อา.: <?php echo $row['court_peak_price'] ? number_format($row['court_peak_price'], 2).' ฿' : '-'; ?></span><br>
+                        <span class="text-small-muted" style="color: #15803d;"><i class="fas fa-tag"></i> อ.-พฤ.: <?php echo $row['court_offpeak_price'] ? number_format($row['court_offpeak_price'], 2).' ฿' : '-'; ?></span>
                     </td>
                     <td>
                         <?php echo ($row['court_open_time'] && $row['court_close_time']) ? date('H:i', strtotime($row['court_open_time'])) . ' - ' . date('H:i', strtotime($row['court_close_time'])) : '-'; ?>
@@ -168,7 +168,7 @@ include 'includes/header.php';
                     <input type="text" name="court_name" id="edit_court_name" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>ราคาปกติ/ชม. (฿) <span class="text-danger">*</span></label>
+                    <label>ราคาปกติ/ชม. (฿) (จ.-พ.-ศ.) <span class="text-danger">*</span></label>
                     <input type="number" step="0.01" name="court_price_per_hour" id="edit_court_price" class="form-control" required>
                 </div>
             </div>
@@ -186,11 +186,11 @@ include 'includes/header.php';
             
             <div class="form-row-2 form-box-highlight">
                 <div class="form-group">
-                    <label class="text-danger">ราคาช่วง Peak/ชม. (฿)</label>
+                    <label class="text-danger">ราคาวันหยุด ส.-อา./ชม. (฿) (Peak)</label>
                     <input type="number" step="0.01" name="court_peak_price" id="edit_peak_price" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label class="text-success">ราคาช่วง Off-peak/ชม. (฿)</label>
+                    <label class="text-success">ราคาวันโปรโมชั่น อ.-พฤ./ชม. (฿) (Off-peak)</label>
                     <input type="number" step="0.01" name="court_offpeak_price" id="edit_offpeak_price" class="form-control">
                 </div>
             </div>

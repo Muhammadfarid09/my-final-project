@@ -1,5 +1,5 @@
 /* =========================================
-   T.S. Pattani - Member/Frontend JavaScript (v1.5)
+   T.S. Pattani - Member/Frontend JavaScript (v1.7)
    ========================================= */
 
 // ฟังก์ชันตรวจสอบความถูกต้องของฟอร์มสมัครสมาชิก (register.php)
@@ -64,7 +64,10 @@ window.onclick = function(event) {
    Booking Page Controls (หน้าจองสนาม)
    ========================================= */
 
-// ฟังก์ชันคำนวณยอดเงินและตรวจสอบเงื่อนไข Dynamic Peak / Off-peak (booking.php)
+// ฟังก์ชันคำนวณยอดเงินและตรวจสอบเงื่อนไขตามวันในสัปดาห์ (booking.php)
+// 1. เสาร์ - อาทิตย์ = 200 ฿ (Peak / Weekend Rate)
+// 2. จันทร์, พุธ, ศุกร์ = 180 ฿ (Standard Rate)
+// 3. อังคาร, พฤหัสบดี = 150 ฿ (Promo / Discount Rate)
 function calculateSummary() {
     let startTimeElement = document.getElementById('start_time');
     let endTimeElement = document.getElementById('end_time');
@@ -81,10 +84,7 @@ function calculateSummary() {
     let courtPriceTotal = 0;
     let rentTotal = 0;
     let prodTotal = 0;
-    let peakHours = 0;
-    let offpeakHours = 0;
-    let peakPriceTotal = 0;
-    let offpeakPriceTotal = 0;
+    let rateDetailText = "";
 
     // 1. คำนวณเวลา (ต้อง 1 ชม. ขึ้นไป)
     if (start && end) {
@@ -103,27 +103,31 @@ function calculateSummary() {
         }
     }
 
-    // 2. คำนวณค่าสนามแบบ Dynamic Peak / Off-peak
+    // 2. คำนวณค่าสนามตามวันในสัปดาห์
     let selectedCourt = document.querySelector('input[name="court_id"]:checked');
-    if (selectedCourt && hours >= 1) {
-        let baseRate = parseFloat(selectedCourt.getAttribute('data-price')) || 0;
-        let peakRate = parseFloat(selectedCourt.getAttribute('data-peak-price')) || baseRate;
-        let offpeakRate = parseFloat(selectedCourt.getAttribute('data-offpeak-price')) || baseRate;
+    let bookingDateInput = document.getElementById('booking_date');
 
-        let startHr = parseInt(start.split(':')[0]);
-        let endHr = parseInt(end.split(':')[0]);
+    if (selectedCourt && hours >= 1 && bookingDateInput && bookingDateInput.value) {
+        let baseRate = parseFloat(selectedCourt.getAttribute('data-price')) || 180;
+        let peakRate = parseFloat(selectedCourt.getAttribute('data-peak-price')) || 200;
+        let offpeakRate = parseFloat(selectedCourt.getAttribute('data-offpeak-price')) || 150;
 
-        for (let h = startHr; h < endHr; h++) {
-            // ช่วง Peak: 17:00 - 22:00 น.
-            if (h >= 17 && h < 22) {
-                peakHours++;
-                peakPriceTotal += peakRate;
-            } else {
-                offpeakHours++;
-                offpeakPriceTotal += offpeakRate;
-            }
+        let dateObj = new Date(bookingDateInput.value + 'T00:00:00');
+        let dow = dateObj.getDay(); // 0=Sun, 6=Sat, 2=Tue, 4=Thu, 1=Mon, 3=Wed, 5=Fri
+        let hourlyRate = baseRate;
+
+        if (dow === 0 || dow === 6) {
+            hourlyRate = peakRate;
+            rateDetailText = `เสาร์-อาทิตย์: ${hours} ชม. x ${hourlyRate} ฿`;
+        } else if (dow === 2 || dow === 4) {
+            hourlyRate = offpeakRate;
+            rateDetailText = `โปรโมชั่น อังคาร-พฤหัส: ${hours} ชม. x ${hourlyRate} ฿`;
+        } else {
+            hourlyRate = baseRate;
+            rateDetailText = `วันปกติ จันทร์-พุธ-ศุกร์: ${hours} ชม. x ${hourlyRate} ฿`;
         }
-        courtPriceTotal = peakPriceTotal + offpeakPriceTotal;
+
+        courtPriceTotal = hourlyRate * hours;
     }
 
     // 3. คำนวณค่าสินค้าและอุปกรณ์เช่า
@@ -144,13 +148,8 @@ function calculateSummary() {
 
     // 4. สรุปยอดรวมและอัปเดตหน้าจอ
     let courtSummaryText = courtPriceTotal.toLocaleString() + " ฿";
-    if (hours > 0 && selectedCourt) {
-        let details = [];
-        if (offpeakHours > 0) details.push(`Off-peak: ${offpeakHours} ชม. (${offpeakPriceTotal.toLocaleString()} ฿)`);
-        if (peakHours > 0) details.push(`Peak: ${peakHours} ชม. (${peakPriceTotal.toLocaleString()} ฿)`);
-        if (details.length > 0) {
-            courtSummaryText += `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">${details.join(' | ')}</span>`;
-        }
+    if (hours > 0 && selectedCourt && rateDetailText) {
+        courtSummaryText += `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">(${rateDetailText})</span>`;
     }
 
     document.getElementById('sum-court').innerHTML = courtSummaryText;
@@ -221,13 +220,29 @@ function renderCourtMatrix(data) {
     let container = document.getElementById('matrixContainer');
     if (!container) return;
 
-    let html = `<table class="matrix-table"><thead><tr>`;
+    // ป้ายสถานะเรทราคาประจำวันที่เลือก
+    let badgeBg = data.rate_category === 'weekend' ? '#fef3c7' : (data.rate_category === 'promo' ? '#dcfce7' : '#e0f2fe');
+    let badgeColor = data.rate_category === 'weekend' ? '#b45309' : (data.rate_category === 'promo' ? '#15803d' : '#0369a1');
+
+    let headerInfo = `
+        <div style="padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px;">
+            <div>
+                <i class="fas fa-calendar-day" style="color: #2563eb;"></i> 
+                <strong>${data.day_name}</strong> (${data.date}) : 
+                <span style="font-weight: 600; color: #1e3c72;">${data.rate_label}</span>
+            </div>
+            <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; border: 1px solid rgba(0,0,0,0.06);">
+                <i class="fas fa-tag"></i> ${data.rate_badge}
+            </span>
+        </div>
+    `;
+
+    let html = headerInfo + `<table class="matrix-table"><thead><tr>`;
     html += `<th class="matrix-court-col">สนาม / เวลา</th>`;
 
     data.slots.forEach(slot => {
         html += `<th>
             <div class="slot-time-header">${slot.start} - ${slot.end}</div>
-            ${slot.is_peak ? '<span class="slot-peak-tag">Peak</span>' : '<span class="slot-offpeak-tag">Off-peak</span>'}
         </th>`;
     });
     html += `</tr></thead><tbody>`;
@@ -236,6 +251,7 @@ function renderCourtMatrix(data) {
         html += `<tr>`;
         html += `<td class="matrix-court-col">
             <strong>${court.court_name}</strong>
+            <div style="font-size: 10px; color: ${badgeColor}; font-weight: bold;">${court.current_rate} ฿/ชม.</div>
         </td>`;
 
         data.slots.forEach(slot => {
@@ -251,13 +267,13 @@ function renderCourtMatrix(data) {
             } else if (slotInfo.status === 'closed') {
                 html += `<td class="matrix-cell cell-closed" title="นอกเวลาทำการ">ปิด</td>`;
             } else {
-                let cellClass = slotInfo.is_peak ? 'cell-peak' : 'cell-offpeak';
+                let cellClass = 'cell-' + slotInfo.rate_category;
                 html += `<td class="matrix-cell ${cellClass}" 
                              data-court-id="${court.court_id}" 
                              data-start="${slot.start}" 
                              data-end="${slot.end}" 
                              onclick="selectSlotFromMatrix(${court.court_id}, '${slot.start}', '${slot.end}', this)"
-                             title="คลิกเพื่อเลือกจองช่วง ${slot.start} - ${slot.end}">
+                             title="คลิกเพื่อเลือกจองช่วง ${slot.start} - ${slot.end} (${slotInfo.price}฿)">
                              <div>ว่าง</div>
                              <div style="font-weight: bold; font-size: 11px;">${slotInfo.price}฿</div>
                          </td>`;
@@ -323,6 +339,7 @@ function setMatrixDate(type, btnEl) {
     if (bookingDate) bookingDate.value = dateStr;
 
     loadCourtMatrix(dateStr);
+    calculateSummary();
 }
 
 function onMatrixDatePickerChange(val) {
@@ -330,6 +347,7 @@ function onMatrixDatePickerChange(val) {
     let bookingDate = document.getElementById('booking_date');
     if (bookingDate) bookingDate.value = val;
     loadCourtMatrix(val);
+    calculateSummary();
 }
 
 /* =========================================

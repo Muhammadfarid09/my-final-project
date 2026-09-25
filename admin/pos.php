@@ -36,19 +36,27 @@ include 'includes/header.php';
         <div class="product-grid" id="productGrid">
             
             <!-- การ์ดสนามสำหรับเปิด Walk-in -->
-            <?php foreach ($courts as $court): ?>
+            <?php foreach ($courts as $court): 
+                $c_base = floatval($court['court_price_per_hour']) > 0 ? floatval($court['court_price_per_hour']) : 180;
+                $c_peak = floatval($court['court_peak_price']) > 0 ? floatval($court['court_peak_price']) : 200;
+                $c_offpeak = floatval($court['court_offpeak_price']) > 0 ? floatval($court['court_offpeak_price']) : 150;
+            ?>
                 <div class="product-card" 
                      data-type="สนาม"
                      style="border: 2px solid #2563eb; background: #f8fafc;"
-                     onclick="openWalkInCourtModal(<?php echo $court['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($court['court_name'])); ?>', <?php echo $court['court_price_per_hour']; ?>)">
+                     onclick="openWalkInCourtModal(<?php echo $court['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($court['court_name'])); ?>', <?php echo $c_base; ?>, <?php echo $c_peak; ?>, <?php echo $c_offpeak; ?>)">
                     
                     <div class="product-img-placeholder w-80 h-80 mb-10" style="background: #eff6ff; color: #2563eb;">
                         <i class="fas fa-map-marker-alt fa-2x"></i>
                     </div>
                     
                     <h5 style="color: #1e3c72; font-size: 15px; margin: 5px 0;"><?php echo htmlspecialchars($court['court_name']); ?></h5>
-                    <p class="price" style="color: #2563eb; font-weight: bold;"><?php echo number_format($court['court_price_per_hour'], 2); ?> ฿ / ชม.</p>
-                    <p class="stock" style="color: #059669; font-weight: 500;">
+                    <div style="font-size: 11px; margin: 4px 0; color: #475569; text-align: left; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">
+                        <div><strong style="color: #0284c7;">จ.-พ.-ศ.:</strong> <?php echo number_format($c_base); ?> ฿</div>
+                        <div><strong style="color: #b45309;">ส.-อา.:</strong> <?php echo number_format($c_peak); ?> ฿</div>
+                        <div><strong style="color: #15803d;">อ.-พฤ.:</strong> <?php echo number_format($c_offpeak); ?> ฿</div>
+                    </div>
+                    <p class="stock" style="color: #059669; font-weight: 500; font-size: 12px; margin-top: 4px;">
                         <i class="fas fa-check-circle"></i> พร้อมเปิด Walk-in
                     </p>
                 </div>
@@ -159,15 +167,17 @@ include 'includes/header.php';
 
         <input type="hidden" id="modal_court_id">
         <input type="hidden" id="modal_court_base_price">
+        <input type="hidden" id="modal_court_peak_price">
+        <input type="hidden" id="modal_court_offpeak_price">
 
         <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 15px; margin-bottom: 18px; font-size: 14px;">
             <div><strong>สนาม:</strong> <span id="modal_court_name" class="font-bold text-primary" style="font-size: 16px;"></span></div>
-            <div><strong>อัตราค่าบริการ:</strong> <span id="modal_court_price_rate" class="font-bold"></span> บาท / ชั่วโมง</div>
+            <div><strong>อัตราค่าบริการ:</strong> <span id="modal_court_price_rate" class="font-bold"></span> บาท / ชั่วโมง <span id="modal_court_rate_badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px;"></span></div>
         </div>
 
         <div class="form-group" style="margin-bottom: 12px;">
             <label class="font-bold" style="font-size: 13px;">วันที่ใช้งาน:</label>
-            <input type="date" id="modal_court_date" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+            <input type="date" id="modal_court_date" class="form-control" value="<?php echo date('Y-m-d'); ?>" onchange="calculateCourtTotal()">
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
@@ -227,11 +237,12 @@ include 'includes/header.php';
 <script src="../assets/js/admin.js?v=1.25"></script>
 
 <script>
-function openWalkInCourtModal(courtId, courtName, courtPrice) {
+function openWalkInCourtModal(courtId, courtName, courtPrice, peakPrice, offpeakPrice) {
     document.getElementById('modal_court_id').value = courtId;
     document.getElementById('modal_court_name').textContent = courtName;
-    document.getElementById('modal_court_price_rate').textContent = parseFloat(courtPrice).toFixed(2);
     document.getElementById('modal_court_base_price').value = courtPrice;
+    document.getElementById('modal_court_peak_price').value = peakPrice || courtPrice;
+    document.getElementById('modal_court_offpeak_price').value = offpeakPrice || courtPrice;
     calculateCourtTotal();
     document.getElementById('walkInCourtModal').style.display = 'flex';
 }
@@ -241,8 +252,43 @@ function closeWalkInCourtModal() {
 }
 
 function calculateCourtTotal() {
-    let rate = parseFloat(document.getElementById('modal_court_base_price').value) || 0;
+    let baseRate = parseFloat(document.getElementById('modal_court_base_price').value) || 180;
+    let peakRate = parseFloat(document.getElementById('modal_court_peak_price').value) || 200;
+    let offpeakRate = parseFloat(document.getElementById('modal_court_offpeak_price').value) || 150;
     let hours = parseInt(document.getElementById('modal_court_hours').value) || 1;
+    let dateVal = document.getElementById('modal_court_date').value;
+
+    let rate = baseRate;
+    let badgeText = "ปกติ จ.-พ.-ศ.";
+    let badgeBg = "#e0f2fe";
+    let badgeColor = "#0369a1";
+
+    if (dateVal) {
+        let dateObj = new Date(dateVal + 'T00:00:00');
+        let dow = dateObj.getDay(); // 0=Sun, 6=Sat, 2=Tue, 4=Thu
+        if (dow === 0 || dow === 6) {
+            rate = peakRate;
+            badgeText = "วันหยุด ส.-อา.";
+            badgeBg = "#fef3c7";
+            badgeColor = "#b45309";
+        } else if (dow === 2 || dow === 4) {
+            rate = offpeakRate;
+            badgeText = "โปรฯ อ.-พฤ.";
+            badgeBg = "#dcfce7";
+            badgeColor = "#15803d";
+        }
+    }
+
+    let rateElem = document.getElementById('modal_court_price_rate');
+    if (rateElem) rateElem.textContent = parseFloat(rate).toFixed(2);
+
+    let badgeElem = document.getElementById('modal_court_rate_badge');
+    if (badgeElem) {
+        badgeElem.textContent = badgeText;
+        badgeElem.style.background = badgeBg;
+        badgeElem.style.color = badgeColor;
+    }
+
     let total = rate * hours;
     document.getElementById('modal_court_total_price').textContent = total.toFixed(2);
 }
@@ -250,11 +296,21 @@ function calculateCourtTotal() {
 function addCourtToCart() {
     let courtId = document.getElementById('modal_court_id').value;
     let courtName = document.getElementById('modal_court_name').textContent;
-    let rate = parseFloat(document.getElementById('modal_court_base_price').value) || 0;
+    let baseRate = parseFloat(document.getElementById('modal_court_base_price').value) || 180;
+    let peakRate = parseFloat(document.getElementById('modal_court_peak_price').value) || 200;
+    let offpeakRate = parseFloat(document.getElementById('modal_court_offpeak_price').value) || 150;
     let hours = parseInt(document.getElementById('modal_court_hours').value) || 1;
     let date = document.getElementById('modal_court_date').value;
     let startTime = document.getElementById('modal_court_start_time').value;
     let phone = document.getElementById('modal_court_member_phone').value.trim();
+
+    let rate = baseRate;
+    if (date) {
+        let dateObj = new Date(date + 'T00:00:00');
+        let dow = dateObj.getDay();
+        if (dow === 0 || dow === 6) rate = peakRate;
+        else if (dow === 2 || dow === 4) rate = offpeakRate;
+    }
 
     let startHour = parseInt(startTime.split(':')[0]);
     let endHour = startHour + hours;

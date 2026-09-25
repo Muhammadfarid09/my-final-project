@@ -34,6 +34,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $b_end = $item['end_time'] ?? '09:00:00';
                 $court_price = floatval($item['price']);
 
+                // Fallback คำนวณราคาตามประเภทวันหากไม่ได้ส่งมา
+                if ($court_price <= 0) {
+                    $c_stmt = $conn->prepare("SELECT court_price_per_hour, court_peak_price, court_offpeak_price FROM Court WHERE court_id = :cid");
+                    $c_stmt->execute([':cid' => $court_id]);
+                    $c_info = $c_stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($c_info) {
+                        $dow = intval(date('w', strtotime($b_date)));
+                        $h_rate = ($dow == 0 || $dow == 6) 
+                            ? (floatval($c_info['court_peak_price']) > 0 ? floatval($c_info['court_peak_price']) : 200.00) 
+                            : (($dow == 2 || $dow == 4) 
+                                ? (floatval($c_info['court_offpeak_price']) > 0 ? floatval($c_info['court_offpeak_price']) : 150.00) 
+                                : (floatval($c_info['court_price_per_hour']) > 0 ? floatval($c_info['court_price_per_hour']) : 180.00));
+                        $h_diff = max(1, (strtotime($b_end) - strtotime($b_start)) / 3600);
+                        $court_price = $h_rate * $h_diff;
+                    }
+                }
+
                 // ค้นหา member_id จากเบอร์โทร (ถ้ากรอก)
                 $member_id = null;
                 if (!empty($item['member_phone'])) {
