@@ -324,6 +324,21 @@ try {
     $conn->exec($sql_table_revenue);
     echo "<h3>19. สร้างตาราง 'Revenue' สร้างสำเร็จ!</h3>";
 
+    // 20. ตรวจสอบและอัปเดตโครงสร้างฟิลด์สำหรับฐานข้อมูลเดิม (Database Migration)
+    $cols_rental = $conn->query("SHOW COLUMNS FROM Rental")->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('rental_fine', $cols_rental)) {
+        $conn->exec("ALTER TABLE Rental ADD COLUMN rental_fine DECIMAL(8,2) NOT NULL DEFAULT 0.00 AFTER rental_status");
+    }
+    if (!in_array('rental_fine_reason', $cols_rental)) {
+        $conn->exec("ALTER TABLE Rental ADD COLUMN rental_fine_reason VARCHAR(255) NULL AFTER rental_fine");
+    }
+    if (!in_array('rental_actual_return', $cols_rental)) {
+        $conn->exec("ALTER TABLE Rental ADD COLUMN rental_actual_return DATETIME NULL AFTER rental_fine_reason");
+    }
+    $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย') NOT NULL DEFAULT 'กำลังเช่า'");
+    $conn->exec("ALTER TABLE Booking MODIFY COLUMN member_id INT(11) NULL");
+    echo "<h3>20. อัปเดตโครงสร้างฟิลด์และระบบรองรับฟังก์ชันใหม่ล่าสุดสำเร็จ 100%!</h3>";
+
 } catch(PDOException $e) {
     echo "<h3 style='color:red;'>เกิดข้อผิดพลาด: " . $e->getMessage() . "</h3>";
 }
