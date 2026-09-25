@@ -45,7 +45,7 @@ include 'includes/header.php';
                             <tr>
                                 <td>
                                     <?php if (!empty($row['news_image'])): ?>
-                                        <img src="../assets/images/news/<?php echo htmlspecialchars($row['news_image']); ?>" alt="News Image" class="news-img-table">
+                                        <img src="../uploads/news/<?php echo htmlspecialchars($row['news_image']); ?>" alt="News Image" class="news-img-table">
                                     <?php else: ?>
                                         <div class="news-placeholder"><i class="fas fa-image"></i></div>
                                     <?php endif; ?>

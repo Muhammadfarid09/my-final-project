@@ -90,24 +90,27 @@ try {
                                 <?php 
                                     $status = $row['booking_status'];
                                     $status_class = 'status-pending';
+                                    $display_status = $status;
 
-                                    if ($status == 'ชำระเงินแล้ว' || $status == 'อนุมัติแล้ว') {
+                                    if ($status == 'จองแล้ว' || $status == 'ชำระเงินแล้ว' || $status == 'อนุมัติแล้ว') {
                                         $status_class = 'status-success';
                                     } elseif ($status == 'ยกเลิก') {
                                         $status_class = 'status-cancel';
+                                    } elseif ($status == 'รอตรวจสอบ') {
+                                        $display_status = !empty($row['payment_slip']) ? 'รอตรวจสอบสลิป' : 'รอแนบสลิป';
                                     }
                                 ?>
                                 <span class="badge-status <?php echo $status_class; ?>">
-                                    <?php echo $status; ?>
+                                    <?php echo $display_status; ?>
                                 </span>
                             </td>
                             <td style="text-align: center;">
-                                <?php if ($status == 'รอตรวจสอบ' && strtotime($row['booking_lock_expire']) > time()): ?>
+                                <?php if ($status == 'รอตรวจสอบ' && empty($row['payment_slip']) && strtotime($row['booking_lock_expire']) > time()): ?>
                                     <a href="payment.php?booking_id=<?php echo $row['booking_id']; ?>" class="btn-action-sm btn-pay-now">
                                         <i class="fas fa-credit-card"></i> ชำระเงิน
                                     </a>
-                                <?php elseif (!empty($row['booking_slip'])): ?>
-                                    <a href="uploads/slips/<?php echo $row['booking_slip']; ?>" target="_blank" class="btn-action-sm btn-view-slip">
+                                <?php elseif (!empty($row['payment_slip'])): ?>
+                                    <a href="uploads/slips/<?php echo $row['payment_slip']; ?>" target="_blank" class="btn-action-sm btn-view-slip">
                                         <i class="fas fa-receipt"></i> ดูสลิป
                                     </a>
                                 <?php else: ?>

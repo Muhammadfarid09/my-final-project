@@ -161,7 +161,7 @@ include 'includes/header.php';
         <div class="modal-content">
             <h4 class="modal-header text-danger"><i class="fas fa-tools"></i> บันทึกส่งซ่อมอุปกรณ์</h4>
             
-            <form action="actions/equipment_court_repair_add_db.php" method="POST">
+            <form action="actions/equipment_repair_add_db.php" method="POST">
                 <input type="hidden" name="product_id" id="modal_eq_id">
                 
                 <p><strong>อุปกรณ์ที่ส่งซ่อม:</strong> <span id="modal_eq_name" class="text-primary-bold"></span></p>
