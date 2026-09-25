@@ -1,0 +1,185 @@
+/* =========================================
+   T.S. Pattani - Global Shared Styles (v1.0)
+   ใช้ร่วมกันระหว่าง Frontend (หน้าบ้าน) และ Admin (หลังบ้าน)
+   ========================================= */
+
+/* =========================================
+   ยูทิลิตี้เสริม (Utility Classes)
+   ========================================= */
+.text-danger { color: #dc3545 !important; }
+.text-success { color: #28a745 !important; }
+.text-center { text-align: center !important; }
+
+/* =========================================
+   แจ้งเตือน (Alerts)
+   ========================================= */
+.alert {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.alert-success { 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb; 
+}
+.alert-error { 
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb; 
+}
+
+/* =========================================
+   ฟอร์ม (Forms & Inputs)
+   ========================================= */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #343a40;
+    font-weight: 600;
+    font-size: 14px;
+}
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: all 0.3s;
+}
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+/* สำหรับกล่องที่มีไอคอนด้านใน (Frontend Login/Register) */
+.input-group .form-control {
+    padding-left: 40px;
+}
+
+/* =========================================
+   ปุ่ม (Buttons) - ยุบรวมคลาสเดิมให้ใช้โค้ดเดียวกัน
+   ========================================= */
+.btn-submit,
+.btn-register,
+.btn-primary-custom,
+.btn-confirm-booking {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* โทนสีปุ่ม */
+.btn-primary-custom,
+.btn-register {
+    background: #007bff;
+    color: white;
+}
+.btn-primary-custom:hover,
+.btn-register:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+}
+
+.btn-submit,
+.btn-confirm-booking {
+    background-color: #28a745;
+    color: white;
+}
+.btn-submit:hover,
+.btn-confirm-booking:hover:not(:disabled) {
+    background-color: #218838;
+}
+.btn-confirm-booking:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+/* ปุ่มสีแดงทั่วไป */
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-danger:hover { background-color: #c82333; }
+
+/* ปุ่มสีเหลือง/ส้ม (แก้ไข) */
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-warning:hover { background-color: #e0a800; }
+
+/* =========================================
+   ป้ายสถานะ (Badges & Status)
+   ========================================= */
+.badge,
+.badge-status,
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Badge แบบมลกลมสำหรับ Frontend */
+.badge-status { border-radius: 20px; padding: 4px 10px; }
+.status-badge { border-radius: 20px; padding: 4px 10px; }
+
+/* สีของป้าย (รวมคลาสของ Admin และ Frontend เข้าด้วยกัน) */
+.badge-warning { background: #ffc107; color: #333; }
+.badge-success { background: #28a745; color: white; }
+.badge-danger  { background: #dc3545; color: white; }
+.badge-info    { background-color: #17a2b8; color: #fff; }
+
+.status-pending, .status-repairing { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.status-success, .status-repaired  { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.status-cancel, .status-broken     { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* =========================================
+   Placeholders (ช่องใส่รูปว่างเปล่า)
+   ========================================= */
+.img-placeholder-shared,
+.news-img-placeholder,
+.news-placeholder,
+.prod-img-placeholder {
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    border: 1px dashed #ddd;
+}

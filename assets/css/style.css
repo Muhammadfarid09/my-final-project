@@ -1,0 +1,534 @@
+/* =========================================
+   T.S. Pattani - Frontend Stylesheet (v1.0)
+   ========================================= */
+
+body {
+    font-family: 'Prompt', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f6f9;
+}
+
+/* =========================================
+   สไตล์เฉพาะหน้าสมัครสมาชิกและล็อกอิน
+   ========================================= */
+body.bg-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../images/bg-badminton.jpg'); /* เปลี่ยนเส้นทางรูปได้ตามต้องการ */
+    background-color: #f0f4f8; /* สีสำรองกรณีรูปไม่ขึ้น */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 30, 60, 0.4);
+    z-index: 1;
+}
+
+.register-container {
+    position: relative;
+    z-index: 2;
+    background: #ffffff;
+    width: 100%;
+    max-width: 500px;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    margin: 40px 20px;
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.register-header h2 {
+    color: #007bff;
+    margin: 0 0 10px 0;
+    font-size: 28px;
+}
+.register-header p {
+    color: #6c757d;
+    margin: 0;
+    font-size: 14px;
+}
+
+
+
+/* ลิงก์กลับหน้าล็อกอิน */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
+.login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 600;
+}
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* =========================================
+   Navbar Styles
+   ========================================= */
+.navbar {
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #007bff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 20px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #495057;
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.3s;
+}
+
+.nav-menu a:hover {
+    color: #007bff;
+}
+
+/* User Dropdown */
+.nav-user {
+    display: flex;
+    align-items: center;
+}
+
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropbtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Prompt', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #343a40;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+}
+
+.badge-level {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+}
+.level-bronze { background: #cd7f32; }
+.level-silver { background: #adb5bd; }
+.level-gold { background: #ffc107; color: #343a40; }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #ffffff;
+    min-width: 220px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.user-point-info {
+    padding: 15px;
+    background: #f8f9fa;
+    font-size: 14px;
+    color: #343a40;
+}
+
+.dropdown-content hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid #e9ecef;
+}
+
+.dropdown-content a {
+    color: #495057;
+    padding: 12px 15px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f3f5;
+}
+
+.text-danger { color: #dc3545 !important; }
+.btn-login-nav {
+    background: #007bff;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+.btn-login-nav:hover { background: #0056b3; }
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #343a40;
+    cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nav-menu {
+        display: none; /* ซ่อนในจอมือถือ */
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    }
+    .nav-menu.show {
+        display: flex;
+    }
+    .mobile-menu-btn {
+        display: block;
+    }
+    .nav-user {
+        display: none; /* ซ่อนในจอมือถือชั่วคราว */
+    }
+}
+/* =========================================
+   Home Page (index.php) Styles
+   ========================================= */
+
+/* Hero Section (แบนเนอร์ด้านบน) */
+.hero-section {
+    background: linear-gradient(rgba(0, 30, 60, 0.7), rgba(0, 30, 60, 0.7)), url('../images/bg-badminton.jpg') center/cover;
+    background-color: #001e3c; /* สีสำรองกรณีรูปภาพไม่โหลด */
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+}
+.hero-section h1 {
+    font-size: 42px;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.hero-section p {
+    font-size: 18px;
+    margin-bottom: 35px;
+    color: #e9ecef;
+}
+
+/* Section Title (หัวข้อแต่ละส่วน) */
+.section-title {
+    text-align: center;
+    margin: 60px 0 40px;
+    color: #343a40;
+    font-size: 28px;
+}
+
+/* News Section (ส่วนแสดงข่าวสาร) */
+.news-container {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+}
+.news-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.news-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+}
+.news-img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+.news-img-placeholder {
+    width: 100%;
+    height: 220px;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+}
+.news-content {
+    padding: 25px;
+}
+.news-date {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 12px;
+}
+.news-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: #212529;
+    line-height: 1.4;
+}
+.news-desc {
+    font-size: 15px;
+    color: #495057;
+    line-height: 1.6;
+    /* ตัดคำอัตโนมัติเมื่อเนื้อหายาวเกิน 3 บรรทัด */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .hero-section h1 { font-size: 32px; }
+    .hero-section p { font-size: 16px; }
+}
+/* =========================================
+   Booking Page Styles (จองสนาม)
+   ========================================= */
+.booking-wrapper {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.booking-header {
+    margin-bottom: 30px;
+}
+.booking-header h2 {
+    color: #007bff;
+    margin: 0 0 5px 0;
+}
+.booking-header p {
+    color: #666;
+    margin: 0;
+}
+.booking-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+.booking-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+.booking-card h3 {
+    margin-top: 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    color: #343a40;
+    font-size: 18px;
+}
+/* Court Selector (Radio Button แบบกล่อง) */
+.court-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+.court-option input {
+    display: none;
+}
+.court-box {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.court-box i { color: #adb5bd; margin-bottom: 10px; }
+.court-box h4 { margin: 0 0 5px 0; color: #495057; }
+.price-tag { font-size: 13px; color: #007bff; font-weight: bold; }
+.court-option input:checked + .court-box {
+    border-color: #007bff;
+    background: #f0f7ff;
+}
+.court-option input:checked + .court-box i { color: #007bff; }
+
+/* =========================================
+   อัปเดต Product List ในหน้าจอง (มีรูปภาพและแบ่งหมวดหมู่)
+   ========================================= */
+.product-category-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.product-list-booking {
+    max-height: 250px; 
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #eee;
+    gap: 12px;
+}
+.prod-img {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+.prod-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.prod-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #f4f6f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+}
+.prod-info {
+    flex-grow: 1;
+}
+.qty-input { 
+    width: 60px; 
+    text-align: center; 
+    padding: 6px; 
+}
+
+/* =========================================
+   Summary Box
+   ========================================= */
+.booking-summary {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    margin-top: 20px;
+}
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: #495057;
+}
+.total-row {
+    font-weight: bold;
+    font-size: 18px;
+    color: #212529;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .booking-grid { grid-template-columns: 1fr; }
+}
+/* =========================================
+   Booking History Page Styles
+   ========================================= */
+.history-wrapper {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 14px;
+}
+.history-table th {
+    padding: 12px;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    background: #f8f9fa;
+}
+.history-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+
+.btn-action-sm {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+    display: inline-block;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.btn-pay-now { background: #ffc107; color: #000; }
+.btn-pay-now:hover { background: #e0a800; }
+.btn-view-slip { background: #17a2b8; color: #fff; }
+.btn-view-slip:hover { background: #138496; }
