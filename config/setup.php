@@ -227,7 +227,7 @@ try {
             `rental_quantity` INT(11) NOT NULL,
             `rental_start_time` DATETIME NOT NULL,
             `rental_return_time` DATETIME DEFAULT NULL,
-            `rental_status` ENUM('รอตรวจสอบ', 'กำลังเช่า', 'คืนแล้ว', 'ชำรุด', 'สูญหาย') NOT NULL DEFAULT 'กำลังเช่า',
+            `rental_status` ENUM('รอตรวจสอบ', 'กำลังเช่า', 'คืนแล้ว', 'ชำรุด', 'สูญหาย', 'ยกเลิก') NOT NULL DEFAULT 'กำลังเช่า',
             `rental_fine` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
             `rental_fine_reason` VARCHAR(255) DEFAULT NULL,
             `rental_actual_return` DATETIME DEFAULT NULL,
@@ -335,7 +335,7 @@ try {
     if (!in_array('rental_actual_return', $cols_rental)) {
         $conn->exec("ALTER TABLE Rental ADD COLUMN rental_actual_return DATETIME NULL AFTER rental_fine_reason");
     }
-    $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย') NOT NULL DEFAULT 'กำลังเช่า'");
+    $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย','ยกเลิก') NOT NULL DEFAULT 'กำลังเช่า'");
     $conn->exec("ALTER TABLE Booking MODIFY COLUMN member_id INT(11) NULL");
     echo "<h3>20. อัปเดตโครงสร้างฟิลด์และระบบรองรับฟังก์ชันใหม่ล่าสุดสำเร็จ 100%!</h3>";
 

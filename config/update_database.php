@@ -144,7 +144,7 @@ require_once 'config.php';
         }
 
         // 2.4 ปรับค่า ENUM สถานะการเช่า
-        $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย') NOT NULL DEFAULT 'กำลังเช่า'");
+        $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย','ยกเลิก') NOT NULL DEFAULT 'กำลังเช่า'");
         echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Rental] ปรับปรุงสถานะ rental_status ให้รองรับ ชำรุด/สูญหาย สำเร็จ</div>";
 
         // 3. ตรวจสอบตาราง Cancellation

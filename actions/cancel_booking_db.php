@@ -68,8 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
         }
 
-        // อัปเดตสถานะในตาราง Rental
-        $sql_up_rent = "UPDATE Rental SET rental_status = 'คืนแล้ว' WHERE booking_id = :b_id";
+        // อัปเดตสถานะในตาราง Rental เป็น 'ยกเลิก'
+        $sql_up_rent = "UPDATE Rental SET rental_status = 'ยกเลิก' WHERE booking_id = :b_id";
         $conn->prepare($sql_up_rent)->execute([':b_id' => $booking_id]);
 
         // 3. อัปเดตสถานะการจองเป็น 'ยกเลิก'

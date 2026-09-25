@@ -71,11 +71,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($member_id) {
                     $earned_points = floor($court_price / 50);
                     if ($earned_points > 0) {
-                        $conn->prepare("UPDATE Point SET point_balance = point_balance + :pt, point_total_earned = point_total_earned + :pt WHERE member_id = :mid")
-                             ->execute([':pt' => $earned_points, ':mid' => $member_id]);
+                        // ตรวจสอบและอัปเดตหรือเพิ่มคะแนนสะสม
+                        $check_pt = $conn->prepare("SELECT point_id FROM Point WHERE member_id = :mid");
+                        $check_pt->execute([':mid' => $member_id]);
+                        if ($check_pt->fetch()) {
+                            $conn->prepare("UPDATE Point SET point_balance = point_balance + :pt, point_total_earned = point_total_earned + :pt WHERE member_id = :mid")
+                                 ->execute([':pt' => $earned_points, ':mid' => $member_id]);
+                        } else {
+                            $conn->prepare("INSERT INTO Point (member_id, point_balance, point_total_earned, member_level) VALUES (:mid, :pt, :pt, 'Bronze')")
+                                 ->execute([':mid' => $member_id, ':pt' => $earned_points]);
+                        }
                         
                         $conn->prepare("INSERT INTO Point_Transaction (member_id, booking_id, transaction_type, transaction_point, transaction_note, transaction_date) VALUES (:mid, :bid, 'ได้รับ', :pt, 'ได้รับคะแนนจากการเปิดสนาม Walk-in', NOW())")
                              ->execute([':mid' => $member_id, ':bid' => $last_booking_id, ':pt' => $earned_points]);
+
+                        // ตรวจสอบและอัปเกรดระดับสมาชิก (Tier Progression): Bronze -> Silver (500 pts) -> Gold (1000 pts)
+                        $stmt_pts = $conn->prepare("SELECT point_total_earned FROM Point WHERE member_id = :mid");
+                        $stmt_pts->execute([':mid' => $member_id]);
+                        $tot = $stmt_pts->fetchColumn() ?: 0;
+                        $new_lvl = ($tot >= 1000) ? 'Gold' : (($tot >= 500) ? 'Silver' : 'Bronze');
+                        $conn->prepare("UPDATE Point SET member_level = :lvl WHERE member_id = :mid")
+                             ->execute([':lvl' => $new_lvl, ':mid' => $member_id]);
                     }
                 }
             }

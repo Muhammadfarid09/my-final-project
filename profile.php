@@ -42,6 +42,18 @@ try {
     $stmt_stats->execute([':mid' => $member_id]);
     $stats = $stmt_stats->fetch(PDO::FETCH_ASSOC);
 
+    // 3. ดึงประวัติรายการพอยท์สะสม (Point Transaction) ล่าสุด 10 รายการ
+    $stmt_point_trans = $conn->prepare("
+        SELECT pt.*, b.booking_date, b.booking_start_time
+        FROM Point_Transaction pt
+        LEFT JOIN Booking b ON pt.booking_id = b.booking_id
+        WHERE pt.member_id = :mid
+        ORDER BY pt.transaction_date DESC, pt.transaction_id DESC
+        LIMIT 10
+    ");
+    $stmt_point_trans->execute([':mid' => $member_id]);
+    $point_transactions = $stmt_point_trans->fetchAll(PDO::FETCH_ASSOC);
+
 } catch(PDOException $e) {
     die("เกิดข้อผิดพลาดในการโหลดข้อมูล: " . $e->getMessage());
 }
@@ -438,7 +450,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
 
                     <div style="display: flex; gap: 10px;">
                         <a href="booking_history.php" class="btn-profile-submit" style="background: #f8fafc; color: #1e3c72; border: 1px solid #cbd5e1; text-decoration: none; font-size: 13px;">
-                            <i class="fas fa-history"></i> ดูประวัติการจอง
+                            <i class="fas fa-history"></i> ประวัติการจอง
                         </a>
                         <a href="rewards.php" class="btn-profile-submit" style="background: #f8fafc; color: #1e3c72; border: 1px solid #cbd5e1; text-decoration: none; font-size: 13px;">
                             <i class="fas fa-gift"></i> แลกของรางวัล
@@ -448,6 +460,62 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
 
             </div>
 
+        </div>
+
+        <!-- การ์ดประวัติคะแนนสะสม (Point Transaction History) -->
+        <div class="profile-card" style="margin-top: 30px;">
+            <div class="profile-card-title" style="justify-content: space-between;">
+                <div><i class="fas fa-coins" style="color: #f39c12;"></i> ประวัติคะแนนสะสม (Point History)</div>
+                <span style="font-size: 13px; font-weight: normal; color: #64748b;">10 รายการล่าสุด</span>
+            </div>
+
+            <?php if (empty($point_transactions)): ?>
+                <div style="text-align: center; padding: 30px; color: #94a3b8;">
+                    <i class="fas fa-receipt fa-2x" style="margin-bottom: 8px;"></i>
+                    <p style="margin: 0; font-size: 14px;">ยังไม่มีประวัติการทำรายการคะแนนสะสม</p>
+                </div>
+            <?php else: ?>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b; text-align: left;">
+                                <th style="padding: 10px 12px;">วัน-เวลา</th>
+                                <th style="padding: 10px 12px;">ประเภทรายการ</th>
+                                <th style="padding: 10px 12px;">รายละเอียด</th>
+                                <th style="padding: 10px 12px; text-align: right;">จำนวนคะแนน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($point_transactions as $pt): 
+                                $is_earned = ($pt['transaction_type'] === 'ได้รับ');
+                                $is_used = ($pt['transaction_type'] === 'ใช้');
+                                $pt_color = $is_earned ? '#28a745' : ($is_used ? '#dc3545' : '#17a2b8');
+                                $pt_prefix = $is_earned ? '+' : ($is_used ? '-' : '');
+                            ?>
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td style="padding: 12px; color: #475569; white-space: nowrap;">
+                                        <?php echo date('d/m/Y H:i', strtotime($pt['transaction_date'])); ?>
+                                    </td>
+                                    <td style="padding: 12px;">
+                                        <span style="display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: <?php echo $is_earned ? '#e8f5e9' : ($is_used ? '#ffebee' : '#e0f2fe'); ?>; color: <?php echo $pt_color; ?>;">
+                                            <?php echo htmlspecialchars($pt['transaction_type']); ?>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 12px; color: #334155;">
+                                        <?php echo htmlspecialchars($pt['transaction_note'] ?? '-'); ?>
+                                        <?php if (!empty($pt['booking_id'])): ?>
+                                            <span style="font-size: 12px; color: #64748b;">(การจอง #<?php echo $pt['booking_id']; ?>)</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td style="padding: 12px; text-align: right; font-weight: 700; color: <?php echo $pt_color; ?>; white-space: nowrap;">
+                                        <?php echo $pt_prefix . number_format($pt['transaction_point']); ?> พอยท์
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
 
     </div>
