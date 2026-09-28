@@ -53,6 +53,30 @@ try {
         .btn-cancel-booking:hover {
             background: #dc2626;
         }
+        /* สถานะตามหลัก HCI */
+        .status-completed {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+        .status-active {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            animation: pulseActive 2s infinite;
+        }
+        @keyframes pulseActive {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .badge-completed {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
         .modal-cancel-overlay {
             display: none;
             position: fixed;
@@ -124,7 +148,68 @@ try {
                         <?php foreach($bookings as $row): 
                             $status = $row['booking_status'];
                             $slip = $row['payment_slip'] ?? '';
-                            $can_cancel = ($status !== 'ยกเลิก');
+                            
+                            $booking_start_ts = strtotime($row['booking_date'] . ' ' . $row['booking_start_time']);
+                            $booking_end_ts = strtotime($row['booking_date'] . ' ' . $row['booking_end_time']);
+                            $is_lock_expired = (!empty($row['booking_lock_expire']) && strtotime($row['booking_lock_expire']) <= time());
+                            $now = time();
+
+                            // ตรวจสอบช่วงเวลาตามหลัก HCI (Nielsen's Error Prevention)
+                            $is_past = ($now >= $booking_end_ts); // ผ่านพ้นเวลาไปแล้ว (อดีต)
+                            $is_active_now = ($now >= $booking_start_ts && $now < $booking_end_ts); // กำลังใช้งานอยู่ในขณะนี้
+                            $is_future = ($now < $booking_start_ts); // ยังไม่ถึงเวลาใช้งาน (อนาคต)
+
+                            $status_class = 'status-pending';
+                            $display_status = $status;
+                            $can_cancel = false;
+                            $cancel_btn_text = 'ยกเลิกการจอง';
+
+                            if ($status === 'ยกเลิก') {
+                                $status_class = 'status-cancel';
+                                $display_status = 'ยกเลิกแล้ว';
+                                $can_cancel = false;
+                            } elseif ($status === 'จองแล้ว' || $status === 'ชำระเงินแล้ว' || $status === 'อนุมัติแล้ว') {
+                                if ($is_past) {
+                                    // จองแล้ว และเวลาผ่านไปแล้ว -> แสดง "ใช้บริการแล้ว" / "เสร็จสิ้น"
+                                    $status_class = 'status-completed';
+                                    $display_status = 'ใช้บริการแล้ว';
+                                    $can_cancel = false; // ปิดปุ่มยกเลิกตามหลัก Error Prevention
+                                } elseif ($is_active_now) {
+                                    // กำลังอยู่ในช่วงเวลาเตะ
+                                    $status_class = 'status-active';
+                                    $display_status = 'กำลังใช้งาน';
+                                    $can_cancel = false;
+                                } else {
+                                    // ยังไม่ถึงเวลาใช้งาน (อนาคต) -> สามารถกดยกเลิกได้
+                                    $status_class = 'status-success';
+                                    $display_status = 'จองแล้ว';
+                                    $can_cancel = true;
+                                    $cancel_btn_text = 'ขอยกเลิก';
+                                }
+                            } elseif ($status === 'รอตรวจสอบ') {
+                                if ($is_past) {
+                                    // รายการค้างที่ไม่ได้รับการอนุมัติจนเลยเวลา
+                                    $status_class = 'status-cancel';
+                                    $display_status = 'เลยเวลาจอง';
+                                    $can_cancel = false;
+                                } elseif (!empty($slip)) {
+                                    $status_class = 'status-pending';
+                                    $display_status = 'รอตรวจสอบสลิป';
+                                    $can_cancel = true;
+                                    $cancel_btn_text = 'ยกเลิกการจอง';
+                                } else {
+                                    if ($is_lock_expired) {
+                                        $status_class = 'status-cancel';
+                                        $display_status = 'หมดเวลาชำระเงิน';
+                                        $can_cancel = false;
+                                    } else {
+                                        $status_class = 'status-pending';
+                                        $display_status = 'รอแนบสลิป';
+                                        $can_cancel = true;
+                                        $cancel_btn_text = 'ยกเลิกการจอง';
+                                    }
+                                }
+                            }
                         ?>
                         <tr>
                             <td style="font-weight: bold;">#<?php echo $row['booking_id']; ?></td>
@@ -133,30 +218,18 @@ try {
                             <td><?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?></td>
                             <td style="color: #007bff; font-weight: bold;"><?php echo number_format($row['booking_total_price'], 2); ?> ฿</td>
                             <td>
-                                <?php 
-                                    $status_class = 'status-pending';
-                                    $display_status = $status;
-
-                                    if ($status == 'จองแล้ว' || $status == 'ชำระเงินแล้ว' || $status == 'อนุมัติแล้ว') {
-                                        $status_class = 'status-success';
-                                        $display_status = 'จองแล้ว';
-                                    } elseif ($status == 'ยกเลิก') {
-                                        $status_class = 'status-cancel';
-                                    } elseif ($status == 'รอตรวจสอบ') {
-                                        if (!empty($slip)) {
-                                            $display_status = 'รอตรวจสอบสลิป';
-                                        } else {
-                                            $display_status = 'รอแนบสลิป';
-                                        }
-                                    }
-                                ?>
                                 <span class="badge-status <?php echo $status_class; ?>">
+                                    <?php if ($status_class === 'status-completed'): ?>
+                                        <i class="fas fa-check-double"></i> 
+                                    <?php elseif ($status_class === 'status-active'): ?>
+                                        <i class="fas fa-running"></i> 
+                                    <?php endif; ?>
                                     <?php echo $display_status; ?>
                                 </span>
                             </td>
                             <td style="text-align: center; white-space: nowrap;">
                                 <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                                    <?php if ($status == 'รอตรวจสอบ' && empty($slip)): ?>
+                                    <?php if ($status === 'รอตรวจสอบ' && empty($slip) && !$is_lock_expired && !$is_past): ?>
                                         <a href="payment.php?booking_id=<?php echo $row['booking_id']; ?>" class="btn-action-sm btn-pay-now">
                                             <i class="fas fa-credit-card"></i> แนบสลิป
                                         </a>
@@ -175,10 +248,18 @@ try {
                                                     '<?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?>',
                                                     '<?php echo number_format($row['booking_total_price'], 2); ?>'
                                                 )">
-                                            <i class="fas fa-times-circle"></i> <?php echo ($status === 'จองแล้ว') ? 'ขอยกเลิก' : 'ยกเลิกการจอง'; ?>
+                                            <i class="fas fa-times-circle"></i> <?php echo $cancel_btn_text; ?>
                                         </button>
-                                    <?php else: ?>
+                                    <?php elseif ($status === 'ยกเลิก'): ?>
                                         <span style="color: #94a3b8; font-size: 13px;"><i class="fas fa-ban"></i> ยกเลิกแล้ว</span>
+                                    <?php elseif ($status_class === 'status-completed'): ?>
+                                        <span class="badge-completed"><i class="fas fa-check-circle text-primary"></i> เสร็จสิ้น</span>
+                                    <?php elseif ($status_class === 'status-active'): ?>
+                                        <span style="color: #059669; font-size: 12px; font-weight: 600;"><i class="fas fa-play-circle"></i> กำลังใช้งาน</span>
+                                    <?php elseif ($is_past || $is_lock_expired): ?>
+                                        <span style="color: #ef4444; font-size: 12px;"><i class="fas fa-clock"></i> หมดเวลา</span>
+                                    <?php else: ?>
+                                        <span style="color: #adb5bd; font-size: 13px;">-</span>
                                     <?php endif; ?>
                                 </div>
                             </td>
