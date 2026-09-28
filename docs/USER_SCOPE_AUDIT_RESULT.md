@@ -8,13 +8,13 @@
 
 ## 1. Executive Summary (สรุปภาพรวม)
 
-### สถิติผลการตรวจสอบสถานะ (User Scope)
+### สถิติผลการตรวจสอบสถานะ (User Scope) - ปรับปรุงล่าสุด 2026-09-28
 | สถานะ (Status) | จำนวนรายการ | คำอธิบาย |
 |---|:---:|---|
-| **Implemented** | **23** | พบการทำงานจริง โค้ดถูกต้อง และตรงตาม Requirement |
-| **Partial** | **11** | มีบางส่วน แต่ยังไม่ครบถ้วน หรือมีข้อบกพร่อง/บัคในโค้ด |
-| **Missing** | **6** | Requirement ระบุไว้ชัดเจนใน 1.3 แต่ไม่พบโค้ดทำงาน |
-| **Not Found** | **1** | ค้นหาหลักฐานไฟล์/ฟังก์ชันที่ระบุในเมนูแล้วไม่พบ (`profile.php`) |
+| **Implemented** | **40** | พัฒนาและทำงานได้จริง โค้ดถูกต้อง และตรงตาม Requirement ครบถ้วน |
+| **Partial** | **1** | มีโค้ดทำงานแล้ว ปรับแต่งเพิ่มเติมเล็กน้อย (ประวัติแลกของรางวัลฝั่งสมาชิก) |
+| **Missing** | **0** | ไม่มีฟังก์ชันที่ขาดหายไปตามข้อกำหนด 1.3 แล้ว |
+| **Not Found** | **0** | ทุกไฟล์และลิงก์มีอยู่จริงในระบบ 100% |
 | **N/A** | **3** | เป็นหน้าที่ของ Admin หรือระบบหลังบ้านโดยตรง |
 
 ### สรุปข้อค้นพบสำคัญ
@@ -379,21 +379,21 @@
 |---|---|---|---|:---:|
 | **สมัครสมาชิก** | `register.php` | `actions/register_db.php` | `Member`, `Point` | **Implemented** |
 | **เข้าสู่ระบบ** | `login.php` | `actions/login_db.php` | `Member` | **Implemented** |
-| **แก้ไขข้อมูลตนเอง** | `profile.php` *(ไม่มีไฟล์)* | *(ไม่มี)* | `Member` | **Not Found** |
+| **แก้ไขข้อมูลตนเอง** | `profile.php` | `actions/profile_edit_db.php` | `Member` | **Implemented** |
 | **กู้คืนรหัสผ่าน** | `forgot_password.php` | `actions/forgot_password_db.php` | `Member` | **Implemented** |
 | **ดูแต้มสะสมและระดับ**| `includes/navbar.php`, `rewards.php` | - | `Point` | **Implemented** |
 | **แลกของรางวัล** | `rewards.php` | `actions/redeem_reward_db.php` | `Reward`, `Point`, `Point_Transaction` | **Implemented** |
-| **ดูสถานะสนาม** | `booking.php` | `actions/booking_db.php` | `Court`, `Booking` | **Partial** |
+| **ดูสถานะสนาม** | `booking.php` | `actions/get_court_matrix.php` | `Court`, `Booking` | **Implemented** |
 | **จองสนาม One-stop** | `booking.php` | `actions/booking_db.php` | `Booking`, `Rental`, `Product` | **Implemented** |
 | **คำนวณยอดเงิน** | `booking.php`, `member.js` | `actions/booking_db.php` | `Court`, `Product` | **Implemented** |
 | **ป้องกันจองซ้อน** | `booking.php` | `actions/booking_db.php` | `Booking` | **Implemented** |
 | **Timeout 15 นาที** | `payment.php` | `admin/includes/auto_cancel.php` | `Booking`, `Product`, `Rental` | **Implemented** |
 | **ชำระเงิน / อัปโหลดสลิป**| `payment.php` | `actions/payment_db.php` | `Payment`, `Booking` | **Implemented** |
-| **ประวัติการจอง** | `booking_history.php` | - | `Booking`, `Court` | **Partial (บัคดูสลิป)** |
+| **ประวัติการจอง** | `booking_history.php` | - | `Booking`, `Court` | **Implemented** |
 | **แชทติดต่อแอดมิน** | `chat.php` | `actions/send_chat_db.php` | `Chat` | **Implemented** |
 | **ข่าวสาร/โปรโมชั่น** | `promotions.php`, `index.php` | - | `News` | **Implemented** |
-| **ยกเลิกการจอง** | *(ไม่มีปุ่ม)* | *(ไม่มีการ INSERT)* | `Cancellation` | **Missing** |
-| **รับคืนอุปกรณ์เช่า** | *(ไม่มีหน้าจอ)* | *(ไม่มี)* | `Rental`, `Product` | **Missing** |
+| **ยกเลิกการจอง** | `booking_history.php` | `actions/cancel_booking_db.php` | `Cancellation` | **Implemented** |
+| **รับคืนอุปกรณ์เช่า** | `admin/equipment_returns.php` | `admin/actions/equipment_return_db.php` | `Rental`, `Product` | **Implemented** |
 
 ---
 *เอกสารผลการตรวจสอบฉบับนี้จัดทำขึ้นโดยการตรวจสอบเชิงประจักษ์จาก Source Code จริง 100% ตามข้อกำหนดใน USER_SCOPE_AUDIT.md อย่างเคร่งครัด*

@@ -234,3 +234,62 @@
   - ฝั่งขวาใช้สไตล์ Glassmorphism (โปร่งแสงเบลอพื้นหลัง) สำหรับฟอร์มกรอกข้อมูล พร้อมปรับปุ่มให้ทันสมัย
   - ฝั่งซ้ายออกแบบให้มีเส้นโค้งเว้า (Curved Divider) เล่นสีพื้นหลังด้วย Dark Slate (`#0f172a`) ให้เข้ากับตีมแอดมิน 
   - สร้างและใช้งานภาพโลโก้สนามแบดมินตันแบบ Minimal Vector แทนไอคอนเก่าเพื่อความสวยงาม (`assets/img/ts-pattani-generated.jpg`)
+
+---
+
+### 16. แก้ไขบัควิกฤตและระบบโปรไฟล์สมาชิก (Phase 5: 2026-09-25)
+- **สร้างหน้าจัดการโปรไฟล์สมาชิก ([profile.php](file:///c:/xampp/htdocs/ts-pattani/profile.php) & [actions/profile_edit_db.php](file:///c:/xampp/htdocs/ts-pattani/actions/profile_edit_db.php)):**
+  - แก้ไขปัญหาลิงก์ 404 จาก Navbar Dropdown
+  - สมาชิกสามารถดูข้อมูลส่วนตัว แก้ไขชื่อ เบอร์โทร อายุ อาชีพ และเปลี่ยนรหัสผ่านได้ด้วยตนเอง
+  - แสดงตารางประวัติการรับ-ใช้คะแนนสะสม (`Point_Transaction`) แบบละเอียด
+- **แก้ไขปุ่มดูสลิปในประวัติการจอง ([booking_history.php](file:///c:/xampp/htdocs/ts-pattani/booking_history.php)):**
+  - แก้ไขการเรียกชื่อคอลัมน์จาก `booking_slip` เป็น `payment_slip` ทำให้ปุ่ม "ดูสลิป" แสดงผลและเปิดดูสลิปได้ถูกต้อง
+  - ปรับเงื่อนไขสีป้ายสถานะรองรับค่า ENUM `'จองแล้ว'` แสดงสีเขียวสมบูรณ์
+- **แก้ไข Action ซ่อมอุปกรณ์ ([admin/products.php](file:///c:/xampp/htdocs/ts-pattani/admin/products.php) & [admin/equipment_repairs.php](file:///c:/xampp/htdocs/ts-pattani/admin/equipment_repairs.php)):**
+  - ลบคำว่า `court_` ที่เกินในชื่อไฟล์ Action แก้ปัญหา 404 เมื่อกดส่งซ่อมและกดเสร็จสิ้นการซ่อม
+- **แก้ไข Path แสดงรูปข่าวสาร ([admin/news.php](file:///c:/xampp/htdocs/ts-pattani/admin/news.php)):**
+  - ปรับ Path รูปภาพให้ชี้ไปยัง `../uploads/news/` ให้รูปข่าวสารแสดงผลถูกต้องในตาราง
+
+---
+
+### 17. พัฒนาระบบรับคืนอุปกรณ์ ยกเลิกการจอง และเปิดสนาม Walk-in บน POS (Phase 6: 2026-09-26)
+- **ระบบตรวจรับคืนอุปกรณ์เช่า ([admin/equipment_returns.php](file:///c:/xampp/htdocs/ts-pattani/admin/equipment_returns.php) & [admin/actions/equipment_return_db.php](file:///c:/xampp/htdocs/ts-pattani/admin/actions/equipment_return_db.php)):**
+  - หน้าจอตรวจรับคืนอุปกรณ์พร้อมการคำนวณเวลาคืนช้า (Overdue) และแนะนำค่าปรับอัตโนมัติ
+  - รองรับการบันทึกสภาพ: ปกติ (คืนสต็อกเข้าคลัง), ชำรุด (ส่งเข้าคิวซ่อมบำรุง `Equipment_repair`), และสูญหาย (คิดค่าปรับและตัดจำหน่าย)
+  - บันทึกรายรับค่าปรับลงตาราง `Revenue` หมวดหมู่อุปกรณ์เช่า
+- **ระบบยกเลิกการจองฝั่งสมาชิก ([booking_history.php](file:///c:/xampp/htdocs/ts-pattani/booking_history.php) & [actions/cancel_booking_db.php](file:///c:/xampp/htdocs/ts-pattani/actions/cancel_booking_db.php)):**
+  - เพิ่มปุ่ม "ขอยกเลิก" พร้อม Modal ชี้แจงเงื่อนไขการคืนเงินตามช่วงเวลา (100%, 70%, 50%)
+  - คืนสต็อกอุปกรณ์เช่ากลับเข้าสู่ตาราง `Product` ทันที และบันทึกคำขอลงตาราง `Cancellation`
+  - แอดมินสามารถพิจารณาคืนเงินหรือพอยท์ผ่านหน้า [admin/cancellations.php](file:///c:/xampp/htdocs/ts-pattani/admin/cancellations.php)
+- **ระบบเปิดสนาม Walk-in และพิมพ์ใบเสร็จความร้อน 80mm ([admin/pos.php](file:///c:/xampp/htdocs/ts-pattani/admin/pos.php) & [admin/receipt.php](file:///c:/xampp/htdocs/ts-pattani/admin/receipt.php)):**
+  - เพิ่มแท็บเปิดสนาม Walk-in หน้าร้าน เลือกระยะเวลาและคำนวณราคาลงบิล POS ร่วมกับสินค้า/อุปกรณ์เช่าได้ในบิลเดียว
+  - บันทึกการจองสถานะ 'จองแล้ว' ทันที พร้อมตัดสต็อกและบันทึกรายรับลง `Revenue`
+  - รองรับการแจกพอยท์สะสมกรณีลูกค้า Walk-in เป็นสมาชิก
+  - พิมพ์ใบเสร็จขนาด 80mm รวมทั้งรายการสนาม สินค้า และอุปกรณ์เช่า
+
+---
+
+### 18. ตาราง Time-Slot Matrix, คิดราคาตามวันในสัปดาห์ และวิเคราะห์กลุ่มอายุ (Phase 7: 2026-09-26)
+- **ตารางความพร้อมของสนาม Time-Slot Matrix ([booking.php](file:///c:/xampp/htdocs/ts-pattani/booking.php) & [actions/get_court_matrix.php](file:///c:/xampp/htdocs/ts-pattani/actions/get_court_matrix.php)):**
+  - พัฒนาตารางแสดงสถานะความพร้อมของสนามแบบ Time-Slot Matrix เรียลไทม์ (09:00 - 22:00 น.)
+  - แสดงสถานะ 4 รูปแบบ: ว่าง, รอตรวจสอบ, จองแล้ว, นอกเวลาทำการ
+  - สามารถคลิกที่ช่องเวลาเพื่อเลือกลงฟอร์มจองได้ทันที
+- **ระบบคำนวณราคาตามวันในสัปดาห์ (Day-of-Week Dynamic Pricing):**
+  - **เสาร์ - อาทิตย์:** 200 บาท/ชม. (ใช้อัตรา `court_peak_price`)
+  - **จันทร์, พุธ, ศุกร์:** 180 บาท/ชม. (ใช้อัตรา `court_price_per_hour` ปกติ)
+  - **อังคาร, พฤหัสบดี:** 150 บาท/ชม. (ใช้อัตรา `court_offpeak_price` โปรโมชั่นลดพิเศษ)
+  - ประมวลผลและตรวจสอบซ้ำฝั่งเซิร์ฟเวอร์ ([actions/booking_db.php](file:///c:/xampp/htdocs/ts-pattani/actions/booking_db.php)) ป้องกันการแก้ไขราคา
+  - เชื่อมโยงระบบคำนวณราคาไปยังหน้าเปิดสนาม Walk-in บน POS ([admin/pos.php](file:///c:/xampp/htdocs/ts-pattani/admin/pos.php))
+- **กราฟวิเคราะห์ช่วงอายุและรายได้ย้อนหลัง 12 เดือน ([admin/index.php](file:///c:/xampp/htdocs/ts-pattani/admin/index.php)):**
+  - เพิ่มกราฟวิเคราะห์กลุ่มอายุลูกค้า (Demographic Age Groups: ต่ำกว่า 18 ปี, 18-25, 26-35, 36-50, มากกว่า 50 ปี)
+  - เพิ่มกราฟแท่งแบบ Stacked Bar แสดงสัดส่วนรายได้ย้อนหลัง 12 เดือนแยก 3 หมวดหมู่ (สนาม/เช่า/สินค้า)
+  - เพิ่มสถิติช่วงเวลาที่มีการจองหนาแน่นที่สุด 5 อันดับแรก (Peak Usage Hours)
+- **ระบบแชทเรียลไทม์ฝั่งสมาชิก ([actions/get_chat_messages.php](file:///c:/xampp/htdocs/ts-pattani/actions/get_chat_messages.php) & [chat.php](file:///c:/xampp/htdocs/ts-pattani/chat.php)):**
+  - เพิ่ม AJAX Polling ดึงข้อความตอบกลับจากแอดมินทุกๆ 3 วินาที พร้อมระบบเลื่อน Scroll อัตโนมัติ
+
+---
+
+### 19. ปรับปรุงมาตรฐานเอกสารโครงงานและการเชื่อมโยง GitHub (Phase 8: 2026-09-28)
+- จัดทำเอกสารแนะนำโครงการฉบับสมบูรณ์ใน [README.md](file:///c:/xampp/htdocs/ts-pattani/README.md) รองรับการแสดงผลบนหน้าแรกของ GitHub Repository
+- ซิงโครไนซ์สถานะผลการตรวจสอบขอบเขตระบบใน [docs/USER_SCOPE_AUDIT_RESULT.md](file:///c:/xampp/htdocs/ts-pattani/docs/USER_SCOPE_AUDIT_RESULT.md) ให้ตรงตามฟังก์ชันที่พัฒนาแล้วจริง 100%
+
