@@ -126,7 +126,11 @@ try {
                             $slip = $row['payment_slip'] ?? '';
                             $booking_start_ts = strtotime($row['booking_date'] . ' ' . $row['booking_start_time']);
                             $is_lock_expired = (!empty($row['booking_lock_expire']) && strtotime($row['booking_lock_expire']) <= time());
-                            $can_cancel = ($status !== 'ยกเลิก' && $booking_start_ts > time());
+                            
+                            // ตามข้อกำหนด 1.3.11: สมาชิกสามารถกดยกเลิกการจองได้เองเฉพาะช่วงสถานะ "รอตรวจสอบ" ที่ยังไม่หมดเวลา
+                            $can_member_cancel = ($status === 'รอตรวจสอบ' && !$is_lock_expired && $booking_start_ts > time());
+                            // ตามข้อกำหนด 1.3.11: หากสถานะเปลี่ยนเป็น "จองแล้ว" จะไม่สามารถยกเลิกผ่านระบบได้ (ต้องติดต่อ Admin)
+                            $need_contact_admin = ($status === 'จองแล้ว' && $booking_start_ts > time());
                         ?>
                         <tr>
                             <td style="font-weight: bold;">#<?php echo $row['booking_id']; ?></td>
@@ -170,7 +174,7 @@ try {
                                     </a>
                                 <?php endif; ?>
 
-                                <?php if ($can_cancel): ?>
+                                <?php if ($can_member_cancel): ?>
                                     <button type="button" class="btn-cancel-booking" 
                                             onclick="openCancelModal(
                                                 <?php echo $row['booking_id']; ?>,
@@ -179,11 +183,17 @@ try {
                                                 '<?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?>',
                                                 '<?php echo number_format($row['booking_total_price'], 2); ?>'
                                             )">
-                                        <i class="fas fa-times"></i> ขอยกเลิก
+                                        <i class="fas fa-times"></i> ยกเลิกการจอง
                                     </button>
+                                <?php elseif ($need_contact_admin): ?>
+                                    <a href="chat.php" class="btn-action-sm" style="background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; text-decoration: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;" title="สถานะจองแล้ว หากต้องการยกเลิกกรุณาติดต่อเจ้าหน้าที่ (ตามเงื่อนไขข้อ 1.3.11)">
+                                        <i class="fas fa-comments text-primary"></i> ติดต่อแอดมินเพื่อยกเลิก
+                                    </a>
                                 <?php elseif ($status === 'ยกเลิก'): ?>
                                     <span style="color: #94a3b8; font-size: 12px;"><i class="fas fa-ban"></i> ยกเลิกแล้ว</span>
-                                <?php elseif (empty($slip)): ?>
+                                <?php elseif ($is_lock_expired && empty($slip)): ?>
+                                    <span style="color: #ef4444; font-size: 12px;"><i class="fas fa-clock"></i> หมดเวลา</span>
+                                <?php else: ?>
                                     <span style="color: #adb5bd; font-size: 12px;">-</span>
                                 <?php endif; ?>
                             </td>

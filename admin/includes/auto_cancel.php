@@ -37,6 +37,19 @@ try {
             // 3. อัปเดตสถานะ Rental เป็นยกเลิก
             $stmt_cancel_rent = $conn->prepare("UPDATE Rental SET rental_status = 'ยกเลิก' WHERE booking_id = :id");
             $stmt_cancel_rent->execute([':id' => $b_id]);
+
+            // 4. บันทึกประวัติลงตาราง Cancellation เพื่อความโปร่งใสตามข้อกำหนด 1.3.11
+            $check_existing = $conn->prepare("SELECT cancel_id FROM Cancellation WHERE booking_id = :id");
+            $check_existing->execute([':id' => $b_id]);
+            if (!$check_existing->fetch()) {
+                $stmt_log_cancel = $conn->prepare("
+                    INSERT INTO Cancellation 
+                    (booking_id, admin_id, cancel_reason, cancel_by, refund_status, refund_point, cancel_date)
+                    VALUES 
+                    (:id, NULL, 'ระบบยกเลิกอัตโนมัติเนื่องจากหมดเวลาชำระเงิน (15 นาที)', 'Admin', 'ไม่คืน', 0, NOW())
+                ");
+                $stmt_log_cancel->execute([':id' => $b_id]);
+            }
         }
 
         $conn->commit();

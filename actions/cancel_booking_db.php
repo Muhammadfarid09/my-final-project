@@ -45,6 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("รายการจองนี้ถูกยกเลิกไปแล้ว");
         }
 
+        // ตามข้อกำหนด 1.3.11: หากสถานะเป็น "จองแล้ว" สมาชิกยกเลิกผ่านระบบเองไม่ได้ ต้องติดต่อ Admin
+        if ($booking['booking_status'] === 'จองแล้ว') {
+            throw new Exception("รายการจองที่ได้รับการอนุมัติแล้ว (สถานะ 'จองแล้ว') ไม่สามารถยกเลิกผ่านระบบได้ กรุณาติดต่อแอดมินผ่านเมนูแชทเพื่อดำเนินการ");
+        }
+
         // ตรวจสอบว่ายังไม่ถึงเวลาเริ่มใช้งานสนาม
         $booking_time = strtotime($booking['booking_date'] . ' ' . $booking['booking_start_time']);
         if ($booking_time <= time()) {
@@ -77,20 +82,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->prepare($sql_booking)->execute([':b_id' => $booking_id]);
 
         // 4. บันทึกประวัติคำขอยกเลิกลงตาราง Cancellation
+        // หากยังไม่ได้แนบสลิป (ยังไม่ได้โอนเงิน) สถานะคือ 'ไม่คืน' ทันที
+        $has_slip = !empty($booking['payment_slip']);
+        $refund_status = $has_slip ? 'รอดำเนินการ' : 'ไม่คืน';
+
         $sql_cancel = "
             INSERT INTO Cancellation 
             (booking_id, admin_id, cancel_reason, cancel_by, refund_status, refund_point, cancel_date)
             VALUES 
-            (:b_id, NULL, :reason, 'สมาชิก', 'รอดำเนินการ', 0, NOW())
+            (:b_id, NULL, :reason, 'สมาชิก', :ref_status, 0, NOW())
         ";
         $stmt_cancel = $conn->prepare($sql_cancel);
         $stmt_cancel->execute([
             ':b_id' => $booking_id,
-            ':reason' => $cancel_reason
+            ':reason' => $cancel_reason,
+            ':ref_status' => $refund_status
         ]);
 
         $conn->commit();
-        $_SESSION['success'] = "ขอยกเลิกการจองเรียบร้อยแล้ว แอดมินจะตรวจสอบและพิจารณาคืนเงิน/พอยท์ตามเงื่อนไข";
+        if ($has_slip) {
+            $_SESSION['success'] = "ขอยกเลิกการจองเรียบร้อยแล้ว แอดมินจะตรวจสอบสลิปและพิจารณาคืนเงิน/พอยท์ตามเงื่อนไข";
+        } else {
+            $_SESSION['success'] = "ยกเลิกรายการจองเรียบร้อยแล้ว ปลดล็อกสนามและคืนอุปกรณ์เรียบร้อย";
+        }
 
     } catch (Exception $e) {
         $conn->rollBack();
