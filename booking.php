@@ -30,7 +30,7 @@ try {
     <title>จองสนาม - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.6">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -188,6 +188,53 @@ try {
         <?php endif; ?>
 
         <!-- ============================================== -->
+        <!-- แถบแสดงขั้นตอน 4 ขั้นตอน (HCI Rule 2 & Section 10) -->
+        <!-- ============================================== -->
+        <div class="booking-stepper-wrapper">
+            <div class="booking-stepper">
+                <div class="stepper-line">
+                    <div class="stepper-line-fill"></div>
+                </div>
+
+                <!-- Phase 1 -->
+                <div class="stepper-step active">
+                    <div class="stepper-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stepper-title">1. วัน เวลา & สนาม</div>
+                    <div class="stepper-subtitle">เลือกวันและช่วงเวลา</div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="stepper-step active">
+                    <div class="stepper-icon">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <div class="stepper-title">2. บริการเสริม</div>
+                    <div class="stepper-subtitle">เครื่องดื่ม & อุปกรณ์</div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="stepper-step active">
+                    <div class="stepper-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="stepper-title">3. สรุปยอดเงิน</div>
+                    <div class="stepper-subtitle">ตรวจสอบและยืนยัน</div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="stepper-step upcoming">
+                    <div class="stepper-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div class="stepper-title">4. ชำระเงิน</div>
+                    <div class="stepper-subtitle">สแกน QR ใน 15 นาที</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
         <!-- ส่วนตารางความพร้อมของสนาม (Time-Slot Matrix) -->
         <!-- ============================================== -->
         <div class="booking-card" style="margin-bottom: 25px;">
@@ -228,13 +275,13 @@ try {
         </div>
 
         <!-- ฟอร์มส่งไปที่ actions/booking_db.php -->
-        <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return validateBooking()">
+        <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return validateBooking(event)">
             <div class="booking-grid">
                 
-                <!-- ฝั่งซ้าย: ข้อมูลการจองสนาม -->
+                <!-- ฝั่งซ้าย: ข้อมูลการจองสนาม (Phase 1) -->
                 <div class="booking-left">
                     <div class="booking-card">
-                        <h3>1. ระบุวันและเวลา (ขั้นต่ำ 1 ชม.)</h3>
+                        <h3><i class="fas fa-calendar-day" style="color: #007bff;"></i> ขั้นตอนที่ 1.1: ระบุวันและเวลา (ขั้นต่ำ 1 ชม.)</h3>
                         <div class="form-group">
                             <label>วันที่จอง</label>
                             <input type="date" name="booking_date" id="booking_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" onchange="if(document.getElementById('matrix_date_picker')) document.getElementById('matrix_date_picker').value = this.value; loadCourtMatrix(this.value); calculateSummary();">
@@ -263,7 +310,7 @@ try {
                     </div>
 
                     <div class="booking-card" style="margin-top: 20px;">
-                        <h3>2. เลือกสนาม</h3>
+                        <h3><i class="fas fa-map-marker-alt" style="color: #007bff;"></i> ขั้นตอนที่ 1.2: เลือกสนามแบดมินตัน</h3>
                         <div class="court-selector">
                             <?php foreach($courts as $court): ?>
                             <label class="court-option">
@@ -291,7 +338,7 @@ try {
                 <div class="booking-right">
                     
                     <div class="booking-card">
-                        <h3><i class="fas fa-shopping-basket"></i> 3. บริการเสริม</h3>
+                        <h3><i class="fas fa-shopping-basket" style="color: #007bff;"></i> ขั้นตอนที่ 2: บริการเสริมและอุปกรณ์เช่า (ทางเลือกเสริม)</h3>
                         
                         <!-- ============================================== -->
                         <!-- หมวดหมู่: สินค้าบริโภค -->
@@ -396,9 +443,9 @@ try {
                         </div>
                     </div>
 
-                    <!-- สรุปยอดรวมก่อนยืนยัน -->
+                    <!-- สรุปยอดรวมก่อนยืนยัน (Phase 3) -->
                     <div class="booking-summary">
-                        <h3>สรุปรายการจอง</h3>
+                        <h3><i class="fas fa-file-invoice-dollar" style="color: #007bff;"></i> ขั้นตอนที่ 3: สรุปรายการจองและยืนยัน</h3>
                         <div class="summary-row">
                             <span>ระยะเวลาจอง:</span>
                             <span id="sum-hours">0 ชั่วโมง</span>
@@ -428,7 +475,7 @@ try {
                         <input type="hidden" name="total_price" id="input_total_price" value="0">
 
                         <button type="submit" class="btn-confirm-booking" id="btnSubmitBooking" disabled>
-                            ดำเนินการจองและชำระเงิน <i class="fas fa-arrow-right"></i>
+                            ตรวจสอบและยืนยันการจอง <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -436,13 +483,71 @@ try {
             </div>
         </form>
     </div>
+    
+    <!-- Modal ยืนยันข้อมูลการจองสนาม (HCI Rule 2, 3, 5 & Section 15) -->
+    <div id="bookingConfirmModal" class="member-modal-overlay">
+        <div class="member-modal-content">
+            <div class="member-modal-header">
+                <i class="fas fa-calendar-check fa-lg" style="color: #007bff;"></i>
+                <h4>ยืนยันข้อมูลการจองสนาม</h4>
+            </div>
+
+            <div class="booking-summary-detail">
+                <div class="detail-row">
+                    <span>สนามที่เลือก:</span>
+                    <strong id="modal_court_name">-</strong>
+                </div>
+                <div class="detail-row">
+                    <span>วันที่จอง:</span>
+                    <strong id="modal_booking_date">-</strong>
+                </div>
+                <div class="detail-row">
+                    <span>ช่วงเวลา:</span>
+                    <strong id="modal_booking_time">-</strong>
+                </div>
+                <div class="detail-row" style="border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 8px;">
+                    <span style="font-weight: 600; color: #1e293b;">ยอดชำระสุทธิ:</span>
+                    <strong id="modal_total_price" style="font-size: 18px; color: #007bff;">0 ฿</strong>
+                </div>
+            </div>
+
+            <div class="modal-timer-warning">
+                <i class="fas fa-clock fa-lg"></i>
+                <div>
+                    <strong>กรุณาชำระเงินภายใน 15 นาที:</strong><br>
+                    เมื่อกดยืนยัน ระบบจะล็อกสนามไว้ให้ท่าน และนำทางไปหน้าชำระเงินเพื่อแนบสลิป
+                </div>
+            </div>
+
+            <div class="member-modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeBookingConfirmModal()">
+                    กลับไปแก้ไข
+                </button>
+                <button type="button" class="btn-submit-confirm" id="btnModalConfirmBooking" onclick="executeBookingSubmit()">
+                    ยืนยันการจอง <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้าที่รวมโค้ดทั้งหมดไว้แล้ว -->
-    <script src="assets/js/member.js?v=1.7"></script>
+    <script src="assets/js/member.js?v=1.8"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let today = new Date().toISOString().split('T')[0];
             loadCourtMatrix(today);
+
+            // ปิด Modal เมื่อคลิกนอกหน้าต่าง
+            let bModal = document.getElementById('bookingConfirmModal');
+            if (bModal) {
+                bModal.addEventListener('click', function(e) {
+                    if (e.target === bModal) closeBookingConfirmModal();
+                });
+            }
+            // ปิดเมื่อกดปุ่ม ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeBookingConfirmModal();
+            });
         });
     </script>
 </body>

@@ -173,17 +173,90 @@ function calculateSummary() {
     }
 }
 
-// ตรวจสอบก่อนกด Submit ทำรายการจอง
-function validateBooking() {
+// ตรวจสอบก่อนกด Submit ทำรายการจอง (HCI Rule 2, 3, 5)
+function validateBooking(event) {
+    if (event) event.preventDefault();
+
     let totalInput = document.getElementById('input_total_price');
     if (!totalInput) return false;
 
     let total = parseFloat(totalInput.value);
-    if(total <= 0) {
+    if (total <= 0) {
         alert("กรุณาเลือกสนามและเวลาที่ต้องการจอง");
         return false;
     }
-    return confirm("ยอดชำระสุทธิ " + total.toLocaleString() + " บาท\nยืนยันการทำรายการจองใช่หรือไม่?");
+
+    // ดึงข้อมูลสนามที่เลือก
+    let selectedCourt = document.querySelector('input[name="court_id"]:checked');
+    let courtName = "-";
+    if (selectedCourt) {
+        let box = selectedCourt.closest('.court-option');
+        if (box && box.querySelector('h4')) {
+            courtName = box.querySelector('h4').innerText.trim();
+        }
+    }
+
+    // ดึงวันและเวลา
+    let dateVal = document.getElementById('booking_date').value;
+    let startTime = document.getElementById('start_time').value;
+    let endTime = document.getElementById('end_time').value;
+    let hoursText = document.getElementById('sum-hours') ? document.getElementById('sum-hours').innerText : '';
+    let totalText = document.getElementById('sum-total') ? document.getElementById('sum-total').innerText : '';
+
+    // เติมค่าลงใน Modal
+    let modalCourt = document.getElementById('modal_court_name');
+    let modalDate = document.getElementById('modal_booking_date');
+    let modalTime = document.getElementById('modal_booking_time');
+    let modalPrice = document.getElementById('modal_total_price');
+
+    if (modalCourt) modalCourt.innerText = courtName;
+    if (modalDate) {
+        let dParts = dateVal.split('-');
+        modalDate.innerText = dParts.length === 3 ? `${dParts[2]}/${dParts[1]}/${dParts[0]}` : dateVal;
+    }
+    if (modalTime) modalTime.innerText = `${startTime} - ${endTime} (${hoursText})`;
+    if (modalPrice) modalPrice.innerText = totalText;
+
+    // แสดง Modal
+    let modal = document.getElementById('bookingConfirmModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    } else {
+        executeBookingSubmit();
+    }
+
+    return false;
+}
+
+function closeBookingConfirmModal() {
+    let modal = document.getElementById('bookingConfirmModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function executeBookingSubmit() {
+    let btnModalConfirm = document.getElementById('btnModalConfirmBooking');
+    let btnMainSubmit = document.getElementById('btnSubmitBooking');
+    let bookingForm = document.getElementById('bookingForm');
+
+    if (btnModalConfirm) {
+        btnModalConfirm.disabled = true;
+        btnModalConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจอง...';
+        btnModalConfirm.style.opacity = '0.75';
+        btnModalConfirm.style.cursor = 'not-allowed';
+    }
+
+    if (btnMainSubmit) {
+        btnMainSubmit.disabled = true;
+        btnMainSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจอง...';
+        btnMainSubmit.style.opacity = '0.75';
+        btnMainSubmit.style.cursor = 'not-allowed';
+    }
+
+    if (bookingForm) {
+        bookingForm.submit();
+    }
 }
 
 /* =========================================

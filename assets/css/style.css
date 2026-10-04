@@ -607,4 +607,211 @@ body.bg-register {
     margin-left: 5px;
     display: none;
     font-weight: 600;
-}
+}
+
+/* =========================================
+   Booking Page - 4-Phase Stepper (HCI Rule 2 & Section 10)
+   ========================================= */
+.booking-stepper-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #e2e8f0;
+}
+.booking-stepper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    max-width: 850px;
+    margin: 0 auto;
+}
+.stepper-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+.stepper-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    border: 2px solid #cbd5e1;
+    transition: all 0.3s ease;
+}
+.stepper-step.active .stepper-icon {
+    background: #007bff;
+    color: #ffffff;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+}
+.stepper-step.completed .stepper-icon {
+    background: #28a745;
+    color: #ffffff;
+    border-color: #1e7e34;
+}
+.stepper-step.upcoming .stepper-icon {
+    background: #f8fafc;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+}
+.stepper-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 2px;
+}
+.stepper-step.active .stepper-title {
+    color: #007bff;
+}
+.stepper-subtitle {
+    font-size: 11px;
+    color: #64748b;
+}
+.stepper-line {
+    position: absolute;
+    top: 22px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+}
+.stepper-line-fill {
+    height: 100%;
+    background: #007bff;
+    width: 66%; /* Phases 1-3 active on booking page */
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 640px) {
+    .stepper-subtitle { display: none; }
+    .stepper-title { font-size: 11px; }
+    .stepper-icon { width: 36px; height: 36px; font-size: 13px; }
+    .stepper-line { top: 18px; }
+}
+
+/* =========================================
+   Member Booking Confirmation Modal
+   ========================================= */
+.member-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+.member-modal-content {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 480px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: modalScaleIn 0.2s ease-out;
+}
+@keyframes modalScaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.member-modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.member-modal-header h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e3c72;
+}
+.booking-summary-detail {
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+.booking-summary-detail .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #475569;
+}
+.booking-summary-detail .detail-row:last-child {
+    margin-bottom: 0;
+}
+.booking-summary-detail .detail-row strong {
+    color: #0f172a;
+}
+.modal-timer-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.member-modal-footer {
+    display: flex;
+    gap: 12px;
+}
+.member-modal-footer .btn-cancel {
+    flex: 1;
+    padding: 10px 16px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.member-modal-footer .btn-cancel:hover {
+    background: #e2e8f0;
+}
+.member-modal-footer .btn-submit-confirm {
+    flex: 1.5;
+    padding: 10px 16px;
+    background: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.member-modal-footer .btn-submit-confirm:hover {
+    background: #0056b3;
+}
+
