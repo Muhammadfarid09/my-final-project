@@ -32,3 +32,10 @@
 * สาเหตุของปัญหาเดิมหรือ Bug ที่ตรวจพบ (Root Cause)
 * วิธีการที่ใช้แก้ปัญหา (Solution / Workaround)
 * ข้อจำกัด หรือข้อควรระวัง (Edge Cases & Notes)
+
+---
+
+### 🎨 มาตรฐานการออกแบบ UI/UX ตามหลัก HCI (HCI & UI/UX Guidelines)
+* ทุกการแก้ไขและออกแบบ UI/UX ทั้งฝั่ง Member และ Admin ต้องยึดถือกฎใน [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) อย่างเคร่งครัด
+* ก่อนแก้ไข UI/UX ต้องปฏิบัติตามลำดับ 6 ขั้นตอนเสมอ: Understand → Analyze → Propose → Confirm → Modify → Verify
+
