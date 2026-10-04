@@ -17,11 +17,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_date = $_POST['booking_date'];
     $start_time = $_POST['start_time'];
     $end_time = $_POST['end_time'];
+
+    // รับค่าชื่อเล่น/ชื่อก๊วนผู้จอง (booking_nickname ไม่เกิน 30 ตัวอักษร)
+    $booking_nickname = trim($_POST['booking_nickname'] ?? '');
+    if (empty($booking_nickname)) {
+        $booking_nickname = $_SESSION['member_name'] ?? 'ผู้ใช้งาน';
+    }
+    $booking_nickname = mb_substr($booking_nickname, 0, 30, 'UTF-8');
     
-    $total_court_price = floatval($_POST['total_court_price']);
-    $total_rental_price = floatval($_POST['total_rental_price']);
-    $total_product_price = floatval($_POST['total_product_price']);
-    $total_price = floatval($_POST['total_price']);
+    $total_court_price = floatval($_POST['total_court_price'] ?? 0);
+    $total_rental_price = floatval($_POST['total_rental_price'] ?? 0);
+    $total_product_price = floatval($_POST['total_product_price'] ?? 0);
+    $total_price = floatval($_POST['total_price'] ?? 0);
     
     // รับค่า Array ของสินค้า (รหัสสินค้า => จำนวน)
     $products = isset($_POST['products']) ? $_POST['products'] : [];
@@ -38,6 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($start_time_ts >= $end_time_ts) {
             throw new Exception("เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด");
         }
+
+        $start_time = date('H:i:s', $start_time_ts);
+        $end_time = date('H:i:s', $end_time_ts);
 
         // ========================================================
         // 2.5 Server-side Price Recalculation (ป้องกันการปลอมแปลงราคา)
@@ -135,11 +145,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 4.1 บันทึกการจองลงตาราง BOOKING (ตั้งสถานะเป็น "รอตรวจสอบ")
         $sql_booking = "INSERT INTO BOOKING (
-                            member_id, court_id, booking_date, booking_start_time, booking_end_time, 
+                            member_id, booking_nickname, court_id, booking_date, booking_start_time, booking_end_time, 
                             booking_status, booking_court_price, booking_rental_price, booking_product_price, 
                             booking_total_price, booking_created_at, booking_lock_expire
                         ) VALUES (
-                            :member_id, :court_id, :booking_date, :start_time, :end_time, 
+                            :member_id, :booking_nickname, :court_id, :booking_date, :start_time, :end_time, 
                             'รอตรวจสอบ', :court_price, :rental_price, :product_price, 
                             :total_price, :created_at, :lock_expire
                         )";
@@ -147,6 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt_booking = $conn->prepare($sql_booking);
         $stmt_booking->execute([
             ':member_id' => $member_id,
+            ':booking_nickname' => $booking_nickname,
             ':court_id' => $court_id,
             ':booking_date' => $booking_date,
             ':start_time' => $start_time,

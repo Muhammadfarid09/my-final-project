@@ -60,83 +60,641 @@ window.onclick = function(event) {
     }
 }
 
-/* =========================================
-   Booking Page Controls (หน้าจองสนาม)
-   ========================================= */
+/* ==========================================================================
+   T.S. Pattani - 5-Step Booking Wizard Controller (HCI & Progressive Disclosure)
+   Zero Inline Style Standard - Complete State & Interaction Management
+   ========================================================================== */
 
-// ฟังก์ชันคำนวณยอดเงินและตรวจสอบเงื่อนไขตามวันในสัปดาห์ (booking.php)
-// 1. เสาร์ - อาทิตย์ = 200 ฿ (Peak / Weekend Rate)
-// 2. จันทร์, พุธ, ศุกร์ = 180 ฿ (Standard Rate)
-// 3. อังคาร, พฤหัสบดี = 150 ฿ (Promo / Discount Rate)
-function calculateSummary() {
-    let startTimeElement = document.getElementById('start_time');
-    let endTimeElement = document.getElementById('end_time');
-    
-    // ถ้าไม่ได้อยู่หน้าจองสนาม ให้ข้ามฟังก์ชันนี้ไปเลย
-    if (!startTimeElement || !endTimeElement) return;
+const wizardState = {
+    currentStep: 1,
+    selectedDate: new Date().toISOString().split('T')[0],
+    currentCalMonth: new Date().getMonth(),
+    currentCalYear: new Date().getFullYear(),
+    dayRateCategory: 'normal',
+    dayRatePrice: 180,
+    dayRateLabel: 'วันจันทร์ (180 ฿/ชม.)',
+    selectedStartTime: '',
+    bookingNickname: '',
+    matrixData: null,
+    // Map of slotStart => { courtId, courtName, price, slotStart, slotEnd }
+    selectedSlots: new Map(),
+    selectedCourtId: null,
+    selectedCourtName: '',
+    selectedHours: 0,
+    courtPriceTotal: 0,
+    rentalPriceTotal: 0,
+    productPriceTotal: 0,
+    grandTotal: 0
+};
 
-    let start = startTimeElement.value;
-    let end = endTimeElement.value;
-    let timeError = document.getElementById('time-error');
-    let btnSubmit = document.getElementById('btnSubmitBooking');
-    
-    let hours = 0;
-    let courtPriceTotal = 0;
+// Thai Month Names for Calendar
+const thaiMonthNames = [
+    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+    "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+];
+const thaiDayNames = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
+
+// Initialize Booking Wizard
+function initBookingWizard() {
+    let nicknameInput = document.getElementById('step3_nickname');
+    if (nicknameInput) {
+        wizardState.bookingNickname = nicknameInput.value.trim();
+    }
+    let todayStr = new Date().toISOString().split('T')[0];
+    wizardState.selectedDate = todayStr;
+    wizardState.currentCalMonth = new Date().getMonth();
+    wizardState.currentCalYear = new Date().getFullYear();
+
+    let inputDate = document.getElementById('input_booking_date');
+    if (inputDate) inputDate.value = todayStr;
+
+    // Render Calendar and load court data
+    renderCalendar();
+    loadCourtMatrixForWizard(todayStr);
+    updateWizardStepperUI(1);
+}
+
+// Navigate between Wizard Steps
+function goToStep(targetStep) {
+    if (targetStep < 1 || targetStep > 5) return;
+
+    // Validation before stepping forward
+    if (targetStep > wizardState.currentStep) {
+        if (targetStep === 2) {
+            if (!wizardState.selectedDate) {
+                alert("กรุณาเลือกวันที่ต้องการใช้บริการ");
+                return;
+            }
+            renderTimeSlots();
+        } else if (targetStep === 3) {
+            if (!wizardState.selectedStartTime) {
+                alert("กรุณาเลือกเวลาเริ่มต้น");
+                return;
+            }
+            renderCourtHourBlocks();
+        } else if (targetStep === 4) {
+            if (wizardState.selectedSlots.size === 0) {
+                alert("กรุณาเลือกสนามอย่างน้อย 1 ช่วงเวลา");
+                return;
+            }
+            updateStep4Summary();
+        } else if (targetStep === 5) {
+            updateInvoiceReview();
+        }
+    } else {
+        // If stepping backwards
+        if (targetStep === 2) {
+            renderTimeSlots();
+        } else if (targetStep === 3) {
+            renderCourtHourBlocks();
+        } else if (targetStep === 4) {
+            updateStep4Summary();
+        }
+    }
+
+    wizardState.currentStep = targetStep;
+
+    // Hide all panels & show target panel
+    for (let s = 1; s <= 5; s++) {
+        let panel = document.getElementById('stepPanel' + s);
+        if (panel) {
+            if (s === targetStep) {
+                panel.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+            }
+        }
+    }
+
+    updateWizardStepperUI(targetStep);
+
+    // Scroll to top of wizard
+    let wrapper = document.querySelector('.wizard-page-wrapper');
+    if (wrapper) {
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Allow clicking on previous completed steps to jump back
+function jumpToWizardStep(targetStep) {
+    if (targetStep < wizardState.currentStep) {
+        goToStep(targetStep);
+    }
+}
+
+// Update Stepper Progress UI
+function updateWizardStepperUI(currentStep) {
+    for (let s = 1; s <= 5; s++) {
+        let node = document.getElementById('stepperNode' + s);
+        if (!node) continue;
+
+        node.classList.remove('active', 'completed', 'upcoming');
+        if (s < currentStep) {
+            node.classList.add('completed');
+        } else if (s === currentStep) {
+            node.classList.add('active');
+        } else {
+            node.classList.add('upcoming');
+        }
+    }
+
+    let fillBar = document.getElementById('stepperFillBar');
+    if (fillBar) {
+        let percent = ((currentStep - 1) / 4) * 100;
+        fillBar.style.width = percent + '%';
+    }
+}
+
+/* ==========================================================================
+   Step 1: Visual Interactive Calendar
+   ========================================================================== */
+function renderCalendar() {
+    let titleEl = document.getElementById('calMonthTitle');
+    let gridEl = document.getElementById('calendarGrid');
+    if (!titleEl || !gridEl) return;
+
+    let year = wizardState.currentCalYear;
+    let month = wizardState.currentCalMonth;
+    titleEl.innerText = `${thaiMonthNames[month]} ${year + 543} (${year})`;
+
+    let html = '';
+    // Day headers
+    thaiDayNames.forEach((dName, idx) => {
+        let weekendClass = (idx === 0 || idx === 6) ? ' weekend' : '';
+        html += `<div class="calendar-day-header${weekendClass}">${dName}</div>`;
+    });
+
+    // First day of month & number of days
+    let firstDayIndex = new Date(year, month, 1).getDay();
+    let daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Empty cells before first day
+    for (let e = 0; e < firstDayIndex; e++) {
+        html += `<div class="calendar-date-cell empty"></div>`;
+    }
+
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        let cellDate = new Date(year, month, day);
+        cellDate.setHours(0, 0, 0, 0);
+
+        let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        let isPast = cellDate < today;
+        let isToday = cellDate.getTime() === today.getTime();
+        let isSelected = dateStr === wizardState.selectedDate;
+
+        let classes = ['calendar-date-cell'];
+        if (isPast) classes.push('disabled');
+        if (isToday) classes.push('today');
+        if (isSelected) classes.push('selected');
+
+        let clickAttr = isPast ? '' : `onclick="onSelectCalendarDate('${dateStr}')"`;
+        html += `<div class="${classes.join(' ')}" ${clickAttr}>${day}</div>`;
+    }
+
+    gridEl.innerHTML = html;
+}
+
+function navigateCalendarMonth(dir) {
+    wizardState.currentCalMonth += dir;
+    if (wizardState.currentCalMonth < 0) {
+        wizardState.currentCalMonth = 11;
+        wizardState.currentCalYear--;
+    } else if (wizardState.currentCalMonth > 11) {
+        wizardState.currentCalMonth = 0;
+        wizardState.currentCalYear++;
+    }
+    renderCalendar();
+}
+
+function selectQuickDate(type) {
+    let target = new Date();
+    if (type === 'tomorrow') {
+        target.setDate(target.getDate() + 1);
+    }
+    let dateStr = target.toISOString().split('T')[0];
+
+    document.querySelectorAll('.btn-quick-date').forEach(b => b.classList.remove('active'));
+    let btn = (type === 'tomorrow') ? document.getElementById('btnQuickTomorrow') : document.getElementById('btnQuickToday');
+    if (btn) btn.classList.add('active');
+
+    wizardState.currentCalMonth = target.getMonth();
+    wizardState.currentCalYear = target.getFullYear();
+
+    onSelectCalendarDate(dateStr);
+}
+
+function onSelectCalendarDate(dateStr) {
+    wizardState.selectedDate = dateStr;
+    let inputDate = document.getElementById('input_booking_date');
+    if (inputDate) inputDate.value = dateStr;
+
+    // Reset slot selection if date changes
+    wizardState.selectedSlots.clear();
+    wizardState.selectedCourtId = null;
+    wizardState.selectedCourtName = '';
+    wizardState.selectedHours = 0;
+    wizardState.courtPriceTotal = 0;
+
+    renderCalendar();
+    loadCourtMatrixForWizard(dateStr);
+}
+
+function loadCourtMatrixForWizard(dateStr) {
+    let banner = document.getElementById('datePriceBanner');
+    let textSpan = document.getElementById('datePriceText');
+    if (textSpan) textSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบอัตราค่าบริการ...';
+
+    fetch('actions/get_court_matrix.php?date=' + encodeURIComponent(dateStr))
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === 'success') {
+            wizardState.matrixData = res;
+            wizardState.dayRateCategory = res.rate_category;
+            wizardState.dayRateLabel = res.rate_label;
+
+            let dow = res.day_of_week;
+            let ratePrice = (dow === 0 || dow === 6) ? 200 : (dow === 2 || dow === 4 ? 150 : 180);
+            wizardState.dayRatePrice = ratePrice;
+
+            if (banner && textSpan) {
+                banner.className = 'date-price-banner ' + res.rate_category;
+                textSpan.innerHTML = `อัตราค่าบริการสำหรับ <strong>${res.day_name} (${formatDateThai(dateStr)})</strong>: <span class="price-tag-value">${res.rate_label}</span>`;
+            }
+        }
+    })
+    .catch(err => {
+        console.error('Court matrix fetch error:', err);
+        if (textSpan) textSpan.innerText = 'ไม่สามารถดึงข้อมูลอัตราค่าบริการได้';
+    });
+}
+
+function formatDateThai(dateStr) {
+    if (!dateStr) return '-';
+    let parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    return `${parts[2]}/${parts[1]}/${parseInt(parts[0]) + 543}`;
+}
+
+/* ==========================================================================
+   Step 2: Operating Hours Grid (Start Time Selection)
+   ========================================================================== */
+function renderTimeSlots() {
+    let container = document.getElementById('timeSlotGrid');
+    if (!container) return;
+
+    if (!wizardState.matrixData || !wizardState.matrixData.slots) {
+        container.innerHTML = '<p class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดช่วงเวลา...</p>';
+        return;
+    }
+
+    let slots = wizardState.matrixData.slots;
+    let courts = wizardState.matrixData.courts;
+
+    let now = new Date();
+    let isToday = (wizardState.selectedDate === now.toISOString().split('T')[0]);
+    let currentHour = now.getHours();
+
+    let html = '';
+    slots.forEach(slot => {
+        let slotHour = parseInt(slot.start.split(':')[0]);
+        let isPastHour = isToday && (slotHour <= currentHour);
+
+        // ตรวจสอบว่าช่วงเวลานี้เปิดให้บริการหรือไม่ (เช็คจากสนามทั้งหมด)
+        let hasOpenCourt = false;
+        if (courts) {
+            courts.forEach(c => {
+                let sInfo = c.slots ? c.slots[slot.start] : null;
+                if (sInfo && sInfo.status !== 'closed') {
+                    hasOpenCourt = true;
+                }
+            });
+        }
+
+        let isDisabled = isPastHour || !hasOpenCourt;
+        let statusText = 'เปิดให้บริการ';
+        let cardClass = 'time-slot-card';
+
+        if (isPastHour) {
+            statusText = 'เลยเวลาแล้ว';
+            cardClass += ' disabled';
+        } else if (!hasOpenCourt) {
+            statusText = 'นอกเวลาทำการ';
+            cardClass += ' disabled';
+        }
+
+        let clickAttr = isDisabled ? '' : `onclick="onSelectStartTime('${slot.start}')"`;
+
+        html += `
+            <div class="${cardClass}" ${clickAttr} title="${slot.start} - ${slot.end}">
+                <i class="fas fa-clock"></i>
+                <div class="time-slot-time">${slot.start} น.</div>
+                <div class="time-slot-status">${statusText}</div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function onSelectStartTime(startStr) {
+    wizardState.selectedStartTime = startStr;
+    let inputStart = document.getElementById('input_start_time');
+    if (inputStart) inputStart.value = startStr;
+
+    // Transition immediately to Step 3 as required by HCI Progressive Disclosure
+    goToStep(3);
+}
+
+/* ==========================================================================
+   Step 3: Court Selection & Consecutive Slot / Scroll Multi-Hour
+   ========================================================================== */
+function renderCourtHourBlocks() {
+    let container = document.getElementById('courtHourBlocksContainer');
+    if (!container || !wizardState.matrixData) return;
+
+    let slots = wizardState.matrixData.slots;
+    let courts = wizardState.matrixData.courts;
+    let startHour = parseInt(wizardState.selectedStartTime.split(':')[0]);
+
+    // กรองเฉพาะช่วงเวลาที่เริ่มตั้งแต่ selectedStartTime เป็นต้นไป
+    let availableSlots = slots.filter(s => parseInt(s.start.split(':')[0]) >= startHour);
+
+    let html = '';
+    availableSlots.forEach((slot, index) => {
+        let isFirstHour = (index === 0);
+        let hourLabel = isFirstHour 
+            ? `ชั่วโมงที่ 1 : ${slot.start} - ${slot.end} น.` 
+            : `ชั่วโมงถัดไป (จองต่อเนื่อง) : ${slot.start} - ${slot.end} น.`;
+
+        html += `
+            <div class="slot-hour-block">
+                <div class="slot-hour-header">
+                    <div class="slot-hour-title">
+                        <i class="fas ${isFirstHour ? 'fa-star text-warning' : 'fa-clock text-primary'}"></i>
+                        ${hourLabel}
+                    </div>
+                    <span class="slot-rate-badge">
+                        <i class="fas fa-tag"></i> ${wizardState.dayRateLabel}
+                    </span>
+                </div>
+                <div class="court-cards-grid">
+        `;
+
+        courts.forEach(court => {
+            let sInfo = court.slots ? court.slots[slot.start] : null;
+            let status = sInfo ? sInfo.status : 'closed';
+            let bookedBy = sInfo ? sInfo.booked_by : '';
+            let price = sInfo ? sInfo.price : wizardState.dayRatePrice;
+
+            // ตรวจสอบว่า slot นี้ถูกเลือกไว้ใน state หรือไม่
+            let isCurrentSlotSelected = false;
+            let selectedEntry = wizardState.selectedSlots.get(slot.start);
+            if (selectedEntry && selectedEntry.courtId === court.court_id) {
+                isCurrentSlotSelected = true;
+            }
+
+            let cardClass = 'court-card-v2 ';
+            let badgeHtml = '';
+            let clickAttr = '';
+
+            if (isCurrentSlotSelected) {
+                cardClass += 'status-selected';
+                badgeHtml = '<span class="court-card-badge">✓ กำลังเลือก</span>';
+                clickAttr = `onclick="toggleCourtSlot('${slot.start}', '${slot.end}', ${court.court_id}, '${court.court_name}', ${price})"`;
+            } else if (status === 'available') {
+                cardClass += 'status-available';
+                badgeHtml = '<span class="court-card-badge">● ว่าง</span>';
+                clickAttr = `onclick="toggleCourtSlot('${slot.start}', '${slot.end}', ${court.court_id}, '${court.court_name}', ${price})"`;
+            } else if (status === 'pending') {
+                cardClass += 'status-pending';
+                badgeHtml = `<span class="court-card-badge" title="รอตรวจสอบ">● รอตรวจสอบ (${bookedBy || 'ผู้ใช้งาน'})</span>`;
+            } else if (status === 'booked') {
+                cardClass += 'status-booked';
+                badgeHtml = `<span class="court-card-badge" title="จองแล้ว">● จองแล้ว (${bookedBy || 'ผู้ใช้งาน'})</span>`;
+            } else if (status === 'maintenance') {
+                cardClass += 'status-maintenance';
+                badgeHtml = '<span class="court-card-badge">● ปิดปรับปรุง</span>';
+            } else {
+                cardClass += 'status-maintenance';
+                badgeHtml = '<span class="court-card-badge">● ปิดบริการ</span>';
+            }
+
+            html += `
+                <div class="${cardClass}" ${clickAttr}>
+                    <i class="fas fa-map-marker-alt court-card-icon"></i>
+                    <h4 class="court-card-title">${court.court_name}</h4>
+                    ${badgeHtml}
+                </div>
+            `;
+        });
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    updateStickySummaryBar();
+}
+
+// Toggle slot selection (consecutive multi-hour support)
+function toggleCourtSlot(slotStart, slotEnd, courtId, courtName, price) {
+    if (wizardState.selectedSlots.has(slotStart)) {
+        let cur = wizardState.selectedSlots.get(slotStart);
+        if (cur.courtId === courtId) {
+            // Unselect this slot
+            wizardState.selectedSlots.delete(slotStart);
+            if (wizardState.selectedSlots.size === 0) {
+                wizardState.selectedCourtId = null;
+                wizardState.selectedCourtName = '';
+            }
+            renderCourtHourBlocks();
+            return;
+        } else {
+            // Change court for this slot
+            wizardState.selectedSlots.set(slotStart, {
+                courtId: courtId,
+                courtName: courtName,
+                price: price,
+                slotStart: slotStart,
+                slotEnd: slotEnd
+            });
+            wizardState.selectedCourtId = courtId;
+            wizardState.selectedCourtName = courtName;
+            renderCourtHourBlocks();
+            return;
+        }
+    }
+
+    // Check same court rule for consecutive hours
+    if (wizardState.selectedCourtId && wizardState.selectedCourtId !== courtId) {
+        if (confirm(`สำหรับการจองต่อเนื่องหลายชั่วโมง ต้องเป็นสนามเดียวกัน\nท่านต้องการเปลี่ยนการจองทั้งหมดเป็น "${courtName}" หรือไม่?`)) {
+            wizardState.selectedSlots.forEach((slotData) => {
+                slotData.courtId = courtId;
+                slotData.courtName = courtName;
+            });
+            wizardState.selectedCourtId = courtId;
+            wizardState.selectedCourtName = courtName;
+        } else {
+            return;
+        }
+    }
+
+    // Check consecutive slot rule
+    if (wizardState.selectedSlots.size > 0) {
+        let selectedHoursList = [];
+        wizardState.selectedSlots.forEach((val, key) => {
+            selectedHoursList.push(parseInt(key.split(':')[0]));
+        });
+        selectedHoursList.sort((a, b) => a - b);
+
+        let newSlotHr = parseInt(slotStart.split(':')[0]);
+        let minHr = selectedHoursList[0];
+        let maxHr = selectedHoursList[selectedHoursList.length - 1];
+
+        // Slot must be adjacent (1 hr before min or 1 hr after max)
+        if (newSlotHr !== (minHr - 1) && newSlotHr !== (maxHr + 1)) {
+            alert("สำหรับการจองหลายชั่วโมง กรุณาเลือกช่วงเวลาที่ต่อเนื่องกัน (เช่น 14:00 - 15:00 และ 15:00 - 16:00)\nหรือคลิกยกเลิกการเลือกเดิมเพื่อเริ่มเลือกช่วงเวลาใหม่");
+            return;
+        }
+    }
+
+    // Add this slot
+    wizardState.selectedSlots.set(slotStart, {
+        courtId: courtId,
+        courtName: courtName,
+        price: price,
+        slotStart: slotStart,
+        slotEnd: slotEnd
+    });
+    wizardState.selectedCourtId = courtId;
+    wizardState.selectedCourtName = courtName;
+
+    renderCourtHourBlocks();
+}
+
+function updateStickySummaryBar() {
+    let hours = wizardState.selectedSlots.size;
+    wizardState.selectedHours = hours;
+
+    let courtTotal = 0;
+    let slotStarts = [];
+    let slotEnds = [];
+    let courtNames = new Set();
+
+    wizardState.selectedSlots.forEach(s => {
+        courtTotal += s.price;
+        slotStarts.push(s.slotStart);
+        slotEnds.push(s.slotEnd);
+        courtNames.add(s.courtName);
+    });
+
+    wizardState.courtPriceTotal = courtTotal;
+
+    // คำนวณช่วงเวลาเริ่มต้นและสิ้นสุด
+    if (slotStarts.length > 0) {
+        slotStarts.sort();
+        slotEnds.sort();
+        let earliestStart = slotStarts[0];
+        let latestEnd = slotEnds[slotEnds.length - 1];
+
+        let inputStart = document.getElementById('input_start_time');
+        let inputEnd = document.getElementById('input_end_time');
+        let inputCourt = document.getElementById('input_court_id');
+
+        if (inputStart) inputStart.value = earliestStart;
+        if (inputEnd) inputEnd.value = latestEnd;
+        if (inputCourt) inputCourt.value = wizardState.selectedCourtId;
+    }
+
+    // อัปเดต Sticky Bar UI
+    let hoursSpan = document.getElementById('stickyHoursDisplay');
+    let courtSpan = document.getElementById('stickyCourtDisplay');
+    let totalSpan = document.getElementById('stickyTotalDisplay');
+    let btnNext = document.getElementById('btnStickyNext');
+
+    if (hoursSpan) hoursSpan.innerText = `[ ${hours} Hour${hours > 1 ? 's' : ''} ]`;
+    if (courtSpan) {
+        let courtStr = Array.from(courtNames).join(', ');
+        courtSpan.innerText = courtStr ? `[ ${courtStr} ]` : '[ ยังไม่ได้เลือกสนาม ]';
+    }
+    if (totalSpan) totalSpan.innerText = `[ Total ${courtTotal.toLocaleString()} ฿ ]`;
+
+    if (btnNext) {
+        btnNext.disabled = (hours === 0);
+    }
+
+    calculateGrandTotal();
+}
+
+function syncBookingNickname(val) {
+    wizardState.bookingNickname = val.trim();
+    let hiddenInput = document.getElementById('input_booking_nickname');
+    if (hiddenInput) hiddenInput.value = wizardState.bookingNickname;
+}
+
+/* ==========================================================================
+   Step 4: Optional Add-on Services (Quantities & Stepper)
+   ========================================================================== */
+function updateStep4Summary() {
+    let stripDate = document.getElementById('stripDate');
+    let stripTime = document.getElementById('stripTime');
+    let stripCourt = document.getElementById('stripCourt');
+
+    let inputStart = document.getElementById('input_start_time');
+    let inputEnd = document.getElementById('input_end_time');
+
+    if (stripDate) stripDate.innerText = `วันที่: ${formatDateThai(wizardState.selectedDate)}`;
+    if (stripTime) stripTime.innerText = `เวลา: ${inputStart ? inputStart.value : ''} - ${inputEnd ? inputEnd.value : ''} (${wizardState.selectedHours} ชม.)`;
+    if (stripCourt) stripCourt.innerText = `สนาม: ${wizardState.selectedCourtName || '-'}`;
+}
+
+function adjustProductQty(prodId, delta) {
+    let input = document.getElementById('prod_qty_' + prodId);
+    if (!input) return;
+
+    let curVal = parseInt(input.value) || 0;
+    let max = parseInt(input.getAttribute('max')) || 999;
+    let newVal = curVal + delta;
+
+    if (newVal < 0) newVal = 0;
+    if (newVal > max) newVal = max;
+
+    input.value = newVal;
+    calculateGrandTotal();
+}
+
+function onProductQtyChange(prodId) {
+    let input = document.getElementById('prod_qty_' + prodId);
+    if (!input) return;
+
+    let val = parseInt(input.value) || 0;
+    let max = parseInt(input.getAttribute('max')) || 999;
+
+    if (val < 0) val = 0;
+    if (val > max) val = max;
+
+    input.value = val;
+    calculateGrandTotal();
+}
+
+/* ==========================================================================
+   Grand Total Calculation & Step 5 Itemized Invoice
+   ========================================================================== */
+function calculateGrandTotal() {
     let rentTotal = 0;
     let prodTotal = 0;
-    let rateDetailText = "";
 
-    // 1. คำนวณเวลา (ต้อง 1 ชม. ขึ้นไป)
-    if (start && end) {
-        let startHr = parseInt(start.split(':')[0]);
-        let endHr = parseInt(end.split(':')[0]);
-        hours = endHr - startHr;
-
-        if (hours < 1) {
-            if (timeError) timeError.style.display = "block";
-            if (btnSubmit) btnSubmit.disabled = true;
-            document.getElementById('sum-hours').innerText = "เวลาไม่ถูกต้อง";
-            return; 
-        } else {
-            if (timeError) timeError.style.display = "none";
-            document.getElementById('sum-hours').innerText = hours + " ชั่วโมง";
-        }
-    }
-
-    // 2. คำนวณค่าสนามตามวันในสัปดาห์
-    let selectedCourt = document.querySelector('input[name="court_id"]:checked');
-    let bookingDateInput = document.getElementById('booking_date');
-
-    if (selectedCourt && hours >= 1 && bookingDateInput && bookingDateInput.value) {
-        let baseRate = parseFloat(selectedCourt.getAttribute('data-price')) || 180;
-        let peakRate = parseFloat(selectedCourt.getAttribute('data-peak-price')) || 200;
-        let offpeakRate = parseFloat(selectedCourt.getAttribute('data-offpeak-price')) || 150;
-
-        let dateObj = new Date(bookingDateInput.value + 'T00:00:00');
-        let dow = dateObj.getDay(); // 0=Sun, 6=Sat, 2=Tue, 4=Thu, 1=Mon, 3=Wed, 5=Fri
-        let hourlyRate = baseRate;
-
-        if (dow === 0 || dow === 6) {
-            hourlyRate = peakRate;
-            rateDetailText = `เสาร์-อาทิตย์: ${hours} ชม. x ${hourlyRate} ฿`;
-        } else if (dow === 2 || dow === 4) {
-            hourlyRate = offpeakRate;
-            rateDetailText = `โปรโมชั่น อังคาร-พฤหัส: ${hours} ชม. x ${hourlyRate} ฿`;
-        } else {
-            hourlyRate = baseRate;
-            rateDetailText = `วันปกติ จันทร์-พุธ-ศุกร์: ${hours} ชม. x ${hourlyRate} ฿`;
-        }
-
-        courtPriceTotal = hourlyRate * hours;
-    }
-
-    // 3. คำนวณค่าสินค้าและอุปกรณ์เช่า
     let qtyInputs = document.querySelectorAll('.qty-input');
     qtyInputs.forEach(input => {
         let qty = parseInt(input.value) || 0;
         let price = parseFloat(input.getAttribute('data-price')) || 0;
         let type = input.getAttribute('data-type');
-        
+
         if (qty > 0) {
             if (type === 'อุปกรณ์เช่า') {
                 rentTotal += (qty * price);
@@ -146,282 +704,101 @@ function calculateSummary() {
         }
     });
 
-    // 4. สรุปยอดรวมและอัปเดตหน้าจอ
-    let courtSummaryText = courtPriceTotal.toLocaleString() + " ฿";
-    if (hours > 0 && selectedCourt && rateDetailText) {
-        courtSummaryText += `<br><span style="font-size: 11px; color: #64748b; font-weight: normal;">(${rateDetailText})</span>`;
-    }
+    wizardState.rentalPriceTotal = rentTotal;
+    wizardState.productPriceTotal = prodTotal;
+    wizardState.grandTotal = wizardState.courtPriceTotal + rentTotal + prodTotal;
 
-    document.getElementById('sum-court').innerHTML = courtSummaryText;
-    document.getElementById('sum-rent').innerText = rentTotal.toLocaleString() + " ฿";
-    document.getElementById('sum-product').innerText = prodTotal.toLocaleString() + " ฿";
-    
-    let grandTotal = courtPriceTotal + rentTotal + prodTotal;
-    document.getElementById('sum-total').innerText = grandTotal.toLocaleString() + " ฿";
+    // Sync to hidden inputs
+    let inputCourtPrice = document.getElementById('input_court_price');
+    let inputRentPrice = document.getElementById('input_rental_price');
+    let inputProdPrice = document.getElementById('input_product_price');
+    let inputTotalPrice = document.getElementById('input_total_price');
 
-    // 5. อัปเดต Input Hidden เตรียมส่งให้ PHP
-    document.getElementById('input_court_price').value = courtPriceTotal;
-    document.getElementById('input_rental_price').value = rentTotal;
-    document.getElementById('input_product_price').value = prodTotal;
-    document.getElementById('input_total_price').value = grandTotal;
-
-    // ปลดล็อกปุ่มกดยืนยันถ้าเลือกสนามและเวลาถูกต้อง (ขั้นต่ำ 1 ชม.)
-    if (hours >= 1 && selectedCourt) {
-        if (btnSubmit) btnSubmit.disabled = false;
-    } else {
-        if (btnSubmit) btnSubmit.disabled = true;
-    }
+    if (inputCourtPrice) inputCourtPrice.value = wizardState.courtPriceTotal;
+    if (inputRentPrice) inputRentPrice.value = rentTotal;
+    if (inputProdPrice) inputProdPrice.value = prodTotal;
+    if (inputTotalPrice) inputTotalPrice.value = wizardState.grandTotal;
 }
 
-// ตรวจสอบก่อนกด Submit ทำรายการจอง (HCI Rule 2, 3, 5)
-function validateBooking(event) {
-    if (event) event.preventDefault();
+function updateInvoiceReview() {
+    calculateGrandTotal();
 
-    let totalInput = document.getElementById('input_total_price');
-    if (!totalInput) return false;
+    let invNick = document.getElementById('invNickname');
+    let invDate = document.getElementById('invDate');
+    let invTime = document.getElementById('invTime');
+    let invCourt = document.getElementById('invCourt');
+    let invGrand = document.getElementById('invGrandTotal');
+    let tableBody = document.getElementById('invoiceTableBody');
 
-    let total = parseFloat(totalInput.value);
-    if (total <= 0) {
-        alert("กรุณาเลือกสนามและเวลาที่ต้องการจอง");
-        return false;
-    }
+    let inputStart = document.getElementById('input_start_time');
+    let inputEnd = document.getElementById('input_end_time');
 
-    // ดึงข้อมูลสนามที่เลือก
-    let selectedCourt = document.querySelector('input[name="court_id"]:checked');
-    let courtName = "-";
-    if (selectedCourt) {
-        let box = selectedCourt.closest('.court-option');
-        if (box && box.querySelector('h4')) {
-            courtName = box.querySelector('h4').innerText.trim();
-        }
-    }
+    let nick = wizardState.bookingNickname || 'ผู้ใช้งาน';
+    if (invNick) invNick.innerText = nick;
+    if (invDate) invDate.innerText = `${formatDateThai(wizardState.selectedDate)}`;
+    if (invTime) invTime.innerText = `${inputStart ? inputStart.value : ''} - ${inputEnd ? inputEnd.value : ''} (${wizardState.selectedHours} ชั่วโมง)`;
+    if (invCourt) invCourt.innerText = wizardState.selectedCourtName || '-';
+    if (invGrand) invGrand.innerText = wizardState.grandTotal.toLocaleString() + ' ฿';
 
-    // ดึงวันและเวลา
-    let dateVal = document.getElementById('booking_date').value;
-    let startTime = document.getElementById('start_time').value;
-    let endTime = document.getElementById('end_time').value;
-    let hoursText = document.getElementById('sum-hours') ? document.getElementById('sum-hours').innerText : '';
-    let totalText = document.getElementById('sum-total') ? document.getElementById('sum-total').innerText : '';
+    if (tableBody) {
+        let html = '';
 
-    // เติมค่าลงใน Modal
-    let modalCourt = document.getElementById('modal_court_name');
-    let modalDate = document.getElementById('modal_booking_date');
-    let modalTime = document.getElementById('modal_booking_time');
-    let modalPrice = document.getElementById('modal_total_price');
+        // 1. ค่าสนาม
+        html += `
+            <tr>
+                <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">${wizardState.dayRateLabel}</small></td>
+                <td>${wizardState.selectedHours} ชม.</td>
+                <td>${wizardState.dayRatePrice.toLocaleString()} ฿</td>
+                <td>${wizardState.courtPriceTotal.toLocaleString()} ฿</td>
+            </tr>
+        `;
 
-    if (modalCourt) modalCourt.innerText = courtName;
-    if (modalDate) {
-        let dParts = dateVal.split('-');
-        modalDate.innerText = dParts.length === 3 ? `${dParts[2]}/${dParts[1]}/${dParts[0]}` : dateVal;
-    }
-    if (modalTime) modalTime.innerText = `${startTime} - ${endTime} (${hoursText})`;
-    if (modalPrice) modalPrice.innerText = totalText;
+        // 2. สินค้าและอุปกรณ์เช่า
+        let qtyInputs = document.querySelectorAll('.qty-input');
+        qtyInputs.forEach(input => {
+            let qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                let name = input.getAttribute('data-name');
+                let price = parseFloat(input.getAttribute('data-price')) || 0;
+                let type = input.getAttribute('data-type');
+                let itemTotal = qty * price;
 
-    // แสดง Modal
-    let modal = document.getElementById('bookingConfirmModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    } else {
-        executeBookingSubmit();
-    }
-
-    return false;
-}
-
-function closeBookingConfirmModal() {
-    let modal = document.getElementById('bookingConfirmModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-function executeBookingSubmit() {
-    let btnModalConfirm = document.getElementById('btnModalConfirmBooking');
-    let btnMainSubmit = document.getElementById('btnSubmitBooking');
-    let bookingForm = document.getElementById('bookingForm');
-
-    if (btnModalConfirm) {
-        btnModalConfirm.disabled = true;
-        btnModalConfirm.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจอง...';
-        btnModalConfirm.style.opacity = '0.75';
-        btnModalConfirm.style.cursor = 'not-allowed';
-    }
-
-    if (btnMainSubmit) {
-        btnMainSubmit.disabled = true;
-        btnMainSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจอง...';
-        btnMainSubmit.style.opacity = '0.75';
-        btnMainSubmit.style.cursor = 'not-allowed';
-    }
-
-    if (bookingForm) {
-        bookingForm.submit();
-    }
-}
-
-/* =========================================
-   Time-Slot Matrix Controller (booking.php)
-   ========================================= */
-
-function loadCourtMatrix(dateStr) {
-    let container = document.getElementById('matrixContainer');
-    if (!container) return;
-
-    container.innerHTML = `
-        <div style="text-align: center; padding: 40px; color: #64748b;">
-            <i class="fas fa-spinner fa-spin fa-2x"></i>
-            <p style="margin-top: 10px;">กำลังโหลดตารางความพร้อมของสนาม (${dateStr})...</p>
-        </div>
-    `;
-
-    fetch('actions/get_court_matrix.php?date=' + encodeURIComponent(dateStr))
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === 'success') {
-            renderCourtMatrix(res);
-        } else {
-            container.innerHTML = `<div style="text-align: center; padding: 30px; color: #dc3545;"><i class="fas fa-exclamation-circle fa-2x"></i><p>${res.message || 'ไม่สามารถโหลดข้อมูลได้'}</p></div>`;
-        }
-    })
-    .catch(err => {
-        console.error('Matrix error:', err);
-        container.innerHTML = `<div style="text-align: center; padding: 30px; color: #dc3545;"><i class="fas fa-exclamation-triangle fa-2x"></i><p>เกิดข้อผิดพลาดในการโหลดตารางสนาม</p></div>`;
-    });
-}
-
-function renderCourtMatrix(data) {
-    let container = document.getElementById('matrixContainer');
-    if (!container) return;
-
-    // ป้ายสถานะเรทราคาประจำวันที่เลือก
-    let badgeBg = data.rate_category === 'weekend' ? '#fef3c7' : (data.rate_category === 'promo' ? '#dcfce7' : '#e0f2fe');
-    let badgeColor = data.rate_category === 'weekend' ? '#b45309' : (data.rate_category === 'promo' ? '#15803d' : '#0369a1');
-
-    let headerInfo = `
-        <div style="padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px;">
-            <div>
-                <i class="fas fa-calendar-day" style="color: #2563eb;"></i> 
-                <strong>${data.day_name}</strong> (${data.date}) : 
-                <span style="font-weight: 600; color: #1e3c72;">${data.rate_label}</span>
-            </div>
-            <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; border: 1px solid rgba(0,0,0,0.06);">
-                <i class="fas fa-tag"></i> ${data.rate_badge}
-            </span>
-        </div>
-    `;
-
-    let html = headerInfo + `<table class="matrix-table"><thead><tr>`;
-    html += `<th class="matrix-court-col">สนาม / เวลา</th>`;
-
-    data.slots.forEach(slot => {
-        html += `<th>
-            <div class="slot-time-header">${slot.start} - ${slot.end}</div>
-        </th>`;
-    });
-    html += `</tr></thead><tbody>`;
-
-    data.courts.forEach(court => {
-        html += `<tr>`;
-        html += `<td class="matrix-court-col">
-            <strong>${court.court_name}</strong>
-            <div style="font-size: 10px; color: ${badgeColor}; font-weight: bold;">${court.current_rate} ฿/ชม.</div>
-        </td>`;
-
-        data.slots.forEach(slot => {
-            let slotInfo = court.slots[slot.start];
-            if (!slotInfo) {
-                html += `<td class="matrix-cell cell-closed">-</td>`;
-                return;
-            }
-
-            if (slotInfo.status === 'booked' || slotInfo.status === 'pending') {
-                let txt = slotInfo.status === 'pending' ? 'รอตรวจ' : 'จองแล้ว';
-                html += `<td class="matrix-cell cell-booked" title="ช่วงเวลานี้มีผู้จองแล้ว">${txt}</td>`;
-            } else if (slotInfo.status === 'closed') {
-                html += `<td class="matrix-cell cell-closed" title="นอกเวลาทำการ">ปิด</td>`;
-            } else {
-                let cellClass = 'cell-' + slotInfo.rate_category;
-                html += `<td class="matrix-cell ${cellClass}" 
-                             data-court-id="${court.court_id}" 
-                             data-start="${slot.start}" 
-                             data-end="${slot.end}" 
-                             onclick="selectSlotFromMatrix(${court.court_id}, '${slot.start}', '${slot.end}', this)"
-                             title="คลิกเพื่อเลือกจองช่วง ${slot.start} - ${slot.end} (${slotInfo.price}฿)">
-                             <div>ว่าง</div>
-                             <div style="font-weight: bold; font-size: 11px;">${slotInfo.price}฿</div>
-                         </td>`;
+                html += `
+                    <tr>
+                        <td>${name} <small class="text-muted">(${type})</small></td>
+                        <td>${qty} หน่วย</td>
+                        <td>${price.toLocaleString()} ฿</td>
+                        <td>${itemTotal.toLocaleString()} ฿</td>
+                    </tr>
+                `;
             }
         });
 
-        html += `</tr>`;
-    });
-
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-function selectSlotFromMatrix(courtId, startStr, endStr, cellEl) {
-    // 1. ไฮไลต์ cell ที่เลือก
-    document.querySelectorAll('.matrix-cell.selected').forEach(el => el.classList.remove('selected'));
-    if (cellEl) cellEl.classList.add('selected');
-
-    // 2. ซิงค์กับ Form
-    let matrixDatePicker = document.getElementById('matrix_date_picker');
-    let bookingDateInput = document.getElementById('booking_date');
-    if (matrixDatePicker && bookingDateInput) {
-        bookingDateInput.value = matrixDatePicker.value;
-    }
-
-    // เลือกสนาม
-    let courtRadio = document.querySelector(`input[name="court_id"][value="${courtId}"]`);
-    if (courtRadio) {
-        courtRadio.checked = true;
-    }
-
-    // เลือกเวลา
-    let startTimeSelect = document.getElementById('start_time');
-    let endTimeSelect = document.getElementById('end_time');
-
-    if (startTimeSelect) startTimeSelect.value = startStr;
-    if (endTimeSelect) endTimeSelect.value = endStr;
-
-    // คำนวณสรุปยอดเงินทันที
-    calculateSummary();
-
-    // เลื่อนหน้าจอลงไปที่ฟอร์มอย่างนุ่มนวล
-    let bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-        bookingForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        tableBody.innerHTML = html;
     }
 }
 
-function setMatrixDate(type, btnEl) {
-    document.querySelectorAll('.btn-matrix-date').forEach(b => b.classList.remove('active'));
-    if (btnEl) btnEl.classList.add('active');
-
-    let targetDate = new Date();
-    if (type === 'tomorrow') {
-        targetDate.setDate(targetDate.getDate() + 1);
+// Form Submission with Loading Spinner Feedback
+function handleBookingFormSubmit(event) {
+    if (wizardState.selectedSlots.size === 0) {
+        alert("กรุณาเลือกสนามก่อนยืนยันการจอง");
+        if (event) event.preventDefault();
+        return false;
     }
-    let dateStr = targetDate.toISOString().split('T')[0];
 
-    let picker = document.getElementById('matrix_date_picker');
-    if (picker) picker.value = dateStr;
+    let btnSubmit = document.getElementById('btnFinalSubmitBooking');
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจองและล็อกสนาม...';
+    }
 
-    let bookingDate = document.getElementById('booking_date');
-    if (bookingDate) bookingDate.value = dateStr;
-
-    loadCourtMatrix(dateStr);
-    calculateSummary();
+    return true;
 }
 
-function onMatrixDatePickerChange(val) {
-    document.querySelectorAll('.btn-matrix-date').forEach(b => b.classList.remove('active'));
-    let bookingDate = document.getElementById('booking_date');
-    if (bookingDate) bookingDate.value = val;
-    loadCourtMatrix(val);
-    calculateSummary();
-}
+/* ==========================================================================
+   Payment Page Countdown Timer & Slip Upload (Existing features maintained)
+   ========================================================================== */
+
 
 /* =========================================
    Payment Countdown Timer (หน้าชำระเงิน)

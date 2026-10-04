@@ -11,543 +11,485 @@ if (!isset($_SESSION['member_id'])) {
 }
 
 try {
-    // ดึงข้อมูลสนามทั้งหมดที่เปิดใช้งาน
-    $stmt_court = $conn->query("SELECT * FROM Court WHERE court_status != 'ปิดปรับปรุง' ORDER BY court_id ASC");
+    // ดึงข้อมูลสนามทั้งหมด
+    $stmt_court = $conn->query("SELECT * FROM Court ORDER BY court_id ASC");
     $courts = $stmt_court->fetchAll(PDO::FETCH_ASSOC);
 
-    // ดึงข้อมูลสินค้าและอุปกรณ์เช่าที่มีในสต็อก (ดึงมาทุกคอลัมน์)
-    $stmt_prod = $conn->query("SELECT * FROM Product WHERE product_stock > 0 ORDER BY product_type DESC");
+    // ดึงข้อมูลสินค้าและอุปกรณ์เช่าที่มีในสต็อก
+    $stmt_prod = $conn->query("SELECT * FROM Product WHERE product_stock > 0 ORDER BY product_type DESC, product_id ASC");
     $products = $stmt_prod->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     die("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: " . $e->getMessage());
 }
+
+$default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จองสนาม - T.S. Pattani Badminton</title>
+    <title>จองสนามแบดมินตัน - T.S. Pattani</title>
     
-    <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
+    <link rel="stylesheet" href="assets/css/global.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/style.css?v=2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .matrix-legend {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            padding: 10px 14px;
-            background: #f8fafc;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-        .legend-normal { background: #e0f2fe; border: 1px solid #bae6fd; }
-        .legend-weekend { background: #fef3c7; border: 1px solid #fde68a; }
-        .legend-promo { background: #dcfce7; border: 1px solid #bbf7d0; }
-        .legend-booked { background: #fee2e2; border: 1px solid #fecaca; }
-        .legend-closed { background: #f1f5f9; border: 1px solid #cbd5e1; }
-
-        .btn-matrix-date {
-            padding: 6px 14px;
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-matrix-date.active, .btn-matrix-date:hover {
-            background: #1e3c72;
-            color: #ffffff;
-            border-color: #1e3c72;
-        }
-
-        .matrix-table-container {
-            overflow-x: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #ffffff;
-            max-height: 480px;
-        }
-        .matrix-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .matrix-table th, .matrix-table td {
-            padding: 8px 10px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-        .matrix-table th {
-            background: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-        .matrix-court-col {
-            position: sticky;
-            left: 0;
-            background: #f8fafc;
-            font-weight: 600;
-            text-align: left !important;
-            min-width: 110px;
-            z-index: 3;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-        }
-        .matrix-cell {
-            cursor: pointer;
-            transition: all 0.15s;
-            user-select: none;
-            min-width: 75px;
-        }
-        .matrix-cell.cell-normal {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-        .matrix-cell.cell-normal:hover {
-            background: #bae6fd;
-            transform: scale(1.04);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .matrix-cell.cell-weekend {
-            background: #fef3c7;
-            color: #b45309;
-        }
-        .matrix-cell.cell-weekend:hover {
-            background: #fde68a;
-            transform: scale(1.04);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .matrix-cell.cell-promo {
-            background: #dcfce7;
-            color: #15803d;
-        }
-        .matrix-cell.cell-promo:hover {
-            background: #bbf7d0;
-            transform: scale(1.04);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .matrix-cell.cell-booked {
-            background: #fee2e2;
-            color: #b91c1c;
-            cursor: not-allowed;
-            opacity: 0.85;
-        }
-        .matrix-cell.cell-closed {
-            background: #f1f5f9;
-            color: #94a3b8;
-            cursor: not-allowed;
-        }
-        .matrix-cell.selected {
-            outline: 3px solid #1e3c72;
-            outline-offset: -3px;
-            box-shadow: inset 0 0 10px rgba(30, 60, 114, 0.4);
-            font-weight: bold;
-        }
-        .slot-time-header {
-            font-size: 11px;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body style="background-color: #f4f6f9;">
+<body class="booking-page-body">
 
     <!-- นำเข้า Navbar -->
     <?php include 'includes/navbar.php'; ?>
 
-    <div class="booking-wrapper">
-        <div class="booking-header">
+    <div class="wizard-page-wrapper">
+        
+        <!-- Header Banner -->
+        <div class="wizard-header-banner">
             <h2><i class="fas fa-calendar-check"></i> จองสนามแบดมินตัน</h2>
-            <p>กรุณาเลือกวัน เวลา สนาม และอุปกรณ์ที่คุณต้องการ (คิดราคาตามวันในสัปดาห์อัตโนมัติ)</p>
+            <p>ระบบจองสนามและบริการเสริมทีละขั้นตอน พร้อมคำนวณราคาจริงตามวันในสัปดาห์</p>
         </div>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-error" style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            <div class="alert alert-error">
                 <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
 
         <!-- ============================================== -->
-        <!-- แถบแสดงขั้นตอน 4 ขั้นตอน (HCI Rule 2 & Section 10) -->
+        <!-- 5-Step Progress Stepper (HCI & Progressive Disclosure) -->
         <!-- ============================================== -->
-        <div class="booking-stepper-wrapper">
-            <div class="booking-stepper">
-                <div class="stepper-line">
-                    <div class="stepper-line-fill"></div>
+        <div class="wizard-stepper-box">
+            <div class="wizard-stepper-nav">
+                <div class="wizard-stepper-track">
+                    <div class="wizard-stepper-fill" id="stepperFillBar"></div>
                 </div>
 
-                <!-- Phase 1 -->
-                <div class="stepper-step active">
-                    <div class="stepper-icon">
+                <!-- Step 1 -->
+                <div class="wizard-step-node active" id="stepperNode1" onclick="jumpToWizardStep(1)">
+                    <div class="wizard-step-circle">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <div class="stepper-title">1. วัน เวลา & สนาม</div>
-                    <div class="stepper-subtitle">เลือกวันและช่วงเวลา</div>
+                    <div class="wizard-step-label">1. วันที่</div>
+                    <div class="wizard-step-sublabel">เลือกวันจอง</div>
                 </div>
 
-                <!-- Phase 2 -->
-                <div class="stepper-step active">
-                    <div class="stepper-icon">
+                <!-- Step 2 -->
+                <div class="wizard-step-node upcoming" id="stepperNode2" onclick="jumpToWizardStep(2)">
+                    <div class="wizard-step-circle">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="wizard-step-label">2. เวลาเริ่ม</div>
+                    <div class="wizard-step-sublabel">เวลาเปิดทำการ</div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="wizard-step-node upcoming" id="stepperNode3" onclick="jumpToWizardStep(3)">
+                    <div class="wizard-step-circle">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="wizard-step-label">3. คอร์ท & ชั่วโมง</div>
+                    <div class="wizard-step-sublabel">เลือกสนามและเวลา</div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="wizard-step-node upcoming" id="stepperNode4" onclick="jumpToWizardStep(4)">
+                    <div class="wizard-step-circle">
                         <i class="fas fa-shopping-basket"></i>
                     </div>
-                    <div class="stepper-title">2. บริการเสริม</div>
-                    <div class="stepper-subtitle">เครื่องดื่ม & อุปกรณ์</div>
+                    <div class="wizard-step-label">4. บริการเสริม</div>
+                    <div class="wizard-step-sublabel">อุปกรณ์ & สินค้า</div>
                 </div>
 
-                <!-- Phase 3 -->
-                <div class="stepper-step active">
-                    <div class="stepper-icon">
+                <!-- Step 5 -->
+                <div class="wizard-step-node upcoming" id="stepperNode5" onclick="jumpToWizardStep(5)">
+                    <div class="wizard-step-circle">
                         <i class="fas fa-receipt"></i>
                     </div>
-                    <div class="stepper-title">3. สรุปยอดเงิน</div>
-                    <div class="stepper-subtitle">ตรวจสอบและยืนยัน</div>
-                </div>
-
-                <!-- Phase 4 -->
-                <div class="stepper-step upcoming">
-                    <div class="stepper-icon">
-                        <i class="fas fa-qrcode"></i>
-                    </div>
-                    <div class="stepper-title">4. ชำระเงิน</div>
-                    <div class="stepper-subtitle">สแกน QR ใน 15 นาที</div>
+                    <div class="wizard-step-label">5. สรุป & ยืนยัน</div>
+                    <div class="wizard-step-sublabel">ตรวจสอบและส่งจอง</div>
                 </div>
             </div>
         </div>
 
         <!-- ============================================== -->
-        <!-- ส่วนตารางความพร้อมของสนาม (Time-Slot Matrix) -->
+        <!-- ฟอร์มหลักสำหรับส่งข้อมูลไปยัง actions/booking_db.php -->
         <!-- ============================================== -->
-        <div class="booking-card" style="margin-bottom: 25px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
-                <div>
-                    <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-th" style="color: #1e3c72;"></i> ตารางความพร้อมของสนาม (Court Availability Matrix)
-                    </h3>
-                    <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">
-                        คลิกเลือกช่องเวลาที่ว่างเพื่อเลือกลงฟอร์มจองได้ทันที
-                    </p>
-                </div>
+        <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return handleBookingFormSubmit(event)">
+            
+            <!-- Hidden inputs สำหรับเก็บสถานะการเลือก -->
+            <input type="hidden" name="booking_date" id="input_booking_date" value="<?php echo date('Y-m-d'); ?>">
+            <input type="hidden" name="start_time" id="input_start_time" value="">
+            <input type="hidden" name="end_time" id="input_end_time" value="">
+            <input type="hidden" name="court_id" id="input_court_id" value="">
+            <input type="hidden" name="booking_nickname" id="input_booking_nickname" value="<?php echo $default_nickname; ?>">
+            <input type="hidden" name="total_court_price" id="input_court_price" value="0">
+            <input type="hidden" name="total_rental_price" id="input_rental_price" value="0">
+            <input type="hidden" name="total_product_price" id="input_product_price" value="0">
+            <input type="hidden" name="total_price" id="input_total_price" value="0">
 
-                <!-- ตัวเลือกวันที่สำหรับตาราง Matrix -->
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button type="button" class="btn-matrix-date active" onclick="setMatrixDate('today', this)">วันนี้</button>
-                    <button type="button" class="btn-matrix-date" onclick="setMatrixDate('tomorrow', this)">พรุ่งนี้</button>
-                    <input type="date" id="matrix_date_picker" class="form-control" style="width: auto; padding: 6px 12px; font-size: 13px;" value="<?php echo date('Y-m-d'); ?>" min="<?php echo date('Y-m-d'); ?>" onchange="onMatrixDatePickerChange(this.value)">
-                </div>
-            </div>
-
-            <!-- แถบคำอธิบายสัญลักษณ์สี (Color Legend) -->
-            <div class="matrix-legend">
-                <div class="legend-item"><span class="legend-color legend-normal"></span> จันทร์, พุธ, ศุกร์: ราคาปกติ (180 ฿/ชม.)</div>
-                <div class="legend-item"><span class="legend-color legend-weekend"></span> เสาร์ - อาทิตย์: วันหยุด (200 ฿/ชม.)</div>
-                <div class="legend-item"><span class="legend-color legend-promo"></span> อังคาร, พฤหัส: วันโปรโมชั่น (150 ฿/ชม.)</div>
-                <div class="legend-item"><span class="legend-color legend-booked"></span> ไม่ว่าง / มีผู้จองแล้ว</div>
-                <div class="legend-item"><span class="legend-color legend-closed"></span> นอกเวลาทำการ</div>
-            </div>
-
-            <!-- กล่องแสดงตาราง Matrix -->
-            <div class="matrix-table-container" id="matrixContainer">
-                <div style="text-align: center; padding: 40px; color: #64748b;">
-                    <i class="fas fa-spinner fa-spin fa-2x"></i>
-                    <p style="margin-top: 10px;">กำลังโหลดตารางความพร้อมของสนาม...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ฟอร์มส่งไปที่ actions/booking_db.php -->
-        <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return validateBooking(event)">
-            <div class="booking-grid">
-                
-                <!-- ฝั่งซ้าย: ข้อมูลการจองสนาม (Phase 1) -->
-                <div class="booking-left">
-                    <div class="booking-card">
-                        <h3><i class="fas fa-calendar-day" style="color: #007bff;"></i> ขั้นตอนที่ 1.1: ระบุวันและเวลา (ขั้นต่ำ 1 ชม.)</h3>
-                        <div class="form-group">
-                            <label>วันที่จอง</label>
-                            <input type="date" name="booking_date" id="booking_date" class="form-control" required min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" onchange="if(document.getElementById('matrix_date_picker')) document.getElementById('matrix_date_picker').value = this.value; loadCourtMatrix(this.value); calculateSummary();">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>เวลาเริ่มต้น</label>
-                                <select name="start_time" id="start_time" class="form-control" required onchange="calculateSummary()">
-                                    <option value="" disabled selected>เลือกเวลาเริ่ม</option>
-                                    <?php for($i=9; $i<=21; $i++): $time = sprintf("%02d:00", $i); ?>
-                                        <option value="<?php echo $time; ?>"><?php echo $time; ?> น.</option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>เวลาสิ้นสุด</label>
-                                <select name="end_time" id="end_time" class="form-control" required onchange="calculateSummary()">
-                                    <option value="" disabled selected>เลือกเวลาสิ้นสุด</option>
-                                    <?php for($i=10; $i<=22; $i++): $time = sprintf("%02d:00", $i); ?>
-                                        <option value="<?php echo $time; ?>"><?php echo $time; ?> น.</option>
-                                    <?php endfor; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <small id="time-error" style="color: red; display: none;"><i class="fas fa-times-circle"></i> ต้องจองขั้นต่ำ 1 ชั่วโมงขึ้นไป</small>
+            <!-- ============================================== -->
+            <!-- Step 1: เลือกวันที่ (Interactive Visual Calendar) -->
+            <!-- ============================================== -->
+            <div class="wizard-panel active" id="stepPanel1">
+                <div class="wizard-card">
+                    <div class="wizard-card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> ขั้นตอนที่ 1: เลือกวันที่ต้องการใช้บริการ</h3>
+                        <p class="wizard-card-desc">คลิกเลือกวันที่จากปฏิทิน (วันที่ในอดีตถูกปิดใช้งาน) พร้อมตรวจสอบอัตราค่าบริการประจำวัน</p>
                     </div>
 
-                    <div class="booking-card" style="margin-top: 20px;">
-                        <h3><i class="fas fa-map-marker-alt" style="color: #007bff;"></i> ขั้นตอนที่ 1.2: เลือกสนามแบดมินตัน</h3>
-                        <div class="court-selector">
-                            <?php foreach($courts as $court): ?>
-                            <label class="court-option">
-                                <input type="radio" name="court_id" value="<?php echo $court['court_id']; ?>" 
-                                       data-price="<?php echo $court['court_price_per_hour']; ?>" 
-                                       data-peak-price="<?php echo $court['court_peak_price']; ?>" 
-                                       data-offpeak-price="<?php echo $court['court_offpeak_price']; ?>" 
-                                       required onchange="calculateSummary()">
-                                <div class="court-box">
-                                    <i class="fas fa-map-marked-alt fa-2x"></i>
-                                    <h4><?php echo htmlspecialchars($court['court_name']); ?></h4>
-                                    <div style="font-size: 11px; margin-top: 5px; line-height: 1.6; text-align: left; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                        <div><span style="color: #0284c7; font-weight: 600;"><i class="fas fa-calendar-day"></i> จ.-พ.-ศ.:</span> <?php echo number_format($court['court_price_per_hour']); ?> ฿</div>
-                                        <div><span style="color: #b45309; font-weight: 600;"><i class="fas fa-star"></i> ส.-อา.:</span> <?php echo number_format($court['court_peak_price']); ?> ฿</div>
-                                        <div><span style="color: #15803d; font-weight: 600;"><i class="fas fa-tag"></i> อ.-พฤ.:</span> <?php echo number_format($court['court_offpeak_price']); ?> ฿</div>
-                                    </div>
-                                </div>
-                            </label>
-                            <?php endforeach; ?>
+                    <div class="calendar-picker-container">
+                        <!-- ปุ่มทางลัด วันนี้ / พรุ่งนี้ -->
+                        <div class="calendar-quick-bar">
+                            <button type="button" class="btn-quick-date active" id="btnQuickToday" onclick="selectQuickDate('today')">
+                                <i class="fas fa-calendar-day"></i> วันนี้
+                            </button>
+                            <button type="button" class="btn-quick-date" id="btnQuickTomorrow" onclick="selectQuickDate('tomorrow')">
+                                <i class="fas fa-calendar-plus"></i> พรุ่งนี้
+                            </button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- ฝั่งขวา: เลือกอุปกรณ์และสรุปยอด (One-stop Booking) -->
-                <div class="booking-right">
-                    
-                    <div class="booking-card">
-                        <h3><i class="fas fa-shopping-basket" style="color: #007bff;"></i> ขั้นตอนที่ 2: บริการเสริมและอุปกรณ์เช่า (ทางเลือกเสริม)</h3>
-                        
-                        <!-- ============================================== -->
-                        <!-- หมวดหมู่: สินค้าบริโภค -->
-                        <!-- ============================================== -->
-                        <div class="product-category-title">
-                            <i class="fas fa-coffee"></i> สินค้าบริโภค (น้ำดื่ม/ลูกแบด)
-                        </div>
-                        <div class="product-list-booking">
-                            <?php 
-                            foreach($products as $prod): 
-                                if($prod['product_type'] == 'สินค้าบริโภค'):
-                            ?>
-                            <div class="product-item">
-                                <div class="prod-img">
-                                    <?php if(!empty($prod['product_image'])): ?>
-                                        <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="product">
-                                    <?php else: ?>
-                                        <div class="prod-img-placeholder"><i class="fas fa-image"></i></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="prod-info">
-                                    <strong><?php echo htmlspecialchars($prod['product_name']); ?></strong>
-                                    
-                                    <div style="font-size: 11px; color: #666; margin-top: 2px;">
-                                        <?php if(!empty($prod['product_brand'])): ?>
-                                            <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
-                                        <?php endif; ?>
-                                    </div>
-                                    
-                                    <div style="font-size: 13px; color: #007bff; font-weight: bold; margin-top: 4px;">
-                                        <?php echo number_format($prod['product_price']); ?> ฿/หน่วย
-                                    </div>
-                                </div>
-                                <div class="prod-qty">
-                                    <input type="number" name="products[<?php echo $prod['product_id']; ?>]" class="qty-input form-control" min="0" max="<?php echo $prod['product_stock']; ?>" value="0" data-price="<?php echo $prod['product_price']; ?>" data-type="<?php echo $prod['product_type']; ?>" oninput="calculateSummary()">
-                                </div>
+                        <!-- ปฏิทินแสดงเดือนและวันที่ 1-31 -->
+                        <div class="calendar-box">
+                            <div class="calendar-nav-bar">
+                                <button type="button" class="cal-nav-btn" onclick="navigateCalendarMonth(-1)" title="เดือนก่อนหน้า">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <span class="cal-month-title" id="calMonthTitle">-</span>
+                                <button type="button" class="cal-nav-btn" onclick="navigateCalendarMonth(1)" title="เดือนถัดไป">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
                             </div>
-                            <?php 
-                                endif;
-                            endforeach; 
-                            ?>
-                        </div>
 
-                        <!-- ============================================== -->
-                        <!-- หมวดหมู่: อุปกรณ์เช่า -->
-                        <!-- ============================================== -->
-                        <div class="product-category-title" style="margin-top: 20px;">
-                            <i class="fas fa-table-tennis"></i> อุปกรณ์เช่า (ไม้แบด/รองเท้า)
-                        </div>
-                        <div class="product-list-booking">
-                            <?php 
-                            foreach($products as $prod): 
-                                if($prod['product_type'] == 'อุปกรณ์เช่า'):
-                            ?>
-                            <div class="product-item">
-                                <div class="prod-img">
-                                    <?php if(!empty($prod['product_image'])): ?>
-                                        <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="product">
-                                    <?php else: ?>
-                                        <div class="prod-img-placeholder"><i class="fas fa-image"></i></div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="prod-info">
-                                    <strong><?php echo htmlspecialchars($prod['product_name']); ?></strong>
-                                    
-                                    <div style="font-size: 11px; color: #666; margin-top: 2px;">
-                                        <?php if(!empty($prod['product_brand'])): ?>
-                                            <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
-                                        <?php endif; ?>
-
-                                        <?php if(!empty($prod['product_model'])): ?>
-                                            <span style="margin-left: 5px;">| รุ่น: <?php echo htmlspecialchars($prod['product_model']); ?></span>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div style="font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 8px;">
-                                        <?php if(!empty($prod['product_level'])): ?>
-                                            <span class="badge-level <?php echo ($prod['product_level'] == 'มือโปร') ? 'level-gold' : 'level-silver'; ?>" style="font-size: 10px; padding: 2px 6px;">
-                                                <i class="fas fa-medal"></i> <?php echo htmlspecialchars($prod['product_level']); ?>
-                                            </span>
-                                        <?php endif; ?>
-
-                                        <?php if(!empty($prod['product_size'])): ?>
-                                            <span style="color: #495057; font-weight: 500; background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-size: 10px;">
-                                                <i class="fas fa-shoe-prints"></i> ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?>
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                    
-                                    <div style="font-size: 13px; color: #007bff; font-weight: bold; margin-top: 6px;">
-                                        <?php echo number_format($prod['product_price']); ?> ฿/หน่วย
-                                    </div>
-                                </div>
-                                <div class="prod-qty">
-                                    <input type="number" name="products[<?php echo $prod['product_id']; ?>]" class="qty-input form-control" min="0" max="<?php echo $prod['product_stock']; ?>" value="0" data-price="<?php echo $prod['product_price']; ?>" data-type="<?php echo $prod['product_type']; ?>" oninput="calculateSummary()">
-                                </div>
+                            <div class="calendar-grid" id="calendarGrid">
+                                <!-- ส่วนแสดงหัววัน อา. - ส. และวันที่ 1-31 จะสร้างด้วย JavaScript -->
                             </div>
-                            <?php 
-                                endif;
-                            endforeach; 
-                            ?>
+                        </div>
+
+                        <!-- ป้ายบอกราคาของวันที่เลือกเพียงบรรทัดเดียวอย่างชัดเจน -->
+                        <div class="date-price-banner" id="datePriceBanner">
+                            <i class="fas fa-tag"></i> 
+                            <span id="datePriceText">กำลังตรวจสอบอัตราค่าบริการ...</span>
                         </div>
                     </div>
 
-                    <!-- สรุปยอดรวมก่อนยืนยัน (Phase 3) -->
-                    <div class="booking-summary">
-                        <h3><i class="fas fa-file-invoice-dollar" style="color: #007bff;"></i> ขั้นตอนที่ 3: สรุปรายการจองและยืนยัน</h3>
-                        <div class="summary-row">
-                            <span>ระยะเวลาจอง:</span>
-                            <span id="sum-hours">0 ชั่วโมง</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>ค่าสนาม:</span>
-                            <span id="sum-court">0 ฿</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>ค่าเช่าอุปกรณ์:</span>
-                            <span id="sum-rent">0 ฿</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>ค่าสินค้า:</span>
-                            <span id="sum-product">0 ฿</span>
-                        </div>
-                        <hr style="margin: 15px 0; border: 0; border-top: 1px dashed #ccc;">
-                        <div class="summary-row total-row">
-                            <span>ยอดชำระสุทธิ:</span>
-                            <span id="sum-total" style="color: #007bff; font-size: 22px;">0 ฿</span>
-                        </div>
+                    <div class="wizard-nav-actions flex-end">
+                        <button type="button" class="btn-wizard-next" id="btnStep1Next" onclick="goToStep(2)">
+                            ถัดไป: เลือกเวลาเริ่มต้น <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                        <!-- ซ่อนค่าผลรวมไว้เพื่อส่งไป PHP -->
-                        <input type="hidden" name="total_court_price" id="input_court_price" value="0">
-                        <input type="hidden" name="total_rental_price" id="input_rental_price" value="0">
-                        <input type="hidden" name="total_product_price" id="input_product_price" value="0">
-                        <input type="hidden" name="total_price" id="input_total_price" value="0">
+            <!-- ============================================== -->
+            <!-- Step 2: เลือกเวลาเริ่มต้น (Operating Hours Grid) -->
+            <!-- ============================================== -->
+            <div class="wizard-panel" id="stepPanel2">
+                <div class="wizard-card">
+                    <div class="wizard-card-header">
+                        <h3><i class="fas fa-clock"></i> ขั้นตอนที่ 2: เลือกเวลาเริ่มต้น</h3>
+                        <p class="wizard-card-desc">คลิกเลือกช่วงเวลาเริ่มต้นที่ต้องการเข้าใช้งาน ระบบจะนำท่านเข้าสู่การเลือกสนามทันที</p>
+                    </div>
 
-                        <button type="submit" class="btn-confirm-booking" id="btnSubmitBooking" disabled>
-                            ตรวจสอบและยืนยันการจอง <i class="fas fa-arrow-right"></i>
+                    <div class="time-picker-wrapper">
+                        <!-- กริดปุ่มช่วงเวลาเปิดทำการ -->
+                        <div class="time-grid-container" id="timeSlotGrid">
+                            <!-- สร้างรายการช่วงเวลาด้วย JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="wizard-nav-actions">
+                        <button type="button" class="btn-wizard-back" onclick="goToStep(1)">
+                            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- Step 3: เลือกคอร์ท & ชั่วโมงต่อเนื่อง (Consecutive Slot) -->
+            <!-- ============================================== -->
+            <div class="wizard-panel" id="stepPanel3">
+                <div class="wizard-card step3-wrapper">
+                    <div class="wizard-card-header">
+                        <h3><i class="fas fa-map-marked-alt"></i> ขั้นตอนที่ 3: เลือกสนามแบดมินตันและชั่วโมงการเล่น</h3>
+                        <p class="wizard-card-desc">คลิกเลือกสนามที่ต้องการในชั่วโมงแรก และสามารถเลื่อนลงด้านล่างเพื่อเลือกชั่วโมงต่อเนื่องได้ทันที</p>
+                    </div>
+
+                    <!-- ช่องกรอกชื่อเล่น / ชื่อก๊วน (PDPA Protection) -->
+                    <div class="nickname-box">
+                        <label for="step3_nickname" class="nickname-label">
+                            <i class="fas fa-user-tag text-success"></i> 
+                            ชื่อเล่น / ชื่อก๊วนผู้จอง:
+                            <span class="pdpa-badge">PDPA</span>
+                        </label>
+                        <div class="nickname-input-group">
+                            <input type="text" id="step3_nickname" class="nickname-control" maxlength="30" placeholder="เช่น ต้น, ก๊วนเพื่อนสุขใจ (ไม่เกิน 30 ตัวอักษร)" value="<?php echo $default_nickname; ?>" oninput="syncBookingNickname(this.value)">
+                            <div class="nickname-hint">
+                                <i class="fas fa-shield-alt"></i> ระบบจะแสดงเฉพาะชื่อเล่นนี้บนการ์ดสนามเพื่อคุ้มครองความเป็นส่วนตัวตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- บล็อกแสดงคอร์ทในแต่ละชั่วโมง (Hour 1 + Scroll Multi-Hour) -->
+                    <div id="courtHourBlocksContainer">
+                        <!-- เนื้อหาบล็อกชั่วโมง 1 และชั่วโมงถัดไปจะถูกเรนเดอร์ด้วย JavaScript -->
+                    </div>
+
+                    <div class="wizard-nav-actions">
+                        <button type="button" class="btn-wizard-back" onclick="goToStep(2)">
+                            <i class="fas fa-arrow-left"></i> เปลี่ยนเวลาเริ่มต้น
                         </button>
                     </div>
                 </div>
 
+                <!-- Sticky Bottom Summary Bar (ตรึงล่างสุดของจอเสมอ) -->
+                <div class="sticky-summary-bar" id="stickySummaryBar">
+                    <div class="sticky-summary-inner">
+                        <div class="sticky-metrics-group">
+                            <div class="sticky-metric-pill">
+                                <i class="fas fa-clock"></i>
+                                <span id="stickyHoursDisplay">[ 0 Hour ]</span>
+                            </div>
+                            <div class="sticky-metric-pill">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="stickyCourtDisplay">[ ยังไม่ได้เลือกสนาม ]</span>
+                            </div>
+                            <div class="sticky-metric-pill sticky-metric-total">
+                                <i class="fas fa-tag"></i>
+                                <span id="stickyTotalDisplay">[ Total 0 ฿ ]</span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-sticky-next" id="btnStickyNext" disabled onclick="goToStep(4)">
+                            ต่อไป: บริการเสริม <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
+
+            <!-- ============================================== -->
+            <!-- Step 4: บริการเสริมและอุปกรณ์เช่า (Add-ons Optional) -->
+            <!-- ============================================== -->
+            <div class="wizard-panel" id="stepPanel4">
+                <div class="wizard-card step4-wrapper">
+                    <div class="wizard-card-header">
+                        <h3><i class="fas fa-shopping-basket"></i> ขั้นตอนที่ 4: บริการเสริมและอุปกรณ์เช่า (ทางเลือกเสริม)</h3>
+                        <p class="wizard-card-desc">เลือกน้ำดื่ม ลูกแบด หรืออุปกรณ์เช่าตามต้องการ หรือกด "ข้ามขั้นตอนนี้" หากมีอุปกรณ์พร้อมแล้ว</p>
+                    </div>
+
+                    <!-- แถบย่อสรุปข้อมูลสนาม วัน และเวลาที่เลือกไว้ -->
+                    <div class="compact-selection-strip" id="step4SummaryStrip">
+                        <div class="compact-strip-item">
+                            <i class="fas fa-calendar-day text-success"></i>
+                            <span id="stripDate">-</span>
+                        </div>
+                        <div class="compact-strip-item">
+                            <i class="fas fa-clock text-success"></i>
+                            <span id="stripTime">-</span>
+                        </div>
+                        <div class="compact-strip-item">
+                            <i class="fas fa-map-marked-alt text-success"></i>
+                            <span id="stripCourt">-</span>
+                        </div>
+                    </div>
+
+                    <!-- หมวดหมู่: สินค้าบริโภค -->
+                    <div class="addon-category-title">
+                        <i class="fas fa-coffee"></i> สินค้าบริโภค (น้ำดื่ม/ลูกแบด)
+                    </div>
+                    <div class="addon-cards-grid">
+                        <?php 
+                        $has_consumer = false;
+                        foreach($products as $prod): 
+                            if($prod['product_type'] == 'สินค้าบริโภค'):
+                                $has_consumer = true;
+                        ?>
+                        <div class="addon-item-card">
+                            <div class="addon-item-thumb">
+                                <?php if(!empty($prod['product_image'])): ?>
+                                    <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
+                                <?php else: ?>
+                                    <i class="fas fa-tint fa-2x"></i>
+                                <?php endif; ?>
+                            </div>
+                            <div class="addon-item-details">
+                                <div class="addon-item-name"><?php echo htmlspecialchars($prod['product_name']); ?></div>
+                                <div class="addon-item-meta">
+                                    <?php if(!empty($prod['product_brand'])): ?>
+                                        <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                    <?php endif; ?>
+                                    <span>(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
+                                </div>
+                                <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                            </div>
+                            <div class="addon-stepper-control">
+                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
+                                <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
+                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)">+</button>
+                            </div>
+                        </div>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        if(!$has_consumer):
+                        ?>
+                            <p class="text-muted">ไม่มีสินค้าบริโภคพร้อมจำหน่ายในขณะนี้</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- หมวดหมู่: อุปกรณ์เช่า -->
+                    <div class="addon-category-title">
+                        <i class="fas fa-table-tennis"></i> อุปกรณ์เช่า (ไม้แบด/รองเท้า)
+                    </div>
+                    <div class="addon-cards-grid">
+                        <?php 
+                        $has_rental = false;
+                        foreach($products as $prod): 
+                            if($prod['product_type'] == 'อุปกรณ์เช่า'):
+                                $has_rental = true;
+                        ?>
+                        <div class="addon-item-card">
+                            <div class="addon-item-thumb">
+                                <?php if(!empty($prod['product_image'])): ?>
+                                    <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
+                                <?php else: ?>
+                                    <i class="fas fa-medal fa-2x"></i>
+                                <?php endif; ?>
+                            </div>
+                            <div class="addon-item-details">
+                                <div class="addon-item-name"><?php echo htmlspecialchars($prod['product_name']); ?></div>
+                                <div class="addon-item-meta">
+                                    <?php if(!empty($prod['product_brand'])): ?>
+                                        <span><?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if(!empty($prod['product_size'])): ?>
+                                        <span>ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?></span>
+                                    <?php endif; ?>
+                                    <span>(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
+                                </div>
+                                <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                            </div>
+                            <div class="addon-stepper-control">
+                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
+                                <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
+                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)">+</button>
+                            </div>
+                        </div>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        if(!$has_rental):
+                        ?>
+                            <p class="text-muted">ไม่มีอุปกรณ์เช่าพร้อมให้บริการในขณะนี้</p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="wizard-nav-actions">
+                        <button type="button" class="btn-wizard-back" onclick="goToStep(3)">
+                            <i class="fas fa-arrow-left"></i> ย้อนกลับไปเลือกสนาม
+                        </button>
+                        <div>
+                            <button type="button" class="btn-wizard-skip" onclick="goToStep(5)">
+                                ข้ามขั้นตอนนี้ <i class="fas fa-forward"></i>
+                            </button>
+                            <button type="button" class="btn-wizard-next" onclick="goToStep(5)">
+                                ถัดไป: ตรวจสอบรายการ <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- Step 5: ตรวจสอบรายการและสรุปยอด (Review & Submit) -->
+            <!-- ============================================== -->
+            <div class="wizard-panel" id="stepPanel5">
+                <div class="wizard-card step5-wrapper">
+                    <div class="wizard-card-header">
+                        <h3><i class="fas fa-receipt"></i> ขั้นตอนที่ 5: ตรวจสอบรายการและยืนยันการจอง</h3>
+                        <p class="wizard-card-desc">ตรวจสอบรายละเอียดการจอง ค่าสนาม และบริการเสริมทั้งหมดก่อนเข้าสู่ขั้นตอนการชำระเงิน</p>
+                    </div>
+
+                    <div class="invoice-card">
+                        <div class="invoice-header-row">
+                            <div class="invoice-header-title">
+                                <i class="fas fa-file-invoice-dollar"></i> ใบสรุปรายการจองสนาม
+                            </div>
+                            <span class="pdpa-badge"><i class="fas fa-user-check"></i> ข้อมูลผู้จองถูกต้อง</span>
+                        </div>
+
+                        <!-- รายละเอียดการจองสนาม -->
+                        <div class="invoice-detail-block">
+                            <div class="invoice-detail-row">
+                                <span>ชื่อเล่น / ชื่อก๊วนผู้จอง:</span>
+                                <strong id="invNickname">-</strong>
+                            </div>
+                            <div class="invoice-detail-row">
+                                <span>วันที่จอง:</span>
+                                <strong id="invDate">-</strong>
+                            </div>
+                            <div class="invoice-detail-row">
+                                <span>ช่วงเวลาที่เข้าเล่น:</span>
+                                <strong id="invTime">-</strong>
+                            </div>
+                            <div class="invoice-detail-row">
+                                <span>สนามที่จอง:</span>
+                                <strong id="invCourt">-</strong>
+                            </div>
+                        </div>
+
+                        <!-- ตารางแจกแจงรายการค่าใช้จ่าย -->
+                        <table class="invoice-breakdown-table">
+                            <thead>
+                                <tr>
+                                    <th>รายการ</th>
+                                    <th>จำนวน</th>
+                                    <th>อัตราค่าบริการ</th>
+                                    <th>รวม (บาท)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceTableBody">
+                                <!-- เรนเดอร์ด้วย JavaScript -->
+                            </tbody>
+                        </table>
+
+                        <!-- แถบยอดชำระสุทธิ -->
+                        <div class="invoice-total-strip">
+                            <span class="invoice-total-label">ยอดชำระสุทธิทั้งหมด:</span>
+                            <span class="invoice-total-amount" id="invGrandTotal">0 ฿</span>
+                        </div>
+
+                        <!-- คำเตือนเวลาล็อกสนาม 15 นาที -->
+                        <div class="payment-warning-strip">
+                            <i class="fas fa-stopwatch fa-lg text-danger"></i>
+                            <div>
+                                <strong>ระบบจะล็อกสนามให้ท่านเป็นเวลา 15 นาที:</strong><br>
+                                เมื่อกดยืนยัน ระบบจะนำท่านไปสู่หน้าชำระเงินเพื่อโอนเงินและแนบสลิป
+                            </div>
+                        </div>
+
+                        <div class="wizard-nav-actions">
+                            <button type="button" class="btn-wizard-back" onclick="goToStep(4)">
+                                <i class="fas fa-arrow-left"></i> กลับไปแก้ไขบริการเสริม
+                            </button>
+                            <button type="submit" class="btn-submit-booking-final" id="btnFinalSubmitBooking">
+                                ยืนยันการจองและไปหน้าชำระเงิน <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
-    
-    <!-- Modal ยืนยันข้อมูลการจองสนาม (HCI Rule 2, 3, 5 & Section 15) -->
-    <div id="bookingConfirmModal" class="member-modal-overlay">
-        <div class="member-modal-content">
-            <div class="member-modal-header">
-                <i class="fas fa-calendar-check fa-lg" style="color: #007bff;"></i>
-                <h4>ยืนยันข้อมูลการจองสนาม</h4>
-            </div>
 
-            <div class="booking-summary-detail">
-                <div class="detail-row">
-                    <span>สนามที่เลือก:</span>
-                    <strong id="modal_court_name">-</strong>
-                </div>
-                <div class="detail-row">
-                    <span>วันที่จอง:</span>
-                    <strong id="modal_booking_date">-</strong>
-                </div>
-                <div class="detail-row">
-                    <span>ช่วงเวลา:</span>
-                    <strong id="modal_booking_time">-</strong>
-                </div>
-                <div class="detail-row" style="border-top: 1px dashed #cbd5e1; padding-top: 8px; margin-top: 8px;">
-                    <span style="font-weight: 600; color: #1e293b;">ยอดชำระสุทธิ:</span>
-                    <strong id="modal_total_price" style="font-size: 18px; color: #007bff;">0 ฿</strong>
-                </div>
-            </div>
-
-            <div class="modal-timer-warning">
-                <i class="fas fa-clock fa-lg"></i>
-                <div>
-                    <strong>กรุณาชำระเงินภายใน 15 นาที:</strong><br>
-                    เมื่อกดยืนยัน ระบบจะล็อกสนามไว้ให้ท่าน และนำทางไปหน้าชำระเงินเพื่อแนบสลิป
-                </div>
-            </div>
-
-            <div class="member-modal-footer">
-                <button type="button" class="btn-cancel" onclick="closeBookingConfirmModal()">
-                    กลับไปแก้ไข
-                </button>
-                <button type="button" class="btn-submit-confirm" id="btnModalConfirmBooking" onclick="executeBookingSubmit()">
-                    ยืนยันการจอง <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้าที่รวมโค้ดทั้งหมดไว้แล้ว -->
-    <script src="assets/js/member.js?v=1.8"></script>
+    <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard -->
+    <script src="assets/js/member.js?v=2.0"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let today = new Date().toISOString().split('T')[0];
-            loadCourtMatrix(today);
-
-            // ปิด Modal เมื่อคลิกนอกหน้าต่าง
-            let bModal = document.getElementById('bookingConfirmModal');
-            if (bModal) {
-                bModal.addEventListener('click', function(e) {
-                    if (e.target === bModal) closeBookingConfirmModal();
-                });
+            // เริ่มต้นระบบ 5-Step Booking Wizard
+            if (typeof initBookingWizard === 'function') {
+                initBookingWizard();
             }
-            // ปิดเมื่อกดปุ่ม ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeBookingConfirmModal();
-            });
         });
     </script>
 </body>

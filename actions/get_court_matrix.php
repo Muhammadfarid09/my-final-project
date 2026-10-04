@@ -37,28 +37,28 @@ try {
         $rate_badge = 'จันทร์-พุธ-ศุกร์ (180฿)';
     }
 
-    // 1. ดึงข้อมูลสนามทั้งหมดที่พร้อมใช้งาน
+    // 1. ดึงข้อมูลสนามทั้งหมด (รวมถึงสนามปิดปรับปรุง เพื่อแสดงสถานะให้ผู้ใช้ทราบ)
     $stmt_court = $conn->query("
-        SELECT court_id, court_name, court_price_per_hour, court_peak_price, court_offpeak_price, court_open_time, court_close_time 
+        SELECT court_id, court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price, court_open_time, court_close_time 
         FROM Court 
-        WHERE court_status != 'ปิดปรับปรุง' 
         ORDER BY court_id ASC
     ");
     $courts = $stmt_court->fetchAll(PDO::FETCH_ASSOC);
 
-    // 2. ดึงรายการจองทั้งหมดในวันที่ระบุ (ไม่รวมรายการที่ยกเลิก)
+    // 2. ดึงรายการจองทั้งหมดในวันที่ระบุ (ไม่รวมรายการที่ยกเลิก) พร้อมชื่อเล่นตามหลัก PDPA
     $stmt_booking = $conn->prepare("
-        SELECT booking_id, court_id, booking_start_time, booking_end_time, booking_status 
-        FROM Booking 
-        WHERE booking_date = :bdate 
-        AND booking_status != 'ยกเลิก'
+        SELECT b.booking_id, b.court_id, b.booking_start_time, b.booking_end_time, b.booking_status, b.booking_nickname, m.member_name 
+        FROM Booking b
+        LEFT JOIN Member m ON b.member_id = m.member_id
+        WHERE b.booking_date = :bdate 
+        AND b.booking_status != 'ยกเลิก'
     ");
     $stmt_booking->execute([':bdate' => $date]);
     $bookings = $stmt_booking->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. กำหนด Time Slots ตั้งแต่ 09:00 ถึง 22:00 น. (13 ช่วงเวลา ช่วงละ 1 ชม.)
+    // 3. กำหนด Time Slots ตั้งแต่ 09:00 ถึง 23:00 น.
     $slots = [];
-    for ($h = 9; $h < 22; $h++) {
+    for ($h = 9; $h < 23; $h++) {
         $start_str = sprintf("%02d:00", $h);
         $end_str = sprintf("%02d:00", $h + 1);
         $slots[] = [
@@ -72,6 +72,7 @@ try {
     $court_data = [];
     foreach ($courts as $c) {
         $c_id = $c['court_id'];
+        $c_status = $c['court_status'] ?? 'ว่าง';
         $c_open = $c['court_open_time'] ? substr($c['court_open_time'], 0, 5) : '09:00';
         $c_close = $c['court_close_time'] ? substr($c['court_close_time'], 0, 5) : '22:00';
 
@@ -96,26 +97,41 @@ try {
             // ตรวจสอบว่ามีผู้จองแล้วหรือไม่
             $is_booked = false;
             $booking_status = '';
+            $booked_nickname = '';
             foreach ($bookings as $b) {
                 if ($b['court_id'] == $c_id) {
                     if ($b['booking_start_time'] < $slot_end && $b['booking_end_time'] > $slot_start) {
                         $is_booked = true;
                         $booking_status = $b['booking_status'];
+                        // PDPA Privacy: แสดงเฉพาะชื่อเล่น หากไม่มีให้ใช้ชื่อตัวแรก ไม่แสดงนามสกุล
+                        if (!empty($b['booking_nickname'])) {
+                            $booked_nickname = $b['booking_nickname'];
+                        } elseif (!empty($b['member_name'])) {
+                            $parts = explode(' ', trim($b['member_name']));
+                            $booked_nickname = $parts[0];
+                        } else {
+                            $booked_nickname = 'ผู้ใช้งาน';
+                        }
                         break;
                     }
                 }
             }
 
-            // สถานะของ Slot นี้
+            // สถานะของ Slot นี้ (Available, Selected, Pending, Booked, Maintenance, Closed)
             $status = 'available';
-            if ($is_booked) {
+            $booked_by = '';
+            if ($c_status === 'ปิดปรับปรุง') {
+                $status = 'maintenance';
+            } elseif ($is_booked) {
                 $status = ($booking_status == 'รอตรวจสอบ') ? 'pending' : 'booked';
+                $booked_by = $booked_nickname;
             } elseif ($slot['start'] < $c_open || $slot['end'] > $c_close) {
                 $status = 'closed'; // นอกเวลาทำการ
             }
 
             $court_slots[$slot['start']] = [
                 'status' => $status,
+                'booked_by' => $booked_by,
                 'rate_category' => $rate_category,
                 'price' => $slot_price,
                 'slot_start' => $slot['start'],
@@ -126,6 +142,7 @@ try {
         $court_data[] = [
             'court_id' => $c['court_id'],
             'court_name' => $c['court_name'],
+            'court_status' => $c_status,
             'current_rate' => $slot_price,
             'price_normal' => $base_rate,
             'price_weekend' => $peak_rate,
