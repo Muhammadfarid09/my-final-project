@@ -1857,4 +1857,596 @@ body.bg-register {
     .btn-sticky-next { width: 100%; justify-content: center; }
 }
 
+/* ==========================================================================
+   T.S. Pattani - Rewards Page Enhanced Styles (HCI & Gamification Standards)
+   Zero Inline Style Standard - Loyalty, Tabs, Shortfall, Modal & History
+   ========================================================================== */
+
+/* Rewards Container */
+.rewards-page-wrapper {
+    max-width: 1050px;
+    margin: 30px auto 60px;
+    padding: 0 16px;
+}
+
+/* Loyalty Hero Card */
+.rewards-hero-card {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 24px rgba(30, 60, 114, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.rewards-hero-card::after {
+    content: '\f06b';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: -15px;
+    bottom: -25px;
+    font-size: 130px;
+    opacity: 0.08;
+    color: #ffffff;
+    pointer-events: none;
+}
+.rewards-hero-info {
+    flex: 1;
+    min-width: 260px;
+    z-index: 1;
+}
+.rewards-hero-title {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.rewards-hero-desc {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    opacity: 0.9;
+    color: #e2e8f0;
+}
+.loyalty-progress-container {
+    max-width: 380px;
+}
+.loyalty-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+}
+.loyalty-progress-label strong {
+    color: #fde047;
+}
+.loyalty-progress-track {
+    background: rgba(255, 255, 255, 0.2);
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.loyalty-progress-fill {
+    height: 100%;
+    background: #fde047;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+.rewards-hero-stats {
+    text-align: right;
+    z-index: 1;
+    min-width: 200px;
+}
+.rewards-coins-display {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fde047;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.rewards-level-row {
+    font-size: 14px;
+    margin-top: 4px;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+.loyalty-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.loyalty-badge.bronze {
+    background: #cd7f32;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.loyalty-badge.silver {
+    background: #e2e8f0;
+    color: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.loyalty-badge.gold {
+    background: #fbbf24;
+    color: #78350f;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Tabs Navigation */
+.rewards-tab-nav {
+    display: flex;
+    gap: 12px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+.rewards-tab-btn {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    margin-bottom: -2px;
+}
+.rewards-tab-btn:hover:not(.active) {
+    color: #1e3c72;
+}
+.rewards-tab-btn.active {
+    color: #1e3c72;
+    border-bottom-color: #1e3c72;
+    font-weight: 700;
+}
+.rewards-tab-count {
+    background: #f1f5f9;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.rewards-tab-btn.active .rewards-tab-count {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Tab Panes */
+.rewards-tab-pane {
+    display: none;
+}
+.rewards-tab-pane.active {
+    display: block;
+    animation: wizardFadeIn 0.25s ease-out;
+}
+
+/* Rewards Grid */
+.rewards-catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 22px;
+}
+.reward-item-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+}
+.reward-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+.reward-item-thumb-box {
+    width: 100%;
+    height: 190px;
+    position: relative;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.reward-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.reward-item-card:hover .reward-item-img {
+    transform: scale(1.04);
+}
+.reward-placeholder-icon {
+    font-size: 54px;
+    color: #cbd5e1;
+}
+.badge-tier-req {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+.badge-urgent-stock {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.badge-out-stock {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #475569;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* Reward Card Body */
+.reward-item-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.reward-item-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 6px 0;
+}
+.reward-item-desc {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
+    flex-grow: 1;
+}
+.reward-item-footer {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 14px;
+    margin-top: auto;
+}
+.reward-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.reward-cost-tag {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3c72;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.reward-cost-tag i {
+    color: #f59e0b;
+}
+.reward-stock-text {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Action Buttons */
+.btn-redeem-action {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    border: none;
+}
+.btn-redeem-action.active {
+    background: #1e3c72;
+    color: #ffffff;
+}
+.btn-redeem-action.active:hover {
+    background: #162c54;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.25);
+}
+.btn-redeem-action.shortfall {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    cursor: not-allowed;
+}
+.btn-redeem-action.locked {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+    cursor: not-allowed;
+}
+.btn-redeem-action.out-of-stock {
+    background: #f8fafc;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Redemption Confirmation Modal
+   ========================================================================== */
+.redeem-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+.redeem-modal-overlay.active {
+    display: flex;
+}
+.redeem-modal-card {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 480px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: modalScaleIn 0.2s ease-out;
+}
+.redeem-modal-header {
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.redeem-modal-header h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e3c72;
+}
+.redeem-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+}
+.redeem-preview-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+.redeem-preview-placeholder {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+.redeem-preview-info {
+    flex-grow: 1;
+}
+.redeem-preview-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+.redeem-preview-cost {
+    font-size: 13px;
+    color: #2563eb;
+    font-weight: 600;
+}
+.redeem-calc-table {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+.redeem-calc-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    color: #475569;
+}
+.redeem-calc-row strong {
+    color: #1e293b;
+}
+.redeem-calc-row.final {
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 8px;
+    margin-top: 6px;
+    font-weight: 700;
+}
+.redeem-calc-row.final strong {
+    color: #059669;
+    font-size: 15px;
+}
+.redeem-note-banner {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #1e40af;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================================================
+   My Redemptions (History Table)
+   ========================================================================== */
+.redemptions-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.redemptions-table-box {
+    overflow-x: auto;
+}
+.redemptions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.redemptions-table th {
+    background: #f8fafc;
+    color: #475569;
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+    font-weight: 600;
+}
+.redemptions-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+}
+.redemptions-table tr:hover td {
+    background: #f8fafc;
+}
+.badge-rdm-code {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid #bae6fd;
+}
+.badge-rdm-status {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #fde68a;
+}
+.badge-rdm-points {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* Empty States */
+.rewards-empty-box {
+    text-align: center;
+    padding: 50px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+.rewards-empty-icon {
+    font-size: 48px;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+}
+.rewards-empty-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 6px 0;
+}
+.rewards-empty-desc {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+}
+.btn-empty-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #1e3c72;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-empty-action:hover {
+    background: #162c54;
+}
+
+/* Small Screens Adjustments */
+@media (max-width: 640px) {
+    .rewards-hero-card { flex-direction: column; text-align: center; }
+    .rewards-hero-stats { text-align: center; }
+    .rewards-coins-display { justify-content: center; }
+    .rewards-level-row { justify-content: center; }
+    .loyalty-progress-container { margin: 0 auto; }
+}
+
+
 

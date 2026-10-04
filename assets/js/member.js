@@ -1001,3 +1001,96 @@ function copyBankAccount(accNo) {
         }
     }
 }
+
+/* ==========================================================================
+   Rewards Page Controller (Tabs, Redemption Modal & Verification)
+   ========================================================================== */
+
+function switchRewardsTab(targetTab) {
+    let tabButtons = document.querySelectorAll('.rewards-tab-btn');
+    let tabPanes = document.querySelectorAll('.rewards-tab-pane');
+
+    tabButtons.forEach(btn => {
+        if (btn.getAttribute('data-tab') === targetTab) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    tabPanes.forEach(pane => {
+        if (pane.id === targetTab) {
+            pane.classList.add('active');
+        } else {
+            pane.classList.remove('active');
+        }
+    });
+}
+
+function openRedeemModal(rewardId, rewardName, pointCost, rewardImg, userPoints) {
+    let modal = document.getElementById('rewardConfirmModal');
+    if (!modal) return;
+
+    // Set hidden form values
+    let inputRewardId = document.getElementById('modal_reward_id');
+    if (inputRewardId) inputRewardId.value = rewardId;
+
+    // Set preview details
+    let titleEl = document.getElementById('modal_reward_title');
+    let costEl = document.getElementById('modal_reward_cost');
+    let imgEl = document.getElementById('modal_reward_img');
+    let iconEl = document.getElementById('modal_reward_placeholder');
+
+    if (titleEl) titleEl.innerText = rewardName;
+    if (costEl) costEl.innerHTML = '<i class="fas fa-coins text-warning"></i> ' + Number(pointCost).toLocaleString() + ' คะแนน';
+
+    if (rewardImg && rewardImg.trim() !== '') {
+        if (imgEl) {
+            imgEl.src = 'uploads/rewards/' + rewardImg;
+            imgEl.style.display = 'block';
+        }
+        if (iconEl) iconEl.style.display = 'none';
+    } else {
+        if (imgEl) imgEl.style.display = 'none';
+        if (iconEl) iconEl.style.display = 'flex';
+    }
+
+    // Calculate points breakdown
+    let currentPtsEl = document.getElementById('modal_current_points');
+    let deductPtsEl = document.getElementById('modal_deduct_points');
+    let remainPtsEl = document.getElementById('modal_remain_points');
+
+    let current = Number(userPoints);
+    let cost = Number(pointCost);
+    let remaining = current - cost;
+
+    if (currentPtsEl) currentPtsEl.innerText = current.toLocaleString() + ' คะแนน';
+    if (deductPtsEl) deductPtsEl.innerText = '- ' + cost.toLocaleString() + ' คะแนน';
+    if (remainPtsEl) remainPtsEl.innerText = remaining.toLocaleString() + ' คะแนน';
+
+    // Show modal
+    modal.classList.add('active');
+}
+
+function closeRedeemModal() {
+    let modal = document.getElementById('rewardConfirmModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function executeRedeemSubmit() {
+    let btnSubmit = document.getElementById('btnModalConfirmRedeem');
+    let form = document.getElementById('redeemRewardForm');
+
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังทำรายการ...';
+        btnSubmit.style.opacity = '0.75';
+        btnSubmit.style.cursor = 'not-allowed';
+    }
+
+    if (form) {
+        form.submit();
+    }
+}
