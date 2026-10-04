@@ -118,7 +118,7 @@ include 'includes/header.php';
             </div>
         </div>
 
-        <form action="actions/pos_checkout_db.php" method="POST" id="checkoutForm" onsubmit="return validateCheckout()">
+        <form action="actions/pos_checkout_db.php" method="POST" id="checkoutForm" onsubmit="return validateCheckout(event)">
             <input type="hidden" name="cart_data" id="cartDataInput">
             <input type="hidden" name="total_amount" id="totalAmountInput">
             <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">
@@ -234,7 +234,7 @@ include 'includes/header.php';
 <?php endif; ?>
 
 <!-- เรียกใช้ไฟล์ JS กลาง -->
-<script src="../assets/js/admin.js?v=1.25"></script>
+<script src="../assets/js/admin.js?v=1.30"></script>
 
 <script>
 function openWalkInCourtModal(courtId, courtName, courtPrice, peakPrice, offpeakPrice) {

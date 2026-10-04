@@ -163,8 +163,8 @@ include 'includes/header.php';
                     
                     <div class="flex-center gap-10">
                         <button type="button" class="btn-cancel" onclick="closeVerifyModal()">ปิด</button>
-                        <!-- กดปุ่มเขียว = ยืนยันสลิป / ส่งค่า action_status = ยืนยันแล้ว -->
-                        <button type="submit" onclick="document.getElementById('verify_action_status').value = 'ยืนยันแล้ว';" class="btn-success">
+                        <!-- กดปุ่มเขียว = ยืนยันสลิปผ่าน SweetAlert2 -->
+                        <button type="button" onclick="confirmApprovePayment()" class="btn-success">
                             <i class="fas fa-check"></i> ยืนยันยอดถูกต้อง
                         </button>
                     </div>
@@ -174,18 +174,35 @@ include 'includes/header.php';
     </div>
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
-    <script src="../assets/js/admin.js?v=1.22"></script>
+    <script src="../assets/js/admin.js?v=1.30"></script>
     <script>
+        function confirmApprovePayment() {
+            let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
+            let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
+            let amount = document.getElementById('info_amount') ? document.getElementById('info_amount').innerText : '';
+            
+            SwalConfirmAction({
+                title: 'ยืนยันยอดชำระเงินถูกต้อง?',
+                message: 'ยืนยันว่าการชำระเงินของ <strong>' + memberName + '</strong> (รายการ ' + bookingId + ') ยอดเงิน <strong>' + amount + '</strong> ถูกต้องเรียบร้อยแล้ว',
+                consequence: 'สถานะการจองจะเปลี่ยนเป็น "จองแล้ว" และระบบจะบันทึกรายได้พร้อมเพิ่มแต้มสะสมให้สมาชิกทันที',
+                confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันยอดถูกต้อง',
+                type: 'success',
+                onConfirm: function() {
+                    document.getElementById('verify_action_status').value = 'ยืนยันแล้ว';
+                    document.getElementById('verifyPaymentForm').submit();
+                }
+            });
+        }
+
         function confirmRejectPayment() {
             let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
             let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
             
-            showActionConfirmModal({
-                title: 'ยืนยันการปฏิเสธสลิปการโอนเงิน',
-                message: 'คุณกำลังจะปฏิเสธสลิปสำหรับรายการจอง <strong>#' + bookingId + '</strong> (' + memberName + ')',
-                consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และคืน Slot เวลาของสนามกลับสู่ระบบทันที',
+            SwalConfirmDelete({
+                title: 'ยืนยันการปฏิเสธสลิปการโอนเงิน?',
+                message: 'คุณกำลังจะปฏิเสธสลิปสำหรับรายการจอง <strong>' + bookingId + '</strong> (' + memberName + ')',
+                consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และ Slot เวลาของสนามจะถูกปล่อยคืนสู่ระบบทันที',
                 confirmText: 'ยืนยันปฏิเสธสลิป',
-                type: 'danger',
                 onConfirm: function() {
                     document.getElementById('verify_action_status').value = 'ปฏิเสธ';
                     document.getElementById('verifyPaymentForm').submit();

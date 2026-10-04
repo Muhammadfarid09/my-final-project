@@ -170,7 +170,7 @@ include 'includes/header.php';
         <div class="modal-content">
             <h4 class="modal-header text-danger"><i class="fas fa-tools"></i> บันทึกส่งซ่อมอุปกรณ์</h4>
             
-            <form action="actions/equipment_repair_add_db.php" method="POST">
+            <form action="actions/equipment_repair_add_db.php" method="POST" id="eqRepairForm" onsubmit="return confirmSendToRepair(event)">
                 <input type="hidden" name="product_id" id="modal_eq_id">
                 
                 <p><strong>อุปกรณ์ที่ส่งซ่อม:</strong> <span id="modal_eq_name" class="text-primary-bold"></span></p>
@@ -195,6 +195,24 @@ include 'includes/header.php';
     </div>
     <?php endif; ?>
 
-    <script src="../assets/js/admin.js?v=1.22"></script>
+    <script src="../assets/js/admin.js?v=1.30"></script>
+    <script>
+    function confirmSendToRepair(e) {
+        e.preventDefault();
+        const name = document.getElementById('modal_eq_name').innerText;
+        const qty = document.getElementById('modal_eq_qty').value;
+        SwalConfirmAction({
+            title: 'ยืนยันการส่งซ่อมอุปกรณ์?',
+            message: 'คุณกำลังจะบันทึกส่งซ่อม <strong>' + name + '</strong> จำนวน <strong>' + qty + ' ชิ้น</strong>',
+            consequence: 'สต็อกของอุปกรณ์พร้อมใช้งานจะถูกตัดออกจำนวน ' + qty + ' ชิ้น และเข้าสู่คิวรอการซ่อมทันที',
+            type: 'warning',
+            confirmText: '<i class="fas fa-tools mr-6"></i> ยืนยันตัดสต็อกและส่งซ่อม',
+            onConfirm: function() {
+                document.getElementById('eqRepairForm').submit();
+            }
+        });
+        return false;
+    }
+    </script>
 </body>
 </html>

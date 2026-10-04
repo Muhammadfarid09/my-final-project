@@ -70,7 +70,11 @@ function addToCart(id, name, price, maxStock) {
         if (existingItem.qty < maxStock) {
             existingItem.qty++;
         } else {
-            alert('ไม่สามารถเพิ่มได้ สต็อกมีแค่ ' + maxStock + ' ชิ้น');
+            if (typeof SwalToast === 'function') {
+                SwalToast('warning', 'ไม่สามารถเพิ่มได้ สต็อกมีแค่ ' + maxStock + ' ชิ้น');
+            } else {
+                alert('ไม่สามารถเพิ่มได้ สต็อกมีแค่ ' + maxStock + ' ชิ้น');
+            }
         }
     } else {
         posCart.push({ id: id, name: name, price: price, qty: 1, maxStock: maxStock });
@@ -86,7 +90,11 @@ function updateQty(id, change) {
         if (newQty > 0 && newQty <= item.maxStock) {
             item.qty = newQty;
         } else if (newQty > item.maxStock) {
-            alert('สินค้ามีไม่พอ!');
+            if (typeof SwalToast === 'function') {
+                SwalToast('warning', 'สินค้าในสต็อกมีไม่เพียงพอ');
+            } else {
+                alert('สินค้ามีไม่พอ!');
+            }
         }
     }
     updateCartUI();
@@ -212,27 +220,96 @@ function calculateChange() {
     }
 }
 
-// ตรวจสอบก่อนชำระเงิน (ปรับปรุงใหม่เพื่อรองรับ QR Code)
-function validateCheckout() {
+// ตรวจสอบก่อนชำระเงิน (ปรับปรุงใหม่ด้วย SweetAlert2)
+function validateCheckout(event) {
+    let form = document.getElementById('checkoutForm');
     let totalPrice = parseFloat(document.getElementById('totalAmountInput').value) || 0;
     let paymentMethod = document.getElementById('paymentMethodInput') ? document.getElementById('paymentMethodInput').value : 'cash';
 
     if (posCart.length === 0 || totalPrice <= 0) {
-        alert('กรุณาเลือกสินค้าก่อนชำระเงิน');
+        if (typeof SwalToast === 'function') {
+            SwalToast('warning', 'กรุณาเลือกสินค้าหรือสนามก่อนชำระเงิน');
+        } else {
+            alert('กรุณาเลือกสินค้าก่อนชำระเงิน');
+        }
         return false;
     }
 
+    if (typeof Swal === 'undefined') {
+        if (paymentMethod === 'qr') {
+            return confirm("ยืนยันว่าลูกค้าสแกนจ่ายสำเร็จ และยอดเงิน " + totalPrice.toFixed(2) + " บาท เข้าบัญชีแล้วใช่หรือไม่?");
+        } else {
+            let cashReceived = parseFloat(document.getElementById('cashReceived').value) || 0;
+            if (cashReceived < totalPrice) {
+                alert('รับเงินมาไม่ครบ! ขาดอีก ' + (totalPrice - cashReceived).toFixed(2) + ' บาท');
+                return false;
+            }
+            return confirm("ยืนยันรับเงินสด " + cashReceived.toFixed(2) + " บาท?");
+        }
+    }
+
+    if (event) {
+        event.preventDefault();
+    }
+
     if (paymentMethod === 'qr') {
-        // หากชำระผ่าน QR ให้ขึ้นกล่อง Confirm ว่าลูกค้าโอนเงินแล้วจริง
-        return confirm("ยืนยันว่าลูกค้าสแกนจ่ายสำเร็จ และยอดเงิน " + totalPrice.toFixed(2) + " บาท เข้าบัญชีแล้วใช่หรือไม่?");
+        Swal.fire({
+            title: 'ยืนยันรับชำระผ่าน QR Code',
+            html: `
+                <div class="swal-custom-body">
+                    <p class="swal-body-text">ยอดชำระสุทธิ: <strong class="text-primary">${totalPrice.toFixed(2)} ฿</strong></p>
+                    <div class="swal-consequence-info">
+                        <i class="fas fa-check-circle"></i>
+                        <span>กรุณาตรวจสอบยอดเงินโอนเข้าบัญชีเรียบร้อยแล้ว ก่อนกดยืนยันเพื่อบันทึกบิลและพิมพ์ใบเสร็จ</span>
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-check mr-6"></i> ยืนยันรับชำระแล้ว',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
     } else {
-        // หากชำระผ่านเงินสด
         let cashReceived = parseFloat(document.getElementById('cashReceived').value) || 0;
         if (cashReceived < totalPrice) {
-            alert('รับเงินมาไม่ครบ! ขาดอีก ' + (totalPrice - cashReceived).toFixed(2) + ' บาท');
+            SwalToast('warning', 'รับเงินสดมาไม่ครบ! ขาดอีก ' + (totalPrice - cashReceived).toFixed(2) + ' บาท');
             return false;
         }
-        return confirm("ยืนยันรับเงินสด " + cashReceived.toFixed(2) + " บาท?");
+        let change = cashReceived - totalPrice;
+        Swal.fire({
+            title: 'ยืนยันการรับเงินสด',
+            html: `
+                <div class="swal-custom-body">
+                    <div class="mb-10 text-15">ยอดชำระ: <strong>${totalPrice.toFixed(2)} ฿</strong></div>
+                    <div class="mb-10 text-15">รับเงินมา: <strong class="text-primary">${cashReceived.toFixed(2)} ฿</strong></div>
+                    <div class="mb-15 text-16">เงินทอนลูกค้า: <strong class="text-success">${change.toFixed(2)} ฿</strong></div>
+                    <div class="swal-consequence-info">
+                        <i class="fas fa-receipt"></i>
+                        <span>ยืนยันเพื่อบันทึกรายการขาย ตัดสต็อกสินค้า และออกใบเสร็จ</span>
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-check mr-6"></i> ยืนยันรับเงินสด',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#64748b',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
     }
 }
 /* =========================================
@@ -313,7 +390,17 @@ function generateQRCodeAndStartTimer(amount) {
             stopQRCouuntdown();
             timerDisplay.innerText = "หมดเวลา!";
             btnCheckout.disabled = true;
-            alert("หมดเวลาการชำระเงิน กรุณาสร้าง QR Code ใหม่โดยการสลับปุ่มไปมา หรือทำรายการใหม่");
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'หมดเวลาการชำระเงิน',
+                    text: 'กรุณาสร้าง QR Code ใหม่โดยการสลับวิธีชำระเงิน หรือทำรายการใหม่',
+                    confirmButtonColor: '#1e3c72',
+                    confirmButtonText: 'เข้าใจแล้ว'
+                });
+            } else {
+                alert("หมดเวลาการชำระเงิน กรุณาสร้าง QR Code ใหม่โดยการสลับปุ่มไปมา หรือทำรายการใหม่");
+            }
         }
     }, 1000);
 }
@@ -742,107 +829,205 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 /* =========================================
-   Global Action Confirmation Modal (HCI Rule 5 & Section 15)
+   SweetAlert2 Central Engine for Admin T.S. Pattani
+   (HCI Rule 5: Error Prevention & Consistency)
    ========================================= */
-function getOrCreateConfirmModal() {
-    let modal = document.getElementById('actionConfirmModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'actionConfirmModal';
-        modal.className = 'modal-overlay';
-        modal.innerHTML = `
-            <div class="modal-content confirm-modal-content">
-                <div class="confirm-modal-icon-wrapper danger" id="confirmModalIconWrapper">
-                    <i class="fas fa-exclamation-triangle" id="confirmModalIcon"></i>
-                </div>
-                <h4 class="confirm-modal-title" id="confirmModalTitle">ยืนยันการทำรายการ</h4>
-                <div class="confirm-modal-body" id="confirmModalBody">
-                    คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?
-                </div>
-                <div class="confirm-modal-consequence" id="confirmModalConsequence">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span id="confirmModalConsequenceText">การดำเนินการนี้ไม่สามารถย้อนกลับได้</span>
-                </div>
-                <div class="modal-footer confirm-modal-footer">
-                    <button type="button" class="btn-cancel" onclick="closeActionConfirmModal()">ยกเลิก</button>
-                    <a href="javascript:void(0);" class="btn-confirm-action btn-danger" id="confirmModalActionBtn">ยืนยันการลบ</a>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
 
-        // ปิดเมื่อคลิกนอกหน้าต่าง
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeActionConfirmModal();
-            }
-        });
-
-        // ปิดเมื่อกดปุ่ม ESC
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.style.display === 'flex') {
-                closeActionConfirmModal();
-            }
-        });
+/**
+ * แสดง Toast แจ้งเตือนมุมขวาบนแบบลอยตัว (Non-blocking Top-End Toast)
+ * @param {string} icon - 'success' | 'error' | 'warning' | 'info'
+ * @param {string} title - ข้อความแจ้งเตือน
+ * @param {number} timer - เวลาแสดงผล (มิลลิวินาที, ค่าเริ่มต้น 3500)
+ */
+function SwalToast(icon, title, timer = 3500) {
+    if (typeof Swal === 'undefined') {
+        console.warn('SweetAlert2 is not loaded');
+        return;
     }
-    return modal;
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: timer,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
+        }
+    });
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
 }
 
-function showActionConfirmModal(options) {
-    let modal = getOrCreateConfirmModal();
-    let titleEl = document.getElementById('confirmModalTitle');
-    let bodyEl = document.getElementById('confirmModalBody');
-    let consqEl = document.getElementById('confirmModalConsequence');
-    let consqTextEl = document.getElementById('confirmModalConsequenceText');
-    let actionBtn = document.getElementById('confirmModalActionBtn');
-    let iconWrapper = document.getElementById('confirmModalIconWrapper');
-    let iconEl = document.getElementById('confirmModalIcon');
+/**
+ * กล่องยืนยันการลบข้อมูลที่มีความเสี่ยงสูง (Destructive Actions)
+ * @param {object} options - การตั้งค่ากล่องยืนยัน
+ */
+function SwalConfirmDelete(options) {
+    if (typeof Swal === 'undefined') {
+        if (confirm(options.title || 'ยืนยันการลบข้อมูล?')) {
+            if (typeof options.onConfirm === 'function') options.onConfirm();
+            else if (options.actionUrl) window.location.href = options.actionUrl;
+        }
+        return;
+    }
+
+    let title = options.title || 'ยืนยันการลบข้อมูล';
+    let message = options.message || options.text || 'คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?';
+    let consequence = options.consequence || 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลจะถูกลบถาวร';
+    let confirmText = options.confirmText || 'ยืนยันการลบ';
+    let cancelText = options.cancelText || 'ยกเลิก';
+
+    let htmlContent = `
+        <div class="swal-custom-body">
+            <div class="swal-body-text">${message}</div>
+            <div class="swal-consequence-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>${consequence}</span>
+            </div>
+        </div>
+    `;
+
+    Swal.fire({
+        title: title,
+        html: htmlContent,
+        icon: 'warning',
+        iconColor: '#dc2626',
+        showCancelButton: true,
+        confirmButtonText: `<i class="fas fa-trash-alt mr-6"></i> ${confirmText}`,
+        cancelButtonText: cancelText,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        reverseButtons: true,
+        focusCancel: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (typeof options.onConfirm === 'function') {
+                options.onConfirm();
+            } else if (options.actionUrl) {
+                window.location.href = options.actionUrl;
+            }
+        }
+    });
+}
+
+/**
+ * กล่องยืนยันการทำรายการทั่วไปใน Workflow (Approve, Reject, Toggle, Finish Repair)
+ * @param {object} options - การตั้งค่ากล่องยืนยัน
+ */
+function SwalConfirmAction(options) {
+    if (typeof Swal === 'undefined') {
+        if (confirm(options.title || 'ยืนยันการทำรายการ?')) {
+            if (typeof options.onConfirm === 'function') options.onConfirm();
+            else if (options.actionUrl) window.location.href = options.actionUrl;
+        }
+        return;
+    }
 
     let title = options.title || 'ยืนยันการทำรายการ';
-    let message = options.message || 'คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?';
-    let consequence = options.consequence || 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลจะได้รับผลกระทบอย่างถาวร';
-    let confirmText = options.confirmText || 'ยืนยันการลบ';
-    let type = options.type || 'danger'; // danger | success | warning
+    let message = options.message || options.text || 'คุณต้องการดำเนินการนี้ใช่หรือไม่?';
+    let consequence = options.consequence || '';
+    let confirmText = options.confirmText || 'ยืนยัน';
+    let cancelText = options.cancelText || 'ยกเลิก';
+    let type = options.type || 'primary'; // 'primary' | 'success' | 'warning' | 'danger'
+    let icon = options.icon || (type === 'danger' ? 'warning' : (type === 'success' ? 'success' : (type === 'warning' ? 'warning' : 'question')));
 
-    titleEl.innerText = title;
-    bodyEl.innerHTML = message;
-    consqTextEl.innerText = consequence;
-    actionBtn.innerText = confirmText;
+    let confirmColor = '#1e3c72';
+    let consequenceClass = 'swal-consequence-info';
 
-    // Reset styles & icons
-    iconWrapper.className = 'confirm-modal-icon-wrapper ' + type;
-    consqEl.className = 'confirm-modal-consequence' + (type === 'success' ? ' info' : '');
-    actionBtn.className = 'btn-confirm-action btn-' + type;
-
-    if (type === 'success') {
-        iconEl.className = 'fas fa-check-circle';
+    if (type === 'danger') {
+        confirmColor = '#dc2626';
+        consequenceClass = 'swal-consequence-danger';
+    } else if (type === 'success') {
+        confirmColor = '#059669';
+        consequenceClass = 'swal-consequence-success';
     } else if (type === 'warning') {
-        iconEl.className = 'fas fa-exclamation-circle';
+        confirmColor = '#d97706';
+        consequenceClass = 'swal-consequence-warning';
+    }
+
+    let htmlContent = `<div class="swal-custom-body"><div class="swal-body-text">${message}</div>`;
+    if (consequence) {
+        htmlContent += `
+            <div class="${consequenceClass}">
+                <i class="fas fa-info-circle"></i>
+                <span>${consequence}</span>
+            </div>
+        `;
+    }
+    htmlContent += `</div>`;
+
+    Swal.fire({
+        title: title,
+        html: htmlContent,
+        icon: icon,
+        showCancelButton: true,
+        confirmButtonText: confirmText,
+        cancelButtonText: cancelText,
+        confirmButtonColor: confirmColor,
+        cancelButtonColor: '#64748b',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (typeof options.onConfirm === 'function') {
+                options.onConfirm();
+            } else if (options.actionUrl) {
+                window.location.href = options.actionUrl;
+            }
+        }
+    });
+}
+
+/**
+ * ฟังก์ชัน Wrapper สำหรับความเข้ากันได้ย้อนหลัง (Backward Compatibility)
+ * ช่วยให้โค้ดที่มีการเรียก showActionConfirmModal(...) เดิมทำงานผ่าน SweetAlert2 ได้ทันที 100%
+ */
+function showActionConfirmModal(options) {
+    if (options.type === 'danger') {
+        SwalConfirmDelete(options);
     } else {
-        iconEl.className = 'fas fa-exclamation-triangle';
+        SwalConfirmAction(options);
+    }
+}
+
+/**
+ * Event Listener กลางสำหรับ Flash Session Toasts และ Logout Confirmation
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. ตรวจสอบ Flash Message จาก Session ที่ส่งมาจาก PHP Header
+    let successEl = document.getElementById('flashSuccessData');
+    if (successEl && successEl.dataset && successEl.dataset.message) {
+        SwalToast('success', successEl.dataset.message);
     }
 
-    // จัดการ Action ตอนกดยืนยัน
-    if (typeof options.onConfirm === 'function') {
-        actionBtn.href = 'javascript:void(0);';
-        actionBtn.onclick = function(e) {
+    let errorEl = document.getElementById('flashErrorData');
+    if (errorEl && errorEl.dataset && errorEl.dataset.message) {
+        SwalToast('error', errorEl.dataset.message);
+    }
+
+    // 2. ดักจับปุ่ม Logout ทั้งหมดในระบบ Admin เพื่อให้ขึ้น SweetAlert2 ยืนยัน
+    let logoutBtns = document.querySelectorAll('.btn-logout, a[href*="logout_db.php"]');
+    logoutBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-            closeActionConfirmModal();
-            options.onConfirm();
-        };
-    } else if (options.actionUrl) {
-        actionBtn.href = options.actionUrl;
-        actionBtn.onclick = function() {
-            closeActionConfirmModal();
-        };
-    }
-
-    modal.style.display = 'flex';
-}
-
-function closeActionConfirmModal() {
-    let modal = document.getElementById('actionConfirmModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
+            let logoutUrl = this.getAttribute('href');
+            Swal.fire({
+                title: 'ยืนยันออกจากระบบ?',
+                text: 'คุณต้องการออกจากระบบผู้ดูแลระบบ T.S. Pattani ใช่หรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-sign-out-alt mr-6"></i> ออกจากระบบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                reverseButtons: true
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    window.location.href = logoutUrl;
+                }
+            });
+        });
+    });
+});

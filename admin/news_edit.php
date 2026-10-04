@@ -23,31 +23,6 @@ try {
     }
 } catch(PDOException $e) {
     $_SESSION['error'] = "เกิดข้อผิดพลาด: " . $e->getMessage();
-<?php
-require_once 'includes/auth_check.php';
-
-// ตรวจสอบว่าส่ง ID ข่าวสารมาหรือไม่
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    header("Location: news.php");
-    exit();
-}
-
-$news_id = intval($_GET['id']);
-$news_data = [];
-
-try {
-    // ดึงข้อมูลข่าวสารเดิมมาแสดง
-    $stmt = $conn->prepare("SELECT * FROM News WHERE news_id = :id");
-    $stmt->execute([':id' => $news_id]);
-    $news_data = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$news_data) {
-        $_SESSION['error'] = "ไม่พบข่าวสารที่ต้องการแก้ไข";
-        header("Location: news.php");
-        exit();
-    }
-} catch(PDOException $e) {
-    $_SESSION['error'] = "เกิดข้อผิดพลาด: " . $e->getMessage();
     header("Location: news.php");
     exit();
 }

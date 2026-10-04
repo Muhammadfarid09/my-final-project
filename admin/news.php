@@ -125,6 +125,6 @@ include 'includes/header.php';
     </div>
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
-    <script src="../assets/js/admin.js?v=1.22"></script>
+    <script src="../assets/js/admin.js?v=1.30"></script>
 </body>
 </html>

@@ -257,7 +257,7 @@ include 'includes/header.php';
             <i class="fas fa-undo-alt text-success"></i> ตรวจรับคืนอุปกรณ์กีฬา
         </h4>
 
-        <form action="actions/equipment_return_db.php" method="POST" id="returnForm">
+        <form action="actions/equipment_return_db.php" method="POST" id="returnForm" onsubmit="return confirmReturnSubmit(event)">
             <input type="hidden" name="rental_id" id="modal_rental_id">
 
             <!-- ข้อมูลสรุปรายการเช่า -->
@@ -397,6 +397,48 @@ function handleConditionChange(status) {
             reasonInput.value = '';
         }
     }
+}
+
+function confirmReturnSubmit(e) {
+    e.preventDefault();
+    const itemName = document.getElementById('modal_item_name').innerText;
+    const qty = document.getElementById('modal_qty').innerText;
+    const member = document.getElementById('modal_member_name').innerText;
+    const condition = document.querySelector('input[name="condition_status"]:checked').value;
+    const fine = parseFloat(document.getElementById('fineAmountInput').value) || 0;
+
+    let conditionBadge = '';
+    if (condition === 'ปกติ') {
+        conditionBadge = '<span class="badge badge-success">สภาพปกติ</span>';
+    } else if (condition === 'ชำรุด') {
+        conditionBadge = '<span class="badge badge-warning">ชำรุด (ส่งซ่อม)</span>';
+    } else {
+        conditionBadge = '<span class="badge badge-danger">สูญหาย</span>';
+    }
+
+    let html = `
+        <div class="swal-custom-body">
+            <div class="mb-10 text-15">ผู้เช่า: <strong>${member}</strong></div>
+            <div class="mb-10 text-15">อุปกรณ์: <strong>${itemName}</strong> (${qty} ชิ้น)</div>
+            <div class="mb-10 text-15">สภาพอุปกรณ์: ${conditionBadge}</div>
+            ${fine > 0 ? `<div class="mb-15 text-danger font-bold text-16">ค่าปรับที่บันทึก: ${fine.toFixed(2)} ฿</div>` : ''}
+            <div class="swal-consequence-info">
+                <i class="fas fa-check-circle"></i>
+                <span>ยืนยันเพื่อบันทึกการตรวจรับคืน และปรับปรุงสต็อกอุปกรณ์ในระบบ</span>
+            </div>
+        </div>
+    `;
+
+    SwalConfirmAction({
+        title: 'ยืนยันการตรวจรับคืนอุปกรณ์?',
+        message: html,
+        type: condition === 'สูญหาย' ? 'danger' : (fine > 0 ? 'warning' : 'success'),
+        confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันการรับคืน',
+        onConfirm: function() {
+            document.getElementById('returnForm').submit();
+        }
+    });
+    return false;
 }
 </script>
 

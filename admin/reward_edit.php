@@ -46,7 +46,7 @@ include 'includes/header.php';
                         <?php endif; ?>
                         <br>
                         <label for="reward_image" class="btn-outline-primary"><i class="fas fa-upload"></i> เปลี่ยนรูปภาพใหม่</label>
-                        <input type="file" name="reward_image" id="reward_image" class="form-control d-none" accept="image/png, image/jpeg, image/jpg" onchange="alert('เลือกไฟล์รูปภาพใหม่เรียบร้อยแล้ว (' + this.files[0].name + ')');">
+                        <input type="file" name="reward_image" id="reward_image" class="form-control d-none" accept="image/png, image/jpeg, image/jpg" onchange="if(this.files[0]) SwalToast('info', 'เลือกไฟล์รูปภาพใหม่: ' + this.files[0].name);">
                     </div>
 
                     <div class="form-group">

@@ -126,7 +126,7 @@ include 'includes/header.php';
     <div class="modal-content">
         <h4 class="modal-header"><i class="fas fa-hand-holding-usd"></i> พิจารณาการคืนเงิน</h4>
         
-        <form action="actions/cancellation_action_db.php" method="POST">
+        <form action="actions/cancellation_action_db.php" method="POST" id="refundForm" onsubmit="return confirmRefundDecision(event)">
             <input type="hidden" name="cancel_id" id="modal_cancel_id">
             <input type="hidden" name="booking_id" id="modal_booking_id">
             
@@ -161,6 +161,37 @@ include 'includes/header.php';
 </div>
 
 <!-- เรียกใช้ไฟล์ JS ส่วนกลาง -->
-<script src="../assets/js/admin.js?v=1.20"></script>
+<script src="../assets/js/admin.js?v=1.30"></script>
+<script>
+function confirmRefundDecision(e) {
+    e.preventDefault();
+    const status = document.getElementById('refund_status').value;
+    if (!status) {
+        if (typeof SwalToast === 'function') {
+            SwalToast('warning', 'กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
+        } else {
+            alert('กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
+        }
+        return false;
+    }
+    const refundPrice = document.getElementById('modal_suggested_refund').innerText;
+    const points = document.querySelector('input[name="refund_point"]').value || 0;
+    const isRefund = (status === 'คืนแล้ว');
+
+    SwalConfirmAction({
+        title: isRefund ? 'ยืนยันการคืนเงินลูกค้า?' : 'ยืนยันปฏิเสธการคืนเงิน?',
+        message: isRefund 
+            ? 'ยืนยันการบันทึกคืนเงินสดจำนวน <strong>' + refundPrice + ' ฿</strong>' + (parseInt(points) > 0 ? ' และคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : '')
+            : 'ยืนยันไม่คืนเงินค่าจอง' + (parseInt(points) > 0 ? ' โดยคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : ''),
+        consequence: 'การตัดสินใจนี้จะส่งผลต่อสถานะการยกเลิกและการคืนพอยท์ทันที ไม่สามารถแก้ไขย้อนหลังได้',
+        type: isRefund ? 'success' : 'warning',
+        confirmText: '<i class="fas fa-save mr-6"></i> ยืนยันบันทึกผล',
+        onConfirm: function() {
+            document.getElementById('refundForm').submit();
+        }
+    });
+    return false;
+}
+</script>
 </body>
 </html>

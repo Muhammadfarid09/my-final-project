@@ -244,6 +244,6 @@ function closeCourtEditModal() {
 </script>
 
 <!-- อัปเดตเวอร์ชัน JS -->
-<script src="../assets/js/admin.js?v=1.22"></script>
+<script src="../assets/js/admin.js?v=1.30"></script>
 </body>
 </html>

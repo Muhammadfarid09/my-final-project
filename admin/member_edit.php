@@ -54,7 +54,7 @@ include 'includes/header.php';
         <?php endif; ?>
 
         <!-- ฟอร์มนี้จะส่งไปที่ actions/member_edit_db.php -->
-        <form action="actions/member_edit_db.php" method="POST">
+        <form action="actions/member_edit_db.php" method="POST" id="memberEditForm" onsubmit="return confirmMemberEdit(event)">
             <input type="hidden" name="member_id" value="<?php echo $member['member_id']; ?>">
             
             <div class="grid-2 gap-20">
@@ -135,7 +135,26 @@ include 'includes/header.php';
 </div>
 
 <!-- เรียกใช้ไฟล์ JS กลาง -->
-<script src="../assets/js/admin.js?v=1.20"></script>
-
+<script src="../assets/js/admin.js?v=1.30"></script>
+<script>
+function confirmMemberEdit(e) {
+    const status = document.getElementById('member_status').value;
+    if (status === 'ระงับสิทธิ์') {
+        e.preventDefault();
+        SwalConfirmAction({
+            title: 'ยืนยันการระงับสิทธิ์สมาชิก?',
+            message: 'คุณกำลังตั้งค่าสถานะบัญชีของสมาชิกท่านนี้เป็น <strong>"ระงับสิทธิ์"</strong>',
+            consequence: 'คำเตือน: สมาชิกนี้จะไม่สามารถเข้าสู่ระบบเพื่อจองสนาม หรือทำรายการใดๆ บนเว็บไซต์ได้จนกว่าจะเปิดสิทธิ์ใหม่อีกครั้ง',
+            type: 'danger',
+            confirmText: '<i class="fas fa-user-slash mr-6"></i> ยืนยันระงับสิทธิ์',
+            onConfirm: function() {
+                document.getElementById('memberEditForm').submit();
+            }
+        });
+        return false;
+    }
+    return true;
+}
+</script>
 </body>
 </html>
