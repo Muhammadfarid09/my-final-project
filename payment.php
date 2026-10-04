@@ -54,7 +54,7 @@ try {
     <title>ชำระเงิน - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.3">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -63,6 +63,20 @@ try {
     <?php include 'includes/navbar.php'; ?>
 
     <div class="payment-wrapper" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <!-- ข้อความแจ้งเตือน Flash Messages -->
+        <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle fa-lg"></i>
+            <div><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+        </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle fa-lg"></i>
+            <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+        </div>
+        <?php endif; ?>
         <div class="booking-card" style="text-align: center; margin-bottom: 25px; background: #fff3cd; border: 1px solid #ffeeba; color: #856404;">
             <h3><i class="fas fa-clock"></i> กรุณาชำระเงินภายใน 15 นาที</h3>
             <p style="margin: 5px 0 0 0; font-size: 14px;">ระบบได้ทำการล็อกสนามไว้ให้ท่านแล้ว หากเกินเวลาการจองจะถูกยกเลิกอัตโนมัติ</p>
@@ -74,14 +88,20 @@ try {
             
             <!-- ฝั่งซ้าย: ข้อมูลการชำระเงิน (QR Code) -->
             <div class="booking-card">
-                <h3><i class="fas id="qrcode"></i> สแกน QR Code ชำระเงิน</h3>
+                <h3><i class="fas fa-qrcode"></i> สแกน QR Code ชำระเงิน</h3>
                 <div style="text-align: center; margin: 20px 0;">
                     <!-- จำลองรูป QR Code PromptPay หรือรูปบัญชีธนาคาร -->
                     <div style="background: #e9ecef; width: 200px; height: 200px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
                         <i class="fas fa-qrcode fa-5x" style="color: #6c757d;"></i>
                     </div>
                     <p style="margin-top: 15px; font-weight: 500; color: #343a40;">ธนาคารกสิกรไทย (KBANK)</p>
-                    <p style="margin: 0; font-size: 18px; font-weight: bold; color: #007bff;">123-4-56789-0</p>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0;">
+                        <span id="bankAccountNo" style="font-size: 18px; font-weight: bold; color: #007bff; letter-spacing: 0.5px;">123-4-56789-0</span>
+                        <button type="button" class="btn-copy-account" onclick="copyBankAccount('123-4-56789-0')" title="คัดลอกเลขบัญชี">
+                            <i class="fas fa-copy"></i> คัดลอก
+                        </button>
+                        <span id="copyFeedback" class="copy-tooltip"><i class="fas fa-check"></i> คัดลอกแล้ว!</span>
+                    </div>
                     <p style="font-size: 13px; color: #666; margin-top: 5px;">ชื่อบัญชี: บจก. ที.เอส. ปัตตานี แบดมินตัน</p>
                 </div>
             </div>
@@ -125,15 +145,33 @@ try {
                 </div>
 
                 <!-- ฟอร์มส่งสลิปไปที่ actions/payment_db.php -->
-                <form action="actions/payment_db.php" method="POST" enctype="multipart/form-data">
+                <form action="actions/payment_db.php" method="POST" enctype="multipart/form-data" id="paymentForm">
                     <input type="hidden" name="booking_id" value="<?php echo $booking['booking_id']; ?>">
                     
                     <div class="form-group">
                         <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">แนบสลิปการโอนเงิน *</label>
-                        <input type="file" name="payment_slip" class="form-control" accept="image/*" required style="padding: 8px;">
+                        <!-- Slip Upload Dropzone with Live Preview -->
+                        <div id="slipUploadBox" class="slip-upload-box">
+                            <input type="file" id="paymentSlipInput" name="payment_slip" accept="image/jpeg,image/png,image/webp" style="display: none;" required>
+                            
+                            <div id="uploadPrompt" class="upload-prompt">
+                                <i class="fas fa-cloud-upload-alt fa-3x" style="color: #007bff; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600; font-size: 14px; color: #333;">คลิกหรือลากไฟล์สลิปมาวางที่นี่</div>
+                                <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB)</div>
+                            </div>
+
+                            <div id="previewContainer" class="preview-container" style="display: none;">
+                                <img id="slipPreviewImg" src="" alt="สลิปโอนเงิน" class="preview-img">
+                                <div id="fileInfoText" style="font-size: 12px; color: #495057; font-weight: 500;"></div>
+                                <button type="button" class="btn-change-file" id="btnChangeSlip">
+                                    <i class="fas fa-sync-alt"></i> เปลี่ยนรูปภาพ
+                                </button>
+                            </div>
+                        </div>
+                        <div id="clientErrorMsg" style="color: #dc3545; font-size: 13px; margin-top: 6px; display: none;"></div>
                     </div>
 
-                    <button type="submit" class="btn-confirm-booking" style="background: #007bff; margin-top: 10px;">
+                    <button type="submit" id="btnSubmitPayment" class="btn-confirm-booking" style="background: #007bff; margin-top: 10px; width: 100%;">
                         ยืนยันการชำระเงิน <i class="fas fa-upload"></i>
                     </button>
                 </form>
@@ -143,11 +181,12 @@ try {
     </div>
 
     <!-- เรียกใช้ไฟล์ JS หลัก และสั่งรันฟังก์ชันนับถอยหลังโดยส่งค่าเวลาเข้าไป -->
-    <script src="assets/js/member.js?v=1.4"></script>
+    <script src="assets/js/member.js?v=1.5"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let lockExpire = "<?php echo $booking['booking_lock_expire']; ?>";
             initPaymentCountdown(lockExpire);
+            initSlipUpload();
         });
     </script>
 </body>

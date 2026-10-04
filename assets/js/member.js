@@ -378,3 +378,176 @@ function initPaymentCountdown(lockExpireStr) {
             (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
     }, 1000);
 }
+
+/* =========================================
+   Payment Page - Slip Upload & Preview (HCI)
+   ========================================= */
+function initSlipUpload() {
+    let fileInput = document.getElementById("paymentSlipInput");
+    let uploadBox = document.getElementById("slipUploadBox");
+    let uploadPrompt = document.getElementById("uploadPrompt");
+    let previewContainer = document.getElementById("previewContainer");
+    let previewImg = document.getElementById("slipPreviewImg");
+    let fileInfoText = document.getElementById("fileInfoText");
+    let btnChangeSlip = document.getElementById("btnChangeSlip");
+    let errorMsg = document.getElementById("clientErrorMsg");
+    let paymentForm = document.getElementById("paymentForm");
+    let btnSubmit = document.getElementById("btnSubmitPayment");
+
+    if (!fileInput || !uploadBox) return;
+
+    // คลิกที่กล่องเพื่อเปิด File Dialog
+    uploadBox.addEventListener("click", function(e) {
+        if (e.target.closest("#btnChangeSlip") || e.target === fileInput) return;
+        fileInput.click();
+    });
+
+    if (btnChangeSlip) {
+        btnChangeSlip.addEventListener("click", function(e) {
+            e.stopPropagation();
+            fileInput.click();
+        });
+    }
+
+    // Drag and Drop
+    ["dragenter", "dragover"].forEach(eventName => {
+        uploadBox.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadBox.classList.add("dragover");
+        }, false);
+    });
+
+    ["dragleave", "drop"].forEach(eventName => {
+        uploadBox.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadBox.classList.remove("dragover");
+        }, false);
+    });
+
+    uploadBox.addEventListener("drop", function(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        if (files && files.length > 0) {
+            fileInput.files = files;
+            handleSlipFile(files[0]);
+        }
+    });
+
+    // เมื่อเลือกไฟล์ผ่าน Dialog
+    fileInput.addEventListener("change", function() {
+        if (fileInput.files && fileInput.files.length > 0) {
+            handleSlipFile(fileInput.files[0]);
+        }
+    });
+
+    function handleSlipFile(file) {
+        if (errorMsg) {
+            errorMsg.style.display = "none";
+            errorMsg.innerText = "";
+        }
+
+        // 1. ตรวจสอบประเภทไฟล์
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        const ext = file.name.split('.').pop().toLowerCase();
+        const allowedExts = ["jpg", "jpeg", "png", "webp"];
+
+        if (!allowedTypes.includes(file.type) && !allowedExts.includes(ext)) {
+            showError("รูปแบบไฟล์ไม่ถูกต้อง! รองรับเฉพาะ JPG, PNG, WEBP เท่านั้น");
+            resetUploadState();
+            return;
+        }
+
+        // 2. ตรวจสอบขนาดไฟล์ (ไม่เกิน 5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showError("ขนาดไฟล์รูปภาพเกินกำหนด! (สูงสุด 5MB)");
+            resetUploadState();
+            return;
+        }
+
+        // 3. แสดงรูปพรีวิวด้วย FileReader
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            if (previewImg) previewImg.src = e.target.result;
+            
+            let sizeFormatted = file.size > 1024 * 1024 
+                ? (file.size / (1024 * 1024)).toFixed(2) + " MB" 
+                : (file.size / 1024).toFixed(1) + " KB";
+            
+            if (fileInfoText) {
+                fileInfoText.innerText = file.name + " (" + sizeFormatted + ")";
+            }
+
+            if (uploadPrompt) uploadPrompt.style.display = "none";
+            if (previewContainer) previewContainer.style.display = "flex";
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function showError(msg) {
+        if (errorMsg) {
+            errorMsg.innerText = msg;
+            errorMsg.style.display = "block";
+        } else {
+            alert(msg);
+        }
+    }
+
+    function resetUploadState() {
+        fileInput.value = "";
+        if (previewImg) previewImg.src = "";
+        if (uploadPrompt) uploadPrompt.style.display = "flex";
+        if (previewContainer) previewContainer.style.display = "none";
+    }
+
+    // 4. Loading & Disabled State เมื่อ Submit Form
+    if (paymentForm) {
+        paymentForm.addEventListener("submit", function(e) {
+            if (!fileInput.files || fileInput.files.length === 0) {
+                e.preventDefault();
+                showError("กรุณาแนบรูปภาพสลิปการโอนเงินก่อนยืนยัน");
+                return false;
+            }
+
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดสลิป กรุณารอสักครู่...';
+                btnSubmit.style.opacity = "0.75";
+                btnSubmit.style.cursor = "not-allowed";
+            }
+        });
+    }
+}
+
+// ฟังก์ชันคัดลอกเลขบัญชีธนาคาร
+function copyBankAccount(accNo) {
+    if (!accNo) return;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(accNo).then(showFeedback).catch(() => fallbackCopy(accNo));
+    } else {
+        fallbackCopy(accNo);
+    }
+
+    function fallbackCopy(text) {
+        let tempInput = document.createElement("textarea");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        showFeedback();
+    }
+
+    function showFeedback() {
+        let feedback = document.getElementById("copyFeedback");
+        if (feedback) {
+            feedback.style.display = "inline";
+            setTimeout(() => {
+                feedback.style.display = "none";
+            }, 2500);
+        }
+    }
+}
