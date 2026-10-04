@@ -67,6 +67,7 @@ try {
         CREATE TABLE IF NOT EXISTS `Booking` (
             `booking_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `member_id` INT(11) NULL,
+            `booking_nickname` VARCHAR(50) NULL DEFAULT NULL,
             `court_id` INT(11) NOT NULL,
             `booking_date` DATE NOT NULL,
             `booking_start_time` TIME NOT NULL,

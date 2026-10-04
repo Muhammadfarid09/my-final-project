@@ -19,8 +19,10 @@
 
 ## 2. รายละเอียดการดำเนินงานและการเปลี่ยนแปลง (What Was Done)
 
-### 2.1 ฐานข้อมูล (Database Migration)
-- เพิ่มคอลัมน์ `booking_nickname VARCHAR(50) NULL DEFAULT NULL` ในตาราง `Booking` ต่อจาก `member_id` เพื่อเก็บชื่อเล่น/ชื่อก๊วนผู้จองสำหรับแสดงผลต่อสาธารณะ
+### 2.1 ฐานข้อมูลและการติดตั้งระบบ (Database Migration & Setup Scripts)
+- เพิ่มคอลัมน์ `booking_nickname VARCHAR(50) NULL DEFAULT NULL` ในตาราง `Booking` ต่อจาก `member_id` เพื่อเก็บชื่อเล่น/ชื่อก๊วนผู้จองสำหรับแสดงผลต่อสาธารณะตามระเบียบ PDPA
+- **อัปเดตไฟล์ `config/setup.php`:** เพิ่มคอลัมน์ `booking_nickname` ลงในคำสั่งสร้างตาราง `Booking` สำหรับการติดตั้งระบบใหม่ตั้งแต่เริ่มต้น
+- **อัปเดตไฟล์ `config/update_database.php`:** เพิ่มขั้นตอนตรวจสอบคอลัมน์ `booking_nickname` ในตาราง `Booking` อัตโนมัติ (หากยังไม่มีจะรันคำสั่ง `ALTER TABLE` ทันที) เพื่อรองรับการ Deploy/Migrate ฐานข้อมูลข้ามเครื่องอย่างสมบูรณ์
 
 ### 2.2 ปรับปรุง Backend Action & API
 1. **`actions/get_court_matrix.php`:**

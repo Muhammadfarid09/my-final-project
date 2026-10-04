@@ -116,6 +116,15 @@ require_once 'config.php';
             echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Booking] ฟิลด์ member_id รองรับลูกค้า Walk-in อยู่แล้ว</div>";
         }
 
+        // 1.2 ตรวจสอบคอลัมน์ booking_nickname ในตาราง Booking (PDPA Privacy)
+        $cols_booking_fields = array_column($cols_booking, 'Field');
+        if (!in_array('booking_nickname', $cols_booking_fields)) {
+            $conn->exec("ALTER TABLE Booking ADD COLUMN booking_nickname VARCHAR(50) NULL AFTER member_id");
+            echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Booking] เพิ่มคอลัมน์ booking_nickname (ชื่อเล่น/ชื่อก๊วนผู้จองตามระเบียบ PDPA) สำเร็จ</div>";
+        } else {
+            echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Booking] มีคอลัมน์ booking_nickname (PDPA) อยู่แล้ว</div>";
+        }
+
         // 2. ตรวจสอบตาราง Rental (คอลัมน์ค่าปรับและการตรวจรับคืน)
         $cols_rental = $conn->query("SHOW COLUMNS FROM Rental")->fetchAll(PDO::FETCH_COLUMN);
 
