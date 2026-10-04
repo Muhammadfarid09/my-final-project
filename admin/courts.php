@@ -94,12 +94,32 @@ include 'includes/header.php';
                             <button onclick="openRepairModal(<?php echo $row['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($row['court_name'])); ?>')" class="btn-danger btn-action-small" title="ปิดแจ้งซ่อม">
                                 <i class="fas fa-tools"></i>
                             </button>
-                            <a href="actions/court_delete_db.php?id=<?php echo $row['court_id']; ?>" class="btn-secondary btn-action-small" onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบ <?php echo htmlspecialchars(addslashes($row['court_name'])); ?> ?\n\nคำเตือน: หากสนามนี้เคยมีการจองแล้ว จะไม่สามารถลบได้');" title="ลบ">
-                            <i class="fas fa-trash-alt"></i></a>
+                            <button type="button" 
+                                    class="btn-secondary btn-action-small" 
+                                    onclick="showActionConfirmModal({
+                                        title: 'ยืนยันการลบสนามแบดมินตัน',
+                                        message: 'คุณกำลังจะลบ <strong><?php echo htmlspecialchars(addslashes($row['court_name'])); ?></strong> ออกจากระบบ',
+                                        consequence: 'คำเตือน: หากสนามนี้เคยมีประวัติการจองแล้วจะไม่สามารถลบได้ หากไม่มีประวัติ ข้อมูลสนามจะถูกลบถาวร',
+                                        confirmText: 'ยืนยันการลบ',
+                                        type: 'danger',
+                                        actionUrl: 'actions/court_delete_db.php?id=<?php echo $row['court_id']; ?>'
+                                    })" 
+                                    title="ลบ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         <?php else: ?>
-                            <a href="actions/court_repair_finish_db.php?court_id=<?php echo $row['court_id']; ?>" class="btn-success" onclick="return confirm('การซ่อมแซมเสร็จสิ้น และพร้อมเปิดใช้งานสนามใช่หรือไม่?');">
+                            <button type="button" 
+                                    class="btn-success" 
+                                    onclick="showActionConfirmModal({
+                                        title: 'ยืนยันการเปิดใช้งานสนาม',
+                                        message: 'ยืนยันว่าการซ่อมบำรุง <strong><?php echo htmlspecialchars(addslashes($row['court_name'])); ?></strong> เสร็จสิ้นเรียบร้อยแล้ว',
+                                        consequence: 'สถานะสนามจะเปลี่ยนเป็น \"พร้อมใช้งาน\" ทันที และสมาชิกจะสามารถทำการจองสนามนี้ได้ตามปกติ',
+                                        confirmText: 'ยืนยันเปิดใช้งาน',
+                                        type: 'success',
+                                        actionUrl: 'actions/court_repair_finish_db.php?court_id=<?php echo $row['court_id']; ?>'
+                                    })">
                                 <i class="fas fa-check-circle"></i> ซ่อมเสร็จแล้ว
-                            </a>
+                            </button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -224,6 +244,6 @@ function closeCourtEditModal() {
 </script>
 
 <!-- อัปเดตเวอร์ชัน JS -->
-<script src="../assets/js/admin.js?v=1.20"></script>
+<script src="../assets/js/admin.js?v=1.22"></script>
 </body>
 </html>

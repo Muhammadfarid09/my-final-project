@@ -150,20 +150,21 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <form action="actions/payment_verify_db.php" method="POST">
+            <form action="actions/payment_verify_db.php" method="POST" id="verifyPaymentForm">
                 <input type="hidden" name="payment_id" id="modal_payment_id">
                 <input type="hidden" name="booking_id" id="modal_booking_id">
                 
                 <div class="modal-footer flex-between-center mt-20">
                     <!-- กดปุ่มแดง = ปฏิเสธสลิป / ส่งค่า action_status = ปฏิเสธ -->
-                    <button type="submit" name="action_status" value="ปฏิเสธ" class="btn-danger" onclick="return confirm('แน่ใจหรือไม่ว่าต้องการปฏิเสธสลิปใบนี้? การจองจะถูกยกเลิก');">
+                    <input type="hidden" name="action_status" id="verify_action_status" value="ยืนยันแล้ว">
+                    <button type="button" class="btn-danger" onclick="confirmRejectPayment()">
                         <i class="fas fa-times"></i> ปฏิเสธสลิป
                     </button>
                     
                     <div class="flex-center gap-10">
                         <button type="button" class="btn-cancel" onclick="closeVerifyModal()">ปิด</button>
                         <!-- กดปุ่มเขียว = ยืนยันสลิป / ส่งค่า action_status = ยืนยันแล้ว -->
-                        <button type="submit" name="action_status" value="ยืนยันแล้ว" class="btn-success">
+                        <button type="submit" onclick="document.getElementById('verify_action_status').value = 'ยืนยันแล้ว';" class="btn-success">
                             <i class="fas fa-check"></i> ยืนยันยอดถูกต้อง
                         </button>
                     </div>
@@ -173,6 +174,24 @@ include 'includes/header.php';
     </div>
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
-    <script src="../assets/js/admin.js?v=1.20"></script>
+    <script src="../assets/js/admin.js?v=1.22"></script>
+    <script>
+        function confirmRejectPayment() {
+            let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
+            let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
+            
+            showActionConfirmModal({
+                title: 'ยืนยันการปฏิเสธสลิปการโอนเงิน',
+                message: 'คุณกำลังจะปฏิเสธสลิปสำหรับรายการจอง <strong>#' + bookingId + '</strong> (' + memberName + ')',
+                consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และคืน Slot เวลาของสนามกลับสู่ระบบทันที',
+                confirmText: 'ยืนยันปฏิเสธสลิป',
+                type: 'danger',
+                onConfirm: function() {
+                    document.getElementById('verify_action_status').value = 'ปฏิเสธ';
+                    document.getElementById('verifyPaymentForm').submit();
+                }
+            });
+        }
+    </script>
 </body>
 </html>

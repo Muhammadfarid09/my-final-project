@@ -740,3 +740,109 @@ document.addEventListener("DOMContentLoaded", function() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 });
+
+/* =========================================
+   Global Action Confirmation Modal (HCI Rule 5 & Section 15)
+   ========================================= */
+function getOrCreateConfirmModal() {
+    let modal = document.getElementById('actionConfirmModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'actionConfirmModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content confirm-modal-content">
+                <div class="confirm-modal-icon-wrapper danger" id="confirmModalIconWrapper">
+                    <i class="fas fa-exclamation-triangle" id="confirmModalIcon"></i>
+                </div>
+                <h4 class="confirm-modal-title" id="confirmModalTitle">ยืนยันการทำรายการ</h4>
+                <div class="confirm-modal-body" id="confirmModalBody">
+                    คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?
+                </div>
+                <div class="confirm-modal-consequence" id="confirmModalConsequence">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="confirmModalConsequenceText">การดำเนินการนี้ไม่สามารถย้อนกลับได้</span>
+                </div>
+                <div class="modal-footer confirm-modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeActionConfirmModal()">ยกเลิก</button>
+                    <a href="javascript:void(0);" class="btn-confirm-action btn-danger" id="confirmModalActionBtn">ยืนยันการลบ</a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // ปิดเมื่อคลิกนอกหน้าต่าง
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeActionConfirmModal();
+            }
+        });
+
+        // ปิดเมื่อกดปุ่ม ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeActionConfirmModal();
+            }
+        });
+    }
+    return modal;
+}
+
+function showActionConfirmModal(options) {
+    let modal = getOrCreateConfirmModal();
+    let titleEl = document.getElementById('confirmModalTitle');
+    let bodyEl = document.getElementById('confirmModalBody');
+    let consqEl = document.getElementById('confirmModalConsequence');
+    let consqTextEl = document.getElementById('confirmModalConsequenceText');
+    let actionBtn = document.getElementById('confirmModalActionBtn');
+    let iconWrapper = document.getElementById('confirmModalIconWrapper');
+    let iconEl = document.getElementById('confirmModalIcon');
+
+    let title = options.title || 'ยืนยันการทำรายการ';
+    let message = options.message || 'คุณแน่ใจหรือไม่ว่าต้องการดำเนินการนี้?';
+    let consequence = options.consequence || 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลจะได้รับผลกระทบอย่างถาวร';
+    let confirmText = options.confirmText || 'ยืนยันการลบ';
+    let type = options.type || 'danger'; // danger | success | warning
+
+    titleEl.innerText = title;
+    bodyEl.innerHTML = message;
+    consqTextEl.innerText = consequence;
+    actionBtn.innerText = confirmText;
+
+    // Reset styles & icons
+    iconWrapper.className = 'confirm-modal-icon-wrapper ' + type;
+    consqEl.className = 'confirm-modal-consequence' + (type === 'success' ? ' info' : '');
+    actionBtn.className = 'btn-confirm-action btn-' + type;
+
+    if (type === 'success') {
+        iconEl.className = 'fas fa-check-circle';
+    } else if (type === 'warning') {
+        iconEl.className = 'fas fa-exclamation-circle';
+    } else {
+        iconEl.className = 'fas fa-exclamation-triangle';
+    }
+
+    // จัดการ Action ตอนกดยืนยัน
+    if (typeof options.onConfirm === 'function') {
+        actionBtn.href = 'javascript:void(0);';
+        actionBtn.onclick = function(e) {
+            e.preventDefault();
+            closeActionConfirmModal();
+            options.onConfirm();
+        };
+    } else if (options.actionUrl) {
+        actionBtn.href = options.actionUrl;
+        actionBtn.onclick = function() {
+            closeActionConfirmModal();
+        };
+    }
+
+    modal.style.display = 'flex';
+}
+
+function closeActionConfirmModal() {
+    let modal = document.getElementById('actionConfirmModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}

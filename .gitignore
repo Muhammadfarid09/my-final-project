@@ -1,0 +1,3 @@
+# Ignore slip uploads
+uploads/slips/*
+!uploads/slips/.gitkeep

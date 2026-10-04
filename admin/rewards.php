@@ -141,9 +141,18 @@ include 'includes/header.php';
                                             <a href="reward_edit.php?id=<?php echo $row['reward_id']; ?>" class="btn-secondary btn-action-small">
                                                 <i class="fas fa-edit"></i> แก้ไข
                                             </a>
-                                            <a href="actions/reward_delete_db.php?id=<?php echo $row['reward_id']; ?>" class="btn-reject btn-action-small" onclick="return confirm('คุณแน่ใจหรือไม่ที่จะลบของรางวัลนี้? (หากลบแล้วจะไม่สามารถกู้คืนได้)');">
+                                            <button type="button" 
+                                                    class="btn-reject btn-action-small" 
+                                                    onclick="showActionConfirmModal({
+                                                        title: 'ยืนยันการลบของรางวัล',
+                                                        message: 'คุณกำลังจะลบของรางวัล: <strong><?php echo htmlspecialchars(addslashes($row['reward_name'])); ?></strong>',
+                                                        consequence: 'ของรางวัลนี้จะไม่สามารถแลกได้อีกต่อไป และข้อมูลของรางวัลจะถูกนำออกจากระบบถาวร ไม่สามารถกู้คืนได้',
+                                                        confirmText: 'ยืนยันการลบ',
+                                                        type: 'danger',
+                                                        actionUrl: 'actions/reward_delete_db.php?id=<?php echo $row['reward_id']; ?>'
+                                                    })">
                                                 <i class="fas fa-trash"></i> ลบ
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

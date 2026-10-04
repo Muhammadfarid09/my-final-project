@@ -66,9 +66,18 @@ include 'includes/header.php';
                                     <a href="news_edit.php?id=<?php echo $row['news_id']; ?>" class="btn-secondary btn-action-small">
                                         <i class="fas fa-edit"></i> แก้ไข
                                     </a>
-                                    <a href="actions/news_delete_db.php?id=<?php echo $row['news_id']; ?>" class="btn-danger btn-action-small" onclick="return confirm('ยืนยันการลบข่าวสาร: <?php echo htmlspecialchars($row['news_title']); ?> ?');">
+                                    <button type="button" 
+                                            class="btn-danger btn-action-small" 
+                                            onclick="showActionConfirmModal({
+                                                title: 'ยืนยันการลบข่าวสารและโปรโมชั่น',
+                                                message: 'คุณกำลังจะลบข่าวสาร: <strong><?php echo htmlspecialchars(addslashes($row['news_title'])); ?></strong>',
+                                                consequence: 'ข่าวสารและรูปภาพประกอบนี้จะถูกลบออกจากระบบอย่างถาวร และจะไม่แสดงบนหน้าเว็บไซต์อีกต่อไป',
+                                                confirmText: 'ยืนยันการลบ',
+                                                type: 'danger',
+                                                actionUrl: 'actions/news_delete_db.php?id=<?php echo $row['news_id']; ?>'
+                                            })">
                                         <i class="fas fa-trash"></i> ลบ
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -116,6 +125,6 @@ include 'includes/header.php';
     </div>
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
-    <script src="../assets/js/admin.js?v=1.20"></script>
+    <script src="../assets/js/admin.js?v=1.22"></script>
 </body>
 </html>

@@ -68,11 +68,19 @@ include 'includes/header.php';
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 <?php else: ?>
-                                    <a href="actions/admin_delete_db.php?id=<?php echo $admin['admin_id']; ?>" 
-                                       class="btn-danger btn-action-small" 
-                                       onclick="return confirm('คุณแน่ใจหรือไม่ว่าต้องการลบผู้ดูแลระบบ: <?php echo htmlspecialchars($admin['admin_name']); ?> ?');" title="ลบ">
+                                    <button type="button" 
+                                            class="btn-danger btn-action-small" 
+                                            onclick="showActionConfirmModal({
+                                                title: 'ยืนยันการลบผู้ดูแลระบบ',
+                                                message: 'คุณกำลังจะลบผู้ดูแลระบบ: <strong><?php echo htmlspecialchars(addslashes($admin['admin_name'])); ?></strong>',
+                                                consequence: 'บัญชีผู้ดูแลระบบนี้จะไม่สามารถเข้าสู่ระบบหรือจัดการงานใดๆ ได้อีกต่อไป และไม่สามารถกู้คืนได้',
+                                                confirmText: 'ยืนยันการลบ',
+                                                type: 'danger',
+                                                actionUrl: 'actions/admin_delete_db.php?id=<?php echo $admin['admin_id']; ?>'
+                                            })" 
+                                            title="ลบ">
                                         <i class="fas fa-trash"></i>
-                                    </a>
+                                    </button>
                                 <?php endif; ?>
                             </td>
                         </tr>

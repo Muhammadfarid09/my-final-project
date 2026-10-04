@@ -134,9 +134,18 @@ include 'includes/header.php';
                                     <a href="product_edit.php?id=<?php echo $row['product_id']; ?>" class="btn-warning btn-action-small text-decor-none">
                                         <i class="fas fa-edit"></i> แก้ไข
                                     </a>
-                                    <a href="actions/product_delete_db.php?id=<?php echo $row['product_id']; ?>&tab=<?php echo $active_tab; ?>" class="btn-danger btn-action-small text-decor-none" onclick="return confirm('ยืนยันการลบ: <?php echo htmlspecialchars($row['product_name']); ?> ?');">
+                                    <button type="button" 
+                                            class="btn-danger btn-action-small text-decor-none" 
+                                            onclick="showActionConfirmModal({
+                                                title: 'ยืนยันการลบ<?php echo $active_tab == 'rental' ? 'อุปกรณ์เช่า' : 'สินค้า'; ?>',
+                                                message: 'คุณกำลังจะลบ: <strong><?php echo htmlspecialchars(addslashes($row['product_name'])); ?></strong> ออกจากระบบ',
+                                                consequence: 'คำเตือน: หากสินค้านี้เคยมีประวัติการขายหรือการเช่าในอดีต ข้อมูลจะถูกปิดใช้งาน/ลบออก และไม่สามารถกู้คืนได้',
+                                                confirmText: 'ยืนยันการลบ',
+                                                type: 'danger',
+                                                actionUrl: 'actions/product_delete_db.php?id=<?php echo $row['product_id']; ?>&tab=<?php echo $active_tab; ?>'
+                                            })">
                                         <i class="fas fa-trash"></i> ลบ
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -186,6 +195,6 @@ include 'includes/header.php';
     </div>
     <?php endif; ?>
 
-    <script src="../assets/js/admin.js?v=1.20"></script>
+    <script src="../assets/js/admin.js?v=1.22"></script>
 </body>
 </html>
