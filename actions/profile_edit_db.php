@@ -11,6 +11,7 @@ if (!isset($_SESSION['member_id'])) {
 $member_id = intval($_SESSION['member_id']);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     $action = $_POST['action'] ?? '';
 
     // ==========================================

@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     
     $admin_id = intval($_SESSION['admin_id']);
     $rental_id = intval($_POST['rental_id'] ?? 0);

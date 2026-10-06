@@ -115,6 +115,7 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
         <!-- ฟอร์มหลักสำหรับส่งข้อมูลไปยัง actions/booking_db.php -->
         <!-- ============================================== -->
         <form action="actions/booking_db.php" method="POST" id="bookingForm" onsubmit="return handleBookingFormSubmit(event)">
+            <?php echo csrf_field(); ?>
             
             <!-- Hidden inputs สำหรับเก็บสถานะการเลือก -->
             <input type="hidden" name="booking_date" id="input_booking_date" value="<?php echo date('Y-m-d'); ?>">

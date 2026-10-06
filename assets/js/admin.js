@@ -448,7 +448,7 @@ function openReceipt(posId) {
 /* =========================================
    ระบบพิจารณายกเลิก (admin/cancellations.php)
    ========================================= */
-function openRefundModal(cancelId, bookingId, price, penaltyAmount, suggestedRefund, penaltyPercent) {
+function openRefundModal(cancelId, bookingId, price, penaltyAmount, suggestedRefund, penaltyPercent, memberName, memberPhone, slipImage, refundBank, refundAccNo, refundAccName) {
     let modal = document.getElementById('refundModal');
     if (modal) {
         document.getElementById('modal_cancel_id').value = cancelId;
@@ -463,8 +463,114 @@ function openRefundModal(cancelId, bookingId, price, penaltyAmount, suggestedRef
         if(elPenaltyAmount) elPenaltyAmount.innerText = parseFloat(penaltyAmount).toFixed(2);
         if(elSuggestedRefund) elSuggestedRefund.innerText = parseFloat(suggestedRefund).toFixed(2);
         
+        let elRefundInput = document.getElementById('modal_refund_amount_input');
+        if(elRefundInput) elRefundInput.value = parseFloat(suggestedRefund).toFixed(2);
+
+        let elMemberName = document.getElementById('modal_refund_member_name');
+        if (elMemberName) elMemberName.innerText = memberName || '-';
+
+        let elMemberPhone = document.getElementById('modal_refund_member_phone');
+        if (elMemberPhone) elMemberPhone.innerText = memberPhone || '-';
+
+        let elRefundBank = document.getElementById('modal_refund_bank');
+        if (elRefundBank) elRefundBank.innerText = refundBank || '-';
+
+        let elRefundAccNo = document.getElementById('modal_refund_acc_no');
+        if (elRefundAccNo) elRefundAccNo.innerText = refundAccNo || '-';
+
+        let elRefundAccName = document.getElementById('modal_refund_acc_name');
+        if (elRefundAccName) elRefundAccName.innerText = refundAccName || '-';
+
+        let elSlipLink = document.getElementById('modal_refund_slip_link');
+        let elSlipBox = document.getElementById('modal_slip_preview_box');
+        let elSlipImg = document.getElementById('modal_slip_img');
+        let elSlipPreviewLink = document.getElementById('modal_slip_preview_link');
+
+        if (slipImage) {
+            if (elSlipLink) {
+                elSlipLink.innerHTML = `<a href="../uploads/slips/${slipImage}" target="_blank" class="btn-sm-info text-12" style="text-decoration: none;"><i class="fas fa-receipt"></i> ดูรูปสลิปต้นฉบับ</a>`;
+            }
+            if (elSlipBox && elSlipImg && elSlipPreviewLink) {
+                elSlipImg.src = `../uploads/slips/${slipImage}`;
+                elSlipPreviewLink.href = `../uploads/slips/${slipImage}`;
+                elSlipBox.style.display = 'block';
+            }
+        } else {
+            if (elSlipLink) {
+                elSlipLink.innerHTML = `<span class="text-small-muted">ไม่มีสลิป</span>`;
+            }
+            if (elSlipBox) {
+                elSlipBox.style.display = 'none';
+            }
+        }
+        
+        // รีเซ็ตฟิลด์เลือกสถานะ
+        let elRefundStatus = document.getElementById('refund_status');
+        if (elRefundStatus) elRefundStatus.value = '';
+        let pointBox = document.getElementById('point_return_group');
+        if (pointBox) pointBox.style.display = 'none';
+        
         modal.style.display = 'flex';
     }
+}
+
+function copyRefundAccount() {
+    let el = document.getElementById('modal_refund_acc_no');
+    let text = el ? el.innerText.trim() : '';
+    if (!text || text === '-' || text === 'ไม่มีข้อมูล') {
+        if (typeof SwalToast === 'function') {
+            SwalToast('warning', 'ไม่มีเลขบัญชีสำหรับคัดลอก');
+        } else {
+            alert('ไม่มีเลขบัญชีสำหรับคัดลอก');
+        }
+        return;
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            if (typeof SwalToast === 'function') {
+                SwalToast('success', 'คัดลอกเลขบัญชี ' + text + ' เรียบร้อยแล้ว');
+            } else {
+                alert('คัดลอกเลขบัญชี ' + text + ' เรียบร้อยแล้ว');
+            }
+        }).catch(() => {
+            fallbackCopyAccount(text);
+        });
+    } else {
+        fallbackCopyAccount(text);
+    }
+}
+
+function fallbackCopyAccount(text) {
+    let textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        let successful = document.execCommand('copy');
+        if (successful) {
+            if (typeof SwalToast === 'function') {
+                SwalToast('success', 'คัดลอกเลขบัญชี ' + text + ' เรียบร้อยแล้ว');
+            } else {
+                alert('คัดลอกเลขบัญชี ' + text + ' เรียบร้อยแล้ว');
+            }
+        } else {
+            if (typeof SwalToast === 'function') {
+                SwalToast('error', 'ไม่สามารถคัดลอกได้');
+            } else {
+                alert('ไม่สามารถคัดลอกได้');
+            }
+        }
+    } catch (err) {
+        if (typeof SwalToast === 'function') {
+            SwalToast('error', 'ไม่สามารถคัดลอกได้');
+        }
+    }
+    document.body.removeChild(textArea);
 }
 
 function closeRefundModal() {

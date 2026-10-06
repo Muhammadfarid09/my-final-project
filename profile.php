@@ -353,6 +353,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                 </h3>
 
                 <form action="actions/profile_edit_db.php" method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="update_profile">
 
                     <div class="form-group-custom">
@@ -402,6 +403,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                     </h3>
 
                     <form action="actions/profile_edit_db.php" method="POST">
+                        <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="change_password">
 
                         <div class="form-group-custom">

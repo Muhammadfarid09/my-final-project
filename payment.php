@@ -146,6 +146,7 @@ try {
 
                 <!-- ฟอร์มส่งสลิปไปที่ actions/payment_db.php -->
                 <form action="actions/payment_db.php" method="POST" enctype="multipart/form-data" id="paymentForm">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="booking_id" value="<?php echo $booking['booking_id']; ?>">
                     
                     <div class="form-group">

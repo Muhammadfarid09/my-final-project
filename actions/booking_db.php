@@ -1,6 +1,6 @@
 <?php
 session_start();
-// เรียกใช้ไฟล์ตั้งค่าฐานข้อมูล
+// เรียกใช้ไฟล์ตั้งค่าฐานข้อมูล (จะโหลด includes/csrf.php เข้ามาด้วยอัตโนมัติ)
 require_once '../config/config.php';
 
 // ตรวจสอบว่าล็อกอินอยู่หรือไม่
@@ -11,12 +11,15 @@ if (!isset($_SESSION['member_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
+    // ตรวจสอบความถูกต้องของ CSRF Token ก่อนดำเนินการใดๆ
+    require_csrf_token();
+
     // 1. รับค่าจากฟอร์ม
-    $member_id = $_SESSION['member_id'];
-    $court_id = $_POST['court_id'] ?? '';
-    $booking_date = $_POST['booking_date'];
-    $start_time = $_POST['start_time'];
-    $end_time = $_POST['end_time'];
+    $member_id = intval($_SESSION['member_id']);
+    $court_id = intval($_POST['court_id'] ?? 0);
+    $booking_date = trim($_POST['booking_date'] ?? '');
+    $start_time = trim($_POST['start_time'] ?? '');
+    $end_time = trim($_POST['end_time'] ?? '');
 
     // รับค่าชื่อเล่น/ชื่อก๊วนผู้จอง (booking_nickname ไม่เกิน 30 ตัวอักษร)
     $booking_nickname = trim($_POST['booking_nickname'] ?? '');
@@ -25,55 +28,94 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $booking_nickname = mb_substr($booking_nickname, 0, 30, 'UTF-8');
     
-    $total_court_price = floatval($_POST['total_court_price'] ?? 0);
-    $total_rental_price = floatval($_POST['total_rental_price'] ?? 0);
-    $total_product_price = floatval($_POST['total_product_price'] ?? 0);
-    $total_price = floatval($_POST['total_price'] ?? 0);
-    
     // รับค่า Array ของสินค้า (รหัสสินค้า => จำนวน)
-    $products = isset($_POST['products']) ? $_POST['products'] : [];
+    $products = isset($_POST['products']) && is_array($_POST['products']) ? $_POST['products'] : [];
 
     try {
-        // 2. ตรวจสอบความสมบูรณ์เบื้องต้น
-        if (empty($court_id) || empty($start_time) || empty($end_time)) {
-            throw new Exception("กรุณาเลือกสนามและเวลาให้ครบถ้วน");
+        // ========================================================
+        // 2. เคลียร์สล็อตที่หมดเวลาล็อก 15 นาทีอัตโนมัติก่อนเริ่มตรวจสอบ
+        // ========================================================
+        require_once __DIR__ . '/../admin/includes/auto_cancel.php';
+
+        // 2.1 ตรวจสอบความสมบูรณ์ของข้อมูลเบื้องต้น
+        if ($court_id <= 0 || empty($booking_date) || empty($start_time) || empty($end_time)) {
+            throw new Exception("กรุณาเลือกสนาม วันที่ และเวลาให้ครบถ้วน");
+        }
+
+        // ตรวจสอบรูปแบบวันที่ (YYYY-MM-DD)
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $booking_date)) {
+            throw new Exception("รูปแบบวันที่ไม่ถูกต้อง");
         }
 
         $start_time_ts = strtotime($start_time);
         $end_time_ts = strtotime($end_time);
 
+        if (!$start_time_ts || !$end_time_ts) {
+            throw new Exception("รูปแบบเวลาไม่ถูกต้อง");
+        }
+
         if ($start_time_ts >= $end_time_ts) {
             throw new Exception("เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด");
         }
 
-        $start_time = date('H:i:s', $start_time_ts);
-        $end_time = date('H:i:s', $end_time_ts);
+        $start_time_str = date('H:i:s', $start_time_ts);
+        $end_time_str = date('H:i:s', $end_time_ts);
 
-        // ========================================================
-        // 2.5 Server-side Price Recalculation (ป้องกันการปลอมแปลงราคา)
-        // คำนวณราคาค่าบริการตามวันในสัปดาห์ (Day-of-Week Pricing)
-        // ========================================================
+        // 2.2 ตรวจสอบเวลาเปิดทำการ (08:00 - 22:00 น.)
+        if ($start_time_str < '08:00:00' || $end_time_str > '22:00:00') {
+            throw new Exception("การจองต้องอยู่ในช่วงเวลาทำการ (08:00 - 22:00 น.)");
+        }
+
+        // 2.3 ตรวจสอบไม่ให้จองวันหรือเวลาย้อนหลัง
+        $booking_start_datetime = strtotime($booking_date . ' ' . $start_time_str);
+        // ให้ระยะผ่อนปรน 5 นาที (300 วินาที) สำหรับกรณีเวลาเครื่องเพี้ยนเล็กน้อย
+        if ($booking_start_datetime < (time() - 300)) {
+            throw new Exception("ไม่สามารถเลือกวันหรือช่วงเวลาย้อนหลังได้");
+        }
+
+        // 2.4 ตรวจสอบความยาวการจองอย่างน้อย 1 ชั่วโมง
         $hours = ($end_time_ts - $start_time_ts) / 3600;
         if ($hours < 1) {
             throw new Exception("ระยะเวลาการจองต้องอย่างน้อย 1 ชั่วโมง");
         }
 
-        $real_court_price = 0;
-        $real_rental_price = 0;
-        $real_product_price = 0;
-
-        // คำนวณค่าสนาม
-        $stmt_court = $conn->prepare("SELECT court_price_per_hour, court_peak_price, court_offpeak_price FROM Court WHERE court_id = :court_id");
-        $stmt_court->execute([':court_id' => $court_id]);
-        $court_data = $stmt_court->fetch(PDO::FETCH_ASSOC);
-        if (!$court_data) {
-            throw new Exception("ไม่พบข้อมูลสนาม");
+        // 2.5 ตรวจสอบสถานะสมาชิกในฐานข้อมูล
+        $stmt_member = $conn->prepare("SELECT member_status FROM Member WHERE member_id = :id");
+        $stmt_member->execute([':id' => $member_id]);
+        $member_status = $stmt_member->fetchColumn();
+        if (!$member_status) {
+            throw new Exception("ไม่พบข้อมูลสมาชิกในระบบ");
+        }
+        if ($member_status === 'ระงับสิทธิ์') {
+            throw new Exception("บัญชีของคุณถูกระงับสิทธิ์การใช้งาน ไม่สามารถทำการจองสนามได้");
         }
 
-        // กำหนดเรทราคาตามเงื่อนไขของวัน:
-        // - เสาร์ - อาทิตย์ (0, 6) = 200 ฿ (Peak / Weekend Rate)
-        // - จันทร์, พุธ, ศุกร์ (1, 3, 5) = 180 ฿ (Standard Rate)
-        // - อังคาร, พฤหัสบดี (2, 4) = 150 ฿ (Promo / Discount Rate)
+        // ========================================================
+        // 3. เริ่มต้น Database Transaction และ Pessimistic Row Lock
+        // ========================================================
+        $conn->beginTransaction();
+
+        // 3.1 ล็อกแถวสนามที่เลือกด้วย SELECT ... FOR UPDATE เพื่อป้องกัน Concurrent Booking
+        $stmt_court = $conn->prepare("
+            SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price 
+            FROM Court 
+            WHERE court_id = :court_id 
+            FOR UPDATE
+        ");
+        $stmt_court->execute([':court_id' => $court_id]);
+        $court_data = $stmt_court->fetch(PDO::FETCH_ASSOC);
+
+        if (!$court_data) {
+            throw new Exception("ไม่พบข้อมูลสนามที่ต้องการจอง");
+        }
+
+        if ($court_data['court_status'] === 'ปิดปรับปรุง') {
+            throw new Exception("ขออภัย สนาม '{$court_data['court_name']}' อยู่ระหว่างปิดปรับปรุง ไม่สามารถจองได้");
+        }
+
+        // ========================================================
+        // 3.2 คำนวณราคาค่าบริการตามวันในสัปดาห์ (Server-side Recalculation)
+        // ========================================================
         $dow = intval(date('w', strtotime($booking_date)));
         $base_rate = floatval($court_data['court_price_per_hour']) > 0 ? floatval($court_data['court_price_per_hour']) : 180.00;
         $peak_rate = floatval($court_data['court_peak_price']) > 0 ? floatval($court_data['court_peak_price']) : 200.00;
@@ -88,22 +130,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $real_court_price = $hourly_rate * $hours;
+        $real_rental_price = 0.00;
+        $real_product_price = 0.00;
 
-        // คำนวณค่าสินค้าและอุปกรณ์เช่า
+        // คำนวณราคาค่าสินค้าและอุปกรณ์เช่าจากฐานข้อมูลจริง
+        $valid_products = [];
         if (!empty($products)) {
             foreach ($products as $prod_id => $qty) {
-                if ($qty > 0) {
-                    $stmt_prod = $conn->prepare("SELECT product_price, product_type FROM Product WHERE product_id = :id");
+                $qty = intval($qty);
+                $prod_id = intval($prod_id);
+                if ($qty > 0 && $prod_id > 0) {
+                    $stmt_prod = $conn->prepare("SELECT product_name, product_price, product_type, product_stock FROM Product WHERE product_id = :id");
                     $stmt_prod->execute([':id' => $prod_id]);
                     $prod_data = $stmt_prod->fetch(PDO::FETCH_ASSOC);
                     
                     if ($prod_data) {
-                        $item_total = $prod_data['product_price'] * $qty;
+                        $item_total = floatval($prod_data['product_price']) * $qty;
                         if ($prod_data['product_type'] === 'อุปกรณ์เช่า') {
                             $real_rental_price += $item_total;
                         } else {
                             $real_product_price += $item_total;
                         }
+                        $valid_products[$prod_id] = [
+                            'qty' => $qty,
+                            'name' => $prod_data['product_name'],
+                            'type' => $prod_data['product_type'],
+                            'price' => floatval($prod_data['product_price'])
+                        ];
                     }
                 }
             }
@@ -112,22 +165,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $real_total_price = $real_court_price + $real_rental_price + $real_product_price;
 
         // ========================================================
-        // 3. ระบบป้องกันการจองซ้อน (Overlap Protection)
+        // 3.3 ตรวจสอบการจองซ้อน (Overlap Protection) ภายใต้ Transaction & Lock
         // ========================================================
-        $sql_check = "SELECT COUNT(*) FROM BOOKING 
-                      WHERE court_id = :court_id 
-                      AND booking_date = :booking_date 
-                      AND booking_status != 'ยกเลิก'
-                      AND (
-                          (booking_start_time < :end_time AND booking_end_time > :start_time)
-                      )";
-        
+        $sql_check = "
+            SELECT COUNT(*) FROM Booking 
+            WHERE court_id = :court_id 
+            AND booking_date = :booking_date 
+            AND booking_status != 'ยกเลิก'
+            AND (
+                (booking_start_time < :end_time AND booking_end_time > :start_time)
+            )
+        ";
         $stmt_check = $conn->prepare($sql_check);
         $stmt_check->execute([
             ':court_id' => $court_id,
             ':booking_date' => $booking_date,
-            ':start_time' => $start_time,
-            ':end_time' => $end_time
+            ':start_time' => $start_time_str,
+            ':end_time' => $end_time_str
         ]);
         
         if ($stmt_check->fetchColumn() > 0) {
@@ -135,24 +189,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // ========================================================
-        // 4. เริ่มต้น Transaction เพื่อล็อกสนามและบันทึกข้อมูล
+        // 4. บันทึกข้อมูลลงตาราง Booking พร้อมกำหนดเวลาล็อก 15 นาที
         // ========================================================
-        $conn->beginTransaction();
-
-        // คำนวณเวลาหมดอายุ (ปัจจุบัน + 15 นาที) สำหรับ Atomic Locking
         $created_at = date('Y-m-d H:i:s');
         $lock_expire = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
-        // 4.1 บันทึกการจองลงตาราง BOOKING (ตั้งสถานะเป็น "รอตรวจสอบ")
-        $sql_booking = "INSERT INTO BOOKING (
-                            member_id, booking_nickname, court_id, booking_date, booking_start_time, booking_end_time, 
-                            booking_status, booking_court_price, booking_rental_price, booking_product_price, 
-                            booking_total_price, booking_created_at, booking_lock_expire
-                        ) VALUES (
-                            :member_id, :booking_nickname, :court_id, :booking_date, :start_time, :end_time, 
-                            'รอตรวจสอบ', :court_price, :rental_price, :product_price, 
-                            :total_price, :created_at, :lock_expire
-                        )";
+        $sql_booking = "
+            INSERT INTO Booking (
+                member_id, booking_nickname, court_id, booking_date, booking_start_time, booking_end_time, 
+                booking_status, booking_court_price, booking_rental_price, booking_product_price, 
+                booking_total_price, booking_created_at, booking_lock_expire
+            ) VALUES (
+                :member_id, :booking_nickname, :court_id, :booking_date, :start_time, :end_time, 
+                'รอตรวจสอบ', :court_price, :rental_price, :product_price, 
+                :total_price, :created_at, :lock_expire
+            )
+        ";
         
         $stmt_booking = $conn->prepare($sql_booking);
         $stmt_booking->execute([
@@ -160,8 +212,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':booking_nickname' => $booking_nickname,
             ':court_id' => $court_id,
             ':booking_date' => $booking_date,
-            ':start_time' => $start_time,
-            ':end_time' => $end_time,
+            ':start_time' => $start_time_str,
+            ':end_time' => $end_time_str,
             ':court_price' => $real_court_price,
             ':rental_price' => $real_rental_price,
             ':product_price' => $real_product_price,
@@ -173,64 +225,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $booking_id = $conn->lastInsertId();
 
         // ========================================================
-        // 5. บันทึกรายการสินค้าและตัดสต็อกชั่วคราว
+        // 5. บันทึกรายการสินค้าและตัดสต็อกแบบ Atomic Concurrency
         // ========================================================
-        if (!empty($products)) {
-            $sql_rental = "INSERT INTO RENTAL (
-                                booking_id, product_id, rental_quantity, 
-                                rental_start_time, rental_return_time, rental_status
-                           ) VALUES (
-                                :booking_id, :product_id, :qty, 
-                                :start_time, :return_time, 'รอตรวจสอบ'
-                           )";
+        if (!empty($valid_products)) {
+            $sql_rental = "
+                INSERT INTO Rental (
+                    booking_id, product_id, rental_quantity, 
+                    rental_start_time, rental_return_time, rental_status
+                ) VALUES (
+                    :booking_id, :product_id, :qty, 
+                    :start_time, :return_time, 'รอตรวจสอบ'
+                )
+            ";
             $stmt_rental = $conn->prepare($sql_rental);
 
-            // เตรียมคำสั่งตัดสต็อก
-            $sql_update_stock = "UPDATE PRODUCT SET product_stock = product_stock - :qty WHERE product_id = :id";
+            // คำสั่งตัดสต็อกแบบมีเงื่อนไข Atomic ป้องกันสต็อกติดลบ
+            $sql_update_stock = "
+                UPDATE Product 
+                SET product_stock = product_stock - :qty 
+                WHERE product_id = :id AND product_stock >= :qty
+            ";
             $stmt_update_stock = $conn->prepare($sql_update_stock);
 
-            foreach ($products as $prod_id => $qty) {
-                if ($qty > 0) {
-                    
-                    // 5.1 ตรวจสอบสต็อกในฐานข้อมูลอีกครั้ง (Backend Validation)
-                    $stmt_check_stock = $conn->prepare("SELECT product_name, product_stock FROM PRODUCT WHERE product_id = :id");
-                    $stmt_check_stock->execute([':id' => $prod_id]);
-                    $prod_db = $stmt_check_stock->fetch(PDO::FETCH_ASSOC);
+            foreach ($valid_products as $prod_id => $item) {
+                $qty = $item['qty'];
+                
+                // ตัดสต็อกแบบ Atomic
+                $stmt_update_stock->execute([
+                    ':qty' => $qty,
+                    ':id' => $prod_id
+                ]);
 
-                    if (!$prod_db || $prod_db['product_stock'] < $qty) {
-                        throw new Exception("ขออภัย สินค้า/อุปกรณ์ '{$prod_db['product_name']}' มีจำนวนไม่พอ (คงเหลือ {$prod_db['product_stock']})");
-                    }
-
-                    // 5.2 บันทึกลงตาราง RENTAL
-                    $rental_start = $booking_date . ' ' . $start_time;
-                    $rental_end = $booking_date . ' ' . $end_time;
-                    $stmt_rental->execute([
-                        ':booking_id' => $booking_id,
-                        ':product_id' => $prod_id,
-                        ':qty' => $qty,
-                        ':start_time' => $rental_start,
-                        ':return_time' => $rental_end
-                    ]);
-
-                    // 5.3 ตัดสต็อกสินค้าทันทีเพื่อจองไว้ให้ลูกค้ารายนี้
-                    $stmt_update_stock->execute([
-                        ':qty' => $qty,
-                        ':id' => $prod_id
-                    ]);
+                // หากแถวที่ได้รับผลกระทบเป็น 0 แสดงว่าสต็อกไม่พอ ณ เสี้ยววินาทีนั้น
+                if ($stmt_update_stock->rowCount() === 0) {
+                    $stmt_cur = $conn->prepare("SELECT product_stock FROM Product WHERE product_id = :id");
+                    $stmt_cur->execute([':id' => $prod_id]);
+                    $cur_stock = $stmt_cur->fetchColumn() ?: 0;
+                    throw new Exception("ขออภัย สินค้า/อุปกรณ์ '{$item['name']}' มีจำนวนไม่พอ (คงเหลือ {$cur_stock} ชิ้น)");
                 }
+
+                // บันทึกลงตาราง Rental
+                $rental_start = $booking_date . ' ' . $start_time_str;
+                $rental_end = $booking_date . ' ' . $end_time_str;
+                $stmt_rental->execute([
+                    ':booking_id' => $booking_id,
+                    ':product_id' => $prod_id,
+                    ':qty' => $qty,
+                    ':start_time' => $rental_start,
+                    ':return_time' => $rental_end
+                ]);
             }
         }
 
-        // 6. ยืนยันการบันทึกข้อมูล (Commit)
+        // ========================================================
+        // 6. ยืนยัน Transaction (Commit)
+        // ========================================================
         $conn->commit();
 
         // ส่งลูกค้าไปยังหน้าชำระเงิน
-        $_SESSION['success'] = "ล็อกสนามและจองอุปกรณ์สำเร็จ! กรุณาชำระเงินภายใน 15 นาที";
+        $_SESSION['success'] = "ล็อกสนามและจองอุปกรณ์สำเร็จ! กรุณาชำระเงินและแนบสลิปภายใน 15 นาที";
         header("Location: ../payment.php?booking_id=" . $booking_id);
         exit();
 
     } catch (Exception $e) {
-        // หากเกิดข้อผิดพลาดใดๆ ให้ยกเลิกการบันทึกและการตัดสต็อกทั้งหมด (Rollback)
+        // หากเกิดข้อผิดพลาดใดๆ ให้ Rollback ยกเลิกรายการและคืนสต็อกทั้งหมดทันที
         if ($conn->inTransaction()) {
             $conn->rollBack();
         }

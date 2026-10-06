@@ -258,6 +258,7 @@ include 'includes/header.php';
         </h4>
 
         <form action="actions/equipment_return_db.php" method="POST" id="returnForm" onsubmit="return confirmReturnSubmit(event)">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="rental_id" id="modal_rental_id">
 
             <!-- ข้อมูลสรุปรายการเช่า -->

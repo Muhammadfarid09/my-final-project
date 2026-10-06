@@ -8,6 +8,7 @@ if (!isset($_SESSION['member_id'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     $booking_id = intval($_POST['booking_id']);
     $member_id = $_SESSION['member_id'];
 
@@ -57,13 +58,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพสลิป");
         }
 
-        // 4. ดึงข้อมูลยอดรวมการจอง
-        $stmt_price = $conn->prepare("SELECT booking_total_price FROM Booking WHERE booking_id = :booking_id AND member_id = :member_id");
+        // 4. ดึงข้อมูลการจองและตรวจสอบสถานะ
+        $stmt_price = $conn->prepare("SELECT booking_total_price, booking_status, booking_lock_expire FROM Booking WHERE booking_id = :booking_id AND member_id = :member_id");
         $stmt_price->execute([':booking_id' => $booking_id, ':member_id' => $member_id]);
         $booking = $stmt_price->fetch(PDO::FETCH_ASSOC);
 
         if (!$booking) {
-            throw new Exception("ไม่พบข้อมูลการจอง");
+            throw new Exception("ไม่พบข้อมูลการจองนี้ในระบบ");
+        }
+
+        if ($booking['booking_status'] !== 'รอตรวจสอบ') {
+            throw new Exception("รายการจองนี้ไม่อยู่ในสถานะรอชำระเงิน (อาจได้รับการยืนยันหรือยกเลิกไปแล้ว)");
+        }
+
+        if (!empty($booking['booking_lock_expire']) && strtotime($booking['booking_lock_expire']) < time()) {
+            throw new Exception("หมดเวลาการชำระเงินสำหรับการจองนี้แล้ว (เกินกำหนด 15 นาที) กรุณาทำรายการจองใหม่");
         }
 
         $booking_total_price = $booking['booking_total_price'];

@@ -169,6 +169,9 @@ require_once 'config.php';
                     `cancel_reason` VARCHAR(255) NOT NULL,
                     `cancel_by` ENUM('สมาชิก', 'Admin') NOT NULL,
                     `refund_status` ENUM('คืนแล้ว', 'ไม่คืน', 'รอดำเนินการ') DEFAULT 'รอดำเนินการ',
+                    `refund_bank` VARCHAR(50) DEFAULT NULL,
+                    `refund_account_no` VARCHAR(30) DEFAULT NULL,
+                    `refund_account_name` VARCHAR(100) DEFAULT NULL,
                     `refund_point` INT(11) DEFAULT 0,
                     `cancel_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (`booking_id`) REFERENCES `Booking`(`booking_id`) ON DELETE CASCADE,
@@ -176,6 +179,33 @@ require_once 'config.php';
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             ");
             echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Cancellation] สร้างตารางใหม่เรียบร้อยแล้ว</div>";
+        }
+
+        // 3.1 ตรวจสอบคอลัมน์ข้อมูลบัญชีรับเงินคืนในตาราง Cancellation
+        $cols_cancel = $conn->query("SHOW COLUMNS FROM Cancellation")->fetchAll(PDO::FETCH_COLUMN);
+
+        // refund_bank
+        if (!in_array('refund_bank', $cols_cancel)) {
+            $conn->exec("ALTER TABLE Cancellation ADD COLUMN refund_bank VARCHAR(50) NULL AFTER refund_status");
+            echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Cancellation] เพิ่มคอลัมน์ refund_bank (ธนาคาร/ช่องทางรับเงินคืน) สำเร็จ</div>";
+        } else {
+            echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Cancellation] มีคอลัมน์ refund_bank อยู่แล้ว</div>";
+        }
+
+        // refund_account_no
+        if (!in_array('refund_account_no', $cols_cancel)) {
+            $conn->exec("ALTER TABLE Cancellation ADD COLUMN refund_account_no VARCHAR(30) NULL AFTER refund_bank");
+            echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Cancellation] เพิ่มคอลัมน์ refund_account_no (เลขที่บัญชี/เบอร์พร้อมเพย์) สำเร็จ</div>";
+        } else {
+            echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Cancellation] มีคอลัมน์ refund_account_no อยู่แล้ว</div>";
+        }
+
+        // refund_account_name
+        if (!in_array('refund_account_name', $cols_cancel)) {
+            $conn->exec("ALTER TABLE Cancellation ADD COLUMN refund_account_name VARCHAR(100) NULL AFTER refund_account_no");
+            echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Cancellation] เพิ่มคอลัมน์ refund_account_name (ชื่อเจ้าของบัญชี) สำเร็จ</div>";
+        } else {
+            echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Cancellation] มีคอลัมน์ refund_account_name อยู่แล้ว</div>";
         }
 
         echo "<div style='text-align: center; margin-top: 25px; padding: 15px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0;'>

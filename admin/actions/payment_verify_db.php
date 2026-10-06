@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     
     // รับค่าจาก Modal
     $payment_id = intval($_POST['payment_id']);
@@ -30,6 +31,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         if ($data['payment_status'] != 'รอตรวจสอบ') {
             throw new Exception("รายการนี้ถูกตรวจสอบไปแล้ว ไม่สามารถทำรายการซ้ำได้");
+        }
+        if ($data['booking_status'] === 'ยกเลิก') {
+            throw new Exception("รายการจองนี้ถูกยกเลิกแล้ว กรุณาไปตรวจสอบและพิจารณาคืนเงินที่เมนู 'จัดการการยกเลิก'");
         }
 
         // ============================================

@@ -8,6 +8,7 @@ if (!isset($_SESSION['member_id'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     $member_id = $_SESSION['member_id'];
     $reward_id = intval($_POST['reward_id']);
 

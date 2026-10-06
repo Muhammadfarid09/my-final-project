@@ -8,9 +8,9 @@ $payments = [];
 try {
     // ดึงข้อมูลการชำระเงิน เชื่อมกับตาราง Booking, Member และ Court เพื่อเอาข้อมูลมาโชว์แอดมิน
     if ($active_tab == 'pending') {
-        $status_filter = "p.payment_status = 'รอตรวจสอบ'";
+        $status_filter = "p.payment_status = 'รอตรวจสอบ' AND b.booking_status != 'ยกเลิก'";
     } else {
-        $status_filter = "p.payment_status != 'รอตรวจสอบ'";
+        $status_filter = "p.payment_status != 'รอตรวจสอบ' OR (p.payment_status = 'รอตรวจสอบ' AND b.booking_status = 'ยกเลิก')";
     }
 
     $sql = "SELECT p.*, 
@@ -151,6 +151,7 @@ include 'includes/header.php';
             </div>
 
             <form action="actions/payment_verify_db.php" method="POST" id="verifyPaymentForm">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="payment_id" id="modal_payment_id">
                 <input type="hidden" name="booking_id" id="modal_booking_id">
                 

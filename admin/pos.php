@@ -119,6 +119,7 @@ include 'includes/header.php';
         </div>
 
         <form action="actions/pos_checkout_db.php" method="POST" id="checkoutForm" onsubmit="return validateCheckout(event)">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="cart_data" id="cartDataInput">
             <input type="hidden" name="total_amount" id="totalAmountInput">
             <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">

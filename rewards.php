@@ -365,6 +365,7 @@ try {
 
             <!-- ฟอร์มส่งไป actions/redeem_reward_db.php -->
             <form action="actions/redeem_reward_db.php" method="POST" id="redeemRewardForm">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="reward_id" id="modal_reward_id" value="">
                 
                 <div class="member-modal-footer">
