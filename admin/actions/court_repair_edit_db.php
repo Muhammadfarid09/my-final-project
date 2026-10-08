@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // --- ลอจิกพิเศษ: เปิด/ปิดสนามอัตโนมัติ ---
         if ($repair_status == 'เสร็จแล้ว') {
             // ถ้าซ่อมเสร็จ เปิดสนามอัตโนมัติ
-            $update_court = $conn->prepare("UPDATE Court SET court_status = 'เปิดใช้งาน' WHERE court_id = :court_id");
+            $update_court = $conn->prepare("UPDATE Court SET court_status = 'ว่าง' WHERE court_id = :court_id");
             $update_court->execute([':court_id' => $court_id]);
         } 
         else if ($repair_status == 'กำลังซ่อม') {

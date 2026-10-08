@@ -21,7 +21,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ระบบจัดการอัปโหลดรูปภาพ
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0) {
-        $ext = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
+        $allowed_mime = ['image/jpeg', 'image/png', 'image/webp'];
+        $ext = strtolower(pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION));
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES['product_image']['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($ext, $allowed_ext) || !in_array($mime, $allowed_mime)) {
+            $_SESSION['error'] = "อัปโหลดได้เฉพาะไฟล์รูปภาพ (JPG, JPEG, PNG, WEBP) เท่านั้น";
+            header("Location: ../products.php?tab=" . $tab_return);
+            exit();
+        }
+
+        if ($_FILES['product_image']['size'] > 2097152) {
+            $_SESSION['error'] = "ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB";
+            header("Location: ../products.php?tab=" . $tab_return);
+            exit();
+        }
+
         // สร้างชื่อรูปใหม่แบบสุ่ม ป้องกันรูปชื่อซ้ำกันทับกัน
         $new_image_name = 'PD_' . uniqid() . '.' . $ext;
         

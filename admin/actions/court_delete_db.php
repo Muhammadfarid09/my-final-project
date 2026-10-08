@@ -1,8 +1,10 @@
 <?php
 require_once '../includes/auth_check.php';
 
-if (isset($_GET['id'])) {
-    $court_id = intval($_GET['id']);
+$court_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+
+if ($court_id > 0) {
+    require_csrf_token();
 
     try {
         // 1. เช็คก่อนว่าสนามนี้เคยมีการจอง (BOOKING) หรือยัง

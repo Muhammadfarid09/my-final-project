@@ -61,12 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $start_time_str = date('H:i:s', $start_time_ts);
         $end_time_str = date('H:i:s', $end_time_ts);
 
-        // 2.2 ตรวจสอบเวลาเปิดทำการ (08:00 - 22:00 น.)
-        if ($start_time_str < '08:00:00' || $end_time_str > '22:00:00') {
-            throw new Exception("การจองต้องอยู่ในช่วงเวลาทำการ (08:00 - 22:00 น.)");
-        }
-
-        // 2.3 ตรวจสอบไม่ให้จองวันหรือเวลาย้อนหลัง
+        // 2.2 ตรวจสอบไม่ให้จองวันหรือเวลาย้อนหลัง
         $booking_start_datetime = strtotime($booking_date . ' ' . $start_time_str);
         // ให้ระยะผ่อนปรน 5 นาที (300 วินาที) สำหรับกรณีเวลาเครื่องเพี้ยนเล็กน้อย
         if ($booking_start_datetime < (time() - 300)) {
@@ -97,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 3.1 ล็อกแถวสนามที่เลือกด้วย SELECT ... FOR UPDATE เพื่อป้องกัน Concurrent Booking
         $stmt_court = $conn->prepare("
-            SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price 
+            SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price, court_open_time, court_close_time 
             FROM Court 
             WHERE court_id = :court_id 
             FOR UPDATE
@@ -111,6 +106,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($court_data['court_status'] === 'ปิดปรับปรุง') {
             throw new Exception("ขออภัย สนาม '{$court_data['court_name']}' อยู่ระหว่างปิดปรับปรุง ไม่สามารถจองได้");
+        }
+
+        // ตรวจสอบเวลาเปิดทำการของสนามนี้จากฐานข้อมูลจริง
+        $court_open = !empty($court_data['court_open_time']) ? $court_data['court_open_time'] : '08:00:00';
+        $court_close = !empty($court_data['court_close_time']) ? $court_data['court_close_time'] : '23:00:00';
+
+        if ($start_time_str < $court_open || $end_time_str > $court_close) {
+            $open_show = substr($court_open, 0, 5);
+            $close_show = substr($court_close, 0, 5);
+            throw new Exception("การจองสนาม '{$court_data['court_name']}' ต้องอยู่ในช่วงเวลาทำการ ({$open_show} - {$close_show} น.)");
         }
 
         // ========================================================

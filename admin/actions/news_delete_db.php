@@ -1,9 +1,10 @@
 <?php
 require_once '../includes/auth_check.php';
 
-// ตรวจสอบว่ามีการส่ง id มาหรือไม่
-if (isset($_GET['id'])) {
-    $news_id = intval($_GET['id']);
+$news_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+
+if ($news_id > 0) {
+    require_csrf_token();
 
     try {
         // 1. ดึงข้อมูลข่าวสารมาเช็คก่อนว่ามีรูปภาพไหม เพื่อจะได้ตามไปลบไฟล์รูปทิ้ง

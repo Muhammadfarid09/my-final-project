@@ -1,8 +1,10 @@
 <?php
 require_once '../includes/auth_check.php';
 
-if (isset($_GET['court_id'])) {
-    $court_id = intval($_GET['court_id']);
+$court_id = isset($_POST['court_id']) ? intval($_POST['court_id']) : (isset($_GET['court_id']) ? intval($_GET['court_id']) : 0);
+
+if ($court_id > 0) {
+    require_csrf_token();
 
     try {
         $conn->beginTransaction();

@@ -315,6 +315,19 @@ function addCourtToCart() {
 
     let startHour = parseInt(startTime.split(':')[0]);
     let endHour = startHour + hours;
+    if (endHour > 23) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'เวลาเกินเวลาปิดสนาม',
+                text: 'เวลาสิ้นสุดการใช้งาน (' + endHour + ':00 น.) เกินเวลาปิดทำการของสนาม (23:00 น.) กรุณาลดจำนวนชั่วโมงการเล่น',
+                confirmButtonColor: '#2563eb'
+            });
+        } else {
+            alert('เวลาสิ้นสุดการใช้งานเกินเวลาปิดสนาม (23:00 น.) กรุณาลดจำนวนชั่วโมงการเล่น');
+        }
+        return;
+    }
     let endTimeStr = (endHour < 10 ? '0' : '') + endHour + ':00';
     let totalPrice = rate * hours;
     let itemUniqueId = 'court_' + courtId + '_' + Date.now();

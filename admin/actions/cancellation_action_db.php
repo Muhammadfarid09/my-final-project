@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // ปฏิเสธการคืนเงิน (สลิปปลอมหรือไม่มียอดโอนจริง)
                 $conn->prepare("
                     UPDATE Payment 
-                    SET payment_status = 'ไม่ถูกต้อง', admin_id = :admin, payment_verified_at = NOW() 
+                    SET payment_status = 'ปฏิเสธ', admin_id = :admin, payment_verified_at = NOW() 
                     WHERE payment_id = :p_id
                 ")->execute([':admin' => $admin_id, ':p_id' => $c_info['payment_id']]);
             }

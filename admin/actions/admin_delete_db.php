@@ -8,12 +8,14 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'Super Admin'
     exit();
 }
 
-if (!isset($_GET['id'])) {
+$admin_id_to_delete = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+
+if ($admin_id_to_delete <= 0) {
     header("Location: ../admins.php");
     exit();
 }
 
-$admin_id_to_delete = intval($_GET['id']);
+require_csrf_token();
 
 // ป้องกันไม่ให้แอดมินลบตัวเอง (รหัสเดียวกับที่ล็อคอินอยู่)
 if ($admin_id_to_delete === intval($_SESSION['admin_id'])) {

@@ -72,9 +72,9 @@ try {
         // หัวตาราง
         fputcsv($output, ['รหัสการจอง', 'ชื่อลูกค้า', 'สนาม', 'วันที่เล่น', 'เวลา', 'สถานะ', 'วันที่ทำรายการ']);
         
-        $sql = "SELECT b.booking_id, m.member_name, c.court_name, b.booking_date, b.booking_start_time, b.booking_end_time, b.booking_status, b.booking_created_at
+        $sql = "SELECT b.booking_id, COALESCE(m.member_name, b.booking_nickname, 'ลูกค้าทั่วไป (Walk-in)') AS member_name, c.court_name, b.booking_date, b.booking_start_time, b.booking_end_time, b.booking_status, b.booking_created_at
                 FROM Booking b 
-                JOIN Member m ON b.member_id = m.member_id
+                LEFT JOIN Member m ON b.member_id = m.member_id
                 JOIN Court c ON b.court_id = c.court_id
                 ORDER BY b.booking_id DESC";
         $stmt = $conn->query($sql);

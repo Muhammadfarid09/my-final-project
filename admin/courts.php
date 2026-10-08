@@ -113,7 +113,7 @@ include 'includes/header.php';
                                     onclick="showActionConfirmModal({
                                         title: 'ยืนยันการเปิดใช้งานสนาม',
                                         message: 'ยืนยันว่าการซ่อมบำรุง <strong><?php echo htmlspecialchars(addslashes($row['court_name'])); ?></strong> เสร็จสิ้นเรียบร้อยแล้ว',
-                                        consequence: 'สถานะสนามจะเปลี่ยนเป็น \"พร้อมใช้งาน\" ทันที และสมาชิกจะสามารถทำการจองสนามนี้ได้ตามปกติ',
+                                        consequence: 'สถานะสนามจะเปลี่ยนเป็น &quot;พร้อมใช้งาน&quot; ทันที และสมาชิกจะสามารถทำการจองสนามนี้ได้ตามปกติ',
                                         confirmText: 'ยืนยันเปิดใช้งาน',
                                         type: 'success',
                                         actionUrl: 'actions/court_repair_finish_db.php?court_id=<?php echo $row['court_id']; ?>'

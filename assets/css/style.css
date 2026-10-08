@@ -227,7 +227,11 @@ body.bg-register {
     cursor: pointer;
 }
 
-/* Responsive */
+/* Responsive Navbar */
+.mobile-nav-user-item {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .nav-menu {
         display: none; /* ซ่อนในจอมือถือ */
@@ -239,6 +243,7 @@ body.bg-register {
         background: white;
         padding: 20px;
         box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+        gap: 8px;
     }
     .nav-menu.show {
         display: flex;
@@ -247,7 +252,65 @@ body.bg-register {
         display: block;
     }
     .nav-user {
-        display: none; /* ซ่อนในจอมือถือชั่วคราว */
+        display: none; /* ซ่อนหัวข้อ nav-user ด้านบนบนจอมือถือ */
+    }
+    .mobile-nav-user-item {
+        display: block;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #e2e8f0;
+    }
+    .mobile-user-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+    }
+    .mobile-user-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    .mobile-user-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .mobile-user-points {
+        font-size: 13px;
+        color: #475569;
+        margin-top: 6px;
+    }
+    .mobile-user-divider {
+        margin: 10px 0;
+        border: none;
+        border-top: 1px dashed #cbd5e1;
+    }
+    .mobile-user-links {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .mobile-user-links a {
+        padding: 6px 0;
+        font-size: 14px;
+        color: #334155;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    .mobile-login-box {
+        padding-top: 5px;
+    }
+    .mobile-btn-login {
+        display: block;
+        text-align: center;
+        padding: 10px 16px;
+        border-radius: 8px;
     }
 }
 /* =========================================

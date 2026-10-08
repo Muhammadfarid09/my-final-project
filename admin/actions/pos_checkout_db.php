@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // 1.1 ล็อกแถวสนามด้วย SELECT ... FOR UPDATE เพื่อป้องกันการจองชนกัน
                 $c_stmt = $conn->prepare("
-                    SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price 
+                    SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price, court_open_time, court_close_time 
                     FROM Court 
                     WHERE court_id = :cid 
                     FOR UPDATE
@@ -65,6 +65,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 $b_start_str = date('H:i:s', strtotime($b_start));
                 $b_end_str = date('H:i:s', strtotime($b_end));
+
+                $c_open = !empty($c_info['court_open_time']) ? $c_info['court_open_time'] : '08:00:00';
+                $c_close = !empty($c_info['court_close_time']) ? $c_info['court_close_time'] : '23:00:00';
+
+                if ($b_start_str < $c_open || $b_end_str > $c_close || $b_start_str >= $b_end_str) {
+                    throw new Exception("เวลาเปิดสนาม ({$b_start_str} - {$b_end_str}) อยู่นอกเวลาทำการของสนาม '{$c_info['court_name']}'");
+                }
 
                 // 1.2 ตรวจสอบการจองซ้ำซ้อน (Overlap Protection) กับการจองออนไลน์และหน้าร้านทั้งหมด
                 $sql_ov = "

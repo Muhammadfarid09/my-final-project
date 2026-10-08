@@ -29,6 +29,32 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
             <li><a href="booking.php"><i class="fas fa-calendar-check"></i> จองสนาม</a></li>
             <li><a href="rewards.php"><i class="fas fa-gift"></i> แลกของรางวัล</a></li>
             <li><a href="chat.php"><i class="fas fa-comments"></i> ติดต่อเรา</a></li>
+            
+            <!-- สำหรับจอมือถือ: เมนูข้อมูลผู้ใช้ / ปุ่มเข้าสู่ระบบ -->
+            <li class="mobile-nav-user-item">
+                <?php if (isset($_SESSION['member_id'])): ?>
+                    <div class="mobile-user-card">
+                        <div class="mobile-user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="mobile-user-name"><?php echo htmlspecialchars($_SESSION['member_name']); ?></span>
+                            <span class="badge-level level-<?php echo strtolower($member_level); ?>"><?php echo $member_level; ?></span>
+                        </div>
+                        <div class="mobile-user-points">
+                            คะแนนสะสม: <strong><?php echo number_format($member_points); ?></strong> พอยท์
+                        </div>
+                        <hr class="mobile-user-divider">
+                        <div class="mobile-user-links">
+                            <a href="profile.php"><i class="fas fa-id-card"></i> โปรไฟล์ของฉัน</a>
+                            <a href="booking_history.php"><i class="fas fa-history"></i> ประวัติการจอง</a>
+                            <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="mobile-login-box">
+                        <a href="login.php" class="btn-login-nav mobile-btn-login"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ / สมัครสมาชิก</a>
+                    </div>
+                <?php endif; ?>
+            </li>
         </ul>
 
         <!-- ส่วนของข้อมูลผู้ใช้งาน -->

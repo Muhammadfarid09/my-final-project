@@ -968,31 +968,70 @@ function SwalToast(icon, title, timer = 3500) {
 }
 
 /**
- * กล่องยืนยันการลบข้อมูลที่มีความเสี่ยงสูง (Destructive Actions)
+ * ผู้ช่วยส่งคำขอ Action ผ่าน Form POST พร้อม CSRF Token อัตโนมัติ
+ * สำหรับ Action Scripts เช่น _delete_db.php หรือ _finish_db.php
+ */
+function submitActionFormOrRedirect(url, options = {}) {
+    if (!url) return;
+    if (url.includes('_db.php') || options.method === 'POST') {
+        let form = document.createElement('form');
+        form.method = 'POST';
+        let parts = url.split('?');
+        form.action = parts[0];
+        if (parts[1]) {
+            let params = new URLSearchParams(parts[1]);
+            params.forEach((val, key) => {
+                let input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = val;
+                form.appendChild(input);
+            });
+        }
+        let csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        let csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : (document.getElementById('admin_csrf_token')?.value || '');
+        if (csrfToken) {
+            let csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        }
+        document.body.appendChild(form);
+        form.submit();
+    } else {
+        window.location.href = url;
+    }
+}
+
+/**
+ * กล่องยืนยันการลบข้อมูล (Delete Confirmation)
  * @param {object} options - การตั้งค่ากล่องยืนยัน
  */
 function SwalConfirmDelete(options) {
     if (typeof Swal === 'undefined') {
         if (confirm(options.title || 'ยืนยันการลบข้อมูล?')) {
             if (typeof options.onConfirm === 'function') options.onConfirm();
-            else if (options.actionUrl) window.location.href = options.actionUrl;
+            else if (options.actionUrl) submitActionFormOrRedirect(options.actionUrl, options);
         }
         return;
     }
 
     let title = options.title || 'ยืนยันการลบข้อมูล';
     let message = options.message || options.text || 'คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?';
-    let consequence = options.consequence || 'การดำเนินการนี้ไม่สามารถย้อนกลับได้ ข้อมูลจะถูกลบถาวร';
+    let consequence = options.consequence || 'คำเตือน: การลบข้อมูลนี้เป็นการลบถาวร ไม่สามารถกู้คืนได้';
     let confirmText = options.confirmText || 'ยืนยันการลบ';
     let cancelText = options.cancelText || 'ยกเลิก';
 
     let htmlContent = `
         <div class="swal-custom-body">
             <div class="swal-body-text">${message}</div>
-            <div class="swal-consequence-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span>${consequence}</span>
-            </div>
+            ${consequence ? `
+                <div class="swal-consequence-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>${consequence}</span>
+                </div>
+            ` : ''}
         </div>
     `;
 
@@ -1013,7 +1052,7 @@ function SwalConfirmDelete(options) {
             if (typeof options.onConfirm === 'function') {
                 options.onConfirm();
             } else if (options.actionUrl) {
-                window.location.href = options.actionUrl;
+                submitActionFormOrRedirect(options.actionUrl, options);
             }
         }
     });
@@ -1027,7 +1066,7 @@ function SwalConfirmAction(options) {
     if (typeof Swal === 'undefined') {
         if (confirm(options.title || 'ยืนยันการทำรายการ?')) {
             if (typeof options.onConfirm === 'function') options.onConfirm();
-            else if (options.actionUrl) window.location.href = options.actionUrl;
+            else if (options.actionUrl) submitActionFormOrRedirect(options.actionUrl, options);
         }
         return;
     }
@@ -1080,7 +1119,7 @@ function SwalConfirmAction(options) {
             if (typeof options.onConfirm === 'function') {
                 options.onConfirm();
             } else if (options.actionUrl) {
-                window.location.href = options.actionUrl;
+                submitActionFormOrRedirect(options.actionUrl, options);
             }
         }
     });

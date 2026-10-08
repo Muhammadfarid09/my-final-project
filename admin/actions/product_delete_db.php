@@ -1,9 +1,11 @@
 <?php
 require_once '../includes/auth_check.php';
 
-if (isset($_GET['id']) && isset($_GET['tab'])) {
-    $product_id = intval($_GET['id']);
-    $tab_return = $_GET['tab']; // เพื่อให้ลบเสร็จแล้วเด้งกลับไปถูกแท็บ (consumable หรือ rental)
+$product_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+$tab_return = isset($_POST['tab']) ? $_POST['tab'] : (isset($_GET['tab']) ? $_GET['tab'] : 'all');
+
+if ($product_id > 0) {
+    require_csrf_token();
 
     try {
         // 1. ดึงข้อมูลรูปภาพของสินค้าที่จะลบก่อน เพื่อเอาชื่อไฟล์ไปลบออกจากโฟลเดอร์

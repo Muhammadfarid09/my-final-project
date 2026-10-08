@@ -10,6 +10,7 @@
     <!-- SweetAlert2 CDN (v11) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
     <?php if (isset($extra_head)) echo $extra_head; ?>
 </head>
 <body>

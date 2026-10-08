@@ -1,8 +1,10 @@
 <?php
 require_once '../includes/auth_check.php';
 
-if (isset($_GET['id'])) {
-    $reward_id = intval($_GET['id']);
+$reward_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+
+if ($reward_id > 0) {
+    require_csrf_token();
 
     try {
         // ดึงชื่อไฟล์รูปมาเพื่อที่จะลบออกจากโฟลเดอร์ uploads/rewards ก่อน
