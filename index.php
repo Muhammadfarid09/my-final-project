@@ -67,8 +67,8 @@ try {
             <?php endforeach; ?>
         <?php else: ?>
             <!-- กรณีไม่มีข่าวสารในระบบ -->
-            <div style="text-align: center; grid-column: 1 / -1; color: #6c757d; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                <i class="fas fa-info-circle fa-3x" style="margin-bottom: 15px; color: #ced4da;"></i><br>
+            <div class="news-empty-state">
+                <i class="fas fa-info-circle fa-3x news-empty-icon"></i><br>
                 ยังไม่มีข่าวสารหรือประกาศในขณะนี้
             </div>
         <?php endif; ?>

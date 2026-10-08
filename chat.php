@@ -23,131 +23,15 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>ติดต่อแอดมิน - T.S. Pattani</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.3">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        .chat-container {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 600px;
-        }
-        .chat-header {
-            background: #1e3c72;
-            color: #fff;
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-header-status {
-            font-size: 13px;
-            font-weight: 400;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #28a745;
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 6px #28a745;
-        }
-        .chat-body {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f8f9fa;
-        }
-        .chat-message {
-            margin-bottom: 15px;
-            max-width: 70%;
-        }
-        .chat-message.admin {
-            margin-right: auto;
-        }
-        .chat-message.member {
-            margin-left: auto;
-            text-align: right;
-        }
-        .chat-bubble {
-            padding: 10px 15px;
-            border-radius: 15px;
-            display: inline-block;
-            font-size: 15px;
-            word-wrap: break-word;
-            text-align: left;
-        }
-        .chat-message.admin .chat-bubble {
-            background: #e9ecef;
-            color: #333;
-            border-bottom-left-radius: 0;
-        }
-        .chat-message.member .chat-bubble {
-            background: #007bff;
-            color: #fff;
-            border-bottom-right-radius: 0;
-        }
-        .chat-time {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
-            display: block;
-        }
-        .chat-footer {
-            padding: 15px;
-            background: #fff;
-            border-top: 1px solid #ddd;
-        }
-        .chat-input-group {
-            display: flex;
-            gap: 10px;
-        }
-        .chat-input {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            font-family: 'Prompt', sans-serif;
-            outline: none;
-        }
-        .chat-input:focus {
-            border-color: #007bff;
-        }
-        .btn-send {
-            background: #007bff;
-            color: #fff;
-            border: none;
-            padding: 0 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .btn-send:hover {
-            background: #0056b3;
-        }
-        .btn-send:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-    </style>
 </head>
-<body style="background-color: #f4f6f9;">
+<body class="page-body">
 
     <?php include 'includes/navbar.php'; ?>
 
-    <div class="container" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+    <div class="container chat-page-wrapper">
         
         <div class="chat-container">
             <div class="chat-header">
@@ -157,8 +41,8 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             <div class="chat-body" id="chatBody">
                 <?php if (empty($chats)): ?>
-                    <div id="emptyChatPlaceholder" style="text-align: center; color: #999; margin-top: 50px;">
-                        <i class="fas fa-comments fa-3x" style="margin-bottom: 10px;"></i>
+                    <div id="emptyChatPlaceholder" class="chat-empty-box">
+                        <i class="fas fa-comments fa-3x chat-empty-icon"></i>
                         <p>ยังไม่มีข้อความสนทนา ส่งข้อความเพื่อเริ่มคุยกับแอดมินได้เลย</p>
                     </div>
                 <?php else: ?>

@@ -43,105 +43,39 @@ try {
     <title>ประวัติการจอง - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.6">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .btn-cancel-booking {
-            background: #ef4444;
-            color: #ffffff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            text-decoration: none;
-        }
-        .btn-cancel-booking:hover {
-            background: #dc2626;
-        }
-        /* สถานะตามหลัก HCI */
-        .status-completed {
-            background-color: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-        .status-active {
-            background-color: #ecfdf5;
-            color: #047857;
-            border: 1px solid #a7f3d0;
-            animation: pulseActive 2s infinite;
-        }
-        @keyframes pulseActive {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        .badge-completed {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: #64748b;
-            font-weight: 500;
-        }
-        .modal-cancel-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-cancel-box {
-            background: #ffffff;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-            animation: fadeInModal 0.2s ease-out;
-        }
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-    </style>
 </head>
-<body style="background-color: #f4f6f9;">
+<body class="page-body">
 
     <?php include 'includes/navbar.php'; ?>
 
     <div class="history-wrapper">
         
-        <div class="booking-header" style="margin-bottom: 25px;">
+        <div class="booking-header history-header">
             <h2><i class="fas fa-history"></i> ประวัติการจองสนามและคำสั่งซื้อ</h2>
             <p>ตรวจสอบสถานะการจองสนาม ดูสลิปการโอน หรือขอยกเลิกการจอง</p>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success" style="background: #d4edda; color: #155724; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb; display: flex; align-items: center; gap: 8px;">
+            <div class="alert alert-success">
                 <i class="fas fa-check-circle fa-lg"></i> <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-error" style="background: #f8d7da; color: #721c24; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #f5c6cb; display: flex; align-items: center; gap: 8px;">
+            <div class="alert alert-error">
                 <i class="fas fa-exclamation-circle fa-lg"></i> <div><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
             </div>
         <?php endif; ?>
 
-        <div class="booking-card" style="padding: 20px; overflow-x: auto;">
+        <div class="booking-card history-card">
             <?php if (empty($bookings)): ?>
-                <div style="text-align: center; padding: 40px; color: #6c757d;">
-                    <i class="fas fa-folder-open fa-3x" style="margin-bottom: 10px;"></i>
+                <div class="history-empty-box">
+                    <i class="fas fa-folder-open fa-3x history-empty-icon"></i>
                     <p>ยังไม่มีประวัติการจองสนามในระบบ</p>
-                    <a href="booking.php" class="btn-confirm-booking" style="display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px; text-decoration: none;">ไปจองสนามเลย</a>
+                    <a href="booking.php" class="btn-confirm-booking btn-empty-book">ไปจองสนามเลย</a>
                 </div>
             <?php else: ?>
                 <table class="history-table">
@@ -153,7 +87,7 @@ try {
                             <th>เวลา</th>
                             <th>ยอดสุทธิ</th>
                             <th>สถานะ</th>
-                            <th style="text-align: center;">จัดการ</th>
+                            <th class="text-center">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,11 +162,11 @@ try {
                             }
                         ?>
                         <tr>
-                            <td style="font-weight: bold;">#<?php echo $row['booking_id']; ?></td>
+                            <td class="booking-id-cell">#<?php echo $row['booking_id']; ?></td>
                             <td><?php echo htmlspecialchars($row['court_name']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($row['booking_date'])); ?></td>
                             <td><?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?></td>
-                            <td style="color: #007bff; font-weight: bold;"><?php echo number_format($row['booking_total_price'], 2); ?> ฿</td>
+                            <td class="booking-price-cell"><?php echo number_format($row['booking_total_price'], 2); ?> ฿</td>
                             <td>
                                 <span class="badge-status <?php echo $status_class; ?>">
                                     <?php if ($status_class === 'status-completed'): ?>
@@ -243,8 +177,8 @@ try {
                                     <?php echo $display_status; ?>
                                 </span>
                             </td>
-                            <td style="text-align: center; white-space: nowrap;">
-                                <div style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                            <td class="booking-action-cell">
+                                <div class="booking-action-wrap">
                                     <?php if ($status === 'รอตรวจสอบ' && empty($slip) && !$is_lock_expired && !$is_past): ?>
                                         <a href="payment.php?booking_id=<?php echo $row['booking_id']; ?>" class="btn-action-sm btn-pay-now">
                                             <i class="fas fa-credit-card"></i> แนบสลิป
@@ -269,15 +203,15 @@ try {
                                             <i class="fas fa-times-circle"></i> <?php echo $cancel_btn_text; ?>
                                         </button>
                                     <?php elseif ($status === 'ยกเลิก'): ?>
-                                        <span style="color: #94a3b8; font-size: 13px;"><i class="fas fa-ban"></i> ยกเลิกแล้ว</span>
+                                        <span class="booking-refund-wait"><i class="fas fa-ban"></i> ยกเลิกแล้ว</span>
                                     <?php elseif ($status_class === 'status-completed'): ?>
                                         <span class="badge-completed"><i class="fas fa-check-circle text-primary"></i> เสร็จสิ้น</span>
                                     <?php elseif ($status_class === 'status-active'): ?>
-                                        <span style="color: #059669; font-size: 12px; font-weight: 600;"><i class="fas fa-play-circle"></i> กำลังใช้งาน</span>
+                                        <span class="booking-refund-done"><i class="fas fa-play-circle"></i> กำลังใช้งาน</span>
                                     <?php elseif ($is_past || $is_lock_expired): ?>
-                                        <span style="color: #ef4444; font-size: 12px;"><i class="fas fa-clock"></i> หมดเวลา</span>
+                                        <span class="booking-refund-rej"><i class="fas fa-clock"></i> หมดเวลา</span>
                                     <?php else: ?>
-                                        <span style="color: #adb5bd; font-size: 13px;">-</span>
+                                        <span class="booking-dash-mute">-</span>
                                     <?php endif; ?>
                                 </div>
                             </td>
@@ -293,7 +227,7 @@ try {
     <!-- Modal ยืนยันการขอยกเลิกการจอง -->
     <div id="cancelModal" class="modal-cancel-overlay">
         <div class="modal-cancel-box">
-            <h4 id="modal_cancel_header" style="margin: 0 0 15px 0; color: #dc2626; border-bottom: 2px solid #fee2e2; padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <h4 id="modal_cancel_header" class="modal-cancel-header-title">
                 <i class="fas fa-exclamation-triangle"></i> <span id="modal_cancel_title_text">ขอยกเลิกการจองสนาม</span>
             </h4>
 
@@ -302,47 +236,47 @@ try {
                 <input type="hidden" name="booking_id" id="modal_cancel_booking_id">
 
                 <!-- รายละเอียดการจอง -->
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; font-size: 14px;">
+                <div class="modal-cancel-summary-box">
                     <div><strong>รหัสจอง:</strong> #<span id="modal_cancel_id_text"></span></div>
                     <div><strong>สนาม:</strong> <span id="modal_cancel_court"></span></div>
                     <div><strong>วัน-เวลา:</strong> <span id="modal_cancel_date"></span> (<span id="modal_cancel_time"></span>)</div>
-                    <div><strong>ยอดเงินรวม:</strong> <span id="modal_cancel_price" style="color: #0284c7; font-weight: bold;"></span> ฿</div>
+                    <div><strong>ยอดเงินรวม:</strong> <span id="modal_cancel_price" class="modal-cancel-price"></span> ฿</div>
                 </div>
 
                 <!-- กรณีที่ 1: รอตรวจสอบ + ยังไม่แนบสลิป (ยังไม่จ่าย) -->
-                <div id="modal_unverified_notice" style="display: none; background: #fee2e2; border: 1px solid #fca5a5; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 13px; color: #991b1b;">
+                <div id="modal_unverified_notice" class="modal-cancel-notice notice-unverified">
                     <strong><i class="fas fa-info-circle"></i> ข้อชี้แจงการยกเลิก:</strong>
-                    <div style="margin-top: 4px;">รายการนี้ยังไม่ได้แนบสลิปชำระเงิน เมื่อกดยกเลิก ระบบจะปล่อย Slot สนามและคืนสต็อกอุปกรณ์ทันที <span style="font-weight: 600;">(ไม่มีการคืนเงินเนื่องจากยังไม่ได้ชำระเงิน)</span></div>
+                    <div class="modal-notice-sub">รายการนี้ยังไม่ได้แนบสลิปชำระเงิน เมื่อกดยกเลิก ระบบจะปล่อย Slot สนามและคืนสต็อกอุปกรณ์ทันที <strong>(ไม่มีการคืนเงินเนื่องจากยังไม่ได้ชำระเงิน)</strong></div>
                 </div>
 
                 <!-- กรณีที่ 2: รอตรวจสอบ + แนบสลิปแล้ว (จ่ายแล้ว แต่รอตรวจ) -->
-                <div id="modal_unverified_slip_notice" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 13px; color: #1e40af;">
+                <div id="modal_unverified_slip_notice" class="modal-cancel-notice notice-unverified-slip">
                     <strong><i class="fas fa-receipt"></i> ข้อชี้แจงการขอคืนเงิน:</strong>
-                    <div style="margin-top: 4px;">ท่านได้แนบสลิปชำระเงินไว้แล้ว เมื่อกดยกเลิก ระบบจะปล่อย Slot สนามทันที และส่งเรื่องให้ผู้ดูแลระบบตรวจสอบสลิปเพื่อดำเนินการ <span style="font-weight: 600; color: #059669;">โอนเงินคืน 100%</span> ตามบัญชีที่ท่านระบุด้านล่าง</div>
+                    <div class="modal-notice-sub">ท่านได้แนบสลิปชำระเงินไว้แล้ว เมื่อกดยกเลิก ระบบจะปล่อย Slot สนามทันที และส่งเรื่องให้ผู้ดูแลระบบตรวจสอบสลิปเพื่อดำเนินการ <strong class="booking-refund-done">โอนเงินคืน 100%</strong> ตามบัญชีที่ท่านระบุด้านล่าง</div>
                 </div>
 
                 <!-- กรณีที่ 3: จองแล้ว (ยืนยันชำระเงินแล้ว) -->
-                <div id="modal_refund_policy_box" style="display: none; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px; margin-bottom: 15px; font-size: 12px; color: #92400e;">
+                <div id="modal_refund_policy_box" class="modal-cancel-notice notice-policy">
                     <strong><i class="fas fa-info-circle"></i> เงื่อนไขและนโยบายการขอคืนเงิน:</strong>
-                    <ul style="margin: 5px 0 0 18px; padding: 0;">
+                    <ul class="cancel-policy-list">
                         <li>ยกเลิกก่อนเวลาใช้งานมากกว่า 24 ชม.: โอนเงินคืน 100%</li>
                         <li>ยกเลิกก่อนเวลาใช้งาน 12 - 24 ชม.: หักค่าธรรมเนียม 30% (โอนคืน 70%)</li>
                         <li>ยกเลิกก่อนเวลาใช้งานน้อยกว่า 12 ชม.: หักค่าธรรมเนียม 50% (โอนคืน 50%)</li>
                     </ul>
-                    <div style="margin-top: 6px; font-size: 11px; color: #b45309;">*ผู้ดูแลระบบจะพิจารณาและโอนเงินคืนตามข้อมูลบัญชีที่ระบุด้านล่าง</div>
+                    <div class="cancel-policy-note">*ผู้ดูแลระบบจะพิจารณาและโอนเงินคืนตามข้อมูลบัญชีที่ระบุด้านล่าง</div>
                 </div>
 
                 <!-- กล่องระบุข้อมูลบัญชีสำหรับรับเงินโอนคืน (HCI: Avoid Redundant User Input) -->
-                <div id="modal_refund_account_section" style="display: none; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 14px 16px; margin-bottom: 15px;">
-                    <div style="font-weight: 600; color: #166534; font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                <div id="modal_refund_account_section" class="modal-refund-account-box">
+                    <div class="cancel-refund-heading">
                         <i class="fas fa-university"></i> ข้อมูลบัญชีสำหรับรับเงินโอนคืน (ผ่านธนาคาร / พร้อมเพย์)
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 10px;">
-                        <label style="display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 4px;">
-                            ธนาคาร หรือ ช่องทางรับเงิน <span style="color: red;">*</span>
+                    <div class="form-group cancel-form-group">
+                        <label class="cancel-label">
+                            ธนาคาร หรือ ช่องทางรับเงิน <span class="required-star">*</span>
                         </label>
-                        <select name="refund_bank" id="cancel_refund_bank" class="form-control" style="width: 100%; box-sizing: border-box; border-radius: 6px; border: 1px solid #cbd5e1; padding: 7px 10px; font-family: inherit; font-size: 13px;">
+                        <select name="refund_bank" id="cancel_refund_bank" class="form-control cancel-select-bank">
                             <option value="พร้อมเพย์ (PromptPay)">พร้อมเพย์ (PromptPay)</option>
                             <option value="ธนาคารกสิกรไทย (KBANK)">ธนาคารกสิกรไทย (KBANK)</option>
                             <option value="ธนาคารไทยพาณิชย์ (SCB)">ธนาคารไทยพาณิชย์ (SCB)</option>
@@ -354,36 +288,39 @@ try {
                         </select>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 10px;">
-                        <label style="display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 4px;">
-                            เลขที่บัญชี หรือ เบอร์พร้อมเพย์ <span style="color: red;">*</span>
+                    <div class="form-group cancel-form-group">
+                        <label class="cancel-label">
+                            เลขที่บัญชี หรือ เบอร์พร้อมเพย์ <span class="required-star">*</span>
                         </label>
-                        <input type="text" name="refund_account_no" id="cancel_refund_account_no" class="form-control" placeholder="เช่น 08xxxxxxxx หรือ เลขบัญชีธนาคาร" style="width: 100%; box-sizing: border-box; border-radius: 6px; border: 1px solid #cbd5e1; padding: 7px 10px; font-family: inherit; font-size: 13px;">
+                        <input type="text" name="refund_account_no" id="cancel_refund_account_no" class="form-control cancel-input-text" placeholder="เช่น 08xxxxxxxx หรือ เลขบัญชีธนาคาร">
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label style="display: block; font-size: 12px; font-weight: 500; color: #374151; margin-bottom: 4px;">
-                            ชื่อ - นามสกุล เจ้าของบัญชี <span style="color: red;">*</span>
+                    <div class="form-group cancel-form-group-last">
+                        <label class="cancel-label">
+                            ชื่อ - นามสกุล เจ้าของบัญชี <span class="required-star">*</span>
                         </label>
-                        <input type="text" name="refund_account_name" id="cancel_refund_account_name" class="form-control" placeholder="ระบุชื่อเจ้าของบัญชีสำหรับเทียบยอดโอน" style="width: 100%; box-sizing: border-box; border-radius: 6px; border: 1px solid #cbd5e1; padding: 7px 10px; font-family: inherit; font-size: 13px;">
+                        <input type="text" name="refund_account_name" id="cancel_refund_account_name" class="form-control cancel-input-text" placeholder="ระบุชื่อเจ้าของบัญชีสำหรับเทียบยอดโอน">
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #334155;">
-                        ระบุเหตุผลในการขอยกเลิก <span style="color: red;">*</span>
+                <div class="form-group cancel-form-group-reason">
+                    <label class="cancel-label-lg">
+                        ระบุเหตุผลในการขอยกเลิก <span class="required-star">*</span>
                     </label>
-                    <textarea name="cancel_reason" class="form-control" rows="3" placeholder="เช่น ติดธุระด่วน, สภาพอากาศไม่เอื้ออำนวย, เพื่อนร่วมทีมไม่สะดวก" style="width: 100%; box-sizing: border-box; border-radius: 8px; border: 1px solid #cbd5e1; padding: 8px 12px; font-family: inherit;" required></textarea>
+                    <textarea name="cancel_reason" class="form-control" rows="3" placeholder="เช่น ติดธุระด่วน, สภาพอากาศไม่เอื้ออำนวย, เพื่อนร่วมทีมไม่สะดวก" required></textarea>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" onclick="closeCancelModal()" style="padding: 10px 18px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; cursor: pointer; font-family: inherit;">
+                <div class="modal-cancel-btn-group">
+                    <button type="button" onclick="closeCancelModal()" class="btn-modal-cancel-dismiss">
                         ปิด
                     </button>
-                    <button type="submit" id="modal_cancel_submit_btn" style="padding: 10px 18px; border-radius: 6px; border: none; background: #dc2626; color: white; cursor: pointer; font-weight: 600; font-family: inherit;">
+                    <button type="submit" id="modal_cancel_submit_btn" class="btn-modal-cancel-confirm">
                         <i class="fas fa-check"></i> <span id="modal_cancel_submit_text">ยืนยันการขอยกเลิก</span>
                     </button>
                 </div>
+            </form>
+        </div>
+    </div>
             </form>
         </div>
     </div>

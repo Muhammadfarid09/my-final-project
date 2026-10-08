@@ -65,7 +65,7 @@ if (isset($_SESSION['member_id'])) {
                     <label for="member_gender">เพศ</label>
                     <div class="input-group">
                         <i class="fas fa-venus-mars"></i>
-                        <select id="member_gender" name="member_gender" class="form-control" style="padding-left: 40px;" required>
+                        <select id="member_gender" name="member_gender" class="form-control" required>
                             <option value="" disabled selected>เลือกเพศ</option>
                             <option value="ชาย">ชาย</option>
                             <option value="หญิง">หญิง</option>

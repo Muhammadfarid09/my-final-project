@@ -27,17 +27,17 @@ if (isset($_SESSION['member_id'])) {
     <!-- เลเยอร์ทำภาพพื้นหลังให้มืดลง -->
     <div class="overlay"></div>
 
-    <div class="register-container" style="max-width: 450px;">
+    <div class="register-container auth-card-md">
         <!-- ฟอร์มส่งไปประมวลผลที่ actions/forgot_password_db.php -->
         <form action="actions/forgot_password_db.php" method="POST" onsubmit="return validateResetPassword()">
             
-            <div class="register-header" style="margin-bottom: 20px;">
+            <div class="register-header auth-header-mb">
                 <h2>ลืมรหัสผ่าน</h2>
                 <p>กรุณากรอกข้อมูลเพื่อยืนยันตัวตนและตั้งรหัสผ่านใหม่</p>
             </div>
 
             <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-error" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                <div class="alert alert-error">
                     <i class="fas fa-exclamation-circle"></i> 
                     <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
                 </div>
@@ -59,7 +59,7 @@ if (isset($_SESSION['member_id'])) {
                 </div>
             </div>
 
-            <hr style="border: 0; border-top: 1px dashed #ccc; margin: 20px 0;">
+            <hr class="divider-dashed">
 
             <div class="form-group">
                 <label for="new_password">รหัสผ่านใหม่</label>

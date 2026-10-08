@@ -27,11 +27,11 @@ if (isset($_SESSION['member_id'])) {
     <!-- เลเยอร์ทำภาพพื้นหลังให้มืดลง -->
     <div class="overlay"></div>
 
-    <div class="register-container" style="max-width: 400px;">
+    <div class="register-container auth-card-sm">
         <!-- ฟอร์มส่งไปประมวลผลที่ actions/login_db.php -->
         <form action="actions/login_db.php" method="POST">
             
-            <div class="register-header" style="margin-bottom: 20px;">
+            <div class="register-header auth-header-mb">
                 <h2>เข้าสู่ระบบสมาชิก</h2>
                 <p>ระบบจัดการและจองสนาม T.S. Pattani</p>
             </div>
@@ -40,14 +40,14 @@ if (isset($_SESSION['member_id'])) {
             <!-- บล็อกแสดงแจ้งเตือน Error หรือ Success (สำคัญมาก) -->
             <!-- ============================================== -->
             <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success" style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i> 
                     <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-error" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 14px;">
+                <div class="alert alert-error">
                     <i class="fas fa-exclamation-circle"></i> 
                     <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
                 </div>
@@ -65,9 +65,9 @@ if (isset($_SESSION['member_id'])) {
 
             <!-- รหัสผ่าน -->
             <div class="form-group">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label for="member_password" style="margin-bottom: 0;">รหัสผ่าน</label>
-                    <a href="forgot_password.php" style="font-size: 13px; color: #007bff; text-decoration: none;">ลืมรหัสผ่าน?</a>
+                <div class="auth-label-row">
+                    <label for="member_password" class="auth-label-mb-0">รหัสผ่าน</label>
+                    <a href="forgot_password.php" class="auth-forgot-link">ลืมรหัสผ่าน?</a>
                 </div>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>

@@ -58,12 +58,12 @@ try {
     die("เกิดข้อผิดพลาดในการโหลดข้อมูล: " . $e->getMessage());
 }
 
-$tier_colors = [
-    'Bronze' => ['bg' => '#cd7f32', 'text' => '#ffffff'],
-    'Silver' => ['bg' => '#6c757d', 'text' => '#ffffff'],
-    'Gold'   => ['bg' => '#d4af37', 'text' => '#ffffff']
+$tier_badge_classes = [
+    'Bronze' => 'tier-bronze',
+    'Silver' => 'tier-silver',
+    'Gold'   => 'tier-gold'
 ];
-$current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32', 'text' => '#ffffff'];
+$current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bronze';
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -73,227 +73,11 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
     <title>โปรไฟล์ของฉัน - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.6">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        .profile-container {
-            max-width: 1050px;
-            margin: 35px auto 60px;
-            padding: 0 20px;
-            font-family: 'Prompt', sans-serif;
-        }
-        .profile-header-card {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-            box-shadow: 0 8px 25px rgba(30, 60, 114, 0.2);
-            margin-bottom: 30px;
-        }
-        .profile-user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
-            color: #ffffff;
-            border: 3px solid rgba(255, 255, 255, 0.4);
-        }
-        .profile-details h2 {
-            margin: 0 0 6px 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
-        .profile-details p {
-            margin: 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        .profile-tier-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-left: 8px;
-            background-color: <?php echo $current_tier_color['bg']; ?>;
-            color: <?php echo $current_tier_color['text']; ?>;
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-        .profile-stats-group {
-            display: flex;
-            gap: 25px;
-            background: rgba(255, 255, 255, 0.12);
-            padding: 15px 25px;
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-item .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffeb3b;
-        }
-        .stat-item .stat-label {
-            font-size: 12px;
-            opacity: 0.85;
-        }
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-        @media (max-width: 850px) {
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-            .profile-header-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .profile-stats-group {
-                width: 100%;
-                justify-content: space-around;
-            }
-        }
-        .profile-card {
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eaeaea;
-        }
-        .profile-card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f2f5;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .profile-card-title i {
-            color: #1e3c72;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #495057;
-        }
-        .form-control-custom {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s;
-            box-sizing: border-box;
-        }
-        .form-control-custom:focus {
-            border-color: #1e3c72;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.15);
-        }
-        .form-group-custom {
-            margin-bottom: 16px;
-        }
-        .form-row-custom {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .btn-profile-submit {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 12px 20px;
-            background: #1e3c72;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-        }
-        .btn-profile-submit:hover {
-            background: #162c54;
-        }
-        .btn-profile-submit:active {
-            transform: scale(0.99);
-        }
-        .btn-password-submit {
-            background: #e67e22;
-        }
-        .btn-password-submit:hover {
-            background: #d35400;
-        }
-        .summary-stats-box {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px dashed #cbd5e1;
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-        }
-        .summary-stat-val {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1e3c72;
-        }
-        .summary-stat-lbl {
-            font-size: 12px;
-            color: #64748b;
-        }
-        .alert-box {
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .alert-success-box {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .alert-error-box {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
 </head>
-<body style="background-color: #f4f6f9;">
+<body class="page-body">
 
     <?php include 'includes/navbar.php'; ?>
 
@@ -323,7 +107,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                 <div class="profile-details">
                     <h2>
                         <?php echo htmlspecialchars($member['member_name']); ?>
-                        <span class="profile-tier-badge">
+                        <span class="profile-tier-badge <?php echo $current_tier_class; ?>">
                             <i class="fas fa-crown"></i> <?php echo htmlspecialchars($member['member_level']); ?>
                         </span>
                     </h2>
@@ -357,12 +141,12 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                     <input type="hidden" name="action" value="update_profile">
 
                     <div class="form-group-custom">
-                        <label class="form-label">ชื่อ - นามสกุล <span style="color: red;">*</span></label>
+                        <label class="form-label">ชื่อ - นามสกุล <span class="required-star">*</span></label>
                         <input type="text" name="member_name" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_name']); ?>" required>
                     </div>
 
                     <div class="form-group-custom">
-                        <label class="form-label">เบอร์โทรศัพท์ (ใช้เข้าสู่ระบบ) <span style="color: red;">*</span></label>
+                        <label class="form-label">เบอร์โทรศัพท์ (ใช้เข้าสู่ระบบ) <span class="required-star">*</span></label>
                         <input type="text" name="member_phone" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_phone']); ?>" maxlength="10" pattern="[0-9]{10}" placeholder="08xxxxxxxx" required>
                     </div>
 
@@ -386,7 +170,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                         <input type="text" name="member_occupation" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_occupation'] ?? ''); ?>" placeholder="เช่น นักเรียน, ข้าราชการ, พนักงานบริษัท">
                     </div>
 
-                    <div style="margin-top: 25px;">
+                    <div class="profile-btn-mt">
                         <button type="submit" class="btn-profile-submit">
                             <i class="fas fa-save"></i> บันทึกข้อมูลส่วนตัว
                         </button>
@@ -397,7 +181,7 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
             <!-- ฝั่งขวา: เปลี่ยนรหัสผ่านและสรุปกิจกรรม -->
             <div>
                 <!-- การ์ดเปลี่ยนรหัสผ่าน -->
-                <div class="profile-card" style="margin-bottom: 25px;">
+                <div class="profile-card profile-card-mb">
                     <h3 class="profile-card-title">
                         <i class="fas fa-key"></i> เปลี่ยนรหัสผ่าน
                     </h3>
@@ -407,21 +191,21 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                         <input type="hidden" name="action" value="change_password">
 
                         <div class="form-group-custom">
-                            <label class="form-label">รหัสผ่านปัจจุบัน <span style="color: red;">*</span></label>
+                            <label class="form-label">รหัสผ่านปัจจุบัน <span class="required-star">*</span></label>
                             <input type="password" name="old_password" class="form-control-custom" placeholder="กรอกรหัสผ่านปัจจุบัน" required>
                         </div>
 
                         <div class="form-group-custom">
-                            <label class="form-label">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร) <span style="color: red;">*</span></label>
+                            <label class="form-label">รหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร) <span class="required-star">*</span></label>
                             <input type="password" name="new_password" class="form-control-custom" minlength="6" placeholder="กรอกรหัสผ่านใหม่" required>
                         </div>
 
                         <div class="form-group-custom">
-                            <label class="form-label">ยืนยันรหัสผ่านใหม่ <span style="color: red;">*</span></label>
+                            <label class="form-label">ยืนยันรหัสผ่านใหม่ <span class="required-star">*</span></label>
                             <input type="password" name="confirm_password" class="form-control-custom" minlength="6" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" required>
                         </div>
 
-                        <div style="margin-top: 25px;">
+                        <div class="profile-btn-mt">
                             <button type="submit" class="btn-profile-submit btn-password-submit">
                                 <i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน
                             </button>
@@ -441,20 +225,20 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
                             <div class="summary-stat-lbl">จองทั้งหมด</div>
                         </div>
                         <div>
-                            <div class="summary-stat-val" style="color: #28a745;"><?php echo intval($stats['success_bookings'] ?? 0); ?></div>
+                            <div class="summary-stat-val stat-green"><?php echo intval($stats['success_bookings'] ?? 0); ?></div>
                             <div class="summary-stat-lbl">จองสำเร็จ</div>
                         </div>
                         <div>
-                            <div class="summary-stat-val" style="color: #dc3545;"><?php echo intval($stats['cancel_bookings'] ?? 0); ?></div>
+                            <div class="summary-stat-val stat-red"><?php echo intval($stats['cancel_bookings'] ?? 0); ?></div>
                             <div class="summary-stat-lbl">ยกเลิก</div>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <a href="booking_history.php" class="btn-profile-submit" style="background: #f8fafc; color: #1e3c72; border: 1px solid #cbd5e1; text-decoration: none; font-size: 13px;">
+                    <div class="profile-action-links">
+                        <a href="booking_history.php" class="btn-profile-submit btn-profile-outline">
                             <i class="fas fa-history"></i> ประวัติการจอง
                         </a>
-                        <a href="rewards.php" class="btn-profile-submit" style="background: #f8fafc; color: #1e3c72; border: 1px solid #cbd5e1; text-decoration: none; font-size: 13px;">
+                        <a href="rewards.php" class="btn-profile-submit btn-profile-outline">
                             <i class="fas fa-gift"></i> แลกของรางวัล
                         </a>
                     </div>
@@ -465,51 +249,52 @@ $current_tier_color = $tier_colors[$member['member_level']] ?? ['bg' => '#cd7f32
         </div>
 
         <!-- การ์ดประวัติคะแนนสะสม (Point Transaction History) -->
-        <div class="profile-card" style="margin-top: 30px;">
-            <div class="profile-card-title" style="justify-content: space-between;">
-                <div><i class="fas fa-coins" style="color: #f39c12;"></i> ประวัติคะแนนสะสม (Point History)</div>
-                <span style="font-size: 13px; font-weight: normal; color: #64748b;">10 รายการล่าสุด</span>
+        <div class="profile-card profile-card-mt">
+            <div class="profile-card-title space-between">
+                <div><i class="fas fa-coins coins-icon"></i> ประวัติคะแนนสะสม (Point History)</div>
+                <span class="profile-subtitle-hint">10 รายการล่าสุด</span>
             </div>
 
             <?php if (empty($point_transactions)): ?>
-                <div style="text-align: center; padding: 30px; color: #94a3b8;">
-                    <i class="fas fa-receipt fa-2x" style="margin-bottom: 8px;"></i>
-                    <p style="margin: 0; font-size: 14px;">ยังไม่มีประวัติการทำรายการคะแนนสะสม</p>
+                <div class="profile-point-empty">
+                    <i class="fas fa-receipt fa-2x"></i>
+                    <p>ยังไม่มีประวัติการทำรายการคะแนนสะสม</p>
                 </div>
             <?php else: ?>
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <div class="table-responsive">
+                    <table class="profile-point-table">
                         <thead>
-                            <tr style="border-bottom: 2px solid #e2e8f0; color: #64748b; text-align: left;">
-                                <th style="padding: 10px 12px;">วัน-เวลา</th>
-                                <th style="padding: 10px 12px;">ประเภทรายการ</th>
-                                <th style="padding: 10px 12px;">รายละเอียด</th>
-                                <th style="padding: 10px 12px; text-align: right;">จำนวนคะแนน</th>
+                            <tr>
+                                <th>วัน-เวลา</th>
+                                <th>ประเภทรายการ</th>
+                                <th>รายละเอียด</th>
+                                <th class="text-right">จำนวนคะแนน</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($point_transactions as $pt): 
                                 $is_earned = ($pt['transaction_type'] === 'ได้รับ');
                                 $is_used = ($pt['transaction_type'] === 'ใช้');
-                                $pt_color = $is_earned ? '#28a745' : ($is_used ? '#dc3545' : '#17a2b8');
+                                $pt_type_class = $is_earned ? 'point-badge-earned' : ($is_used ? 'point-badge-used' : 'point-badge-admin');
+                                $pt_val_class = $is_earned ? 'point-val-earned' : ($is_used ? 'point-val-used' : 'point-val-admin');
                                 $pt_prefix = $is_earned ? '+' : ($is_used ? '-' : '');
                             ?>
-                                <tr style="border-bottom: 1px solid #f1f5f9;">
-                                    <td style="padding: 12px; color: #475569; white-space: nowrap;">
+                                <tr>
+                                    <td class="profile-point-date">
                                         <?php echo date('d/m/Y H:i', strtotime($pt['transaction_date'])); ?>
                                     </td>
-                                    <td style="padding: 12px;">
-                                        <span style="display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; background: <?php echo $is_earned ? '#e8f5e9' : ($is_used ? '#ffebee' : '#e0f2fe'); ?>; color: <?php echo $pt_color; ?>;">
+                                    <td>
+                                        <span class="point-type-badge <?php echo $pt_type_class; ?>">
                                             <?php echo htmlspecialchars($pt['transaction_type']); ?>
                                         </span>
                                     </td>
-                                    <td style="padding: 12px; color: #334155;">
+                                    <td class="profile-point-desc">
                                         <?php echo htmlspecialchars($pt['transaction_note'] ?? '-'); ?>
                                         <?php if (!empty($pt['booking_id'])): ?>
-                                            <span style="font-size: 12px; color: #64748b;">(การจอง #<?php echo $pt['booking_id']; ?>)</span>
+                                            <span class="point-booking-ref">(การจอง #<?php echo $pt['booking_id']; ?>)</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td style="padding: 12px; text-align: right; font-weight: 700; color: <?php echo $pt_color; ?>; white-space: nowrap;">
+                                    <td class="profile-point-amount <?php echo $pt_val_class; ?>">
                                         <?php echo $pt_prefix . number_format($pt['transaction_point']); ?> พอยท์
                                     </td>
                                 </tr>

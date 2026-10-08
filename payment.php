@@ -54,15 +54,15 @@ try {
     <title>ชำระเงิน - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.4">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="background-color: #f4f6f9;">
+<body class="page-body">
 
     <?php include 'includes/navbar.php'; ?>
 
-    <div class="payment-wrapper" style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+    <div class="payment-wrapper payment-page-container">
         <!-- ข้อความแจ้งเตือน Flash Messages -->
         <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-error">
@@ -77,32 +77,32 @@ try {
             <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
         </div>
         <?php endif; ?>
-        <div class="booking-card" style="text-align: center; margin-bottom: 25px; background: #fff3cd; border: 1px solid #ffeeba; color: #856404;">
+        <div class="booking-card payment-countdown-card">
             <h3><i class="fas fa-clock"></i> กรุณาชำระเงินภายใน 15 นาที</h3>
-            <p style="margin: 5px 0 0 0; font-size: 14px;">ระบบได้ทำการล็อกสนามไว้ให้ท่านแล้ว หากเกินเวลาการจองจะถูกยกเลิกอัตโนมัติ</p>
+            <p class="payment-countdown-subtitle">ระบบได้ทำการล็อกสนามไว้ให้ท่านแล้ว หากเกินเวลาการจองจะถูกยกเลิกอัตโนมัติ</p>
             <!-- ตัวจับเวลาถอยหลัง -->
-            <div id="countdown" style="font-size: 24px; font-weight: bold; margin-top: 10px; color: #dc3545;">15:00</div>
+            <div id="countdown" class="payment-countdown-val">15:00</div>
         </div>
 
-        <div class="booking-grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="booking-grid payment-grid-two-cols">
             
             <!-- ฝั่งซ้าย: ข้อมูลการชำระเงิน (QR Code) -->
             <div class="booking-card">
                 <h3><i class="fas fa-qrcode"></i> สแกน QR Code ชำระเงิน</h3>
-                <div style="text-align: center; margin: 20px 0;">
+                <div class="payment-qr-wrapper">
                     <!-- จำลองรูป QR Code PromptPay หรือรูปบัญชีธนาคาร -->
-                    <div style="background: #e9ecef; width: 200px; height: 200px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-                        <i class="fas fa-qrcode fa-5x" style="color: #6c757d;"></i>
+                    <div class="payment-qr-placeholder">
+                        <i class="fas fa-qrcode fa-5x payment-qr-icon"></i>
                     </div>
-                    <p style="margin-top: 15px; font-weight: 500; color: #343a40;">ธนาคารกสิกรไทย (KBANK)</p>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0;">
-                        <span id="bankAccountNo" style="font-size: 18px; font-weight: bold; color: #007bff; letter-spacing: 0.5px;">123-4-56789-0</span>
+                    <p class="payment-bank-title">ธนาคารกสิกรไทย (KBANK)</p>
+                    <div class="payment-account-row">
+                        <span id="bankAccountNo" class="payment-account-number">123-4-56789-0</span>
                         <button type="button" class="btn-copy-account" onclick="copyBankAccount('123-4-56789-0')" title="คัดลอกเลขบัญชี">
                             <i class="fas fa-copy"></i> คัดลอก
                         </button>
                         <span id="copyFeedback" class="copy-tooltip"><i class="fas fa-check"></i> คัดลอกแล้ว!</span>
                     </div>
-                    <p style="font-size: 13px; color: #666; margin-top: 5px;">ชื่อบัญชี: บจก. ที.เอส. ปัตตานี แบดมินตัน</p>
+                    <p class="payment-account-holder">ชื่อบัญชี: บจก. ที.เอส. ปัตตานี แบดมินตัน</p>
                 </div>
             </div>
 
@@ -121,7 +121,7 @@ try {
                     <span>วันที่/เวลา:</span>
                     <strong><?php echo date('d/m/Y', strtotime($booking['booking_date'])); ?> (<?php echo $booking['booking_start_time']; ?> - <?php echo $booking['booking_end_time']; ?>)</strong>
                 </div>
-                <hr style="margin: 10px 0; border: 0; border-top: 1px dashed #ccc;">
+                <hr class="payment-divider">
                 <div class="summary-row">
                     <span>ค่าสนาม:</span>
                     <span><?php echo number_format($booking['booking_court_price'], 2); ?> ฿</span>
@@ -138,10 +138,10 @@ try {
                     <span><?php echo number_format($booking['booking_product_price'], 2); ?> ฿</span>
                 </div>
                 <?php endif; ?>
-                <hr style="margin: 10px 0; border: 0; border-top: 1px dashed #ccc;">
-                <div class="summary-row total-row" style="margin-bottom: 20px;">
+                <hr class="payment-divider">
+                <div class="summary-row total-row payment-total-row">
                     <span>ยอดที่ต้องชำระสุทธิ:</span>
-                    <span style="color: #28a745; font-size: 20px;"><?php echo number_format($booking['booking_total_price'], 2); ?> ฿</span>
+                    <span class="payment-total-val"><?php echo number_format($booking['booking_total_price'], 2); ?> ฿</span>
                 </div>
 
                 <!-- ฟอร์มส่งสลิปไปที่ actions/payment_db.php -->
@@ -150,29 +150,29 @@ try {
                     <input type="hidden" name="booking_id" value="<?php echo $booking['booking_id']; ?>">
                     
                     <div class="form-group">
-                        <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: block;">แนบสลิปการโอนเงิน *</label>
+                        <label class="payment-upload-label">แนบสลิปการโอนเงิน *</label>
                         <!-- Slip Upload Dropzone with Live Preview -->
                         <div id="slipUploadBox" class="slip-upload-box">
-                            <input type="file" id="paymentSlipInput" name="payment_slip" accept="image/jpeg,image/png,image/webp" style="display: none;" required>
+                            <input type="file" id="paymentSlipInput" name="payment_slip" accept="image/jpeg,image/png,image/webp" class="payment-file-input" required>
                             
                             <div id="uploadPrompt" class="upload-prompt">
-                                <i class="fas fa-cloud-upload-alt fa-3x" style="color: #007bff; margin-bottom: 8px;"></i>
-                                <div style="font-weight: 600; font-size: 14px; color: #333;">คลิกหรือลากไฟล์สลิปมาวางที่นี่</div>
-                                <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB)</div>
+                                <i class="fas fa-cloud-upload-alt fa-3x payment-upload-icon"></i>
+                                <div class="payment-upload-text">คลิกหรือลากไฟล์สลิปมาวางที่นี่</div>
+                                <div class="payment-upload-hint">รองรับ JPG, PNG, WEBP (ไม่เกิน 5MB)</div>
                             </div>
 
-                            <div id="previewContainer" class="preview-container" style="display: none;">
+                            <div id="previewContainer" class="preview-container">
                                 <img id="slipPreviewImg" src="" alt="สลิปโอนเงิน" class="preview-img">
-                                <div id="fileInfoText" style="font-size: 12px; color: #495057; font-weight: 500;"></div>
+                                <div id="fileInfoText" class="payment-file-info"></div>
                                 <button type="button" class="btn-change-file" id="btnChangeSlip">
                                     <i class="fas fa-sync-alt"></i> เปลี่ยนรูปภาพ
                                 </button>
                             </div>
                         </div>
-                        <div id="clientErrorMsg" style="color: #dc3545; font-size: 13px; margin-top: 6px; display: none;"></div>
+                        <div id="clientErrorMsg" class="payment-client-error"></div>
                     </div>
 
-                    <button type="submit" id="btnSubmitPayment" class="btn-confirm-booking" style="background: #007bff; margin-top: 10px; width: 100%;">
+                    <button type="submit" id="btnSubmitPayment" class="btn-confirm-booking btn-payment-submit">
                         ยืนยันการชำระเงิน <i class="fas fa-upload"></i>
                     </button>
                 </form>

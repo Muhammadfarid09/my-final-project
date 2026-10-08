@@ -185,3 +185,58 @@
     color: #ccc;
     border: 1px dashed #ddd;
 }
+
+/* =========================================
+   Global Utilities & Page Helpers
+   ========================================= */
+body.page-body {
+    background-color: #f4f6f9;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.auth-card-sm {
+    max-width: 400px;
+}
+
+.auth-card-md {
+    max-width: 450px;
+}
+
+.auth-header-mb {
+    margin-bottom: 20px;
+}
+
+.auth-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.auth-label-mb-0 {
+    margin-bottom: 0;
+}
+
+.auth-forgot-link {
+    font-size: 13px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.auth-forgot-link:hover {
+    text-decoration: underline;
+}
+
+.divider-dashed {
+    border: 0;
+    border-top: 1px dashed #ccc;
+    margin: 20px 0;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+

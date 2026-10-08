@@ -621,7 +621,7 @@ body.bg-register {
     justify-content: center;
 }
 .preview-container {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     gap: 8px;
@@ -2510,6 +2510,1057 @@ body.bg-register {
     .rewards-level-row { justify-content: center; }
     .loyalty-progress-container { margin: 0 auto; }
 }
+
+/* ==========================================================================
+   T.S. Pattani - Customer Chat Styles (chat.php)
+   ========================================================================== */
+.chat-page-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.chat-container {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+.chat-header {
+    background: #1e3c72;
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.chat-header-status {
+    font-size: 13px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #28a745;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 6px #28a745;
+}
+.chat-body {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f8f9fa;
+}
+.chat-message {
+    margin-bottom: 15px;
+    max-width: 70%;
+}
+.chat-message.admin {
+    margin-right: auto;
+}
+.chat-message.member {
+    margin-left: auto;
+    text-align: right;
+}
+.chat-bubble {
+    padding: 10px 15px;
+    border-radius: 15px;
+    display: inline-block;
+    font-size: 15px;
+    word-wrap: break-word;
+    text-align: left;
+}
+.chat-message.admin .chat-bubble {
+    background: #e9ecef;
+    color: #333;
+    border-bottom-left-radius: 0;
+}
+.chat-message.member .chat-bubble {
+    background: #007bff;
+    color: #fff;
+    border-bottom-right-radius: 0;
+}
+.chat-time {
+    font-size: 11px;
+    color: #999;
+    margin-top: 5px;
+    display: block;
+}
+.chat-footer {
+    padding: 15px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+}
+.chat-input-group {
+    display: flex;
+    gap: 10px;
+}
+.chat-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-family: 'Prompt', sans-serif;
+    outline: none;
+}
+.chat-input:focus {
+    border-color: #007bff;
+}
+.btn-send {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+}
+.btn-send:hover {
+    background: #0056b3;
+}
+.btn-send:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+.chat-empty-box {
+    text-align: center;
+    color: #999;
+    margin-top: 50px;
+}
+.chat-empty-icon {
+    margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   T.S. Pattani - Promotions & News Styles (promotions.php, index.php)
+   ========================================================================== */
+.news-page-wrapper {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.news-header-banner {
+    background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+.news-header-banner h1 { margin: 0 0 10px 0; font-size: 32px; }
+.news-header-banner p { margin: 0; font-size: 18px; opacity: 0.9; }
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+.news-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+.news-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #eee;
+}
+.news-img.news-img-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+    font-size: 40px;
+}
+.news-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.news-date {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+.news-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+.news-content {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.btn-read-more {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    color: #007bff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    text-align: center;
+    border: 1px solid #ddd;
+    transition: all 0.2s;
+}
+.btn-read-more:hover {
+    background: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+/* Modal ข่าวสาร */
+.news-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.news-modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 0;
+    border: none;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    overflow: hidden;
+    animation: newsSlideIn 0.3s;
+}
+@keyframes newsSlideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.news-modal-header {
+    padding: 15px 20px;
+    background: #1e3c72;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.news-modal-title {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+}
+.news-close-btn {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.news-close-btn:hover {
+    color: #ddd;
+}
+.news-modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.news-modal-date {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 15px;
+}
+.news-modal-img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.news-modal-body p {
+    line-height: 1.6;
+    color: #444;
+}
+.news-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 50px;
+    background: #fff;
+    border-radius: 12px;
+    color: #6c757d;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+.news-empty-icon {
+    margin-bottom: 15px;
+    color: #ced4da;
+}
+.news-empty-text {
+    font-size: 18px;
+    margin: 0;
+}
+
+/* ==========================================================================
+   T.S. Pattani - Booking History Styles (booking_history.php)
+   ========================================================================== */
+.history-wrapper {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+.history-header {
+    margin-bottom: 25px;
+}
+.history-card {
+    padding: 20px;
+    overflow-x: auto;
+}
+.history-empty-box {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+.history-empty-icon {
+    margin-bottom: 10px;
+}
+.btn-empty-book {
+    display: inline-block;
+    width: auto;
+    margin-top: 15px;
+}
+.btn-cancel-booking {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+}
+.btn-cancel-booking:hover {
+    background: #dc2626;
+}
+.status-completed {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.status-active {
+    background-color: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    animation: pulseActive 2s infinite;
+}
+@keyframes pulseActive {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+.badge-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+}
+.booking-id-cell {
+    font-weight: bold;
+}
+.booking-price-cell {
+    color: #007bff;
+    font-weight: bold;
+}
+.booking-action-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+.booking-action-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.booking-refund-wait {
+    color: #94a3b8;
+    font-size: 13px;
+}
+.booking-refund-done {
+    color: #059669;
+    font-size: 12px;
+    font-weight: 600;
+}
+.booking-refund-rej {
+    color: #ef4444;
+    font-size: 12px;
+}
+.booking-dash-mute {
+    color: #adb5bd;
+    font-size: 13px;
+}
+
+/* Modal ยกเลิกการจอง */
+.modal-cancel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+.modal-cancel-box {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    animation: fadeInModal 0.2s ease-out;
+}
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.modal-cancel-header-title {
+    margin: 0 0 15px 0;
+    color: #dc2626;
+    border-bottom: 2px solid #fee2e2;
+    padding-bottom: 10px;
+}
+.modal-cancel-summary-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+.modal-cancel-price {
+    color: #0284c7;
+    font-weight: 600;
+}
+.modal-cancel-notice {
+    display: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.notice-unverified {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+.notice-unverified-slip {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e40af;
+}
+.notice-policy {
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    color: #92400e;
+}
+.modal-notice-sub {
+    margin-top: 4px;
+}
+.cancel-policy-list {
+    margin: 5px 0 0 18px;
+    padding: 0;
+}
+.cancel-policy-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #b45309;
+}
+.modal-refund-account-box {
+    display: none;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 15px;
+}
+.cancel-refund-heading {
+    font-weight: 600;
+    color: #166534;
+    font-size: 13px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.cancel-form-group {
+    margin-bottom: 10px;
+}
+.cancel-form-group-last {
+    margin-bottom: 0;
+}
+.cancel-form-group-reason {
+    margin-bottom: 20px;
+}
+.cancel-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+.cancel-label-lg {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #374151;
+}
+.required-star {
+    color: red;
+}
+.cancel-select-bank {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+.cancel-input-text {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+.modal-cancel-btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.btn-modal-cancel-dismiss {
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+}
+.btn-modal-cancel-confirm {
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+/* ==========================================================================
+   T.S. Pattani - Member Profile Styles (profile.php)
+   ========================================================================== */
+.profile-container {
+    max-width: 1050px;
+    margin: 35px auto 60px;
+    padding: 0 20px;
+    font-family: 'Prompt', sans-serif;
+}
+.profile-header-card {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.2);
+    margin-bottom: 30px;
+}
+.profile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    color: #ffffff;
+    border: 3px solid rgba(255, 255, 255, 0.4);
+}
+.profile-details h2 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+.profile-details p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+.profile-tier-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.profile-tier-badge.tier-bronze {
+    background-color: #cd7f32;
+    color: #ffffff;
+}
+.profile-tier-badge.tier-silver {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+.profile-tier-badge.tier-gold {
+    background-color: #d4af37;
+    color: #ffffff;
+}
+.profile-stats-group {
+    display: flex;
+    gap: 25px;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 15px 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+}
+.stat-item {
+    text-align: center;
+}
+.stat-item .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffeb3b;
+}
+.stat-item .stat-label {
+    font-size: 12px;
+    opacity: 0.85;
+}
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+@media (max-width: 850px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    .profile-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .profile-stats-group {
+        width: 100%;
+        justify-content: space-around;
+    }
+}
+.profile-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eaeaea;
+}
+.profile-card-mb {
+    margin-bottom: 25px;
+}
+.profile-card-mt {
+    margin-top: 30px;
+}
+.profile-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f2f5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.profile-card-title.space-between {
+    justify-content: space-between;
+}
+.profile-card-title i {
+    color: #1e3c72;
+}
+.profile-card-title i.coins-icon {
+    color: #f39c12;
+}
+.profile-subtitle-hint {
+    font-size: 13px;
+    font-weight: normal;
+    color: #64748b;
+}
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #495057;
+}
+.form-control-custom {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+.form-control-custom:focus {
+    border-color: #1e3c72;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.15);
+}
+.form-group-custom {
+    margin-bottom: 16px;
+}
+.form-row-custom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.profile-btn-mt {
+    margin-top: 25px;
+}
+.btn-profile-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    background: #1e3c72;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none;
+}
+.btn-profile-submit:hover {
+    background: #162c54;
+}
+.btn-profile-submit:active {
+    transform: scale(0.99);
+}
+.btn-profile-outline {
+    background: #f8fafc;
+    color: #1e3c72;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+}
+.btn-profile-outline:hover {
+    background: #e2e8f0;
+    color: #162c54;
+}
+.btn-password-submit {
+    background: #e67e22;
+}
+.btn-password-submit:hover {
+    background: #d35400;
+}
+.summary-stats-box {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px dashed #cbd5e1;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+.summary-stat-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e3c72;
+}
+.summary-stat-val.stat-green {
+    color: #28a745;
+}
+.summary-stat-val.stat-red {
+    color: #dc3545;
+}
+.summary-stat-lbl {
+    font-size: 12px;
+    color: #64748b;
+}
+.profile-action-links {
+    display: flex;
+    gap: 10px;
+}
+.alert-box {
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.alert-success-box {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.alert-error-box {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* ตารางแต้มพอยท์ */
+.profile-point-empty {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+}
+.profile-point-empty i {
+    margin-bottom: 8px;
+}
+.profile-point-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+.profile-point-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.profile-point-table th {
+    border-bottom: 2px solid #e2e8f0;
+    color: #64748b;
+    text-align: left;
+    padding: 10px 12px;
+}
+.profile-point-table th.text-right {
+    text-align: right;
+}
+.profile-point-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.profile-point-date {
+    color: #475569;
+    white-space: nowrap;
+}
+.profile-point-desc {
+    color: #334155;
+}
+.point-booking-ref {
+    font-size: 12px;
+    color: #64748b;
+}
+.point-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.point-badge-earned {
+    background: #e8f5e9;
+    color: #28a745;
+}
+.point-badge-used {
+    background: #ffebee;
+    color: #dc3545;
+}
+.point-badge-admin {
+    background: #e0f2fe;
+    color: #17a2b8;
+}
+.profile-point-amount {
+    text-align: right;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.point-val-earned {
+    color: #28a745;
+}
+.point-val-used {
+    color: #dc3545;
+}
+.point-val-admin {
+    color: #17a2b8;
+}
+
+/* ==========================================================================
+   T.S. Pattani - Payment Page Styles (payment.php)
+   ========================================================================== */
+.payment-page-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.payment-countdown-card {
+    text-align: center;
+    margin-bottom: 25px;
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+.payment-countdown-subtitle {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+}
+.payment-countdown-val {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #dc3545;
+}
+.payment-grid-two-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.payment-qr-wrapper {
+    text-align: center;
+    margin: 20px 0;
+}
+.payment-qr-placeholder {
+    background: #e9ecef;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+.payment-qr-icon {
+    color: #6c757d;
+}
+.payment-bank-title {
+    margin-top: 15px;
+    font-weight: 500;
+    color: #343a40;
+}
+.payment-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+.payment-account-number {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+    letter-spacing: 1px;
+}
+.payment-account-holder {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+.payment-divider {
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px dashed #ccc;
+}
+.payment-total-row {
+    margin-bottom: 20px;
+}
+.payment-total-val {
+    color: #28a745;
+    font-size: 20px;
+    font-weight: bold;
+}
+.payment-upload-label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+    color: #333;
+}
+.payment-file-input {
+    display: none;
+}
+.payment-upload-icon {
+    color: #007bff;
+    margin-bottom: 8px;
+}
+.payment-upload-text {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+.payment-upload-hint {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+.payment-file-info {
+    font-size: 12px;
+    color: #495057;
+    font-weight: 500;
+    margin-top: 8px;
+}
+.payment-client-error {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 6px;
+    display: none;
+}
+.btn-payment-submit {
+    background: #007bff;
+    width: 100%;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 600;
+    font-family: inherit;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+.btn-payment-submit:hover {
+    background: #0056b3;
+}
+
 
 
 
