@@ -107,3 +107,4 @@ SUCCESS: All 63 PHP files in admin/ passed syntax check with 0 errors!
 3. **ปัญหาการทำงานร่วมกับ JavaScript (Modal Display States):**
    - *สาเหตุ:* หากลบ `style="display: none;"` ใน HTML โดยไม่ใส่ใน CSS ค่าเริ่มต้น Modal จะแสดงผลค้างไว้บนหน้าจอ
    - *วิธีแก้:* กำหนด `display: none;` ใน `.pos-modal-backdrop`, `.return-modal-backdrop`, และ `#repairCauseGroup` ใน `admin.css` ไว้อย่างชัดเจน
+
