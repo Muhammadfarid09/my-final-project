@@ -272,7 +272,7 @@ include 'includes/header.php';
 </div>
 
 <!-- รายงานสรุปรายได้รายเดือน 12 เดือน และชั่วโมงยอดนิยม (Peak Usage Hours) -->
-<div class="chart-grid" style="grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px;">
+<div class="chart-grid dashboard-main-grid">
     <!-- กราฟแท่งแบบ Stacked: รายได้รายเดือน 12 เดือน -->
     <div class="chart-card">
         <div class="header-between mb-10">
@@ -293,7 +293,7 @@ include 'includes/header.php';
     <div class="chart-card">
         <h4 class="section-header"><i class="fas fa-fire text-danger"></i> ชั่วโมงยอดนิยม (Peak Hours)</h4>
         <p class="text-small-muted mt-0 mb-15">ช่วงเวลาที่มีการจองสนามหนาแน่นที่สุด</p>
-        <div style="overflow-x: auto;">
+        <div class="table-responsive">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -314,7 +314,7 @@ include 'includes/header.php';
                             <td>
                                 <strong><?php echo sprintf("%02d:00 - %02d:00", $ph['b_hour'], $ph['b_hour'] + 1); ?> น.</strong>
                                 <?php if ($ph['b_hour'] >= 17 && $ph['b_hour'] < 22): ?>
-                                    <span class="badge badge-warning" style="font-size: 10px; padding: 1px 5px;">Peak</span>
+                                    <span class="badge badge-warning badge-xs">Peak</span>
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
@@ -460,7 +460,7 @@ include 'includes/header.php';
 </div>
 
 <!-- กราฟประชากรศาสตร์ (Demographic Analytics: เพศ, ช่วงอายุ, อาชีพ) -->
-<div class="chart-grid-3 mt-20" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px;">
+<div class="chart-grid-3 mt-20 dashboard-charts-grid">
     <!-- กราฟวงกลม: สัดส่วนเพศ -->
     <div class="chart-card">
         <h4 class="section-header"><i class="fas fa-venus-mars"></i> สัดส่วนการจองแบ่งตามเพศ</h4>

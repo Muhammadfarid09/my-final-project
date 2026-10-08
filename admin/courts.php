@@ -71,10 +71,10 @@ include 'includes/header.php';
                 <tr>
                     <td>#<?php echo $row['court_id']; ?></td>
                     <td><strong><?php echo htmlspecialchars($row['court_name']); ?></strong></td>
-                    <td><span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 13px;"><?php echo number_format($row['court_price_per_hour'], 2); ?> ฿</span></td>
+                    <td><span class="court-rate-pill"><?php echo number_format($row['court_price_per_hour'], 2); ?> ฿</span></td>
                     <td>
-                        <span class="text-small-muted" style="color: #b45309;"><i class="fas fa-star"></i> ส.-อา.: <?php echo $row['court_peak_price'] ? number_format($row['court_peak_price'], 2).' ฿' : '-'; ?></span><br>
-                        <span class="text-small-muted" style="color: #15803d;"><i class="fas fa-tag"></i> อ.-พฤ.: <?php echo $row['court_offpeak_price'] ? number_format($row['court_offpeak_price'], 2).' ฿' : '-'; ?></span>
+                        <span class="text-small-muted text-rate-peak"><i class="fas fa-star"></i> ส.-อา.: <?php echo $row['court_peak_price'] ? number_format($row['court_peak_price'], 2).' ฿' : '-'; ?></span><br>
+                        <span class="text-small-muted text-rate-special"><i class="fas fa-tag"></i> อ.-พฤ.: <?php echo $row['court_offpeak_price'] ? number_format($row['court_offpeak_price'], 2).' ฿' : '-'; ?></span>
                     </td>
                     <td>
                         <?php echo ($row['court_open_time'] && $row['court_close_time']) ? date('H:i', strtotime($row['court_open_time'])) . ' - ' . date('H:i', strtotime($row['court_close_time'])) : '-'; ?>

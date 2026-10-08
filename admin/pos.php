@@ -41,22 +41,21 @@ include 'includes/header.php';
                 $c_peak = floatval($court['court_peak_price']) > 0 ? floatval($court['court_peak_price']) : 200;
                 $c_offpeak = floatval($court['court_offpeak_price']) > 0 ? floatval($court['court_offpeak_price']) : 150;
             ?>
-                <div class="product-card" 
+                <div class="product-card pos-court-card-active" 
                      data-type="สนาม"
-                     style="border: 2px solid #2563eb; background: #f8fafc;"
                      onclick="openWalkInCourtModal(<?php echo $court['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($court['court_name'])); ?>', <?php echo $c_base; ?>, <?php echo $c_peak; ?>, <?php echo $c_offpeak; ?>)">
                     
-                    <div class="product-img-placeholder w-80 h-80 mb-10" style="background: #eff6ff; color: #2563eb;">
+                    <div class="product-img-placeholder w-80 h-80 mb-10 pos-court-badge-selected">
                         <i class="fas fa-map-marker-alt fa-2x"></i>
                     </div>
                     
-                    <h5 style="color: #1e3c72; font-size: 15px; margin: 5px 0;"><?php echo htmlspecialchars($court['court_name']); ?></h5>
-                    <div style="font-size: 11px; margin: 4px 0; color: #475569; text-align: left; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">
-                        <div><strong style="color: #0284c7;">จ.-พ.-ศ.:</strong> <?php echo number_format($c_base); ?> ฿</div>
-                        <div><strong style="color: #b45309;">ส.-อา.:</strong> <?php echo number_format($c_peak); ?> ฿</div>
-                        <div><strong style="color: #15803d;">อ.-พฤ.:</strong> <?php echo number_format($c_offpeak); ?> ฿</div>
+                    <h5 class="pos-court-name"><?php echo htmlspecialchars($court['court_name']); ?></h5>
+                    <div class="pos-court-rate-box">
+                        <div><strong class="pos-rate-std">จ.-พ.-ศ.:</strong> <?php echo number_format($c_base); ?> ฿</div>
+                        <div><strong class="pos-rate-peak">ส.-อา.:</strong> <?php echo number_format($c_peak); ?> ฿</div>
+                        <div><strong class="pos-rate-spc">อ.-พฤ.:</strong> <?php echo number_format($c_offpeak); ?> ฿</div>
                     </div>
-                    <p class="stock" style="color: #059669; font-weight: 500; font-size: 12px; margin-top: 4px;">
+                    <p class="stock pos-court-available-hint">
                         <i class="fas fa-check-circle"></i> พร้อมเปิด Walk-in
                     </p>
                 </div>
@@ -94,7 +93,7 @@ include 'includes/header.php';
             <i class="fas fa-cart-arrow-down fa-3x mb-10"></i><br>ยังไม่มีรายการในตะกร้า
         </div>
 
-        <table class="cart-table" id="cartTable" style="display: none;">
+        <table class="cart-table d-none" id="cartTable">
             <thead>
                 <tr>
                     <th>รายการ</th>
@@ -142,9 +141,9 @@ include 'includes/header.php';
             </div>
 
             <!-- ส่วนชำระแบบ QR Code -->
-            <div id="qrPaymentSection" style="display: none;">
+            <div id="qrPaymentSection" class="d-none">
                 <p class="m-0 mb-10 text-14 font-bold text-dark-custom">สแกนเพื่อชำระเงิน (จำลอง)</p>
-                <div class="qr-placeholder" style="text-align: center; padding: 20px;">
+                <div class="qr-placeholder pos-cart-empty-text">
                     <i class="fas fa-qrcode fa-5x text-primary mb-10"></i>
                     <p class="text-12 text-muted">พร้อมเพย์ 099-324-1657 (ที.เอส. ปัตตานี)</p>
                 </div>
@@ -160,9 +159,9 @@ include 'includes/header.php';
 </div>
 
 <!-- Modal สำหรับตั้งค่าเปิดสนาม Walk-in -->
-<div id="walkInCourtModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="modal-content" style="background: white; border-radius: 12px; width: 90%; max-width: 480px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);">
-        <h4 style="margin: 0 0 15px 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; color: #1e3c72; display: flex; align-items: center; gap: 8px;">
+<div id="walkInCourtModal" class="modal-overlay pos-modal-backdrop">
+    <div class="modal-content pos-modal-card">
+        <h4 class="pos-modal-header">
             <i class="fas fa-calendar-plus text-primary"></i> เปิดสนาม Walk-in หน้าเคาน์เตอร์
         </h4>
 
@@ -171,19 +170,19 @@ include 'includes/header.php';
         <input type="hidden" id="modal_court_peak_price">
         <input type="hidden" id="modal_court_offpeak_price">
 
-        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 15px; margin-bottom: 18px; font-size: 14px;">
-            <div><strong>สนาม:</strong> <span id="modal_court_name" class="font-bold text-primary" style="font-size: 16px;"></span></div>
-            <div><strong>อัตราค่าบริการ:</strong> <span id="modal_court_price_rate" class="font-bold"></span> บาท / ชั่วโมง <span id="modal_court_rate_badge" style="font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px;"></span></div>
+        <div class="pos-member-info-box">
+            <div><strong>สนาม:</strong> <span id="modal_court_name" class="font-bold text-primary pos-member-name"></span></div>
+            <div><strong>อัตราค่าบริการ:</strong> <span id="modal_court_price_rate" class="font-bold"></span> บาท / ชั่วโมง <span id="modal_court_rate_badge" class="pos-tier-badge-pill"></span></div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 12px;">
-            <label class="font-bold" style="font-size: 13px;">วันที่ใช้งาน:</label>
+        <div class="form-group pos-form-group-mb">
+            <label class="font-bold pos-form-label-sm">วันที่ใช้งาน:</label>
             <input type="date" id="modal_court_date" class="form-control" value="<?php echo date('Y-m-d'); ?>" onchange="calculateCourtTotal()">
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+        <div class="pos-payment-methods-grid">
             <div class="form-group">
-                <label class="font-bold" style="font-size: 13px;">เวลาเริ่มต้น:</label>
+                <label class="font-bold pos-form-label-sm">เวลาเริ่มต้น:</label>
                 <select id="modal_court_start_time" class="form-control" onchange="calculateCourtTotal()">
                     <?php 
                     $curr_hour = intval(date('H'));
@@ -196,7 +195,7 @@ include 'includes/header.php';
                 </select>
             </div>
             <div class="form-group">
-                <label class="font-bold" style="font-size: 13px;">จำนวนชั่วโมง:</label>
+                <label class="font-bold pos-form-label-sm">จำนวนชั่วโมง:</label>
                 <select id="modal_court_hours" class="form-control" onchange="calculateCourtTotal()">
                     <option value="1" selected>1 ชั่วโมง</option>
                     <option value="2">2 ชั่วโมง</option>
@@ -206,19 +205,19 @@ include 'includes/header.php';
             </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 15px;">
-            <label class="font-bold" style="font-size: 13px;">เบอร์โทรลูกค้า (ถ้าเป็นสมาชิกจะได้รับพอยท์):</label>
+        <div class="form-group pos-form-group-mb-15">
+            <label class="font-bold pos-form-label-sm">เบอร์โทรลูกค้า (ถ้าเป็นสมาชิกจะได้รับพอยท์):</label>
             <input type="text" id="modal_court_member_phone" class="form-control" maxlength="10" placeholder="ระบุเบอร์โทร 10 หลัก (ถ้ามี)">
         </div>
 
-        <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 14px; font-weight: bold; color: #475569;">ยอดรวมค่าสนาม:</span>
-            <span style="font-size: 20px; font-weight: bold; color: #2563eb;"><span id="modal_court_total_price">0.00</span> ฿</span>
+        <div class="pos-net-summary-box">
+            <span class="pos-net-summary-label">ยอดรวมค่าสนาม:</span>
+            <span class="pos-net-summary-val"><span id="modal_court_total_price">0.00</span> ฿</span>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <div class="pos-modal-footer-btns">
             <button type="button" class="btn-cancel" onclick="closeWalkInCourtModal()">ยกเลิก</button>
-            <button type="button" class="btn-submit" onclick="addCourtToCart()" style="background: #2563eb;">
+            <button type="button" class="btn-submit btn-pos-primary" onclick="addCourtToCart()">
                 <i class="fas fa-cart-plus"></i> เพิ่มสนามลงบิล POS
             </button>
         </div>

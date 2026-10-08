@@ -107,3 +107,4 @@ SUCCESS: 100% of user-facing files are completely free of embedded & inline styl
 3. **ปัญหาการทำงานร่วมกับ JavaScript (Display Toggle):**
    - *ปัญหา:* การลบ `style="display: none;"` อาจทำให้ Element ปรากฏขึ้นมาก่อนหาก CSS ไม่ได้ระบุไว้
    - *วิธีแก้:* กำหนด `display: none;` ในคลาส CSS ของ Element นั้นๆ อย่างชัดเจน เช่น `.modal-cancel-notice`, `.modal-refund-account-box`, และ `.preview-container` เพื่อให้ฟังก์ชันของ `member.js` ทำงานได้อย่างราบรื่น
+

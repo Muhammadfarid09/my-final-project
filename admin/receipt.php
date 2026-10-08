@@ -79,119 +79,9 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ใบเสร็จรับเงิน - T.S. Pattani Badminton</title>
-    <style>
-        /* สไตล์สำหรับใบเสร็จสลิปขนาดความกว้าง 80mm */
-        body {
-            font-family: 'Courier New', Courier, 'Prompt', monospace;
-            background: #f1f5f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            font-size: 13px;
-            color: #111;
-        }
-        .receipt-container {
-            background: #ffffff;
-            width: 320px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-radius: 6px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 12px;
-            border-bottom: 1px dashed #333;
-            padding-bottom: 10px;
-        }
-        .header h3 { 
-            margin: 0 0 4px 0; 
-            font-size: 18px; 
-            letter-spacing: 0.5px;
-        }
-        .header p { margin: 2px 0; font-size: 12px; }
-        
-        .info {
-            margin-bottom: 12px;
-            border-bottom: 1px dashed #333;
-            padding-bottom: 8px;
-            font-size: 12px;
-        }
-        .info p { margin: 3px 0; display: flex; justify-content: space-between; }
-
-        .items table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-        }
-        .items th, .items td {
-            text-align: left;
-            padding: 4px 0;
-            font-size: 12px;
-        }
-        .items th:last-child, .items td:last-child {
-            text-align: right;
-        }
-        .items th {
-            border-bottom: 1px dashed #333;
-        }
-
-        .totals {
-            border-top: 1px dashed #333;
-            padding-top: 8px;
-            margin-bottom: 15px;
-        }
-        .totals p {
-            margin: 4px 0;
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-        }
-        .totals p.grand-total {
-            font-size: 17px;
-            font-weight: bold;
-            border-top: 1px solid #111;
-            padding-top: 6px;
-            margin-top: 6px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
-            border-top: 1px dashed #333;
-            padding-top: 10px;
-        }
-        .footer p { margin: 2px 0; }
-
-        /* ปุ่มสั่งพิมพ์ */
-        .btn-print {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: #2563eb;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        .btn-print:hover {
-            background: #1d4ed8;
-        }
-        
-        @media print {
-            body { background: #fff; padding: 0; }
-            .receipt-container { box-shadow: none; width: 100%; padding: 0; }
-            .btn-print { display: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin.css?v=1.31">
 </head>
-<body>
+<body class="receipt-body">
 
     <div class="receipt-container">
         
@@ -199,7 +89,7 @@ try {
             <h3>T.S. PATTANI</h3>
             <p>สนามแบดมินตัน ที.เอส. ปัตตานี</p>
             <p>อ.เมือง จ.ปัตตานี &bull; โทร. 099-324-1657</p>
-            <p style="font-weight: bold; margin-top: 6px;">[ ใบเสร็จรับเงิน / สลิปบริการ ]</p>
+            <p class="receipt-doc-title">[ ใบเสร็จรับเงิน / สลิปบริการ ]</p>
         </div>
 
         <div class="info">
@@ -225,9 +115,9 @@ try {
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 55%;">รายการ</th>
-                        <th style="width: 15%; text-align: center;">จน.</th>
-                        <th style="width: 30%;">รวม (฿)</th>
+                        <th class="receipt-col-desc">รายการ</th>
+                        <th class="receipt-col-qty">จน.</th>
+                        <th class="receipt-col-price">รวม (฿)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -236,12 +126,12 @@ try {
                     <tr>
                         <td>
                             <strong>เปิดสนาม <?php echo htmlspecialchars($court_item['court_name']); ?></strong><br>
-                            <span style="font-size: 11px; color: #555;">
+                            <span class="receipt-item-time">
                                 <?php echo date('d/m/Y', strtotime($court_item['booking_date'])); ?> 
                                 (<?php echo substr($court_item['booking_start_time'], 0, 5); ?> - <?php echo substr($court_item['booking_end_time'], 0, 5); ?>)
                             </span>
                         </td>
-                        <td style="text-align: center;">1 รอบ</td>
+                        <td class="receipt-text-center">1 รอบ</td>
                         <td><?php echo number_format($court_item['booking_court_price'], 2); ?></td>
                     </tr>
                     <?php endif; ?>
@@ -250,7 +140,7 @@ try {
                     <?php foreach ($items as $item): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($item['product_name']); ?></td>
-                        <td style="text-align: center;"><?php echo $item['pos_quantity']; ?></td>
+                        <td class="receipt-text-center"><?php echo $item['pos_quantity']; ?></td>
                         <td><?php echo number_format($item['pos_total_price'], 2); ?></td>
                     </tr>
                     <?php endforeach; ?>

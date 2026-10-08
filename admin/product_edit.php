@@ -77,14 +77,14 @@ include 'includes/header.php';
                         <div>
                             <div class="form-group text-center">
                                 <label>รูปภาพประกอบ</label>
-                                <div class="p-20" style="border: 2px dashed #CBD5E1; border-radius: 8px; background: #F8FAFC; height: calc(100% - 30px); display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                <div class="p-20 product-img-dropzone">
                                     <?php if (!empty($product['product_image'])): ?>
                                         <img src="../uploads/products/<?php echo htmlspecialchars($product['product_image']); ?>" class="img-preview-lg mx-auto d-block" alt="Current Image">
                                     <?php else: ?>
-                                        <i class="fas fa-image text-gray-light" style="font-size: 48px; margin-bottom: 15px; color: #94A3B8;"></i>
+                                        <i class="fas fa-image text-gray-light product-img-icon"></i>
                                     <?php endif; ?>
                                     
-                                    <input type="file" name="product_image" id="product_image" class="form-control mt-10" accept="image/jpeg, image/png, image/webp" style="max-width: 250px;">
+                                    <input type="file" name="product_image" id="product_image" class="form-control mt-10 product-img-preview" accept="image/jpeg, image/png, image/webp">
                                     <small class="text-muted-custom mt-10 d-block">อัปโหลดรูปใหม่เพื่อแทนที่รูปเดิม</small>
                                 </div>
                             </div>

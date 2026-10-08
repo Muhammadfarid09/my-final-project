@@ -56,9 +56,9 @@ include 'includes/header.php';
                         <div>
                             <div class="form-group">
                                 <label for="product_image">รูปภาพประกอบ</label>
-                                <div class="p-20 text-center" style="border: 2px dashed #CBD5E1; border-radius: 8px; background: #F8FAFC; height: calc(100% - 30px); display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                    <i class="fas fa-cloud-upload-alt text-gray-light" style="font-size: 48px; margin-bottom: 15px; color: #94A3B8;"></i>
-                                    <input type="file" name="product_image" id="product_image" class="form-control" accept="image/jpeg, image/png, image/webp" style="max-width: 250px;">
+                                <div class="p-20 text-center product-img-dropzone">
+                                    <i class="fas fa-cloud-upload-alt text-gray-light product-img-icon"></i>
+                                    <input type="file" name="product_image" id="product_image" class="form-control product-img-preview" accept="image/jpeg, image/png, image/webp">
                                     <small class="text-muted-custom mt-10 d-block">รองรับไฟล์ JPG, PNG, WEBP (ไม่เกิน 5MB)</small>
                                 </div>
                             </div>

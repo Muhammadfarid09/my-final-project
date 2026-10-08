@@ -26,7 +26,7 @@ if (isset($_SESSION['admin_id'])) {
             <div class="login-image-content">
                 <!-- หากมีรูปภาพหรือโลโก้สนาม สามารถลบแท็ก <i> ออก แล้วใช้แท็ก <img> ด้านล่างแทนได้เลย -->
                 <!-- <i class="fas fa-volleyball-ball"></i> -->
-                <img src="../assets/img/ts-pattani-generated.jpg" alt="T.S. Pattani Logo" class="stadium-logo-img" style="max-width: 180px; margin-bottom: 20px; border-radius: 50%; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border: 4px solid rgba(255,255,255,0.1);">
+                <img src="../assets/img/ts-pattani-generated.jpg" alt="T.S. Pattani Logo" class="stadium-logo-img admin-login-logo">
                 <h2>T.S. Pattani</h2>
                 <p>ระบบบริหารจัดการสนามกีฬาแบบครบวงจร</p>
             </div>

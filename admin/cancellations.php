@@ -86,15 +86,15 @@ include 'includes/header.php';
                         <strong class="text-danger"><?php echo number_format($row['booking_total_price'], 2); ?> ฿</strong>
 
                         <?php if (!empty($row['refund_account_no'])): ?>
-                            <div style="margin-top: 6px; padding: 6px 8px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; font-size: 11.5px; line-height: 1.4;">
+                            <div class="cancellation-refund-box">
                                 <strong class="text-success"><i class="fas fa-university"></i> <?php echo htmlspecialchars($row['refund_bank']); ?>:</strong><br>
-                                <span style="font-family: monospace; font-size: 12px; font-weight: bold;"><?php echo htmlspecialchars($row['refund_account_no']); ?></span><br>
+                                <span class="cancellation-account-no"><?php echo htmlspecialchars($row['refund_account_no']); ?></span><br>
                                 <span class="text-gray"><?php echo htmlspecialchars($row['refund_account_name']); ?></span>
                             </div>
                         <?php endif; ?>
 
                         <?php if (!empty($row['payment_slip_image'])): ?>
-                            <div style="margin-top: 5px;">
+                            <div class="cancellation-mt-5">
                                 <a href="../uploads/slips/<?php echo htmlspecialchars($row['payment_slip_image']); ?>" target="_blank" class="text-11 text-primary"><i class="fas fa-receipt"></i> สลิปที่โอนเข้ามา</a>
                             </div>
                         <?php endif; ?>
@@ -183,43 +183,43 @@ include 'includes/header.php';
             <input type="hidden" name="refund_amount" id="modal_refund_amount_input" value="0">
             
             <!-- ข้อมูลบัญชีสำหรับโอนเงินคืนลูกค้า (Customer Refund Account Details) -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; font-size: 13px;">
-                <div style="font-weight: bold; color: #1e293b; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">
+            <div class="modal-refund-card">
+                <div class="modal-refund-title">
                     <i class="fas fa-money-check-alt text-primary"></i> ข้อมูลบัญชีรับเงินคืนของลูกค้า
                 </div>
-                <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-refund-row">
                     <span><strong>ธนาคาร/ช่องทาง:</strong></span>
                     <span id="modal_refund_bank" class="badge badge-info font-bold">-</span>
                 </div>
-                <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-refund-row">
                     <span><strong>เลขที่บัญชี / พร้อมเพย์:</strong></span>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span id="modal_refund_acc_no" class="text-primary font-bold" style="font-family: monospace; font-size: 14px;">-</span>
-                        <button type="button" class="btn-sm-secondary" style="padding: 2px 8px; font-size: 11px; cursor: pointer;" onclick="copyRefundAccount()" title="คัดลอกเลขบัญชี">
+                    <div class="modal-refund-val-group">
+                        <span id="modal_refund_acc_no" class="text-primary font-bold modal-refund-acc-text">-</span>
+                        <button type="button" class="btn-sm-secondary modal-refund-btn-copy" onclick="copyRefundAccount()" title="คัดลอกเลขบัญชี">
                             <i class="far fa-copy"></i> คัดลอก
                         </button>
                     </div>
                 </div>
-                <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-refund-row">
                     <span><strong>ชื่อเจ้าของบัญชี:</strong></span>
                     <span id="modal_refund_acc_name" class="font-bold text-dark">-</span>
                 </div>
-                <div style="margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-refund-row">
                     <span><strong>เบอร์โทรสมาชิก:</strong></span>
                     <span id="modal_refund_member_phone" class="text-gray">-</span>
                 </div>
-                <div style="margin-top: 8px; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+                <div class="modal-refund-slip-wrap">
                     <strong>สลิปหลักฐานต้นทาง:</strong> <span id="modal_refund_slip_link">-</span>
-                    <div id="modal_slip_preview_box" style="margin-top: 8px; text-align: center; display: none;">
+                    <div id="modal_slip_preview_box" class="modal-refund-slip-preview-box">
                         <a id="modal_slip_preview_link" href="#" target="_blank" title="คลิกเพื่อดูรูปขนาดเต็ม">
-                            <img id="modal_slip_img" src="" style="max-height: 160px; max-width: 100%; border-radius: 6px; border: 1px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.08);" alt="สลิปโอนเงิน">
+                            <img id="modal_slip_img" src="" class="modal-refund-slip-img" alt="สลิปโอนเงิน">
                         </a>
-                        <div style="font-size: 11px; color: #64748b; margin-top: 4px;"><i class="fas fa-search-plus"></i> คลิกที่รูปเพื่อขยายเต็มจอ</div>
+                        <div class="modal-refund-slip-hint"><i class="fas fa-search-plus"></i> คลิกที่รูปเพื่อขยายเต็มจอ</div>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-bottom: 12px;">
+            <div class="modal-refund-form-group">
                 <p class="m-0"><strong>ยอดเงินค่าจอง:</strong> <span id="modal_booking_price" class="text-dark font-bold text-16">0.00</span> ฿</p>
             </div>
             
@@ -237,7 +237,7 @@ include 'includes/header.php';
                 </select>
             </div>
 
-            <div class="point-return-box" id="point_return_group" style="display: none;">
+            <div class="point-return-box" id="point_return_group">
                 <label><i class="fas fa-star"></i> คืนเป็นพอยท์ (ทางเลือกเสริม)</label>
                 <p class="text-small-muted mb-6">หากต้องการชดเชยลูกค้าเป็นคะแนนสะสม ให้ระบุจำนวนที่นี่</p>
                 <input type="number" name="refund_point" class="form-control" min="0" value="0" placeholder="ระบุจำนวนพอยท์">
