@@ -104,6 +104,19 @@ const thaiDayNames = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส
 
 // Initialize Booking Wizard
 function initBookingWizard() {
+    let pendingEl = document.getElementById('pendingBookingData');
+    if (pendingEl) {
+        try {
+            let pData = JSON.parse(pendingEl.textContent);
+            if (pData && pData.booking_date) {
+                restorePendingBooking(pData);
+                return;
+            }
+        } catch (e) {
+            console.error("Failed to parse pending booking:", e);
+        }
+    }
+
     let nicknameInput = document.getElementById('step3_nickname');
     if (nicknameInput) {
         wizardState.bookingNickname = nicknameInput.value.trim();
@@ -129,6 +142,86 @@ function initBookingWizard() {
     loadCourtMatrixForWizard(todayStr);
     updateWizardStepperUI(1);
 }
+
+// Restore pending booking after login redirect
+function restorePendingBooking(pData) {
+    let nicknameInput = document.getElementById('step3_nickname');
+    if (nicknameInput && pData.booking_nickname) {
+        nicknameInput.value = pData.booking_nickname;
+        wizardState.bookingNickname = pData.booking_nickname;
+    }
+    let inputNickname = document.getElementById('input_booking_nickname');
+    if (inputNickname && pData.booking_nickname) {
+        inputNickname.value = pData.booking_nickname;
+    }
+
+    let dateStr = pData.booking_date;
+    wizardState.selectedDate = dateStr;
+    wizardState.selectedStartTime = pData.start_time;
+
+    let dParts = dateStr.split('-').map(Number);
+    if (dParts.length === 3) {
+        wizardState.currentCalYear = dParts[0];
+        wizardState.currentCalMonth = dParts[1] - 1;
+    }
+
+    let inputDate = document.getElementById('input_booking_date');
+    if (inputDate) inputDate.value = dateStr;
+    let inputStart = document.getElementById('input_start_time');
+    if (inputStart) inputStart.value = pData.start_time;
+    let inputEnd = document.getElementById('input_end_time');
+    if (inputEnd) inputEnd.value = pData.end_time;
+    let inputCourt = document.getElementById('input_court_id');
+    if (inputCourt) inputCourt.value = pData.court_id;
+
+    renderCalendar();
+
+    loadCourtMatrixForWizard(dateStr).then(() => {
+        let targetCourtId = parseInt(pData.court_id);
+        let targetCourt = wizardState.matrixData && wizardState.matrixData.courts 
+            ? wizardState.matrixData.courts.find(c => c.court_id === targetCourtId) 
+            : null;
+        let courtName = targetCourt ? targetCourt.court_name : ('สนาม ' + targetCourtId);
+
+        let startH = parseInt(pData.start_time.split(':')[0]);
+        let endH = parseInt(pData.end_time.split(':')[0]);
+        wizardState.selectedSlots.clear();
+
+        for (let h = startH; h < endH; h++) {
+            let sStart = String(h).padStart(2, '0') + ':00:00';
+            let sEnd = String(h + 1).padStart(2, '0') + ':00:00';
+            let sInfo = (targetCourt && targetCourt.slots) ? targetCourt.slots[sStart] : null;
+            let sPrice = sInfo ? sInfo.price : wizardState.dayRatePrice;
+
+            wizardState.selectedSlots.set(sStart, {
+                courtId: targetCourtId,
+                courtName: courtName,
+                price: sPrice,
+                slotStart: sStart,
+                slotEnd: sEnd
+            });
+        }
+
+        // Restore products
+        if (pData.products && typeof pData.products === 'object') {
+            for (let pId in pData.products) {
+                let qty = parseInt(pData.products[pId]) || 0;
+                let qtyInput = document.getElementById('prod_qty_' + pId) || document.querySelector(`input[name="products[${pId}]"]`);
+                if (qtyInput) {
+                    qtyInput.value = qty;
+                }
+            }
+        }
+
+        updateStep4Summary();
+        updateInvoiceReview();
+        goToStep(5);
+    }).catch(err => {
+        console.error("Error restoring pending booking matrix:", err);
+        goToStep(1);
+    });
+}
+
 
 // Navigate between Wizard Steps
 function goToStep(targetStep) {
@@ -845,7 +938,7 @@ function handleBookingFormSubmit(event) {
     const isUserLoggedIn = document.body.dataset.loggedIn === 'true';
     if (!isUserLoggedIn) {
         if (event) event.preventDefault();
-        openBookingAuthModal('login');
+        submitGuestBooking('login');
         return false;
     }
 
@@ -862,227 +955,42 @@ function handleBookingFormSubmit(event) {
 }
 
 /* ==========================================================================
-   Booking Auth Modal Controller (Guest Checkout Auth Gate)
+   Guest Checkout Handler (Single Login Flow - No In-Page Modal)
    ========================================================================== */
+function submitGuestBooking(authType = 'login') {
+    let bookingForm = document.getElementById('bookingForm');
+    if (!bookingForm) return;
 
-function openBookingAuthModal(defaultTab = 'login') {
-    const modal = document.getElementById('bookingAuthModal');
-    if (!modal) return;
-    switchBookingAuthTab(defaultTab);
-    
-    // รีเซ็ตข้อความแจ้งเตือนเดิม
-    const loginAlert = document.getElementById('loginAlertBox');
-    if (loginAlert) { loginAlert.className = 'alert-box-auth'; loginAlert.textContent = ''; }
-    const regAlert = document.getElementById('registerAlertBox');
-    if (regAlert) { regAlert.className = 'alert-box-auth'; regAlert.textContent = ''; }
-    
-    modal.classList.add('active');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Focus ช่องแรก
-    setTimeout(() => {
-        if (defaultTab === 'login') {
-            const phoneInput = document.getElementById('auth_login_phone');
-            if (phoneInput) phoneInput.focus();
-        } else {
-            const nameInput = document.getElementById('auth_reg_name');
-            if (nameInput) nameInput.focus();
-        }
-    }, 100);
+    if (wizardState.selectedSlots.size === 0) {
+        alert("กรุณาเลือกสนามก่อนดำเนินการ");
+        return;
+    }
+
+    // Ensure hidden summary and total price are up to date
+    updateStep4Summary();
+    updateInvoiceReview();
+
+    let authInput = document.getElementById('input_auth_action');
+    if (!authInput) {
+        authInput = document.createElement('input');
+        authInput.type = 'hidden';
+        authInput.name = 'auth_action';
+        authInput.id = 'input_auth_action';
+        bookingForm.appendChild(authInput);
+    }
+    authInput.value = authType;
+
+    let btnFinal = document.getElementById('btnFinalSubmitBooking');
+    if (btnFinal) {
+        btnFinal.disabled = true;
+        btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกข้อมูลและนำทางไปยังหน้า' + (authType === 'register' ? 'สมัครสมาชิก...' : 'เข้าสู่ระบบ...');
+        btnFinal.style.opacity = "0.75";
+        btnFinal.style.cursor = "not-allowed";
+    }
+
+    bookingForm.submit();
 }
 
-function closeBookingAuthModal() {
-    const modal = document.getElementById('bookingAuthModal');
-    if (modal) {
-        modal.classList.remove('active');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-    }
-}
-
-function switchBookingAuthTab(tabName) {
-    const tabBtnLogin = document.getElementById('tabBtnLogin');
-    const tabBtnRegister = document.getElementById('tabBtnRegister');
-    const tabPaneLogin = document.getElementById('tabPaneLogin');
-    const tabPaneRegister = document.getElementById('tabPaneRegister');
-
-    if (tabName === 'login') {
-        if (tabBtnLogin) tabBtnLogin.classList.add('active');
-        if (tabBtnRegister) tabBtnRegister.classList.remove('active');
-        if (tabPaneLogin) tabPaneLogin.classList.add('active');
-        if (tabPaneRegister) tabPaneRegister.classList.remove('active');
-    } else {
-        if (tabBtnLogin) tabBtnLogin.classList.remove('active');
-        if (tabBtnRegister) tabBtnRegister.classList.add('active');
-        if (tabPaneLogin) tabPaneLogin.classList.remove('active');
-        if (tabPaneRegister) tabPaneRegister.classList.add('active');
-    }
-}
-
-let isAjaxLoginSubmitting = false;
-async function handleBookingAjaxLogin(event) {
-    if (event) event.preventDefault();
-    if (isAjaxLoginSubmitting) return false;
-
-    const form = document.getElementById('ajaxLoginForm');
-    const phoneInput = document.getElementById('auth_login_phone');
-    const passInput = document.getElementById('auth_login_password');
-    const alertBox = document.getElementById('loginAlertBox');
-    const btnSubmit = document.getElementById('btnSubmitAjaxLogin');
-
-    const phone = phoneInput ? phoneInput.value.trim() : '';
-    const password = passInput ? passInput.value : '';
-
-    if (!phone || !password) {
-        showAuthAlert(alertBox, 'กรุณากรอกเบอร์โทรศัพท์และรหัสผ่านให้ครบถ้วน', 'error');
-        return false;
-    }
-
-    if (!/^[0-9]{10}$/.test(phone)) {
-        showAuthAlert(alertBox, 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก', 'error');
-        return false;
-    }
-
-    isAjaxLoginSubmitting = true;
-    if (btnSubmit) {
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังตรวจสอบ...';
-    }
-
-    try {
-        const formData = new FormData(form);
-        const res = await fetch('actions/login_ajax.php', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await res.json();
-
-        if (data.status === 'success') {
-            showAuthAlert(alertBox, 'เข้าสู่ระบบสำเร็จ กำลังพาไปหน้าชำระเงิน...', 'success');
-            // อัปเดตสถานะล็อกอินบน DOM
-            document.body.dataset.loggedIn = 'true';
-            
-            // ปิด Modal
-            closeBookingAuthModal();
-
-            // ส่งฟอร์มจองทันที
-            const bookingForm = document.getElementById('bookingForm');
-            if (bookingForm) {
-                isBookingSubmitting = true;
-                let btnFinal = document.getElementById('btnFinalSubmitBooking');
-                if (btnFinal) {
-                    btnFinal.disabled = true;
-                    btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกการจองและล็อกสนาม...';
-                }
-                bookingForm.submit();
-            }
-        } else {
-            showAuthAlert(alertBox, data.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
-        }
-    } catch (err) {
-        showAuthAlert(alertBox, 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
-    } finally {
-        isAjaxLoginSubmitting = false;
-        if (btnSubmit) {
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = '<i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบและไปชำระเงินทันที';
-        }
-    }
-    return false;
-}
-
-let isAjaxRegisterSubmitting = false;
-async function handleBookingAjaxRegister(event) {
-    if (event) event.preventDefault();
-    if (isAjaxRegisterSubmitting) return false;
-
-    const form = document.getElementById('ajaxRegisterForm');
-    const nameInput = document.getElementById('auth_reg_name');
-    const phoneInput = document.getElementById('auth_reg_phone');
-    const passInput = document.getElementById('auth_reg_password');
-    const confirmInput = document.getElementById('auth_reg_confirm_password');
-    const alertBox = document.getElementById('registerAlertBox');
-    const btnSubmit = document.getElementById('btnSubmitAjaxRegister');
-
-    const name = nameInput ? nameInput.value.trim() : '';
-    const phone = phoneInput ? phoneInput.value.trim() : '';
-    const password = passInput ? passInput.value : '';
-    const confirmPass = confirmInput ? confirmInput.value : '';
-
-    if (!name || !phone || !password || !confirmPass) {
-        showAuthAlert(alertBox, 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน', 'error');
-        return false;
-    }
-
-    if (!/^[0-9]{10}$/.test(phone)) {
-        showAuthAlert(alertBox, 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก', 'error');
-        return false;
-    }
-
-    if (password !== confirmPass) {
-        showAuthAlert(alertBox, 'รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน', 'error');
-        return false;
-    }
-
-    if (password.length < 4) {
-        showAuthAlert(alertBox, 'รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร', 'error');
-        return false;
-    }
-
-    isAjaxRegisterSubmitting = true;
-    if (btnSubmit) {
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังสมัครสมาชิก...';
-    }
-
-    try {
-        const formData = new FormData(form);
-        const res = await fetch('actions/register_ajax.php', {
-            method: 'POST',
-            body: formData
-        });
-        const data = await res.json();
-
-        if (data.status === 'success') {
-            showAuthAlert(alertBox, 'สมัครสมาชิกสำเร็จ กำลังพาไปหน้าชำระเงิน...', 'success');
-            // อัปเดตสถานะล็อกอินบน DOM
-            document.body.dataset.loggedIn = 'true';
-            
-            // ปิด Modal
-            closeBookingAuthModal();
-
-            // ส่งฟอร์มจองทันที
-            const bookingForm = document.getElementById('bookingForm');
-            if (bookingForm) {
-                isBookingSubmitting = true;
-                let btnFinal = document.getElementById('btnFinalSubmitBooking');
-                if (btnFinal) {
-                    btnFinal.disabled = true;
-                    btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกการจองและล็อกสนาม...';
-                }
-                bookingForm.submit();
-            }
-        } else {
-            showAuthAlert(alertBox, data.message || 'สมัครสมาชิกไม่สำเร็จ', 'error');
-        }
-    } catch (err) {
-        showAuthAlert(alertBox, 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
-    } finally {
-        isAjaxRegisterSubmitting = false;
-        if (btnSubmit) {
-            btnSubmit.disabled = false;
-            btnSubmit.innerHTML = '<i class="fas fa-user-plus"></i> สมัครสมาชิกและไปชำระเงินทันที';
-        }
-    }
-    return false;
-}
-
-function showAuthAlert(alertBox, message, type) {
-    if (!alertBox) return;
-    alertBox.className = 'alert-box-auth ' + type;
-    alertBox.innerHTML = (type === 'error' ? '<i class="fas fa-exclamation-circle mr-6"></i> ' : '<i class="fas fa-check-circle mr-6"></i> ') + message;
-}
 
 /* ==========================================================================
    Payment Page Countdown Timer & Slip Upload (Existing features maintained)
@@ -1401,13 +1309,11 @@ function executeRedeemSubmit() {
 document.addEventListener('DOMContentLoaded', function() {
     // ปิดเมื่อคลิกนอกพื้นที่ Modal Dialog
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay') || e.target.classList.contains('booking-auth-modal-overlay')) {
+        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay')) {
             if (e.target.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                 closeRedeemModal();
             } else if (e.target.id === 'cancelModal' && typeof closeCancelModal === 'function') {
                 closeCancelModal();
-            } else if (e.target.id === 'bookingAuthModal' && typeof closeBookingAuthModal === 'function') {
-                closeBookingAuthModal();
             } else {
                 e.target.style.display = 'none';
                 e.target.classList.remove('active');
@@ -1418,14 +1324,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // ปิดเมื่อกดปุ่ม ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
-            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay.active, .booking-auth-modal-overlay.active, .modal-overlay[style*="display: flex"], .booking-auth-modal-overlay[style*="display: flex"]');
+            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay.active, .modal-overlay[style*="display: flex"]');
             if (activeOverlay) {
                 if (activeOverlay.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                     closeRedeemModal();
                 } else if (activeOverlay.id === 'cancelModal' && typeof closeCancelModal === 'function') {
                     closeCancelModal();
-                } else if (activeOverlay.id === 'bookingAuthModal' && typeof closeBookingAuthModal === 'function') {
-                    closeBookingAuthModal();
                 } else {
                     activeOverlay.style.display = 'none';
                     activeOverlay.classList.remove('active');
@@ -1433,4 +1337,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-});
+});

@@ -6,11 +6,16 @@ require_once __DIR__ . '/../config/config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // ตรวจสอบสิทธิ์การเข้าสู่ระบบ: หากยังไม่ล็อกอิน ให้เก็บข้อมูลฟอร์มและพาไปหน้า Login
+    // ตรวจสอบสิทธิ์การเข้าสู่ระบบ: หากยังไม่ล็อกอิน ให้เก็บข้อมูลฟอร์มและพาไปหน้า Login หรือ Register
     if (empty($_SESSION['member_id'])) {
         $_SESSION['pending_booking'] = $_POST;
         $_SESSION['error'] = "กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนดำเนินการชำระเงิน";
-        header("Location: ../login.php?redirect=booking.php");
+        $auth_action = trim($_POST['auth_action'] ?? 'login');
+        if ($auth_action === 'register') {
+            header("Location: ../register.php?redirect=booking.php");
+        } else {
+            header("Location: ../login.php?redirect=booking.php");
+        }
         exit();
     }
 

@@ -27,6 +27,16 @@ if (isset($_SESSION['member_id']) && !empty($_SESSION['member_id'])) {
     }
 }
 
+// ตรวจสอบและกู้คืนข้อมูลการจองชั่วคราว (Pending Booking) หลังล็อกอินสำเร็จ
+$pending_booking_json = '';
+$restored_booking_alert = false;
+if ($is_logged_in && !empty($_SESSION['pending_booking'])) {
+    $pending_booking_json = json_encode($_SESSION['pending_booking'], JSON_UNESCAPED_UNICODE);
+    $restored_booking_alert = true;
+    unset($_SESSION['pending_booking']);
+}
+
+
 try {
     // ดึงข้อมูลสนามทั้งหมด
     $stmt_court = $conn->query("SELECT * FROM Court ORDER BY court_id ASC");
@@ -71,6 +81,20 @@ try {
                 <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
+
+        <?php if ($restored_booking_alert): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>ยินดีต้อนรับกลับมาคุณ <?php echo htmlspecialchars($_SESSION['member_name'] ?? ''); ?>! ข้อมูลการจองที่คุณเลือกไว้ได้รับการกู้คืนเรียบร้อยแล้ว กรุณาตรวจสอบและกดยืนยันเพื่อไปหน้าชำระเงิน</span>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($pending_booking_json)): ?>
+            <script id="pendingBookingData" type="application/json">
+                <?php echo $pending_booking_json; ?>
+            </script>
+        <?php endif; ?>
+
 
         <!-- ============================================== -->
         <!-- 5-Step Progress Stepper (HCI & Progressive Disclosure) -->
@@ -504,10 +528,10 @@ try {
                                     </div>
                                 </div>
                                 <div class="guest-auth-actions">
-                                    <button type="button" class="btn-guest-login" onclick="openBookingAuthModal('login')">
+                                    <button type="button" class="btn-guest-login" onclick="submitGuestBooking('login')">
                                         <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
                                     </button>
-                                    <button type="button" class="btn-guest-register" onclick="openBookingAuthModal('register')">
+                                    <button type="button" class="btn-guest-register" onclick="submitGuestBooking('register')">
                                         <i class="fas fa-user-plus"></i> สมัครสมาชิกใหม่
                                     </button>
                                 </div>
@@ -523,7 +547,7 @@ try {
                                     ยืนยันการจองและไปหน้าชำระเงิน <i class="fas fa-arrow-right"></i>
                                 </button>
                             <?php else: ?>
-                                <button type="button" class="btn-submit-booking-final btn-guest-trigger" id="btnFinalSubmitBooking" onclick="openBookingAuthModal('login')">
+                                <button type="button" class="btn-submit-booking-final btn-guest-trigger" id="btnFinalSubmitBooking" onclick="submitGuestBooking('login')">
                                     <i class="fas fa-lock mr-6"></i> เข้าสู่ระบบเพื่อยืนยันและชำระเงิน <i class="fas fa-arrow-right"></i>
                                 </button>
                             <?php endif; ?>
@@ -535,119 +559,6 @@ try {
         </form>
     </div>
 
-    <!-- ============================================== -->
-    <!-- Booking Auth Modal (สำหรับผู้ใช้ที่ยังไม่ได้ล็อกอิน) -->
-    <!-- ============================================== -->
-    <div id="bookingAuthModal" class="booking-auth-modal-overlay modal-overlay">
-        <div class="booking-auth-modal-card">
-            <div class="auth-modal-header">
-                <div class="auth-modal-title">
-                    <i class="fas fa-calendar-check text-primary"></i> 
-                    <span>เข้าสู่ระบบหรือสมัครสมาชิกเพื่อชำระเงิน</span>
-                </div>
-                <button type="button" class="auth-modal-close" onclick="closeBookingAuthModal()" title="ปิดหน้าต่าง">&times;</button>
-            </div>
-            
-            <p class="auth-modal-subtitle">
-                รายการจองสนามและบริการเสริมที่คุณเลือกไว้จะถูกส่งต่อเพื่อชำระเงินทันทีหลังเข้าสู่ระบบ
-            </p>
-
-            <div class="auth-tabs-nav">
-                <button type="button" class="auth-tab-btn active" id="tabBtnLogin" onclick="switchBookingAuthTab('login')">
-                    <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
-                </button>
-                <button type="button" class="auth-tab-btn" id="tabBtnRegister" onclick="switchBookingAuthTab('register')">
-                    <i class="fas fa-user-plus"></i> สมัครสมาชิกใหม่
-                </button>
-            </div>
-
-            <!-- Tab 1: ฟอร์มเข้าสู่ระบบ -->
-            <div class="auth-tab-pane active" id="tabPaneLogin">
-                <form id="ajaxLoginForm" onsubmit="return handleBookingAjaxLogin(event)">
-                    <div id="loginAlertBox" class="alert-box-auth"></div>
-
-                    <div class="form-group mb-15">
-                        <label class="auth-label">เบอร์โทรศัพท์ (10 หลัก) <span class="text-danger">*</span></label>
-                        <div class="auth-input-wrap">
-                            <i class="fas fa-phone auth-input-icon"></i>
-                            <input type="tel" name="member_phone" id="auth_login_phone" class="form-control auth-control" placeholder="เช่น 0812345678" maxlength="10" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-20">
-                        <label class="auth-label">รหัสผ่าน <span class="text-danger">*</span></label>
-                        <div class="auth-input-wrap">
-                            <i class="fas fa-lock auth-input-icon"></i>
-                            <input type="password" name="member_password" id="auth_login_password" class="form-control auth-control" placeholder="กรอกรหัสผ่าน" required>
-                        </div>
-                    </div>
-
-                    <div class="auth-modal-footer">
-                        <button type="button" class="btn-cancel" onclick="closeBookingAuthModal()">ยกเลิก</button>
-                        <button type="submit" class="btn-submit btn-auth-submit" id="btnSubmitAjaxLogin">
-                            <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบและไปชำระเงินทันที
-                        </button>
-                    </div>
-
-                    <div class="auth-switch-link text-center mt-15">
-                        ยังไม่มีบัญชีสมาชิก? <a href="javascript:void(0)" onclick="switchBookingAuthTab('register')">สมัครสมาชิกใหม่ที่นี่</a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Tab 2: ฟอร์มสมัครสมาชิก -->
-            <div class="auth-tab-pane" id="tabPaneRegister">
-                <form id="ajaxRegisterForm" onsubmit="return handleBookingAjaxRegister(event)">
-                    <div id="registerAlertBox" class="alert-box-auth"></div>
-
-                    <div class="form-group mb-12">
-                        <label class="auth-label">ชื่อ - นามสกุล <span class="text-danger">*</span></label>
-                        <div class="auth-input-wrap">
-                            <i class="fas fa-user auth-input-icon"></i>
-                            <input type="text" name="member_name" id="auth_reg_name" class="form-control auth-control" placeholder="เช่น สมชาย ใจดี" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-12">
-                        <label class="auth-label">เบอร์โทรศัพท์ (ใช้เป็น Username) <span class="text-danger">*</span></label>
-                        <div class="auth-input-wrap">
-                            <i class="fas fa-phone auth-input-icon"></i>
-                            <input type="tel" name="member_phone" id="auth_reg_phone" class="form-control auth-control" placeholder="เช่น 0812345678" maxlength="10" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row-2 mb-12">
-                        <div class="form-group">
-                            <label class="auth-label">รหัสผ่าน <span class="text-danger">*</span></label>
-                            <div class="auth-input-wrap">
-                                <i class="fas fa-lock auth-input-icon"></i>
-                                <input type="password" name="member_password" id="auth_reg_password" class="form-control auth-control" placeholder="อย่างน้อย 4 ตัวอักษร" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="auth-label">ยืนยันรหัสผ่าน <span class="text-danger">*</span></label>
-                            <div class="auth-input-wrap">
-                                <i class="fas fa-check-double auth-input-icon"></i>
-                                <input type="password" name="confirm_password" id="auth_reg_confirm_password" class="form-control auth-control" placeholder="กรอกรหัสผ่านอีกครั้ง" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="auth-modal-footer">
-                        <button type="button" class="btn-cancel" onclick="closeBookingAuthModal()">ยกเลิก</button>
-                        <button type="submit" class="btn-submit btn-auth-submit" id="btnSubmitAjaxRegister">
-                            <i class="fas fa-user-plus"></i> สมัครสมาชิกและไปชำระเงินทันที
-                        </button>
-                    </div>
-
-                    <div class="auth-switch-link text-center mt-15">
-                        มีบัญชีสมาชิกอยู่แล้ว? <a href="javascript:void(0)" onclick="switchBookingAuthTab('login')">เข้าสู่ระบบที่นี่</a>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-    </div>
 
     <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard -->
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
