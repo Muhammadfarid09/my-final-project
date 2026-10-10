@@ -16,7 +16,7 @@ include 'includes/header.php';
 ?>
 <div class="admin-card">
     <h4 class="section-header"><i class="fas fa-plus"></i> เพิ่มสนามแบดมินตันใหม่</h4>
-    <form action="actions/court_add_db.php" method="POST">
+    <form action="actions/court_add_db.php" method="POST" id="addCourtForm" onsubmit="return handleAddCourtSubmit(event)">
         
         <div class="form-row-4">
             <div class="form-group">
@@ -140,7 +140,7 @@ include 'includes/header.php';
     <div class="modal-content">
         <h4 class="modal-header text-danger"><i class="fas fa-tools"></i> บันทึกแจ้งซ่อมบำรุงสนาม</h4>
         
-        <form action="actions/court_repair_add_db.php" method="POST">
+        <form action="actions/court_repair_add_db.php" method="POST" id="courtRepairForm" onsubmit="return handleRepairSubmit(event)">
             <input type="hidden" name="court_id" id="modal_court_id">
             
             <p><strong>สนามที่ซ่อม:</strong> <span id="modal_court_name" class="text-primary-bold"></span></p>
@@ -179,7 +179,7 @@ include 'includes/header.php';
     <div class="modal-content">
         <h4 class="modal-header"><i class="fas fa-edit"></i> แก้ไขข้อมูลสนาม</h4>
         
-        <form action="actions/court_edit_db.php" method="POST">
+        <form action="actions/court_edit_db.php" method="POST" id="courtEditForm" onsubmit="return handleCourtEditSubmit(event)">
             <input type="hidden" name="court_id" id="edit_court_id">
             
             <div class="form-row-2">
@@ -225,25 +225,80 @@ include 'includes/header.php';
 
 <!-- Script สำหรับ Court Edit Modal -->
 <script>
-function openCourtEditModal(id, name, price, openTime, closeTime, peakPrice, offpeakPrice) {
-    document.getElementById('edit_court_id').value = id;
-    document.getElementById('edit_court_name').value = name;
-    document.getElementById('edit_court_price').value = price;
-    document.getElementById('edit_open_time').value = openTime;
-    document.getElementById('edit_close_time').value = closeTime;
-    
-    if (peakPrice !== null) document.getElementById('edit_peak_price').value = peakPrice;
-    if (offpeakPrice !== null) document.getElementById('edit_offpeak_price').value = offpeakPrice;
-    
-    document.getElementById('courtEditModal').style.display = 'flex';
-}
+(function() {
+    let isAddCourtSubmitting = false;
+    let isRepairSubmitting = false;
+    let isEditSubmitting = false;
 
-function closeCourtEditModal() {
-    document.getElementById('courtEditModal').style.display = 'none';
-}
+    window.handleAddCourtSubmit = function(e) {
+        if (isAddCourtSubmitting) {
+            e.preventDefault();
+            return false;
+        }
+        isAddCourtSubmitting = true;
+        const btn = document.querySelector('#addCourtForm button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+        }
+        return true;
+    };
+
+    window.openCourtEditModal = function(id, name, price, openTime, closeTime, peakPrice, offpeakPrice) {
+        document.getElementById('edit_court_id').value = id;
+        document.getElementById('edit_court_name').value = name;
+        document.getElementById('edit_court_price').value = price;
+        document.getElementById('edit_open_time').value = openTime;
+        document.getElementById('edit_close_time').value = closeTime;
+        
+        if (peakPrice !== null) document.getElementById('edit_peak_price').value = peakPrice;
+        if (offpeakPrice !== null) document.getElementById('edit_offpeak_price').value = offpeakPrice;
+        
+        isEditSubmitting = false;
+        const btn = document.querySelector('#courtEditForm button[type="submit"]');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'บันทึกการเปลี่ยนแปลง';
+        }
+        document.getElementById('courtEditModal').style.display = 'flex';
+    };
+
+    window.closeCourtEditModal = function() {
+        isEditSubmitting = false;
+        document.getElementById('courtEditModal').style.display = 'none';
+    };
+
+    window.handleCourtEditSubmit = function(e) {
+        if (isEditSubmitting) {
+            e.preventDefault();
+            return false;
+        }
+        isEditSubmitting = true;
+        const btn = document.querySelector('#courtEditForm button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+        }
+        return true;
+    };
+
+    window.handleRepairSubmit = function(e) {
+        if (isRepairSubmitting) {
+            e.preventDefault();
+            return false;
+        }
+        isRepairSubmitting = true;
+        const btn = document.querySelector('#courtRepairForm button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+        }
+        return true;
+    };
+})();
 </script>
 
 <!-- อัปเดตเวอร์ชัน JS -->
-<script src="../assets/js/admin.js?v=1.30"></script>
+<script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
 </body>
 </html>

@@ -827,18 +827,27 @@ function updateInvoiceReview() {
     }
 }
 
-// Form Submission with Loading Spinner Feedback
+// Form Submission with Loading Spinner Feedback & Double Submit Prevention
+let isBookingSubmitting = false;
 function handleBookingFormSubmit(event) {
+    if (isBookingSubmitting) {
+        if (event) event.preventDefault();
+        return false;
+    }
+
     if (wizardState.selectedSlots.size === 0) {
         alert("กรุณาเลือกสนามก่อนยืนยันการจอง");
         if (event) event.preventDefault();
         return false;
     }
 
+    isBookingSubmitting = true;
     let btnSubmit = document.getElementById('btnFinalSubmitBooking');
     if (btnSubmit) {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกการจองและล็อกสนาม...';
+        btnSubmit.style.opacity = "0.75";
+        btnSubmit.style.cursor = "not-allowed";
     }
 
     return true;
@@ -1001,15 +1010,22 @@ function initSlipUpload() {
         if (previewContainer) previewContainer.style.display = "none";
     }
 
-    // 4. Loading & Disabled State เมื่อ Submit Form
+    // 4. Loading & Disabled State เมื่อ Submit Form พร้อมป้องกัน Double Submit
+    let isPaymentSubmitting = false;
     if (paymentForm) {
         paymentForm.addEventListener("submit", function(e) {
+            if (isPaymentSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+
             if (!fileInput.files || fileInput.files.length === 0) {
                 e.preventDefault();
                 showError("กรุณาแนบรูปภาพสลิปการโอนเงินก่อนยืนยัน");
                 return false;
             }
 
+            isPaymentSubmitting = true;
             if (btnSubmit) {
                 btnSubmit.disabled = true;
                 btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดสลิป กรุณารอสักครู่...';
@@ -1128,10 +1144,14 @@ function closeRedeemModal() {
     }
 }
 
+let isRedeemSubmitting = false;
 function executeRedeemSubmit() {
+    if (isRedeemSubmitting) return false;
+
     let btnSubmit = document.getElementById('btnModalConfirmRedeem');
     let form = document.getElementById('redeemRewardForm');
 
+    isRedeemSubmitting = true;
     if (btnSubmit) {
         btnSubmit.disabled = true;
         btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังทำรายการ...';
@@ -1143,3 +1163,39 @@ function executeRedeemSubmit() {
         form.submit();
     }
 }
+
+/* =========================================
+   Modal Backdrop Click & ESC Key Guard (Member Modals)
+   ========================================= */
+document.addEventListener('DOMContentLoaded', function() {
+    // ปิดเมื่อคลิกนอกพื้นที่ Modal Dialog
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay')) {
+            if (e.target.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
+                closeRedeemModal();
+            } else if (e.target.id === 'cancelModal' && typeof closeCancelModal === 'function') {
+                closeCancelModal();
+            } else {
+                e.target.style.display = 'none';
+                e.target.classList.remove('active');
+            }
+        }
+    });
+
+    // ปิดเมื่อกดปุ่ม ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
+            if (activeOverlay) {
+                if (activeOverlay.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
+                    closeRedeemModal();
+                } else if (activeOverlay.id === 'cancelModal' && typeof closeCancelModal === 'function') {
+                    closeCancelModal();
+                } else {
+                    activeOverlay.style.display = 'none';
+                    activeOverlay.classList.remove('active');
+                }
+            }
+        }
+    });
+});

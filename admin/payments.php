@@ -175,9 +175,13 @@ include 'includes/header.php';
     </div>
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
-    <script src="../assets/js/admin.js?v=1.30"></script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
     <script>
-        function confirmApprovePayment() {
+    (function() {
+        let isVerifySubmitting = false;
+
+        window.confirmApprovePayment = function() {
+            if (isVerifySubmitting) return;
             let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
             let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
             let amount = document.getElementById('info_amount') ? document.getElementById('info_amount').innerText : '';
@@ -189,13 +193,18 @@ include 'includes/header.php';
                 confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันยอดถูกต้อง',
                 type: 'success',
                 onConfirm: function() {
+                    if (isVerifySubmitting) return;
+                    isVerifySubmitting = true;
+                    const buttons = document.querySelectorAll('#verifyPaymentForm button');
+                    buttons.forEach(btn => btn.disabled = true);
                     document.getElementById('verify_action_status').value = 'ยืนยันแล้ว';
                     document.getElementById('verifyPaymentForm').submit();
                 }
             });
-        }
+        };
 
-        function confirmRejectPayment() {
+        window.confirmRejectPayment = function() {
+            if (isVerifySubmitting) return;
             let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
             let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
             
@@ -205,11 +214,16 @@ include 'includes/header.php';
                 consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และ Slot เวลาของสนามจะถูกปล่อยคืนสู่ระบบทันที',
                 confirmText: 'ยืนยันปฏิเสธสลิป',
                 onConfirm: function() {
+                    if (isVerifySubmitting) return;
+                    isVerifySubmitting = true;
+                    const buttons = document.querySelectorAll('#verifyPaymentForm button');
+                    buttons.forEach(btn => btn.disabled = true);
                     document.getElementById('verify_action_status').value = 'ปฏิเสธ';
                     document.getElementById('verifyPaymentForm').submit();
                 }
             });
-        }
+        };
+    })();
     </script>
 </body>
 </html>

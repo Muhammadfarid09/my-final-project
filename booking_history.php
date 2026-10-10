@@ -225,7 +225,7 @@ try {
                 <i class="fas fa-exclamation-triangle"></i> <span id="modal_cancel_title_text">ขอยกเลิกการจองสนาม</span>
             </h4>
 
-            <form action="actions/cancel_booking_db.php" method="POST">
+            <form action="actions/cancel_booking_db.php" method="POST" id="cancelBookingForm" onsubmit="return handleCancelBookingSubmit(event)">
                 <?php echo csrf_field(); ?>
                 <input type="hidden" name="booking_id" id="modal_cancel_booking_id">
 
@@ -315,76 +315,131 @@ try {
             </form>
         </div>
     </div>
-            </form>
-        </div>
-    </div>
 
-    <script src="assets/js/member.js?v=1.5"></script>
+    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
     <script>
-    const defaultMemberName = <?php echo json_encode($default_member_name); ?>;
-    const defaultMemberPhone = <?php echo json_encode($default_member_phone); ?>;
+    (function() {
+        const defaultMemberName = <?php echo json_encode($default_member_name); ?>;
+        const defaultMemberPhone = <?php echo json_encode($default_member_phone); ?>;
+        let isCancelSubmitting = false;
 
-    function openCancelModal(id, court, date, time, price, status, hasSlip) {
-        document.getElementById('modal_cancel_booking_id').value = id;
-        document.getElementById('modal_cancel_id_text').textContent = id;
-        document.getElementById('modal_cancel_court').textContent = court;
-        document.getElementById('modal_cancel_date').textContent = date;
-        document.getElementById('modal_cancel_time').textContent = time;
-        document.getElementById('modal_cancel_price').textContent = price;
+        window.openCancelModal = function(id, court, date, time, price, status, hasSlip) {
+            document.getElementById('modal_cancel_booking_id').value = id;
+            document.getElementById('modal_cancel_id_text').textContent = id;
+            document.getElementById('modal_cancel_court').textContent = court;
+            document.getElementById('modal_cancel_date').textContent = date;
+            document.getElementById('modal_cancel_time').textContent = time;
+            document.getElementById('modal_cancel_price').textContent = price;
 
-        const unverifiedNotice = document.getElementById('modal_unverified_notice');
-        const unverifiedSlipNotice = document.getElementById('modal_unverified_slip_notice');
-        const policyBox = document.getElementById('modal_refund_policy_box');
-        const accountSection = document.getElementById('modal_refund_account_section');
-        const titleText = document.getElementById('modal_cancel_title_text');
-        const submitText = document.getElementById('modal_cancel_submit_text');
+            const unverifiedNotice = document.getElementById('modal_unverified_notice');
+            const unverifiedSlipNotice = document.getElementById('modal_unverified_slip_notice');
+            const policyBox = document.getElementById('modal_refund_policy_box');
+            const accountSection = document.getElementById('modal_refund_account_section');
+            const titleText = document.getElementById('modal_cancel_title_text');
+            const submitText = document.getElementById('modal_cancel_submit_text');
+            const submitBtn = document.getElementById('modal_cancel_submit_btn');
 
-        const accNoInput = document.getElementById('cancel_refund_account_no');
-        const accNameInput = document.getElementById('cancel_refund_account_name');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+            isCancelSubmitting = false;
 
-        // เติมค่าเริ่มต้นเพื่อลดภาระการพิมพ์ (Avoid Redundant User Input)
-        if (accNoInput && !accNoInput.value) accNoInput.value = defaultMemberPhone;
-        if (accNameInput && !accNameInput.value) accNameInput.value = defaultMemberName;
+            const accNoInput = document.getElementById('cancel_refund_account_no');
+            const accNameInput = document.getElementById('cancel_refund_account_name');
 
-        if (status === 'รอตรวจสอบ' && !hasSlip) {
-            // กรณีที่ 1: รอแนบสลิป (ยังไม่จ่าย)
-            unverifiedNotice.style.display = 'block';
-            unverifiedSlipNotice.style.display = 'none';
-            policyBox.style.display = 'none';
-            accountSection.style.display = 'none';
-            if (accNoInput) accNoInput.removeAttribute('required');
-            if (accNameInput) accNameInput.removeAttribute('required');
-            titleText.textContent = 'ยกเลิกการจองสนาม (ก่อนชำระเงิน)';
-            submitText.textContent = 'ยืนยันยกเลิกการจอง';
-        } else if (status === 'รอตรวจสอบ' && hasSlip) {
-            // กรณีที่ 2: แนบสลิปแล้ว แต่อยู่ระหว่างรอตรวจ (จ่ายแล้ว)
-            unverifiedNotice.style.display = 'none';
-            unverifiedSlipNotice.style.display = 'block';
-            policyBox.style.display = 'none';
-            accountSection.style.display = 'block';
-            if (accNoInput) accNoInput.setAttribute('required', 'required');
-            if (accNameInput) accNameInput.setAttribute('required', 'required');
-            titleText.textContent = 'ขอยกเลิกและขอคืนเงิน (แนบสลิปแล้ว)';
-            submitText.textContent = 'ส่งคำขอยกเลิกและขอคืนเงิน';
-        } else {
-            // กรณีที่ 3: จองแล้ว (แอดมินอนุมัติแล้ว)
-            unverifiedNotice.style.display = 'none';
-            unverifiedSlipNotice.style.display = 'none';
-            policyBox.style.display = 'block';
-            accountSection.style.display = 'block';
-            if (accNoInput) accNoInput.setAttribute('required', 'required');
-            if (accNameInput) accNameInput.setAttribute('required', 'required');
-            titleText.textContent = 'ขอยกเลิกการจองสนาม (เพื่อขอคืนเงิน)';
-            submitText.textContent = 'ส่งคำขอยกเลิกการจอง';
-        }
+            // เติมค่าเริ่มต้นเพื่อลดภาระการพิมพ์ (Avoid Redundant User Input)
+            if (accNoInput && !accNoInput.value) accNoInput.value = defaultMemberPhone;
+            if (accNameInput && !accNameInput.value) accNameInput.value = defaultMemberName;
 
-        const modal = document.getElementById('cancelModal');
-        modal.style.display = 'flex';
-    }
+            if (status === 'รอตรวจสอบ' && !hasSlip) {
+                // กรณีที่ 1: รอแนบสลิป (ยังไม่จ่าย)
+                unverifiedNotice.style.display = 'block';
+                unverifiedSlipNotice.style.display = 'none';
+                policyBox.style.display = 'none';
+                accountSection.style.display = 'none';
+                if (accNoInput) accNoInput.removeAttribute('required');
+                if (accNameInput) accNameInput.removeAttribute('required');
+                titleText.textContent = 'ยกเลิกการจองสนาม (ก่อนชำระเงิน)';
+                submitText.textContent = 'ยืนยันยกเลิกการจอง';
+            } else if (status === 'รอตรวจสอบ' && hasSlip) {
+                // กรณีที่ 2: แนบสลิปแล้ว แต่อยู่ระหว่างรอตรวจ (จ่ายแล้ว)
+                unverifiedNotice.style.display = 'none';
+                unverifiedSlipNotice.style.display = 'block';
+                policyBox.style.display = 'none';
+                accountSection.style.display = 'block';
+                if (accNoInput) accNoInput.setAttribute('required', 'required');
+                if (accNameInput) accNameInput.setAttribute('required', 'required');
+                titleText.textContent = 'ขอยกเลิกและขอคืนเงิน (แนบสลิปแล้ว)';
+                submitText.textContent = 'ส่งคำขอยกเลิกและขอคืนเงิน';
+            } else {
+                // กรณีที่ 3: จองแล้ว (แอดมินอนุมัติแล้ว)
+                unverifiedNotice.style.display = 'none';
+                unverifiedSlipNotice.style.display = 'none';
+                policyBox.style.display = 'block';
+                accountSection.style.display = 'block';
+                if (accNoInput) accNoInput.setAttribute('required', 'required');
+                if (accNameInput) accNameInput.setAttribute('required', 'required');
+                titleText.textContent = 'ขอยกเลิกการจองสนาม (เพื่อขอคืนเงิน)';
+                submitText.textContent = 'ส่งคำขอยกเลิกการจอง';
+            }
 
-    function closeCancelModal() {
-        document.getElementById('cancelModal').style.display = 'none';
-    }
+            const modal = document.getElementById('cancelModal');
+            if (modal) modal.style.display = 'flex';
+        };
+
+        window.closeCancelModal = function() {
+            const modal = document.getElementById('cancelModal');
+            if (modal) modal.style.display = 'none';
+            const form = document.getElementById('cancelBookingForm');
+            if (form) form.reset();
+            const submitBtn = document.getElementById('modal_cancel_submit_btn');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+            isCancelSubmitting = false;
+        };
+
+        window.handleCancelBookingSubmit = function(event) {
+            if (isCancelSubmitting) {
+                if (event) event.preventDefault();
+                return false;
+            }
+
+            isCancelSubmitting = true;
+            const submitBtn = document.getElementById('modal_cancel_submit_btn');
+            const submitText = document.getElementById('modal_cancel_submit_text');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.75';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+            if (submitText) {
+                submitText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งคำขอยกเลิก...';
+            }
+            return true;
+        };
+
+        // Backdrop click & ESC Key Guard
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('cancelModal');
+            if (modal && e.target === modal) {
+                window.closeCancelModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                const modal = document.getElementById('cancelModal');
+                if (modal && modal.style.display === 'flex') {
+                    window.closeCancelModal();
+                }
+            }
+        });
+    })();
     </script>
 </body>
 </html>

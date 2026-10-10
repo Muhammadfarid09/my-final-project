@@ -234,7 +234,7 @@ include 'includes/header.php';
 <?php endif; ?>
 
 <!-- เรียกใช้ไฟล์ JS กลาง -->
-<script src="../assets/js/admin.js?v=1.30"></script>
+<script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
 
 <script>
 function openWalkInCourtModal(courtId, courtName, courtPrice, peakPrice, offpeakPrice) {
@@ -328,6 +328,31 @@ function addCourtToCart() {
         return;
     }
     let endTimeStr = (endHour < 10 ? '0' : '') + endHour + ':00';
+
+    // ป้องกันการเลือกสนามซ้ำหรือเวลาชนกันในตะกร้า POS
+    let isDuplicateCourt = posCart.some(item => {
+        if (!item.is_court || String(item.court_id) !== String(courtId) || item.booking_date !== date) {
+            return false;
+        }
+        let existingStart = item.start_time.substring(0, 5);
+        let existingEnd = item.end_time.substring(0, 5);
+        return (startTime < existingEnd && endTimeStr > existingStart);
+    });
+
+    if (isDuplicateCourt) {
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'สนามนี้มีอยู่ในตะกร้าแล้ว',
+                text: 'สนาม ' + courtName + ' ในช่วงเวลาดังกล่าว มีอยู่ในรายการขายแล้ว กรุณาตรวจสอบตะกร้าสินค้า',
+                confirmButtonColor: '#2563eb'
+            });
+        } else {
+            alert('สนาม ' + courtName + ' ในช่วงเวลาดังกล่าว มีอยู่ในรายการขายแล้ว');
+        }
+        return;
+    }
+
     let totalPrice = rate * hours;
     let itemUniqueId = 'court_' + courtId + '_' + Date.now();
 

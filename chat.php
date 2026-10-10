@@ -86,12 +86,15 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
             scrollToBottom();
 
-            // ส่งข้อความแบบ AJAX (เรียลไทม์ไม่ต้องโหลดหน้าใหม่)
+            // ส่งข้อความแบบ AJAX (เรียลไทม์ไม่ต้องโหลดหน้าใหม่) พร้อมป้องกัน Double Submit
+            var isSending = false;
             chatForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                if (isSending) return;
                 var msg = chatInput.value.trim();
                 if (!msg) return;
 
+                isSending = true;
                 chatInput.disabled = true;
                 btnSend.disabled = true;
 
@@ -104,6 +107,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 })
                 .then(function(res) { return res.json(); })
                 .then(function(res) {
+                    isSending = false;
                     chatInput.value = '';
                     chatInput.disabled = false;
                     btnSend.disabled = false;
@@ -115,6 +119,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 })
                 .catch(function(err) {
                     console.error('Send error:', err);
+                    isSending = false;
                     chatInput.disabled = false;
                     btnSend.disabled = false;
                     chatForm.submit(); // fallback ส่งแบบฟอร์มปกติถ้ามีข้อผิดพลาด

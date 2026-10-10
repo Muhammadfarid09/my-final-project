@@ -323,124 +323,145 @@ include 'includes/header.php';
 </div>
 
 <script>
-let currentLateMinutes = 0;
-let currentItemPrice = 0;
+(function() {
+    let currentLateMinutes = 0;
+    let currentItemPrice = 0;
+    let isReturnSubmitting = false;
 
-function openReturnModal(id, name, qty, member, due, isLate, lateMinutes, price) {
-    document.getElementById('modal_rental_id').value = id;
-    document.getElementById('modal_item_name').textContent = name;
-    document.getElementById('modal_qty').textContent = qty;
-    document.getElementById('modal_member_name').textContent = member;
-    document.getElementById('modal_due_time').textContent = due;
-    
-    currentLateMinutes = lateMinutes;
-    currentItemPrice = price;
-
-    const lateBox = document.getElementById('lateAlertBox');
-    const fineInput = document.getElementById('fineAmountInput');
-    const reasonInput = document.getElementById('fineReasonInput');
-
-    // รีเซ็ตฟอร์ม
-    document.querySelector('input[name="condition_status"][value="ปกติ"]').checked = true;
-    document.getElementById('repairCauseGroup').style.display = 'none';
-
-    if (isLate && lateMinutes > 0) {
-        lateBox.style.display = 'block';
-        const hours = Math.ceil(lateMinutes / 60);
-        document.getElementById('modal_late_text').textContent = `${hours} ชั่วโมง (${lateMinutes} นาที)`;
+    window.openReturnModal = function(id, name, qty, member, due, isLate, lateMinutes, price) {
+        document.getElementById('modal_rental_id').value = id;
+        document.getElementById('modal_item_name').textContent = name;
+        document.getElementById('modal_qty').textContent = qty;
+        document.getElementById('modal_member_name').textContent = member;
+        document.getElementById('modal_due_time').textContent = due;
         
-        // คำนวณค่าปรับคืนช้าอัตโนมัติ (เช่น ชม. ละ 20 บาท ต่อชิ้น)
-        const lateFine = hours * 20 * qty;
-        fineInput.value = lateFine.toFixed(2);
-        reasonInput.value = `คืนอุปกรณ์ช้ากว่ากำหนด ${hours} ชม.`;
-    } else {
-        lateBox.style.display = 'none';
-        fineInput.value = '0.00';
-        reasonInput.value = '';
-    }
+        currentLateMinutes = lateMinutes;
+        currentItemPrice = price;
 
-    const modal = document.getElementById('returnModal');
-    modal.style.display = 'flex';
-}
+        const lateBox = document.getElementById('lateAlertBox');
+        const fineInput = document.getElementById('fineAmountInput');
+        const reasonInput = document.getElementById('fineReasonInput');
 
-function closeReturnModal() {
-    document.getElementById('returnModal').style.display = 'none';
-}
+        // รีเซ็ตฟอร์ม
+        document.querySelector('input[name="condition_status"][value="ปกติ"]').checked = true;
+        document.getElementById('repairCauseGroup').style.display = 'none';
 
-function handleConditionChange(status) {
-    const repairGroup = document.getElementById('repairCauseGroup');
-    const repairInput = document.getElementById('repairCauseInput');
-    const fineInput = document.getElementById('fineAmountInput');
-    const reasonInput = document.getElementById('fineReasonInput');
-
-    if (status === 'ชำรุด') {
-        repairGroup.style.display = 'block';
-        repairInput.required = true;
-        // แนะนำค่าปรับซ่อม (ถ้ายังเป็น 0)
-        if (parseFloat(fineInput.value) === 0) {
-            fineInput.value = '100.00';
-            reasonInput.value = 'อุปกรณ์ชำรุดจากการใช้งาน';
-        }
-    } else if (status === 'สูญหาย') {
-        repairGroup.style.display = 'none';
-        repairInput.required = false;
-        // คิดค่าปรับเต็มราคาอุปกรณ์
-        if (currentItemPrice > 0) {
-            fineInput.value = currentItemPrice.toFixed(2);
-            reasonInput.value = 'อุปกรณ์สูญหาย คิดค่าชดใช้เต็มจำนวน';
-        }
-    } else {
-        // ปกติ
-        repairGroup.style.display = 'none';
-        repairInput.required = false;
-        if (currentLateMinutes <= 0) {
+        if (isLate && lateMinutes > 0) {
+            lateBox.style.display = 'block';
+            const hours = Math.ceil(lateMinutes / 60);
+            document.getElementById('modal_late_text').textContent = `${hours} ชั่วโมง (${lateMinutes} นาที)`;
+            
+            // คำนวณค่าปรับคืนช้าอัตโนมัติ (เช่น ชม. ละ 20 บาท ต่อชิ้น)
+            const lateFine = hours * 20 * qty;
+            fineInput.value = lateFine.toFixed(2);
+            reasonInput.value = `คืนอุปกรณ์ช้ากว่ากำหนด ${hours} ชม.`;
+        } else {
+            lateBox.style.display = 'none';
             fineInput.value = '0.00';
             reasonInput.value = '';
         }
-    }
-}
 
-function confirmReturnSubmit(e) {
-    e.preventDefault();
-    const itemName = document.getElementById('modal_item_name').innerText;
-    const qty = document.getElementById('modal_qty').innerText;
-    const member = document.getElementById('modal_member_name').innerText;
-    const condition = document.querySelector('input[name="condition_status"]:checked').value;
-    const fine = parseFloat(document.getElementById('fineAmountInput').value) || 0;
-
-    let conditionBadge = '';
-    if (condition === 'ปกติ') {
-        conditionBadge = '<span class="badge badge-success">สภาพปกติ</span>';
-    } else if (condition === 'ชำรุด') {
-        conditionBadge = '<span class="badge badge-warning">ชำรุด (ส่งซ่อม)</span>';
-    } else {
-        conditionBadge = '<span class="badge badge-danger">สูญหาย</span>';
-    }
-
-    let html = `
-        <div class="swal-custom-body">
-            <div class="mb-10 text-15">ผู้เช่า: <strong>${member}</strong></div>
-            <div class="mb-10 text-15">อุปกรณ์: <strong>${itemName}</strong> (${qty} ชิ้น)</div>
-            <div class="mb-10 text-15">สภาพอุปกรณ์: ${conditionBadge}</div>
-            ${fine > 0 ? `<div class="mb-15 text-danger font-bold text-16">ค่าปรับที่บันทึก: ${fine.toFixed(2)} ฿</div>` : ''}
-            <div class="swal-consequence-info">
-                <i class="fas fa-check-circle"></i>
-                <span>ยืนยันเพื่อบันทึกการตรวจรับคืน และปรับปรุงสต็อกอุปกรณ์ในระบบ</span>
-            </div>
-        </div>
-    `;
-
-    SwalConfirmAction({
-        title: 'ยืนยันการตรวจรับคืนอุปกรณ์?',
-        message: html,
-        type: condition === 'สูญหาย' ? 'danger' : (fine > 0 ? 'warning' : 'success'),
-        confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันการรับคืน',
-        onConfirm: function() {
-            document.getElementById('returnForm').submit();
+        const submitBtn = document.querySelector('#returnForm button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> ยืนยันการรับคืน';
         }
-    });
-    return false;
-}
+        isReturnSubmitting = false;
+
+        const modal = document.getElementById('returnModal');
+        modal.style.display = 'flex';
+    };
+
+    window.closeReturnModal = function() {
+        isReturnSubmitting = false;
+        const modal = document.getElementById('returnModal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.handleConditionChange = function(status) {
+        const repairGroup = document.getElementById('repairCauseGroup');
+        const repairInput = document.getElementById('repairCauseInput');
+        const fineInput = document.getElementById('fineAmountInput');
+        const reasonInput = document.getElementById('fineReasonInput');
+
+        if (status === 'ชำรุด') {
+            repairGroup.style.display = 'block';
+            repairInput.required = true;
+            // แนะนำค่าปรับซ่อม (ถ้ายังเป็น 0)
+            if (parseFloat(fineInput.value) === 0) {
+                fineInput.value = '100.00';
+                reasonInput.value = 'อุปกรณ์ชำรุดจากการใช้งาน';
+            }
+        } else if (status === 'สูญหาย') {
+            repairGroup.style.display = 'none';
+            repairInput.required = false;
+            // คิดค่าปรับเต็มราคาอุปกรณ์
+            if (currentItemPrice > 0) {
+                fineInput.value = currentItemPrice.toFixed(2);
+                reasonInput.value = 'อุปกรณ์สูญหาย คิดค่าชดใช้เต็มจำนวน';
+            }
+        } else {
+            // ปกติ
+            repairGroup.style.display = 'none';
+            repairInput.required = false;
+            if (currentLateMinutes <= 0) {
+                fineInput.value = '0.00';
+                reasonInput.value = '';
+            }
+        }
+    };
+
+    window.confirmReturnSubmit = function(e) {
+        e.preventDefault();
+        if (isReturnSubmitting) return false;
+
+        const itemName = document.getElementById('modal_item_name').innerText;
+        const qty = document.getElementById('modal_qty').innerText;
+        const member = document.getElementById('modal_member_name').innerText;
+        const condition = document.querySelector('input[name="condition_status"]:checked').value;
+        const fine = parseFloat(document.getElementById('fineAmountInput').value) || 0;
+
+        let conditionBadge = '';
+        if (condition === 'ปกติ') {
+            conditionBadge = '<span class="badge badge-success">สภาพปกติ</span>';
+        } else if (condition === 'ชำรุด') {
+            conditionBadge = '<span class="badge badge-warning">ชำรุด (ส่งซ่อม)</span>';
+        } else {
+            conditionBadge = '<span class="badge badge-danger">สูญหาย</span>';
+        }
+
+        let html = `
+            <div class="swal-custom-body">
+                <div class="mb-10 text-15">ผู้เช่า: <strong>${member}</strong></div>
+                <div class="mb-10 text-15">อุปกรณ์: <strong>${itemName}</strong> (${qty} ชิ้น)</div>
+                <div class="mb-10 text-15">สภาพอุปกรณ์: ${conditionBadge}</div>
+                ${fine > 0 ? `<div class="mb-15 text-danger font-bold text-16">ค่าปรับที่บันทึก: ${fine.toFixed(2)} ฿</div>` : ''}
+                <div class="swal-consequence-info">
+                    <i class="fas fa-check-circle"></i>
+                    <span>ยืนยันเพื่อบันทึกการตรวจรับคืน และปรับปรุงสต็อกอุปกรณ์ในระบบ</span>
+                </div>
+            </div>
+        `;
+
+        SwalConfirmAction({
+            title: 'ยืนยันการตรวจรับคืนอุปกรณ์?',
+            message: html,
+            type: condition === 'สูญหาย' ? 'danger' : (fine > 0 ? 'warning' : 'success'),
+            confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันการรับคืน',
+            onConfirm: function() {
+                if (isReturnSubmitting) return;
+                isReturnSubmitting = true;
+                const submitBtn = document.querySelector('#returnForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกการรับคืน...';
+                }
+                document.getElementById('returnForm').submit();
+            }
+        });
+        return false;
+    };
+})();
 </script>
 
 <?php include 'includes/footer.php'; ?>

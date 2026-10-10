@@ -220,8 +220,15 @@ function calculateChange() {
     }
 }
 
-// ตรวจสอบก่อนชำระเงิน (ปรับปรุงใหม่ด้วย SweetAlert2)
+let isPosSubmitting = false;
+
+// ตรวจสอบก่อนชำระเงิน (ปรับปรุงใหม่ด้วย SweetAlert2 และระบบป้องกัน Double Submission)
 function validateCheckout(event) {
+    if (isPosSubmitting) {
+        if (event) event.preventDefault();
+        return false;
+    }
+
     let form = document.getElementById('checkoutForm');
     let totalPrice = parseFloat(document.getElementById('totalAmountInput').value) || 0;
     let paymentMethod = document.getElementById('paymentMethodInput') ? document.getElementById('paymentMethodInput').value : 'cash';
@@ -237,20 +244,49 @@ function validateCheckout(event) {
 
     if (typeof Swal === 'undefined') {
         if (paymentMethod === 'qr') {
-            return confirm("ยืนยันว่าลูกค้าสแกนจ่ายสำเร็จ และยอดเงิน " + totalPrice.toFixed(2) + " บาท เข้าบัญชีแล้วใช่หรือไม่?");
+            if (confirm("ยืนยันว่าลูกค้าสแกนจ่ายสำเร็จ และยอดเงิน " + totalPrice.toFixed(2) + " บาท เข้าบัญชีแล้วใช่หรือไม่?")) {
+                isPosSubmitting = true;
+                return true;
+            }
+            return false;
         } else {
             let cashReceived = parseFloat(document.getElementById('cashReceived').value) || 0;
             if (cashReceived < totalPrice) {
                 alert('รับเงินมาไม่ครบ! ขาดอีก ' + (totalPrice - cashReceived).toFixed(2) + ' บาท');
                 return false;
             }
-            return confirm("ยืนยันรับเงินสด " + cashReceived.toFixed(2) + " บาท?");
+            if (confirm("ยืนยันรับเงินสด " + cashReceived.toFixed(2) + " บาท?")) {
+                isPosSubmitting = true;
+                return true;
+            }
+            return false;
         }
     }
 
     if (event) {
         event.preventDefault();
     }
+
+    const triggerSubmitWithLoading = () => {
+        if (isPosSubmitting) return;
+        isPosSubmitting = true;
+        const submitBtn = form.querySelector('button[type="submit"]') || document.getElementById('btnCheckout');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+        }
+        Swal.fire({
+            title: 'กำลังบันทึกรายการขาย...',
+            text: 'กรุณารอสักครู่ ระบบกำลังตัดสต็อกและจัดเตรียมใบเสร็จ',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        form.submit();
+    };
 
     if (paymentMethod === 'qr') {
         Swal.fire({
@@ -273,7 +309,7 @@ function validateCheckout(event) {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                form.submit();
+                triggerSubmitWithLoading();
             }
         });
         return false;
@@ -306,7 +342,7 @@ function validateCheckout(event) {
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                form.submit();
+                triggerSubmitWithLoading();
             }
         });
         return false;
@@ -967,12 +1003,15 @@ function SwalToast(icon, title, timer = 3500) {
     });
 }
 
+let isFormRedirecting = false;
+
 /**
  * ผู้ช่วยส่งคำขอ Action ผ่าน Form POST พร้อม CSRF Token อัตโนมัติ
  * สำหรับ Action Scripts เช่น _delete_db.php หรือ _finish_db.php
  */
 function submitActionFormOrRedirect(url, options = {}) {
-    if (!url) return;
+    if (!url || isFormRedirecting) return;
+    isFormRedirecting = true;
     if (url.includes('_db.php') || options.method === 'POST') {
         let form = document.createElement('form');
         form.method = 'POST';
@@ -1017,6 +1056,7 @@ function SwalConfirmDelete(options) {
         return;
     }
 
+    let isDeleteConfirmed = false;
     let title = options.title || 'ยืนยันการลบข้อมูล';
     let message = options.message || options.text || 'คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?';
     let consequence = options.consequence || 'คำเตือน: การลบข้อมูลนี้เป็นการลบถาวร ไม่สามารถกู้คืนได้';
@@ -1048,7 +1088,8 @@ function SwalConfirmDelete(options) {
         reverseButtons: true,
         focusCancel: true
     }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && !isDeleteConfirmed) {
+            isDeleteConfirmed = true;
             if (typeof options.onConfirm === 'function') {
                 options.onConfirm();
             } else if (options.actionUrl) {
@@ -1071,6 +1112,7 @@ function SwalConfirmAction(options) {
         return;
     }
 
+    let isActionConfirmed = false;
     let title = options.title || 'ยืนยันการทำรายการ';
     let message = options.message || options.text || 'คุณต้องการดำเนินการนี้ใช่หรือไม่?';
     let consequence = options.consequence || '';
@@ -1115,7 +1157,8 @@ function SwalConfirmAction(options) {
         cancelButtonColor: '#64748b',
         reverseButtons: true
     }).then((result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && !isActionConfirmed) {
+            isActionConfirmed = true;
             if (typeof options.onConfirm === 'function') {
                 options.onConfirm();
             } else if (options.actionUrl) {
@@ -1138,7 +1181,34 @@ function showActionConfirmModal(options) {
 }
 
 /**
- * Event Listener กลางสำหรับ Flash Session Toasts และ Logout Confirmation
+ * ปิด Modal ที่กำลังเปิดอยู่ในระบบ Admin พร้อมเรียกฟังก์ชันปิดเฉพาะตัว (ถ้ามี)
+ */
+function closeActiveAdminModal(modal) {
+    if (!modal) return;
+    const modalId = modal.id;
+    if (modalId === 'refundModal' && typeof closeRefundModal === 'function') {
+        closeRefundModal();
+    } else if (modalId === 'verifyPaymentModal' && typeof closeVerifyModal === 'function') {
+        closeVerifyModal();
+    } else if (modalId === 'repairModal' && typeof closeRepairModal === 'function') {
+        closeRepairModal();
+    } else if (modalId === 'courtEditModal' && typeof closeCourtEditModal === 'function') {
+        closeCourtEditModal();
+    } else if (modalId === 'walkInCourtModal' && typeof closeWalkInCourtModal === 'function') {
+        closeWalkInCourtModal();
+    } else if (modalId === 'returnModal' && typeof closeReturnModal === 'function') {
+        closeReturnModal();
+    } else if (modalId === 'eqRepairModal' && typeof closeEqRepairModal === 'function') {
+        closeEqRepairModal();
+    } else if (modalId === 'newsAddModal' && typeof closeNewsModal === 'function') {
+        closeNewsModal();
+    } else {
+        modal.style.display = 'none';
+    }
+}
+
+/**
+ * Event Listener กลางสำหรับ Flash Session Toasts, Logout Confirmation, และ Modal Overlay Interactions
  */
 document.addEventListener("DOMContentLoaded", function() {
     // 1. ตรวจสอบ Flash Message จาก Session ที่ส่งมาจาก PHP Header
@@ -1174,5 +1244,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         });
+    });
+
+    // 3. Centralized Modal Backdrop Click Listener
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+            closeActiveAdminModal(e.target);
+        }
+    });
+
+    // 4. Centralized ESC Key Handler for Modal Overlays
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' || e.key === 'Esc') {
+            if (typeof Swal !== 'undefined' && Swal.isVisible && Swal.isVisible()) {
+                return; // ปล่อยให้ SweetAlert2 จัดการ ESC ของตัวเอง
+            }
+            const openModals = document.querySelectorAll('.modal-overlay');
+            openModals.forEach(modal => {
+                const display = window.getComputedStyle(modal).display;
+                if (display !== 'none') {
+                    closeActiveAdminModal(modal);
+                }
+            });
+        }
     });
 });

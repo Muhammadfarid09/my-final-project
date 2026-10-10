@@ -252,10 +252,14 @@ include 'includes/header.php';
 </div>
 
 <!-- เรียกใช้ไฟล์ JS ส่วนกลาง -->
-<script src="../assets/js/admin.js?v=1.32"></script>
+<script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
 <script>
+let isRefundSubmitting = false;
+
 function confirmRefundDecision(e) {
     e.preventDefault();
+    if (isRefundSubmitting) return false;
+
     const status = document.getElementById('refund_status').value;
     if (!status) {
         if (typeof SwalToast === 'function') {
@@ -278,6 +282,13 @@ function confirmRefundDecision(e) {
         type: isRefund ? 'success' : 'warning',
         confirmText: '<i class="fas fa-save mr-6"></i> ยืนยันบันทึกผล',
         onConfirm: function() {
+            if (isRefundSubmitting) return;
+            isRefundSubmitting = true;
+            const submitBtn = document.querySelector('#refundForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกผล...';
+            }
             document.getElementById('refundForm').submit();
         }
     });

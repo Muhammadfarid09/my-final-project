@@ -195,10 +195,14 @@ include 'includes/header.php';
     </div>
     <?php endif; ?>
 
-    <script src="../assets/js/admin.js?v=1.30"></script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
     <script>
+    let isRepairSubmitting = false;
+
     function confirmSendToRepair(e) {
         e.preventDefault();
+        if (isRepairSubmitting) return false;
+
         const name = document.getElementById('modal_eq_name').innerText;
         const qty = document.getElementById('modal_eq_qty').value;
         SwalConfirmAction({
@@ -208,6 +212,13 @@ include 'includes/header.php';
             type: 'warning',
             confirmText: '<i class="fas fa-tools mr-6"></i> ยืนยันตัดสต็อกและส่งซ่อม',
             onConfirm: function() {
+                if (isRepairSubmitting) return;
+                isRepairSubmitting = true;
+                const submitBtn = document.querySelector('#eqRepairForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังส่งซ่อม...';
+                }
                 document.getElementById('eqRepairForm').submit();
             }
         });
