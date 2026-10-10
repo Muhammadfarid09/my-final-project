@@ -65,9 +65,17 @@ window.onclick = function(event) {
    Zero Inline Style Standard - Complete State & Interaction Management
    ========================================================================== */
 
+// คืนค่าวันที่ในรูปแบบ YYYY-MM-DD ตามเวลาท้องถิ่น (ไม่คลาดเคลื่อนตาม UTC)
+function getLocalDateString(d = new Date()) {
+    let year = d.getFullYear();
+    let month = String(d.getMonth() + 1).padStart(2, '0');
+    let day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 const wizardState = {
     currentStep: 1,
-    selectedDate: new Date().toISOString().split('T')[0],
+    selectedDate: getLocalDateString(new Date()),
     currentCalMonth: new Date().getMonth(),
     currentCalYear: new Date().getFullYear(),
     dayRateCategory: 'normal',
@@ -100,12 +108,20 @@ function initBookingWizard() {
     if (nicknameInput) {
         wizardState.bookingNickname = nicknameInput.value.trim();
     }
-    let todayStr = new Date().toISOString().split('T')[0];
-    wizardState.selectedDate = todayStr;
-    wizardState.currentCalMonth = new Date().getMonth();
-    wizardState.currentCalYear = new Date().getFullYear();
-
+    
     let inputDate = document.getElementById('input_booking_date');
+    let todayStr = (inputDate && inputDate.value) ? inputDate.value : getLocalDateString(new Date());
+    wizardState.selectedDate = todayStr;
+    
+    let dParts = todayStr.split('-').map(Number);
+    if (dParts.length === 3) {
+        wizardState.currentCalYear = dParts[0];
+        wizardState.currentCalMonth = dParts[1] - 1;
+    } else {
+        wizardState.currentCalMonth = new Date().getMonth();
+        wizardState.currentCalYear = new Date().getFullYear();
+    }
+
     if (inputDate) inputDate.value = todayStr;
 
     // Render Calendar and load court data
@@ -125,7 +141,12 @@ function goToStep(targetStep) {
                 alert("กรุณาเลือกวันที่ต้องการใช้บริการ");
                 return;
             }
-            renderTimeSlots();
+            if (!wizardState.matrixData || wizardState.matrixData.date !== wizardState.selectedDate) {
+                renderTimeSlots();
+                loadCourtMatrixForWizard(wizardState.selectedDate);
+            } else {
+                renderTimeSlots();
+            }
         } else if (targetStep === 3) {
             if (!wizardState.selectedStartTime) {
                 alert("กรุณาเลือกเวลาเริ่มต้น");
@@ -274,7 +295,7 @@ function selectQuickDate(type) {
     if (type === 'tomorrow') {
         target.setDate(target.getDate() + 1);
     }
-    let dateStr = target.toISOString().split('T')[0];
+    let dateStr = getLocalDateString(target);
 
     document.querySelectorAll('.btn-quick-date').forEach(b => b.classList.remove('active'));
     let btn = (type === 'tomorrow') ? document.getElementById('btnQuickTomorrow') : document.getElementById('btnQuickToday');
@@ -307,8 +328,16 @@ function loadCourtMatrixForWizard(dateStr) {
     let textSpan = document.getElementById('datePriceText');
     if (textSpan) textSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบอัตราค่าบริการ...';
 
-    fetch('actions/get_court_matrix.php?date=' + encodeURIComponent(dateStr))
-    .then(res => res.json())
+    let timeGrid = document.getElementById('timeSlotGrid');
+    if (timeGrid && wizardState.currentStep === 2 && (!wizardState.matrixData || wizardState.matrixData.date !== dateStr)) {
+        timeGrid.innerHTML = '<p class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin fa-lg"></i> กำลังโหลดช่วงเวลา...</p>';
+    }
+
+    return fetch('actions/get_court_matrix.php?date=' + encodeURIComponent(dateStr))
+    .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+    })
     .then(res => {
         if (res.status === 'success') {
             wizardState.matrixData = res;
@@ -323,11 +352,31 @@ function loadCourtMatrixForWizard(dateStr) {
                 banner.className = 'date-price-banner ' + res.rate_category;
                 textSpan.innerHTML = `อัตราค่าบริการสำหรับ <strong>${res.day_name} (${formatDateThai(dateStr)})</strong>: <span class="price-tag-value">${res.rate_label}</span>`;
             }
+
+            // [HCI CRITICAL]: เมื่อข้อมูลเดินทางมาถึง ให้ Render หน้าจอขั้นตอนปัจจุบันทันที
+            if (wizardState.currentStep === 2) {
+                renderTimeSlots();
+            } else if (wizardState.currentStep === 3) {
+                renderCourtHourBlocks();
+            }
+        } else {
+            throw new Error(res.message || 'ไม่สามารถโหลดข้อมูลสนามได้');
         }
     })
     .catch(err => {
         console.error('Court matrix fetch error:', err);
         if (textSpan) textSpan.innerText = 'ไม่สามารถดึงข้อมูลอัตราค่าบริการได้';
+        if (timeGrid && wizardState.currentStep === 2) {
+            timeGrid.innerHTML = `
+                <div class="col-12 text-center text-danger py-4">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <p>เกิดข้อผิดพลาดในการโหลดช่วงเวลา (${err.message})</p>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="loadCourtMatrixForWizard('${dateStr}')">
+                        <i class="fas fa-redo"></i> ลองใหม่อีกครั้ง
+                    </button>
+                </div>
+            `;
+        }
     });
 }
 
@@ -345,8 +394,8 @@ function renderTimeSlots() {
     let container = document.getElementById('timeSlotGrid');
     if (!container) return;
 
-    if (!wizardState.matrixData || !wizardState.matrixData.slots) {
-        container.innerHTML = '<p class="text-center text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดช่วงเวลา...</p>';
+    if (!wizardState.matrixData || wizardState.matrixData.date !== wizardState.selectedDate || !wizardState.matrixData.slots) {
+        container.innerHTML = '<p class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin fa-lg"></i> กำลังโหลดช่วงเวลา...</p>';
         return;
     }
 
@@ -354,7 +403,7 @@ function renderTimeSlots() {
     let courts = wizardState.matrixData.courts;
 
     let now = new Date();
-    let isToday = (wizardState.selectedDate === now.toISOString().split('T')[0]);
+    let isToday = (wizardState.selectedDate === getLocalDateString(now));
     let currentHour = now.getHours();
 
     let html = '';

@@ -479,7 +479,7 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
     </div>
 
     <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard -->
-    <script src="assets/js/member.js?v=2.0"></script>
+    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // เริ่มต้นระบบ 5-Step Booking Wizard

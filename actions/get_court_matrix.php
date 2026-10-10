@@ -99,6 +99,9 @@ try {
         $c_close = $c['court_close_time'] ? substr($c['court_close_time'], 0, 5) : sprintf("%02d:00", $max_close_hour);
 
         // คำนวณราคาของสนามนี้ตามประเภทวัน
+        $base_rate = floatval($c['court_price_per_hour'] ?? 0) > 0 ? floatval($c['court_price_per_hour']) : 180.00;
+        $peak_rate = floatval($c['court_peak_price'] ?? 0) > 0 ? floatval($c['court_peak_price']) : 200.00;
+        $offpeak_rate = floatval($c['court_offpeak_price'] ?? 0) > 0 ? floatval($c['court_offpeak_price']) : 150.00;
         $slot_price = calculate_court_hourly_rate($c, $date);
 
         $court_slots = [];
