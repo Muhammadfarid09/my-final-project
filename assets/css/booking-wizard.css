@@ -1028,3 +1028,308 @@
     cursor: not-allowed;
 }
 
+/* ==========================================================================
+   Guest Booking Auth Gate & In-Page Modal (HCI & Progressive Disclosure)
+   ========================================================================== */
+
+.badge-guest {
+    background: #fef3c7;
+    color: #b45309;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.guest-auth-gate-card {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%);
+    border: 1.5px solid #bae6fd;
+    border-left: 5px solid #0284c7;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+}
+.guest-auth-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.guest-auth-icon {
+    background: #0284c7;
+    color: #ffffff;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.guest-auth-text {
+    flex: 1;
+}
+.guest-auth-title {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0c4a6e;
+}
+.guest-auth-desc {
+    margin: 0;
+    font-size: 13px;
+    color: #0369a1;
+    line-height: 1.5;
+}
+.guest-auth-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.btn-guest-login {
+    flex: 1;
+    min-width: 140px;
+    padding: 11px 16px;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+}
+.btn-guest-login:hover {
+    background: #0369a1;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.3);
+}
+.btn-guest-register {
+    flex: 1;
+    min-width: 140px;
+    padding: 11px 16px;
+    background: #ffffff;
+    color: #0284c7;
+    border: 1.5px solid #0284c7;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+}
+.btn-guest-register:hover {
+    background: #f0f9ff;
+}
+.btn-guest-trigger {
+    background: #0284c7;
+}
+.btn-guest-trigger:hover {
+    background: #0369a1;
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+}
+
+/* Booking Auth Modal */
+.booking-auth-modal-card {
+    max-width: 480px;
+    width: 90%;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.25s ease;
+}
+.auth-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.auth-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e3c72;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.auth-modal-close {
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.auth-modal-close:hover {
+    color: #ef4444;
+}
+.auth-modal-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 18px 0;
+    line-height: 1.4;
+}
+.auth-tabs-nav {
+    display: flex;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 20px;
+    gap: 8px;
+}
+.auth-tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+}
+.auth-tab-btn.active {
+    color: #1e3c72;
+    border-bottom-color: #1e3c72;
+}
+.auth-tab-pane {
+    display: none;
+}
+.auth-tab-pane.active {
+    display: block;
+}
+.auth-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+.auth-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.auth-input-icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    font-size: 14px;
+    pointer-events: none;
+}
+.auth-control {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+.auth-control:focus {
+    border-color: #1e3c72;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+}
+.alert-box-auth {
+    display: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+.alert-box-auth.error {
+    display: block;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+.alert-box-auth.success {
+    display: block;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #059669;
+}
+.auth-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn-auth-submit {
+    flex: 1;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #1e3c72;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+}
+.btn-auth-submit:hover {
+    background: #162c54;
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.25);
+}
+.btn-auth-submit:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+.auth-switch-link {
+    font-size: 13px;
+    color: #64748b;
+}
+.auth-switch-link a {
+    color: #0284c7;
+    font-weight: 600;
+    text-decoration: none;
+}
+.auth-switch-link a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .guest-auth-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .guest-auth-actions {
+        flex-direction: column;
+    }
+    .btn-guest-login,
+    .btn-guest-register {
+        width: 100%;
+    }
+    .booking-auth-modal-card {
+        padding: 18px 16px;
+    }
+}
+
+

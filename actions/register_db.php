@@ -76,7 +76,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // สมัครสำเร็จ พากลับไปหน้าเข้าสู่ระบบ พร้อมข้อความแจ้งเตือนสีเขียว
         $_SESSION['success'] = "สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบด้วยเบอร์โทรศัพท์ของคุณ";
-        header("Location: ../login.php");
+        $redirect_param = trim($_POST['redirect'] ?? '');
+        $login_target = "../login.php" . (!empty($redirect_param) ? "?redirect=" . urlencode($redirect_param) : "");
+        header("Location: " . $login_target);
         exit();
 
     } catch (Exception $e) {
@@ -87,7 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // ส่งข้อความ Error กลับไปแสดงที่หน้าสมัครสมาชิก
         $_SESSION['error'] = $e->getMessage();
-        header("Location: ../register.php");
+        $redirect_param = trim($_POST['redirect'] ?? '');
+        $fallback_reg = "../register.php" . (!empty($redirect_param) ? "?redirect=" . urlencode($redirect_param) : "");
+        header("Location: " . $fallback_reg);
         exit();
     }
 

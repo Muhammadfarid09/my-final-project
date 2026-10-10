@@ -36,8 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['member_name'] = $member['member_name'];
                 $_SESSION['member_phone'] = $member['member_phone'];
 
-                // ล็อกอินสำเร็จ ส่งกลับไปที่หน้าแรกของฝั่งลูกค้า
-                header("Location: ../index.php");
+                // ตรวจสอบปลายทางที่ต้องการให้ Redirect กลับไป
+                $redirect_url = "../index.php";
+                $redirect_param = trim($_POST['redirect'] ?? '');
+                if ($redirect_param === 'booking.php' || strpos($redirect_param, 'booking.php') === 0 || isset($_SESSION['pending_booking'])) {
+                    $redirect_url = "../booking.php";
+                }
+
+                header("Location: " . $redirect_url);
                 exit();
 
             } else {
@@ -52,7 +58,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         // หากมี Error (รหัสผิด, ข้อมูลไม่ครบ, ถูกระงับสิทธิ์) ให้ส่งข้อความแจ้งเตือนกลับไปที่หน้า login
         $_SESSION['error'] = $e->getMessage();
-        header("Location: ../login.php");
+        $redirect_param = trim($_POST['redirect'] ?? '');
+        $fallback_login = "../login.php" . (!empty($redirect_param) ? "?redirect=" . urlencode($redirect_param) : "");
+        header("Location: " . $fallback_login);
         exit();
     }
 

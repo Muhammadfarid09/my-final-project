@@ -76,10 +76,14 @@ if (isset($_SESSION['member_id'])) {
                 </div>
             </div>
             
+            <!-- รักษาค่า Redirect URL หลังล็อกอินสำเร็จ -->
+            <?php $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? '')); ?>
+            <input type="hidden" name="redirect" value="<?php echo $redirect_target; ?>">
+
             <button type="submit" class="btn-register">เข้าสู่ระบบ</button>
 
             <div class="login-link">
-                ยังไม่มีบัญชีใช่ไหม? <a href="register.php">สมัครสมาชิกใหม่</a>
+                ยังไม่มีบัญชีใช่ไหม? <a href="register.php<?php echo !empty($redirect_target) ? '?redirect=' . urlencode($redirect_target) : ''; ?>">สมัครสมาชิกใหม่</a>
             </div>
         </form>
     </div>

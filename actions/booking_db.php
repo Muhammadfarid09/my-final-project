@@ -1,8 +1,21 @@
 <?php
-require_once '../includes/auth_check.php';
-
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../config/config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // ตรวจสอบสิทธิ์การเข้าสู่ระบบ: หากยังไม่ล็อกอิน ให้เก็บข้อมูลฟอร์มและพาไปหน้า Login
+    if (empty($_SESSION['member_id'])) {
+        $_SESSION['pending_booking'] = $_POST;
+        $_SESSION['error'] = "กรุณาเข้าสู่ระบบหรือสมัครสมาชิกก่อนดำเนินการชำระเงิน";
+        header("Location: ../login.php?redirect=booking.php");
+        exit();
+    }
+
+    // ตรวจสอบสถานะบัญชีสมาชิกแบบ Real-time
+    require_once '../includes/auth_check.php';
     
     // ตรวจสอบความถูกต้องของ CSRF Token ก่อนดำเนินการใดๆ
     require_csrf_token();
@@ -268,6 +281,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 6. ยืนยัน Transaction (Commit)
         // ========================================================
         $conn->commit();
+
+        // เคลียร์ข้อมูลการจองชั่วคราวออกจาก Session (ถ้ามี)
+        unset($_SESSION['pending_booking']);
 
         // ส่งลูกค้าไปยังหน้าชำระเงิน
         $_SESSION['success'] = "ล็อกสนามและจองอุปกรณ์สำเร็จ! กรุณาชำระเงินและแนบสลิปภายใน 15 นาที";

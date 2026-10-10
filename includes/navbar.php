@@ -51,7 +51,8 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
                     </div>
                 <?php else: ?>
                     <div class="mobile-login-box">
-                        <a href="login.php" class="btn-login-nav mobile-btn-login"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ / สมัครสมาชิก</a>
+                        <?php $nav_login_href = (basename($_SERVER['PHP_SELF'] ?? '') === 'booking.php') ? 'login.php?redirect=booking.php' : 'login.php'; ?>
+                        <a href="<?php echo $nav_login_href; ?>" class="btn-login-nav mobile-btn-login"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ / สมัครสมาชิก</a>
                     </div>
                 <?php endif; ?>
             </li>
@@ -79,7 +80,8 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
                 </div>
             <?php else: ?>
                 <!-- กรณีเข้าชมทั่วไป (ยังไม่ล็อกอิน) -->
-                <a href="login.php" class="btn-login-nav"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</a>
+                <?php $nav_login_href = (basename($_SERVER['PHP_SELF'] ?? '') === 'booking.php') ? 'login.php?redirect=booking.php' : 'login.php'; ?>
+                <a href="<?php echo $nav_login_href; ?>" class="btn-login-nav"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</a>
             <?php endif; ?>
         </div>
         

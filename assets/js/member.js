@@ -841,6 +841,14 @@ function handleBookingFormSubmit(event) {
         return false;
     }
 
+    // ตรวจสอบว่าผู้ใช้เข้าสู่ระบบแล้วหรือยัง
+    const isUserLoggedIn = document.body.dataset.loggedIn === 'true';
+    if (!isUserLoggedIn) {
+        if (event) event.preventDefault();
+        openBookingAuthModal('login');
+        return false;
+    }
+
     isBookingSubmitting = true;
     let btnSubmit = document.getElementById('btnFinalSubmitBooking');
     if (btnSubmit) {
@@ -851,6 +859,223 @@ function handleBookingFormSubmit(event) {
     }
 
     return true;
+}
+
+/* ==========================================================================
+   Booking Auth Modal Controller (Guest Checkout Auth Gate)
+   ========================================================================== */
+
+function openBookingAuthModal(defaultTab = 'login') {
+    const modal = document.getElementById('bookingAuthModal');
+    if (!modal) return;
+    switchBookingAuthTab(defaultTab);
+    
+    // รีเซ็ตข้อความแจ้งเตือนเดิม
+    const loginAlert = document.getElementById('loginAlertBox');
+    if (loginAlert) { loginAlert.className = 'alert-box-auth'; loginAlert.textContent = ''; }
+    const regAlert = document.getElementById('registerAlertBox');
+    if (regAlert) { regAlert.className = 'alert-box-auth'; regAlert.textContent = ''; }
+    
+    modal.style.display = 'flex';
+    
+    // Focus ช่องแรก
+    setTimeout(() => {
+        if (defaultTab === 'login') {
+            const phoneInput = document.getElementById('auth_login_phone');
+            if (phoneInput) phoneInput.focus();
+        } else {
+            const nameInput = document.getElementById('auth_reg_name');
+            if (nameInput) nameInput.focus();
+        }
+    }, 100);
+}
+
+function closeBookingAuthModal() {
+    const modal = document.getElementById('bookingAuthModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function switchBookingAuthTab(tabName) {
+    const tabBtnLogin = document.getElementById('tabBtnLogin');
+    const tabBtnRegister = document.getElementById('tabBtnRegister');
+    const tabPaneLogin = document.getElementById('tabPaneLogin');
+    const tabPaneRegister = document.getElementById('tabPaneRegister');
+
+    if (tabName === 'login') {
+        if (tabBtnLogin) tabBtnLogin.classList.add('active');
+        if (tabBtnRegister) tabBtnRegister.classList.remove('active');
+        if (tabPaneLogin) tabPaneLogin.classList.add('active');
+        if (tabPaneRegister) tabPaneRegister.classList.remove('active');
+    } else {
+        if (tabBtnLogin) tabBtnLogin.classList.remove('active');
+        if (tabBtnRegister) tabBtnRegister.classList.add('active');
+        if (tabPaneLogin) tabPaneLogin.classList.remove('active');
+        if (tabPaneRegister) tabPaneRegister.classList.add('active');
+    }
+}
+
+let isAjaxLoginSubmitting = false;
+async function handleBookingAjaxLogin(event) {
+    if (event) event.preventDefault();
+    if (isAjaxLoginSubmitting) return false;
+
+    const form = document.getElementById('ajaxLoginForm');
+    const phoneInput = document.getElementById('auth_login_phone');
+    const passInput = document.getElementById('auth_login_password');
+    const alertBox = document.getElementById('loginAlertBox');
+    const btnSubmit = document.getElementById('btnSubmitAjaxLogin');
+
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const password = passInput ? passInput.value : '';
+
+    if (!phone || !password) {
+        showAuthAlert(alertBox, 'กรุณากรอกเบอร์โทรศัพท์และรหัสผ่านให้ครบถ้วน', 'error');
+        return false;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        showAuthAlert(alertBox, 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก', 'error');
+        return false;
+    }
+
+    isAjaxLoginSubmitting = true;
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังตรวจสอบ...';
+    }
+
+    try {
+        const formData = new FormData(form);
+        const res = await fetch('actions/login_ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            showAuthAlert(alertBox, 'เข้าสู่ระบบสำเร็จ กำลังพาไปหน้าชำระเงิน...', 'success');
+            // อัปเดตสถานะล็อกอินบน DOM
+            document.body.dataset.loggedIn = 'true';
+            
+            // ปิด Modal
+            closeBookingAuthModal();
+
+            // ส่งฟอร์มจองทันที
+            const bookingForm = document.getElementById('bookingForm');
+            if (bookingForm) {
+                isBookingSubmitting = true;
+                let btnFinal = document.getElementById('btnFinalSubmitBooking');
+                if (btnFinal) {
+                    btnFinal.disabled = true;
+                    btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกการจองและล็อกสนาม...';
+                }
+                bookingForm.submit();
+            }
+        } else {
+            showAuthAlert(alertBox, data.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showAuthAlert(alertBox, 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    } finally {
+        isAjaxLoginSubmitting = false;
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบและไปชำระเงินทันที';
+        }
+    }
+    return false;
+}
+
+let isAjaxRegisterSubmitting = false;
+async function handleBookingAjaxRegister(event) {
+    if (event) event.preventDefault();
+    if (isAjaxRegisterSubmitting) return false;
+
+    const form = document.getElementById('ajaxRegisterForm');
+    const nameInput = document.getElementById('auth_reg_name');
+    const phoneInput = document.getElementById('auth_reg_phone');
+    const passInput = document.getElementById('auth_reg_password');
+    const confirmInput = document.getElementById('auth_reg_confirm_password');
+    const alertBox = document.getElementById('registerAlertBox');
+    const btnSubmit = document.getElementById('btnSubmitAjaxRegister');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const password = passInput ? passInput.value : '';
+    const confirmPass = confirmInput ? confirmInput.value : '';
+
+    if (!name || !phone || !password || !confirmPass) {
+        showAuthAlert(alertBox, 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน', 'error');
+        return false;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        showAuthAlert(alertBox, 'เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก', 'error');
+        return false;
+    }
+
+    if (password !== confirmPass) {
+        showAuthAlert(alertBox, 'รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน', 'error');
+        return false;
+    }
+
+    if (password.length < 4) {
+        showAuthAlert(alertBox, 'รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร', 'error');
+        return false;
+    }
+
+    isAjaxRegisterSubmitting = true;
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังสมัครสมาชิก...';
+    }
+
+    try {
+        const formData = new FormData(form);
+        const res = await fetch('actions/register_ajax.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            showAuthAlert(alertBox, 'สมัครสมาชิกสำเร็จ กำลังพาไปหน้าชำระเงิน...', 'success');
+            // อัปเดตสถานะล็อกอินบน DOM
+            document.body.dataset.loggedIn = 'true';
+            
+            // ปิด Modal
+            closeBookingAuthModal();
+
+            // ส่งฟอร์มจองทันที
+            const bookingForm = document.getElementById('bookingForm');
+            if (bookingForm) {
+                isBookingSubmitting = true;
+                let btnFinal = document.getElementById('btnFinalSubmitBooking');
+                if (btnFinal) {
+                    btnFinal.disabled = true;
+                    btnFinal.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกการจองและล็อกสนาม...';
+                }
+                bookingForm.submit();
+            }
+        } else {
+            showAuthAlert(alertBox, data.message || 'สมัครสมาชิกไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showAuthAlert(alertBox, 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    } finally {
+        isAjaxRegisterSubmitting = false;
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.innerHTML = '<i class="fas fa-user-plus"></i> สมัครสมาชิกและไปชำระเงินทันที';
+        }
+    }
+    return false;
+}
+
+function showAuthAlert(alertBox, message, type) {
+    if (!alertBox) return;
+    alertBox.className = 'alert-box-auth ' + type;
+    alertBox.innerHTML = (type === 'error' ? '<i class="fas fa-exclamation-circle mr-6"></i> ' : '<i class="fas fa-check-circle mr-6"></i> ') + message;
 }
 
 /* ==========================================================================
@@ -1175,6 +1400,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeRedeemModal();
             } else if (e.target.id === 'cancelModal' && typeof closeCancelModal === 'function') {
                 closeCancelModal();
+            } else if (e.target.id === 'bookingAuthModal' && typeof closeBookingAuthModal === 'function') {
+                closeBookingAuthModal();
             } else {
                 e.target.style.display = 'none';
                 e.target.classList.remove('active');
@@ -1191,6 +1418,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     closeRedeemModal();
                 } else if (activeOverlay.id === 'cancelModal' && typeof closeCancelModal === 'function') {
                     closeCancelModal();
+                } else if (activeOverlay.id === 'bookingAuthModal' && typeof closeBookingAuthModal === 'function') {
+                    closeBookingAuthModal();
                 } else {
                     activeOverlay.style.display = 'none';
                     activeOverlay.classList.remove('active');
