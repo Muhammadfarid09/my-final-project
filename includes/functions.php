@@ -279,3 +279,78 @@ if (!function_exists('handle_secure_image_upload')) {
         return $new_filename;
     }
 }
+
+// =========================================================================
+// 8. Member Leaderboard & PDPA Helpers (ทำเนียบผู้เล่นและการคุ้มครองข้อมูล)
+// =========================================================================
+if (!function_exists('mask_phone_number')) {
+    /**
+     * มาสก์เบอร์โทรศัพท์เพื่อการแสดงผลสาธารณะตามมาตรฐาน PDPA (เช่น 081-XXX-5678)
+     */
+    function mask_phone_number(?string $phone): string {
+        if (empty($phone)) return '-';
+        $cleaned = preg_replace('/[^0-9]/', '', $phone);
+        if (strlen($cleaned) === 10) {
+            return substr($cleaned, 0, 3) . '-XXX-' . substr($cleaned, 6, 4);
+        }
+        return $phone;
+    }
+}
+
+if (!function_exists('get_top_booking_members')) {
+    /**
+     * ดึงข้อมูล 3 อันดับสมาชิกที่จองสำเร็จสูงสุด พร้อมระบบ Fallback Mock Data
+     */
+    function get_top_booking_members(PDO $conn, int $limit = 3): array {
+        $results = [];
+        try {
+            $sql = "SELECT m.member_id, m.member_name, m.member_phone, IFNULL(p.member_level, 'Bronze') as member_level, COUNT(b.booking_id) as booking_count 
+                    FROM Member m 
+                    LEFT JOIN Point p ON m.member_id = p.member_id
+                    JOIN Booking b ON m.member_id = b.member_id 
+                    WHERE b.booking_status = :status 
+                    GROUP BY m.member_id 
+                    ORDER BY booking_count DESC 
+                    LIMIT :limit";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(':status', STATUS_BOOKING_CONFIRMED, PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $results = [];
+        }
+
+        // Mock Fallback Data เติมเต็มกรณีข้อมูลจริงไม่ครบ $limit
+        $mock_players = [
+            [
+                'member_name' => 'Farid Cheloh',
+                'member_phone' => '0993241657',
+                'member_level' => 'Gold',
+                'booking_count' => 15,
+                'is_mock' => true
+            ],
+            [
+                'member_name' => 'อานัส เปิ้ล',
+                'member_phone' => '0812345678',
+                'member_level' => 'Silver',
+                'booking_count' => 9,
+                'is_mock' => true
+            ],
+            [
+                'member_name' => 'ก๊วนแบดมินตัน ปัตตานี',
+                'member_phone' => '0899887766',
+                'member_level' => 'Bronze',
+                'booking_count' => 5,
+                'is_mock' => true
+            ]
+        ];
+
+        $current_count = count($results);
+        for ($i = $current_count; $i < $limit; $i++) {
+            $results[] = $mock_players[$i];
+        }
+
+        return $results;
+    }
+}

@@ -6,6 +6,45 @@
 /* =========================================
    ยูทิลิตี้เสริม (Utility Classes)
    ========================================= */
+:root {
+    --brand-primary: #1e3c72;
+    --brand-primary-dark: #162c54;
+    --brand-accent: #0284c7;
+    --brand-accent-hover: #0369a1;
+    --brand-highlight: #38bdf8;
+    
+    --gold-color: #f59e0b;
+    --gold-bg: #fef3c7;
+    --silver-color: #64748b;
+    --silver-bg: #f1f5f9;
+    --bronze-color: #b45309;
+    --bronze-bg: #ffedd5;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-alt: #f1f5f9;
+    
+    --border-light: #e2e8f0;
+    --border-subtle: #cbd5e1;
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.1);
+    --shadow-xl: 0 20px 30px -5px rgba(15, 23, 42, 0.15);
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+    
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
 .text-danger { color: #dc3545 !important; }
 .text-success { color: #28a745 !important; }
 .text-center { text-align: center !important; }
