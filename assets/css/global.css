@@ -240,3 +240,29 @@ body.page-body {
     overflow-x: auto;
 }
 
+/* =========================================
+   Mobile-First Design Tokens & Helpers
+   ========================================= */
+:root {
+    --touch-min: 44px;
+    --bottom-nav-h: 68px;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --badge-gold: #f59e0b;
+    --badge-silver: #94a3b8;
+    --badge-bronze: #b45309;
+}
+
+@media (max-width: 768px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .hide-on-desktop {
+        display: none !important;
+    }
+}
+

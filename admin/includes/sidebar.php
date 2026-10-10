@@ -3,10 +3,16 @@
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
-<aside class="admin-sidebar">
+<div class="admin-sidebar-backdrop hide-on-desktop" id="adminSidebarBackdrop" onclick="toggleAdminSidebar()"></div>
+<aside class="admin-sidebar" id="adminSidebar">
     <div class="brand">
-        <h2>T.S. Pattani</h2>
-        <span><i class="fas fa-circle"></i> ระบบผู้ดูแลระบบ</span>
+        <div class="brand-title">
+            <h2>T.S. Pattani</h2>
+            <span><i class="fas fa-circle"></i> ระบบผู้ดูแลระบบ</span>
+        </div>
+        <button type="button" class="btn-close-sidebar hide-on-desktop" onclick="toggleAdminSidebar()" aria-label="ปิดเมนู">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
     
     <ul class="admin-menu">

@@ -13,9 +13,9 @@ if (isset($_SESSION['member_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สมัครสมาชิก - T.S. Pattani Badminton</title>
     
-    <!-- เรียกใช้ไฟล์ CSS ของฝั่งลูกค้า (แยกไฟล์แล้ว) -->
-    <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.0">
+    <!-- เรียกใช้ไฟล์ CSS ของฝั่งลูกค้า (v=2.1) -->
+    <link rel="stylesheet" href="assets/css/global.css?v=1.2">
+    <link rel="stylesheet" href="assets/css/style.css?v=2.1">
     
     <!-- นำเข้า Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,6 +28,16 @@ if (isset($_SESSION['member_id'])) {
     <div class="overlay"></div>
 
     <div class="register-container">
+        <a href="index.php" class="auth-back-link">
+            <i class="fas fa-arrow-left"></i> กลับสู่หน้าแรก
+        </a>
+
+        <!-- แถบสลับแท็บเข้าสู่ระบบ / สมัครสมาชิก -->
+        <div class="auth-tab-switcher">
+            <a href="login.php" class="auth-tab">เข้าสู่ระบบ</a>
+            <a href="register.php" class="auth-tab active">สมัครสมาชิก</a>
+        </div>
+
         <div class="register-header">
             <h2>สมัครสมาชิก</h2>
             <p>T.S. Pattani Badminton</p>
@@ -56,7 +66,7 @@ if (isset($_SESSION['member_id'])) {
                 <label for="member_phone">เบอร์โทรศัพท์ (ใช้เข้าสู่ระบบ) *</label>
                 <div class="input-group">
                     <i class="fas fa-phone"></i>
-                    <input type="text" id="member_phone" name="member_phone" class="form-control" placeholder="08X-XXX-XXXX" maxlength="10" required>
+                    <input type="text" id="member_phone" name="member_phone" class="form-control" placeholder="08X-XXX-XXXX" maxlength="10" inputmode="tel" autocomplete="tel" required>
                 </div>
             </div>
 
@@ -91,10 +101,13 @@ if (isset($_SESSION['member_id'])) {
             </div>
 
             <div class="form-group">
-                <label for="member_password">รหัสผ่าน *</label>
+                <label for="password">รหัสผ่าน *</label>
                 <div class="input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" name="member_password" class="form-control" placeholder="ตั้งรหัสผ่านอย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                    <input type="password" id="password" name="member_password" class="form-control" placeholder="ตั้งรหัสผ่านอย่างน้อย 6 ตัวอักษร" minlength="6" autocomplete="new-password" required>
+                    <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('password', this)" title="ดู/ซ่อนรหัสผ่าน">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -102,7 +115,10 @@ if (isset($_SESSION['member_id'])) {
                 <label for="confirm_password">ยืนยันรหัสผ่านอีกครั้ง *</label>
                 <div class="input-group">
                     <i class="fas fa-check-circle"></i>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="กรอกรหัสผ่านอีกครั้งให้ตรงกัน" required>
+                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="กรอกรหัสผ่านอีกครั้งให้ตรงกัน" autocomplete="new-password" required>
+                    <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('confirm_password', this)" title="ดู/ซ่อนรหัสผ่าน">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -115,6 +131,6 @@ if (isset($_SESSION['member_id'])) {
     </div>
 
     <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้า -->
-    <script src="assets/js/member.js?v=1.0"></script>
+    <script src="assets/js/member.js?v=2.1"></script>
 </body>
 </html>

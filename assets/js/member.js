@@ -22,6 +22,26 @@ function validatePassword() {
     return true;
 }
 
+// สลับการมองเห็นรหัสผ่าน (Show / Hide Password)
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+}
+
 // ฟังก์ชันซ่อน Alert อัตโนมัติ (ใช้ร่วมกันทุกหน้าฝั่งลูกค้า)
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
@@ -203,6 +223,69 @@ function updateWizardStepperUI(currentStep) {
         let percent = ((currentStep - 1) / 4) * 100;
         fillBar.style.width = percent + '%';
     }
+
+    // อัปเดต Mobile Slim Stepper บนจอมือถือ
+    let mobileCurr = document.getElementById('mobileStepperCurr');
+    let mobileTitle = document.getElementById('mobileStepperTitle');
+    let mobileFill = document.getElementById('mobileStepperFill');
+    const stepTitles = ["", "เลือกวันที่", "เลือกเวลาเริ่มต้น", "เลือกสนาม & ชั่วโมง", "บริการเสริม & อุปกรณ์", "สรุป & ยืนยันการจอง"];
+    if (mobileCurr) mobileCurr.innerText = `ขั้นตอนที่ ${currentStep} จาก 5`;
+    if (mobileTitle) mobileTitle.innerText = stepTitles[currentStep] || '';
+    if (mobileFill) mobileFill.style.width = (((currentStep - 1) / 4) * 100) + '%';
+}
+
+// กรองหมวดหมู่บริการเสริมและอุปกรณ์เช่าในขั้นตอนที่ 4 บนมือถือ
+function filterAddonCategory(category, btn) {
+    const cards = document.querySelectorAll('.addon-item-card');
+    document.querySelectorAll('.btn-addon-filter').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const catTitleConsumer = document.getElementById('catTitleConsumer');
+    const catTitleRental = document.getElementById('catTitleRental');
+
+    if (category === 'all') {
+        if (catTitleConsumer) catTitleConsumer.style.display = 'block';
+        if (catTitleRental) catTitleRental.style.display = 'block';
+        cards.forEach(card => card.style.display = 'flex');
+    } else if (category === 'สินค้าบริโภค') {
+        if (catTitleConsumer) catTitleConsumer.style.display = 'block';
+        if (catTitleRental) catTitleRental.style.display = 'none';
+        cards.forEach(card => {
+            card.style.display = (card.getAttribute('data-type') === 'สินค้าบริโภค') ? 'flex' : 'none';
+        });
+    } else if (category === 'อุปกรณ์เช่า') {
+        if (catTitleConsumer) catTitleConsumer.style.display = 'none';
+        if (catTitleRental) catTitleRental.style.display = 'block';
+        cards.forEach(card => {
+            card.style.display = (card.getAttribute('data-type') === 'อุปกรณ์เช่า') ? 'flex' : 'none';
+        });
+    }
+}
+
+// กรองสถานะประวัติการจอง (ตาราง Desktop และการ์ด Mobile)
+function filterHistoryStatus(cat, btn) {
+    if (btn) {
+        document.querySelectorAll('.btn-history-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    const tableRows = document.querySelectorAll('tr[data-status-cat]');
+    tableRows.forEach(row => {
+        if (cat === 'all' || row.getAttribute('data-status-cat') === cat) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    const mobileCards = document.querySelectorAll('.history-mobile-card-item[data-status-cat]');
+    mobileCards.forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-status-cat') === cat) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 /* ==========================================================================

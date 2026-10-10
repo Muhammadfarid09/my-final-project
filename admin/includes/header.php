@@ -21,7 +21,12 @@
 
         <main class="admin-content">
             <div class="top-navbar">
-                <h3><?php echo $page_header ?? '<i class="fas fa-tachometer-alt"></i> แดชบอร์ดภาพรวมระบบ'; ?></h3>
+                <div class="top-navbar-left">
+                    <button type="button" class="admin-mobile-toggle hide-on-desktop" onclick="toggleAdminSidebar()" aria-label="เปิดเมนูจัดการ">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h3><?php echo $page_header ?? '<i class="fas fa-tachometer-alt"></i> แดชบอร์ดภาพรวมระบบ'; ?></h3>
+                </div>
                 <div class="user-profile">
                     <i class="fas fa-user-circle"></i> 
                     <span><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></span>

@@ -55,6 +55,17 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
             </div>
         <?php endif; ?>
 
+        <!-- Mobile Progress Stepper (Slim Bar for Smartphones) -->
+        <div class="wizard-mobile-stepper hide-on-desktop">
+            <div class="mobile-stepper-info">
+                <span class="mobile-stepper-curr" id="mobileStepperCurr">ขั้นตอนที่ 1 จาก 5</span>
+                <span class="mobile-stepper-title" id="mobileStepperTitle">เลือกวันที่</span>
+            </div>
+            <div class="mobile-stepper-track">
+                <div class="mobile-stepper-fill" id="mobileStepperFill"></div>
+            </div>
+        </div>
+
         <!-- ============================================== -->
         <!-- 5-Step Progress Stepper (HCI & Progressive Disclosure) -->
         <!-- ============================================== -->
@@ -293,8 +304,21 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
                         </div>
                     </div>
 
+                    <!-- แถบฟิลเตอร์หมวดหมู่บริการเสริมสำหรับมือถือ -->
+                    <div class="addon-filter-pill-bar">
+                        <button type="button" class="btn-addon-filter active" onclick="filterAddonCategory('all', this)">
+                            <i class="fas fa-th-large"></i> ทั้งหมด
+                        </button>
+                        <button type="button" class="btn-addon-filter" onclick="filterAddonCategory('สินค้าบริโภค', this)">
+                            <i class="fas fa-coffee"></i> สินค้าบริโภค
+                        </button>
+                        <button type="button" class="btn-addon-filter" onclick="filterAddonCategory('อุปกรณ์เช่า', this)">
+                            <i class="fas fa-table-tennis"></i> อุปกรณ์เช่า
+                        </button>
+                    </div>
+
                     <!-- หมวดหมู่: สินค้าบริโภค -->
-                    <div class="addon-category-title">
+                    <div class="addon-category-title" id="catTitleConsumer">
                         <i class="fas fa-coffee"></i> สินค้าบริโภค (น้ำดื่ม/ลูกแบด)
                     </div>
                     <div class="addon-cards-grid">
@@ -304,7 +328,7 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
                             if($prod['product_type'] == 'สินค้าบริโภค'):
                                 $has_consumer = true;
                         ?>
-                        <div class="addon-item-card">
+                        <div class="addon-item-card" data-type="สินค้าบริโภค">
                             <div class="addon-item-thumb">
                                 <?php if(!empty($prod['product_image'])): ?>
                                     <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
@@ -338,7 +362,7 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
                     </div>
 
                     <!-- หมวดหมู่: อุปกรณ์เช่า -->
-                    <div class="addon-category-title">
+                    <div class="addon-category-title" id="catTitleRental">
                         <i class="fas fa-table-tennis"></i> อุปกรณ์เช่า (ไม้แบด/รองเท้า)
                     </div>
                     <div class="addon-cards-grid">
@@ -348,7 +372,7 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
                             if($prod['product_type'] == 'อุปกรณ์เช่า'):
                                 $has_rental = true;
                         ?>
-                        <div class="addon-item-card">
+                        <div class="addon-item-card" data-type="อุปกรณ์เช่า">
                             <div class="addon-item-thumb">
                                 <?php if(!empty($prod['product_image'])): ?>
                                     <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">

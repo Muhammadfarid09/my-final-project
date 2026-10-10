@@ -24,6 +24,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
+// ฟังก์ชันเปิด/ปิดเมนูด้านข้างบนมือถือ (Admin Mobile Sidebar Drawer)
+function toggleAdminSidebar() {
+    var sidebar = document.getElementById('adminSidebar');
+    var backdrop = document.getElementById('adminSidebarBackdrop');
+    if (sidebar) {
+        sidebar.classList.toggle('sidebar-open');
+    }
+    if (backdrop) {
+        backdrop.classList.toggle('active');
+    }
+}
+
 /* =========================================
    ระบบเปิดหน้าต่างใบเสร็จอัตโนมัติ (admin/pos.php)
    ========================================= */

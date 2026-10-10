@@ -78,6 +78,20 @@ try {
                     <a href="booking.php" class="btn-confirm-booking btn-empty-book">ไปจองสนามเลย</a>
                 </div>
             <?php else: ?>
+                <div class="history-filter-bar">
+                    <button type="button" class="btn-history-filter active" onclick="filterHistoryStatus('all', this)">
+                        ทั้งหมด (<?php echo count($bookings); ?>)
+                    </button>
+                    <button type="button" class="btn-history-filter" onclick="filterHistoryStatus('pending', this)">
+                        ⏳ รอชำระ/รอตรวจ
+                    </button>
+                    <button type="button" class="btn-history-filter" onclick="filterHistoryStatus('success', this)">
+                        ✅ จองสำเร็จ
+                    </button>
+                    <button type="button" class="btn-history-filter" onclick="filterHistoryStatus('cancel', this)">
+                        ❌ ยกเลิก
+                    </button>
+                </div>
                 <table class="history-table">
                     <thead>
                         <tr>
@@ -161,7 +175,10 @@ try {
                                 }
                             }
                         ?>
-                        <tr>
+                        <?php 
+                            $status_cat = ($status === 'ยกเลิก' || $status_class === 'status-cancel') ? 'cancel' : (($status === 'จองแล้ว' || $status === 'ชำระเงินแล้ว' || $status === 'อนุมัติแล้ว' || $status_class === 'status-completed' || $status_class === 'status-active') ? 'success' : 'pending');
+                        ?>
+                        <tr data-status-cat="<?php echo $status_cat; ?>">
                             <td class="booking-id-cell">#<?php echo $row['booking_id']; ?></td>
                             <td><?php echo htmlspecialchars($row['court_name']); ?></td>
                             <td><?php echo date('d/m/Y', strtotime($row['booking_date'])); ?></td>
@@ -219,6 +236,128 @@ try {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                <!-- การ์ดตั๋วแสดงผลบนอุปกรณ์เคลื่อนที่ (Mobile Ticket Cards) -->
+                <div class="history-mobile-cards">
+                    <?php foreach($bookings as $row): 
+                        $status = $row['booking_status'];
+                        $slip = $row['payment_slip'] ?? '';
+                        $booking_start_ts = strtotime($row['booking_date'] . ' ' . $row['booking_start_time']);
+                        $booking_end_ts = strtotime($row['booking_date'] . ' ' . $row['booking_end_time']);
+                        $is_lock_expired = (!empty($row['booking_lock_expire']) && strtotime($row['booking_lock_expire']) <= time());
+                        $now = time();
+                        $is_past = ($now >= $booking_end_ts);
+                        $is_active_now = ($now >= $booking_start_ts && $now < $booking_end_ts);
+
+                        $status_class = 'status-pending';
+                        $display_status = $status;
+                        $can_cancel = false;
+                        $cancel_btn_text = 'ยกเลิกการจอง';
+
+                        if ($status === 'ยกเลิก') {
+                            $status_class = 'status-cancel';
+                            $display_status = 'ยกเลิกแล้ว';
+                            $can_cancel = false;
+                        } elseif (!empty($row['cancel_refund_status']) && $row['cancel_refund_status'] === 'รอดำเนินการ') {
+                            $status_class = 'status-pending';
+                            $display_status = 'ขอยกเลิก (รอแอดมินพิจารณา)';
+                            $can_cancel = false;
+                        } elseif ($status === 'จองแล้ว' || $status === 'ชำระเงินแล้ว' || $status === 'อนุมัติแล้ว') {
+                            if ($is_past) {
+                                $status_class = 'status-completed';
+                                $display_status = 'ใช้บริการแล้ว';
+                                $can_cancel = false;
+                            } elseif ($is_active_now) {
+                                $status_class = 'status-active';
+                                $display_status = 'กำลังใช้งาน';
+                                $can_cancel = false;
+                            } else {
+                                $status_class = 'status-success';
+                                $display_status = 'จองแล้ว';
+                                $can_cancel = true;
+                                $cancel_btn_text = 'ขอยกเลิก';
+                            }
+                        } elseif ($status === 'รอตรวจสอบ') {
+                            if ($is_past) {
+                                $status_class = 'status-cancel';
+                                $display_status = 'เลยเวลาจอง';
+                                $can_cancel = false;
+                            } elseif (!empty($slip)) {
+                                $status_class = 'status-pending';
+                                $display_status = 'รอตรวจสอบสลิป';
+                                $can_cancel = true;
+                                $cancel_btn_text = 'ยกเลิกการจอง';
+                            } else {
+                                if ($is_lock_expired) {
+                                    $status_class = 'status-cancel';
+                                    $display_status = 'หมดเวลาชำระเงิน';
+                                    $can_cancel = false;
+                                } else {
+                                    $status_class = 'status-pending';
+                                    $display_status = 'รอแนบสลิป';
+                                    $can_cancel = true;
+                                    $cancel_btn_text = 'ยกเลิกการจอง';
+                                }
+                            }
+                        }
+
+                        $status_cat = ($status === 'ยกเลิก' || $status_class === 'status-cancel') ? 'cancel' : (($status === 'จองแล้ว' || $status === 'ชำระเงินแล้ว' || $status === 'อนุมัติแล้ว' || $status_class === 'status-completed' || $status_class === 'status-active') ? 'success' : 'pending');
+                    ?>
+                    <div class="history-mobile-card-item" data-status-cat="<?php echo $status_cat; ?>">
+                        <div class="hm-card-header">
+                            <span class="hm-card-id">#BK-<?php echo $row['booking_id']; ?></span>
+                            <span class="badge-status <?php echo $status_class; ?>">
+                                <?php if ($status_class === 'status-completed'): ?>
+                                    <i class="fas fa-check-double"></i> 
+                                <?php elseif ($status_class === 'status-active'): ?>
+                                    <i class="fas fa-running"></i> 
+                                <?php endif; ?>
+                                <?php echo $display_status; ?>
+                            </span>
+                        </div>
+                        <div class="hm-card-court">
+                            <i class="fas fa-shuttlecock text-success"></i> <?php echo htmlspecialchars($row['court_name']); ?>
+                        </div>
+                        <div class="hm-card-meta">
+                            <div><i class="far fa-calendar-alt"></i> วันที่: <?php echo date('d/m/Y', strtotime($row['booking_date'])); ?></div>
+                            <div><i class="far fa-clock"></i> เวลา: <?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?> น.</div>
+                        </div>
+                        <div class="hm-card-divider"></div>
+                        <div class="hm-card-footer">
+                            <div class="hm-card-price">
+                                ยอดสุทธิ: <strong><?php echo number_format($row['booking_total_price'], 2); ?> ฿</strong>
+                            </div>
+                            <div class="hm-card-actions">
+                                <?php if ($status === 'รอตรวจสอบ' && empty($slip) && !$is_lock_expired && !$is_past): ?>
+                                    <a href="payment.php?booking_id=<?php echo $row['booking_id']; ?>" class="btn-action-sm btn-pay-now">
+                                        <i class="fas fa-credit-card"></i> แนบสลิป
+                                    </a>
+                                <?php elseif (!empty($slip)): ?>
+                                    <a href="uploads/slips/<?php echo htmlspecialchars($slip); ?>" target="_blank" class="btn-action-sm btn-view-slip">
+                                        <i class="fas fa-receipt"></i> ดูสลิป
+                                    </a>
+                                <?php endif; ?>
+
+                                <?php if ($can_cancel): ?>
+                                    <button type="button" class="btn-cancel-booking" 
+                                            onclick="openCancelModal(
+                                                <?php echo $row['booking_id']; ?>,
+                                                '<?php echo htmlspecialchars(addslashes($row['court_name'])); ?>',
+                                                '<?php echo date('d/m/Y', strtotime($row['booking_date'])); ?>',
+                                                '<?php echo $row['booking_start_time'] . ' - ' . $row['booking_end_time']; ?>',
+                                                '<?php echo number_format($row['booking_total_price'], 2); ?>',
+                                                '<?php echo $status; ?>',
+                                                <?php echo !empty($slip) ? 'true' : 'false'; ?>
+                                            )">
+                                        <i class="fas fa-times-circle"></i> <?php echo $cancel_btn_text; ?>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
             <?php endif; ?>
         </div>
 

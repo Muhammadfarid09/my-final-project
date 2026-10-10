@@ -98,31 +98,23 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
             </div>
         <?php endif; ?>
 
-        <!-- การ์ดส่วนหัวข้อมูลสมาชิก -->
-        <div class="profile-header-card">
-            <div class="profile-user-info">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <div class="profile-details">
-                    <h2>
-                        <?php echo htmlspecialchars($member['member_name']); ?>
-                        <span class="profile-tier-badge <?php echo $current_tier_class; ?>">
-                            <i class="fas fa-crown"></i> <?php echo htmlspecialchars($member['member_level']); ?>
-                        </span>
-                    </h2>
-                    <p><i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($member['member_phone']); ?> &bull; สมาชิกตั้งแต่ <?php echo date('d/m/Y', strtotime($member['member_created_at'])); ?></p>
-                </div>
+        <!-- บัตรสมาชิกดิจิทัล (Virtual Digital Member Card) -->
+        <div class="virtual-member-card virtual-card-<?php echo strtolower($member['member_level'] ?? 'bronze'); ?>">
+            <div class="virtual-card-top">
+                <div class="virtual-card-club"><i class="fas fa-certificate"></i> T.S. PATTANI BADMINTON CLUB</div>
+                <div class="virtual-card-badge"><i class="fas fa-crown"></i> <?php echo htmlspecialchars($member['member_level'] ?? 'Bronze'); ?> TIER</div>
             </div>
-            
-            <div class="profile-stats-group">
-                <div class="stat-item">
-                    <div class="stat-value"><?php echo number_format($member['point_balance']); ?></div>
-                    <div class="stat-label">พอยท์คงเหลือ</div>
+            <div class="virtual-card-mid">
+                <div class="virtual-card-name"><?php echo htmlspecialchars($member['member_name']); ?></div>
+                <div class="virtual-card-phone"><i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($member['member_phone']); ?> &bull; สมาชิกตั้งแต่ <?php echo date('d/m/Y', strtotime($member['member_created_at'])); ?></div>
+            </div>
+            <div class="virtual-card-bottom">
+                <div>
+                    <div class="virtual-card-point-label">พอยท์คงเหลือสำหรับแลกรางวัล</div>
+                    <div class="virtual-card-points"><?php echo number_format($member['point_balance'] ?? 0); ?> <span class="virtual-card-unit">พอยท์ (สะสม <?php echo number_format($member['point_total_earned'] ?? 0); ?>)</span></div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?php echo number_format($member['point_total_earned']); ?></div>
-                    <div class="stat-label">พอยท์สะสมตลอดชีพ</div>
+                <div>
+                    <a href="rewards.php" class="btn-redeem-chip"><i class="fas fa-gift"></i> แลกของรางวัล</a>
                 </div>
             </div>
         </div>
