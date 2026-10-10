@@ -148,3 +148,11 @@ actions/booking_db.php บันทึกลงฐานข้อมูล Booki
 3. **การรักษาความเข้ากันได้ย้อนหลัง (Backward Compatibility & Fallback):**
    - หากผู้ใช้ปิดการทำงานของ JavaScript หรือเข้าผ่านลิงก์ฟอร์มโดยตรง
    - *วิธีแก้:* เพิ่ม Backend Guard ใน `actions/booking_db.php` เก็บค่าลง `$_SESSION['pending_booking']` และรองรับพารามิเตอร์ `?redirect=booking.php` ใน `login.php`, `register.php`, และ `actions/login_db.php`
+4. **ปัญหาหน้าต่าง Modal ซ้อนกับหน้าจอ Step 1 (Modal Overlap on Initial Load):**
+   - *สาเหตุ (Root Cause):* คลาส `.modal-overlay` และ `.modal-content` มีนิยาม CSS อยู่เฉพาะใน `assets/css/admin.css` ซึ่งหน้าบ้าน `booking.php` ไม่ได้โหลดไฟล์ดังกล่าว ทำให้ตัว Modal `#bookingAuthModal` ขาดการกำหนด `display: none; position: fixed;` และกลายเป็น `display: block` อยู่ใน Document Flow ปกติ จึงไปโผล่ซ้อนอยู่ที่ด้านล่างของหน้าจอ Step 1 บนหน้าเว็บทันทีตั้งแต่เริ่มโหลด
+   - *วิธีแก้ (Solution):*
+     - ประกาศคลาส `.booking-auth-modal-overlay` และ Selector `#bookingAuthModal` ใน [`assets/css/booking-wizard.css`](file:///c:/xampp/htdocs/ts-pattani/assets/css/booking-wizard.css) ให้มี `display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 99999;` ปิดการแสดงผลโดยสิ้นเชิงเมื่อยังไม่ถูกเรียก
+     - กำหนดให้แสดงผลเฉพาะเมื่อมีคลาส `.active` หรือถูกเปิดผ่าน JS (`display: flex`) พร้อมอนิเมชัน `@keyframes modalFadeIn`
+     - ปรับฟังก์ชันใน [`assets/js/member.js`](file:///c:/xampp/htdocs/ts-pattani/assets/js/member.js) ให้เพิ่ม/ลบคลาส `active`, สลับ `display`, และล็อก Body Scroll (`overflow: hidden`)
+     - รองรับการปิด Modal ครบทุกรูปแบบ: ปุ่มกากบาท, ปุ่มยกเลิก, คลิกพื้นหลัง (Backdrop Click), และปุ่ม `Escape` บนคีย์บอร์ด
+

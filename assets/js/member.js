@@ -876,7 +876,9 @@ function openBookingAuthModal(defaultTab = 'login') {
     const regAlert = document.getElementById('registerAlertBox');
     if (regAlert) { regAlert.className = 'alert-box-auth'; regAlert.textContent = ''; }
     
+    modal.classList.add('active');
     modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     
     // Focus ช่องแรก
     setTimeout(() => {
@@ -892,7 +894,11 @@ function openBookingAuthModal(defaultTab = 'login') {
 
 function closeBookingAuthModal() {
     const modal = document.getElementById('bookingAuthModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
 }
 
 function switchBookingAuthTab(tabName) {
@@ -1395,7 +1401,7 @@ function executeRedeemSubmit() {
 document.addEventListener('DOMContentLoaded', function() {
     // ปิดเมื่อคลิกนอกพื้นที่ Modal Dialog
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay')) {
+        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay') || e.target.classList.contains('booking-auth-modal-overlay')) {
             if (e.target.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                 closeRedeemModal();
             } else if (e.target.id === 'cancelModal' && typeof closeCancelModal === 'function') {
@@ -1412,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ปิดเมื่อกดปุ่ม ESC
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
-            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay[style*="display: flex"], .modal-overlay[style*="display: block"]');
+            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay.active, .booking-auth-modal-overlay.active, .modal-overlay[style*="display: flex"], .booking-auth-modal-overlay[style*="display: flex"]');
             if (activeOverlay) {
                 if (activeOverlay.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                     closeRedeemModal();

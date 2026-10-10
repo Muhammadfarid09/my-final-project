@@ -538,8 +538,8 @@ try {
     <!-- ============================================== -->
     <!-- Booking Auth Modal (สำหรับผู้ใช้ที่ยังไม่ได้ล็อกอิน) -->
     <!-- ============================================== -->
-    <div id="bookingAuthModal" class="modal-overlay">
-        <div class="modal-content booking-auth-modal-card">
+    <div id="bookingAuthModal" class="booking-auth-modal-overlay modal-overlay">
+        <div class="booking-auth-modal-card">
             <div class="auth-modal-header">
                 <div class="auth-modal-title">
                     <i class="fas fa-calendar-check text-primary"></i> 
