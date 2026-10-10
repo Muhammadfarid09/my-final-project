@@ -158,5 +158,14 @@
     .section-main-title {
         font-size: 24px;
     }
+    .auth-card-register {
+        padding: 28px 20px;
+        margin: 20px 12px;
+    }
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
 }
+
 

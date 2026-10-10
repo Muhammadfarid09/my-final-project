@@ -1337,4 +1337,197 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-});
+});
+
+/* ==========================================================================
+   Modern Member Registration Controller (register.php)
+   HCI Real-time Validation, Toggle Visibility & Double Submit Guard
+   ========================================================================== */
+(function() {
+    function initRegisterForm() {
+        const form = document.getElementById('registerForm');
+        if (!form) return;
+
+        const nameInput = document.getElementById('member_name');
+        const phoneInput = document.getElementById('member_phone');
+        const ageInput = document.getElementById('member_age');
+        const passInput = document.getElementById('password');
+        const confirmPassInput = document.getElementById('confirm_password');
+        const btnTogglePass = document.getElementById('btnTogglePassword');
+        const togglePassIcon = document.getElementById('togglePasswordIcon');
+        const btnToggleConfirm = document.getElementById('btnToggleConfirmPassword');
+        const toggleConfirmIcon = document.getElementById('toggleConfirmPasswordIcon');
+        const matchHint = document.getElementById('passwordMatchHint');
+        const alertBox = document.getElementById('registerClientAlertBox');
+        const btnSubmit = document.getElementById('btnRegisterSubmit');
+
+        let isSubmitting = false;
+
+        function showAlert(msg) {
+            if (!alertBox) {
+                alert(msg);
+                return;
+            }
+            alertBox.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${escapeHtml(msg)}</span>
+                </div>
+            `;
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearAlert() {
+            if (alertBox) alertBox.innerHTML = '';
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Toggle Password Visibility
+        function setupToggle(btn, input, icon) {
+            if (!btn || !input || !icon) return;
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        setupToggle(btnTogglePass, passInput, togglePassIcon);
+        setupToggle(btnToggleConfirm, confirmPassInput, toggleConfirmIcon);
+
+        // Real-time password match check
+        function checkPasswordMatch() {
+            if (!matchHint || !passInput || !confirmPassInput) return;
+            const pVal = passInput.value;
+            const cVal = confirmPassInput.value;
+
+            if (!cVal) {
+                matchHint.style.display = 'none';
+                matchHint.className = 'password-match-hint';
+                matchHint.innerHTML = '';
+                return;
+            }
+
+            matchHint.style.display = 'block';
+            if (pVal === cVal) {
+                matchHint.className = 'password-match-hint valid';
+                matchHint.innerHTML = '<i class="fas fa-check-circle"></i> รหัสผ่านตรงกัน';
+            } else {
+                matchHint.className = 'password-match-hint invalid';
+                matchHint.innerHTML = '<i class="fas fa-times-circle"></i> รหัสผ่านไม่ตรงกัน';
+            }
+        }
+
+        if (confirmPassInput) {
+            confirmPassInput.addEventListener('input', checkPasswordMatch);
+        }
+        if (passInput) {
+            passInput.addEventListener('input', function() {
+                if (confirmPassInput && confirmPassInput.value) {
+                    checkPasswordMatch();
+                }
+            });
+        }
+
+        // Phone Input Sanitation (numeric only)
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+            });
+        }
+
+        // Form Submit Handler
+        form.addEventListener('submit', function(e) {
+            clearAlert();
+
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
+            const confirmPass = confirmPassInput ? confirmPassInput.value : '';
+            const ageVal = ageInput && ageInput.value ? parseInt(ageInput.value) : null;
+
+            if (!name) {
+                e.preventDefault();
+                showAlert('กรุณากรอกชื่อ - นามสกุล');
+                if (nameInput) nameInput.focus();
+                return;
+            }
+
+            if (!phone) {
+                e.preventDefault();
+                showAlert('กรุณากรอกเบอร์โทรศัพท์');
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+
+            if (!/^0[0-9]{9}$/.test(phone)) {
+                e.preventDefault();
+                showAlert('เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลักและขึ้นต้นด้วย 0 (เช่น 08X-XXX-XXXX)');
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+
+            if (ageVal !== null && (isNaN(ageVal) || ageVal < 5 || ageVal > 100)) {
+                e.preventDefault();
+                showAlert('กรุณาระบุอายุให้ถูกต้อง (ระหว่าง 5 - 100 ปี)');
+                if (ageInput) ageInput.focus();
+                return;
+            }
+
+            if (!password) {
+                e.preventDefault();
+                showAlert('กรุณาตั้งรหัสผ่าน');
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            if (password.length < 6) {
+                e.preventDefault();
+                showAlert('รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร');
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            if (password !== confirmPass) {
+                e.preventDefault();
+                showAlert('รหัสผ่านและการยืนยันรหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง');
+                if (confirmPassInput) confirmPassInput.focus();
+                return;
+            }
+
+            // Double Submit Prevention
+            if (isSubmitting) {
+                e.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> <span>กำลังบันทึกข้อมูล...</span>';
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initRegisterForm);
+    } else {
+        initRegisterForm();
+    }
+})();
+

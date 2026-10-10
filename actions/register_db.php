@@ -6,15 +6,16 @@ require_once '../config/config.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // 1. รับค่าและทำความสะอาดข้อมูลที่ส่งมาจากฟอร์ม
-    $member_name = trim($_POST['member_name']);
-    $member_phone = trim($_POST['member_phone']);
-    $member_gender = $_POST['member_gender'] ?? 'อื่นๆ';
+    $member_name = trim($_POST['member_name'] ?? '');
+    $raw_phone = trim($_POST['member_phone'] ?? '');
+    $member_phone = preg_replace('/[^0-9]/', '', $raw_phone);
+    $member_gender = trim($_POST['member_gender'] ?? 'อื่นๆ / ไม่ระบุ');
     // เช็คค่าอายุ ถ้าไม่กรอก ให้บันทึกเป็น NULL
     $member_age = !empty($_POST['member_age']) ? intval($_POST['member_age']) : null;
-    $member_occupation = trim($_POST['member_occupation']);
+    $member_occupation = trim($_POST['member_occupation'] ?? 'อื่นๆ');
     
-    $password = $_POST['member_password'];
-    $confirm_password = $_POST['confirm_password'];
+    $password = $_POST['member_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
     try {
         // 2. ตรวจสอบความสมบูรณ์ของข้อมูลเบื้องต้น (Backend Validation)
@@ -22,8 +23,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน");
         }
 
-        if (!preg_match('/^[0-9]{10}$/', $member_phone)) {
-            throw new Exception("รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง กรุณากรอกตัวเลข 10 หลัก");
+        if (strlen($member_phone) !== 10 || substr($member_phone, 0, 1) !== '0') {
+            throw new Exception("รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง (ต้องเป็นตัวเลข 10 หลักขึ้นต้นด้วย 0)");
+        }
+
+        if ($member_age !== null && ($member_age < 5 || $member_age > 100)) {
+            throw new Exception("กรุณาระบุอายุให้ถูกต้อง (ระหว่าง 5 - 100 ปี)");
+        }
+
+        if (strlen($password) < 6) {
+            throw new Exception("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร");
         }
 
         if ($password !== $confirm_password) {
