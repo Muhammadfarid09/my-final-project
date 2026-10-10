@@ -56,9 +56,31 @@ try {
     $stmt_booking->execute([':bdate' => $date]);
     $bookings = $stmt_booking->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. กำหนด Time Slots ตั้งแต่ 09:00 ถึง 23:00 น.
+    // 3. กำหนด Time Slots แบบ Dynamic ตามเวลาเปิด-ปิดจริงของสนามในฐานข้อมูล
+    $min_open_hour = 8;
+    $max_close_hour = 23;
+
+    if (!empty($courts)) {
+        $open_hours = [];
+        $close_hours = [];
+        foreach ($courts as $c) {
+            if (!empty($c['court_open_time'])) {
+                $open_hours[] = intval(substr($c['court_open_time'], 0, 2));
+            }
+            if (!empty($c['court_close_time'])) {
+                $close_hours[] = intval(substr($c['court_close_time'], 0, 2));
+            }
+        }
+        if (!empty($open_hours)) {
+            $min_open_hour = min($open_hours);
+        }
+        if (!empty($close_hours)) {
+            $max_close_hour = max($close_hours);
+        }
+    }
+
     $slots = [];
-    for ($h = 9; $h < 23; $h++) {
+    for ($h = $min_open_hour; $h < $max_close_hour; $h++) {
         $start_str = sprintf("%02d:00", $h);
         $end_str = sprintf("%02d:00", $h + 1);
         $slots[] = [
@@ -73,8 +95,8 @@ try {
     foreach ($courts as $c) {
         $c_id = $c['court_id'];
         $c_status = $c['court_status'] ?? 'ว่าง';
-        $c_open = $c['court_open_time'] ? substr($c['court_open_time'], 0, 5) : '09:00';
-        $c_close = $c['court_close_time'] ? substr($c['court_close_time'], 0, 5) : '22:00';
+        $c_open = $c['court_open_time'] ? substr($c['court_open_time'], 0, 5) : sprintf("%02d:00", $min_open_hour);
+        $c_close = $c['court_close_time'] ? substr($c['court_close_time'], 0, 5) : sprintf("%02d:00", $max_close_hour);
 
         // คำนวณราคาของสนามนี้ตามประเภทวัน
         $base_rate = floatval($c['court_price_per_hour']) > 0 ? floatval($c['court_price_per_hour']) : 180.00;
