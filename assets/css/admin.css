@@ -275,7 +275,7 @@ body {
 .btn-success:hover { background-color: #059669; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
 .btn-reject { background-color: #EF4444; padding: 8px 16px; font-size: 14px; font-weight: 500; border:none; color:white; border-radius:6px; cursor:pointer; transition: 0.2s;}
 .btn-reject:hover { background-color: #DC2626; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2); }
-.btn-disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none;}
+.btn-disabled { background-color: #E2E8F0; border: 1px solid #CBD5E1; color: #94A3B8; opacity: 0.6; cursor: not-allowed; pointer-events: none; }
 .btn-sm-info { display: inline-block; padding: 6px 12px; border-radius: 6px; color: #3B82F6; background: #EFF6FF; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; border: 1px solid #BFDBFE;}
 .btn-sm-info:hover { background: #DBEAFE; }
 .btn-secondary { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; }
@@ -290,14 +290,14 @@ body {
 .btn-submit { background-color: #2563EB; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 500; display: inline-block; text-decoration: none; text-align: center; }
 .btn-submit:hover { background-color: #1D4ED8; color: white; }
 
-/* Admin Override: Badges */
-.badge-success { background-color: #ECFDF5 !important; color: #10B981 !important; border: 1px solid #A7F3D0 !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-warning { background-color: #FFFBEB !important; color: #F59E0B !important; border: 1px solid #FDE68A !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-danger { background-color: #FEF2F2 !important; color: #EF4444 !important; border: 1px solid #FECACA !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-info { background-color: #EFF6FF !important; color: #3B82F6 !important; border: 1px solid #BFDBFE !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-bronze { background-color: #FEF3C7 !important; color: #D97706 !important; border: 1px solid #FDE68A !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-silver { background-color: #F1F5F9 !important; color: #475569 !important; border: 1px solid #E2E8F0 !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
-.badge-gold { background-color: #FEF08A !important; color: #CA8A04 !important; border: 1px solid #FDE047 !important; border-radius: 9999px !important; padding: 4px 10px !important; font-weight: 600 !important; font-size: 12px !important; }
+/* Admin Badges (Cleaned Specificity) */
+.badge-success { background-color: #ECFDF5; color: #10B981; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-warning { background-color: #FFFBEB; color: #F59E0B; border: 1px solid #FDE68A; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-danger { background-color: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-info { background-color: #EFF6FF; color: #3B82F6; border: 1px solid #BFDBFE; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-bronze { background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-silver { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+.badge-gold { background-color: #FEF08A; color: #CA8A04; border: 1px solid #FDE047; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
 
 /* Grid Custom */
 .layout-grid-sidebar { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
@@ -415,10 +415,7 @@ body {
 
 /* Additional Utilities */
 .whitespace-nowrap { white-space: nowrap; }
-.btn-disabled { background: #ccc !important; border-color: #ccc !important; cursor: not-allowed !important; color: #fff !important; }
 .h-fit { height: fit-content; }
-.mb-15 { margin-bottom: 15px; }
-.p-20 { padding: 20px; }
 .gap-8 { gap: 8px; }
 .flex-wrap { flex-wrap: wrap; }
 .text-success-custom { color: #10B981; }
@@ -429,37 +426,27 @@ body {
 .btn-outline-primary:hover { background: #007bff; color: #fff; }
 .d-none { display: none !important; }
 
-.max-w-800 { max-width: 800px; }
 .px-30 { padding-left: 30px; padding-right: 30px; }
 .py-10 { padding-top: 10px; padding-bottom: 10px; }
 .text-16 { font-size: 16px; }
 
 .grid-row-span-3 { grid-row: span 3; }
 .mt-10 { margin-top: 10px; }
-.mb-10 { margin-bottom: 10px; }
 .hr-dashed { border: 0; border-top: 1px dashed #ccc; }
 .mt-30 { margin-top: 30px; }
 
-.border-b { border-bottom: 1px solid #eee; }
 .pb-15 { padding-bottom: 15px; }
-.pb-10 { padding-bottom: 10px; }
 .my-20 { margin-top: 20px; margin-bottom: 20px; }
-.mt-20 { margin-top: 20px; }
 .d-block { display: block; }
-.text-right { text-align: right; }
 .px-20 { padding-left: 20px; padding-right: 20px; }
 .text-dark { color: #333; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; }
-.gap-20 { gap: 20px; }
-.text-18 { font-size: 18px; }
-.text-13 { font-size: 13px; }
 .text-success { color: #28a745; }
 .w-200 { width: 200px; }
 .border-l-warning { border-left: 4px solid #ffc107; }
 
 .mb-25 { margin-bottom: 25px; }
 .text-left { text-align: left; }
-.text-center { text-align: center; }
 .w-full { width: 100%; }
 .p-10 { padding: 10px; }
 .btn-danger { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; display: inline-block; transition: 0.2s; }

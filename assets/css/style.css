@@ -353,56 +353,7 @@ body.bg-register {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 30px;
 }
-.news-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.news-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
-}
-.news-img {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-}
-.news-img-placeholder {
-    width: 100%;
-    height: 220px;
-    background: #e9ecef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #adb5bd;
-}
-.news-content {
-    padding: 25px;
-}
-.news-date {
-    font-size: 13px;
-    color: #6c757d;
-    margin-bottom: 12px;
-}
-.news-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 12px 0;
-    color: #212529;
-    line-height: 1.4;
-}
-.news-desc {
-    font-size: 15px;
-    color: #495057;
-    line-height: 1.6;
-    /* ตัดคำอัตโนมัติเมื่อเนื้อหายาวเกิน 3 บรรทัด */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+
 
 @media (max-width: 768px) {
     .hero-section h1 { font-size: 32px; }
@@ -445,101 +396,7 @@ body.bg-register {
     color: #343a40;
     font-size: 18px;
 }
-/* Court Selector (Radio Button แบบกล่อง) */
-.court-selector {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
-}
-.court-option input {
-    display: none;
-}
-.court-box {
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 20px 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.court-box i { color: #adb5bd; margin-bottom: 10px; }
-.court-box h4 { margin: 0 0 5px 0; color: #495057; }
-.price-tag { font-size: 13px; color: #007bff; font-weight: bold; }
-.court-option input:checked + .court-box {
-    border-color: #007bff;
-    background: #f0f7ff;
-}
-.court-option input:checked + .court-box i { color: #007bff; }
 
-/* =========================================
-   อัปเดต Product List ในหน้าจอง (มีรูปภาพและแบ่งหมวดหมู่)
-   ========================================= */
-.product-category-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #495057;
-    background: #f8f9fa;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.product-list-booking {
-    max-height: 250px; 
-    overflow-y: auto;
-    padding-right: 5px;
-}
-.product-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px dashed #eee;
-    gap: 12px;
-}
-.prod-img {
-    width: 50px;
-    height: 50px;
-    flex-shrink: 0;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid #eee;
-}
-.prod-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.prod-img-placeholder {
-    width: 100%;
-    height: 100%;
-    background: #f4f6f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #adb5bd;
-}
-.prod-info {
-    flex-grow: 1;
-}
-.qty-input { 
-    width: 60px; 
-    text-align: center; 
-    padding: 6px; 
-}
-
-/* =========================================
-   Summary Box
-   ========================================= */
-.booking-summary {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
-    border: 1px solid #e9ecef;
-    margin-top: 20px;
-}
 .summary-row {
     display: flex;
     justify-content: space-between;
@@ -559,11 +416,7 @@ body.bg-register {
 /* =========================================
    Booking History Page Styles
    ========================================= */
-.history-wrapper {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
+
 .history-table {
     width: 100%;
     border-collapse: collapse;
@@ -672,100 +525,7 @@ body.bg-register {
     font-weight: 600;
 }
 
-/* =========================================
-   Booking Page - 4-Phase Stepper (HCI Rule 2 & Section 10)
-   ========================================= */
-.booking-stepper-wrapper {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border: 1px solid #e2e8f0;
-}
-.booking-stepper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    position: relative;
-    max-width: 850px;
-    margin: 0 auto;
-}
-.stepper-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    position: relative;
-    z-index: 2;
-    flex: 1;
-}
-.stepper-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #f1f5f9;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    border: 2px solid #cbd5e1;
-    transition: all 0.3s ease;
-}
-.stepper-step.active .stepper-icon {
-    background: #007bff;
-    color: #ffffff;
-    border-color: #0056b3;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
-}
-.stepper-step.completed .stepper-icon {
-    background: #28a745;
-    color: #ffffff;
-    border-color: #1e7e34;
-}
-.stepper-step.upcoming .stepper-icon {
-    background: #f8fafc;
-    color: #94a3b8;
-    border-color: #e2e8f0;
-}
-.stepper-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #334155;
-    margin-bottom: 2px;
-}
-.stepper-step.active .stepper-title {
-    color: #007bff;
-}
-.stepper-subtitle {
-    font-size: 11px;
-    color: #64748b;
-}
-.stepper-line {
-    position: absolute;
-    top: 22px;
-    left: 12%;
-    right: 12%;
-    height: 2px;
-    background: #e2e8f0;
-    z-index: 1;
-}
-.stepper-line-fill {
-    height: 100%;
-    background: #007bff;
-    width: 66%; /* Phases 1-3 active on booking page */
-    transition: width 0.3s ease;
-}
 
-@media (max-width: 640px) {
-    .stepper-subtitle { display: none; }
-    .stepper-title { font-size: 11px; }
-    .stepper-icon { width: 36px; height: 36px; font-size: 13px; }
-    .stepper-line { top: 18px; }
-}
 
 /* =========================================
    Member Booking Confirmation Modal
@@ -1649,14 +1409,18 @@ body.bg-register {
     object-fit: cover;
     background: #eee;
 }
-.news-img.news-img-placeholder {
+.news-img.news-img-placeholder,
+.news-img-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ccc;
+    color: #adb5bd;
     font-size: 40px;
+    height: 200px;
+    background: #e9ecef;
 }
-.news-body {
+.news-body,
+.news-container .news-content {
     padding: 20px;
     flex-grow: 1;
     display: flex;
@@ -1674,7 +1438,8 @@ body.bg-register {
     margin-bottom: 15px;
     line-height: 1.4;
 }
-.news-content {
+.news-body .news-content,
+.news-desc {
     font-size: 14px;
     color: #666;
     margin-bottom: 20px;
@@ -1683,6 +1448,7 @@ body.bg-register {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.6;
 }
 .btn-read-more {
     display: inline-block;
