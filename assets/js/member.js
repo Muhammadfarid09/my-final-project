@@ -1530,4 +1530,121 @@ document.addEventListener('DOMContentLoaded', function() {
         initRegisterForm();
     }
 })();
+
+/* ==========================================================================
+   Modern Member Login Controller (login.php)
+   Book Split-Screen, Password Visibility Toggle & Double Submit Guard
+   ========================================================================== */
+(function() {
+    function initLoginForm() {
+        const form = document.getElementById('loginForm');
+        if (!form) return;
+
+        const phoneInput = document.getElementById('member_phone');
+        const passInput = document.getElementById('member_password');
+        const btnTogglePass = document.getElementById('btnToggleLoginPassword');
+        const togglePassIcon = document.getElementById('toggleLoginPasswordIcon');
+        const btnSubmit = document.getElementById('btnLoginSubmit');
+        const alertBox = document.getElementById('loginClientAlertBox');
+
+        let isSubmitting = false;
+
+        function showAlert(msg) {
+            if (!alertBox) {
+                alert(msg);
+                return;
+            }
+            alertBox.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${escapeHtml(msg)}</span>
+                </div>
+            `;
+            alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearAlert() {
+            if (alertBox) alertBox.innerHTML = '';
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // Toggle Password Visibility
+        if (btnTogglePass && passInput && togglePassIcon) {
+            btnTogglePass.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    togglePassIcon.classList.remove('fa-eye');
+                    togglePassIcon.classList.add('fa-eye-slash');
+                } else {
+                    passInput.type = 'password';
+                    togglePassIcon.classList.remove('fa-eye-slash');
+                    togglePassIcon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        // Phone Input Sanitation (numeric only, max 10 digits)
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+            });
+        }
+
+        // Form Submit Handler
+        form.addEventListener('submit', function(e) {
+            clearAlert();
+
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
+
+            if (!phone) {
+                e.preventDefault();
+                showAlert('กรุณากรอกเบอร์โทรศัพท์');
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+
+            if (!/^0[0-9]{9}$/.test(phone)) {
+                e.preventDefault();
+                showAlert('เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลักและขึ้นต้นด้วย 0 (เช่น 08X-XXX-XXXX)');
+                if (phoneInput) phoneInput.focus();
+                return;
+            }
+
+            if (!password) {
+                e.preventDefault();
+                showAlert('กรุณากรอกรหัสผ่าน');
+                if (passInput) passInput.focus();
+                return;
+            }
+
+            // Double Submit Prevention
+            if (isSubmitting) {
+                e.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> <span>กำลังตรวจสอบข้อมูล...</span>';
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLoginForm);
+    } else {
+        initLoginForm();
+    }
+})();
 

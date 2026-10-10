@@ -3265,6 +3265,262 @@ body.bg-register {
     box-shadow: none;
 }
 
+/* ==========================================================================
+   T.S. Pattani - Book Split-Screen Login Page (login.php)
+   HCI Ergonomics, Book-style Layout & Brand Experience
+   ========================================================================== */
+
+/* Main Book Container */
+.login-book-wrapper {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    max-width: 960px;
+    min-height: 580px;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    margin: 40px 20px;
+}
+
+/* Left Column: Cover / Visual Page */
+.login-book-cover {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(145deg, #0f2744 0%, #1e3c72 50%, #0284c7 100%);
+    color: #ffffff;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+/* Decorative Badminton Court Lines */
+.login-book-cover::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 280px;
+    height: 280px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.login-book-cover::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 320px;
+    height: 320px;
+    border: 2px dashed rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.cover-court-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.cover-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.cover-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.cover-logo-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.cover-brand-name {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.cover-hero-title {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0 0 12px 0;
+    color: #ffffff;
+}
+.cover-hero-slogan {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 28px 0;
+}
+
+/* 3 Feature Highlights */
+.cover-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: auto;
+}
+.cover-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    transition: background var(--transition-fast, 0.2s);
+}
+.cover-feature-item:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+.cover-feature-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #ffffff;
+}
+.cover-feature-text {
+    display: flex;
+    flex-direction: column;
+}
+.cover-feature-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+}
+.cover-feature-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.78);
+    margin-top: 2px;
+}
+
+/* Right Column: Form Page */
+.login-book-form-section {
+    flex: 1;
+    background: #ffffff;
+    padding: 48px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-form-inner {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+.login-header-group {
+    margin-bottom: 24px;
+    text-align: left;
+}
+.login-title {
+    color: var(--brand-primary, #007bff);
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+.login-subtitle {
+    color: var(--text-muted, #64748b);
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Controls Under Password: Checkbox & Forgot Link */
+.login-control-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0 24px 0;
+    font-size: 13px;
+}
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+    cursor: pointer;
+    user-select: none;
+    font-size: 13px;
+    font-weight: 500;
+}
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand-primary, #007bff);
+    cursor: pointer;
+    border-radius: 4px;
+}
+.forgot-password-link {
+    color: var(--brand-primary, #007bff);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast, 0.2s);
+}
+.forgot-password-link:hover {
+    color: var(--brand-accent-hover, #0369a1);
+    text-decoration: underline;
+}
+
+.login-footer-register {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: #64748b;
+}
+.login-footer-register a {
+    color: var(--brand-primary, #007bff);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-fast, 0.2s);
+}
+.login-footer-register a:hover {
+    color: var(--brand-accent-hover, #0369a1);
+    text-decoration: underline;
+}
+
 
 
 

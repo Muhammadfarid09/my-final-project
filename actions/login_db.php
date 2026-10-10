@@ -6,8 +6,9 @@ require_once '../config/config.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // 1. รับค่าและทำความสะอาดข้อมูล (ตัดช่องว่างหน้า-หลัง)
-    $member_phone = trim($_POST['member_phone']);
-    $password = $_POST['member_password'];
+    $member_phone = trim($_POST['member_phone'] ?? '');
+    $password = $_POST['member_password'] ?? '';
+    $remember_me = !empty($_POST['remember_me']);
 
     try {
         // 2. ตรวจสอบว่ากรอกข้อมูลมาครบหรือไม่
@@ -15,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("กรุณากรอกเบอร์โทรศัพท์และรหัสผ่านให้ครบถ้วน");
         }
 
-        // 3. ค้นหาข้อมูลสมาชิกจากเบอร์โทรศัพท์
+        // 3. ค้นหาข้อมูลสมาชิกจากเบอร์โทรศัพท์ด้วย Prepared Statement
         $stmt = $conn->prepare("SELECT * FROM Member WHERE member_phone = :phone");
         $stmt->execute([':phone' => $member_phone]);
         $member = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -31,10 +32,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
                 }
 
-                // 7. ถ้ารหัสถูกและสถานะปกติ -> สร้าง Session เก็บข้อมูลผู้ใช้
+                // 7. Regenerate Session ID ป้องกัน Session Fixation
+                session_regenerate_id(true);
+
+                // 8. ถ้ารหัสถูกและสถานะปกติ -> สร้าง Session เก็บข้อมูลผู้ใช้
                 $_SESSION['member_id'] = $member['member_id'];
                 $_SESSION['member_name'] = $member['member_name'];
                 $_SESSION['member_phone'] = $member['member_phone'];
+
+                // 9. จัดการฟีเจอร์จดจำเบอร์โทรศัพท์ (Remember Me)
+                if ($remember_me) {
+                    setcookie('remember_phone', $member_phone, [
+                        'expires' => time() + (86400 * 30),
+                        'path' => '/',
+                        'samesite' => 'Lax'
+                    ]);
+                } else {
+                    if (isset($_COOKIE['remember_phone'])) {
+                        setcookie('remember_phone', '', [
+                            'expires' => time() - 3600,
+                            'path' => '/',
+                            'samesite' => 'Lax'
+                        ]);
+                    }
+                }
+
+                // ล้างค่าฟอร์มค้าง (ถ้ามี)
+                unset($_SESSION['form_phone']);
 
                 // ตรวจสอบปลายทางที่ต้องการให้ Redirect กลับไป
                 $redirect_url = "../index.php";
@@ -56,8 +80,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
     } catch (Exception $e) {
-        // หากมี Error (รหัสผิด, ข้อมูลไม่ครบ, ถูกระงับสิทธิ์) ให้ส่งข้อความแจ้งเตือนกลับไปที่หน้า login
+        // หากมี Error ให้เก็บเบอร์เดิมไว้ช่วยให้ผู้ใช้ไม่ต้องพิมพ์ใหม่
         $_SESSION['error'] = $e->getMessage();
+        if (!empty($member_phone)) {
+            $_SESSION['form_phone'] = $member_phone;
+        }
         $redirect_param = trim($_POST['redirect'] ?? '');
         $fallback_login = "../login.php" . (!empty($redirect_param) ? "?redirect=" . urlencode($redirect_param) : "");
         header("Location: " . $fallback_login);
