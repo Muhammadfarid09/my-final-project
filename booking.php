@@ -33,6 +33,8 @@ $default_nickname = htmlspecialchars($_SESSION['member_name'] ?? '');
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.1">
     <link rel="stylesheet" href="assets/css/style.css?v=2.0">
+    <link rel="stylesheet" href="assets/css/booking-wizard.css?v=1.0">
+    <link rel="stylesheet" href="assets/css/responsive-mobile.css?v=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>

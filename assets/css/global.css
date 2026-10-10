@@ -239,4 +239,8 @@ body.page-body {
 .table-responsive {
     overflow-x: auto;
 }
-
+/* Global Animation Keyframes */
+@keyframes wizardFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
