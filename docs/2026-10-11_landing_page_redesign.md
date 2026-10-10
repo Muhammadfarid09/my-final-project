@@ -108,3 +108,7 @@
 3. **ปัญหาความต่อเนื่องของ Marquee Animation บนมือถือ:**
    - *สาเหตุ:* Marquee ที่คำนวณผ่าน JS มักกระตุกเมื่อเบราว์เซอร์มือถือประมวลผลหนัก
    - *วิธีแก้:* ใช้ Pure CSS Hardware-accelerated `translate3d` และทำชุดข้อมูลซ้ำ 2 ชุดใน Track ทำให้เบราว์เซอร์ Render ผ่าน GPU ลื่นไหล 60 FPS ไร้รอยต่อ
+4. **การนำ Mock Players Fallback ออกอย่างเป็นทางการ (Pure Database Only):**
+   - *รายละเอียด:* เมื่อระบบมีสมาชิกที่มีประวัติการจองสำเร็จครบ 3 ท่านจริงแล้ว (Farid Cheloh, อานัส เปิ้ล, Mister bin) จึงได้ดำเนินการตัดบล็อกตัวแปร `$mock_players` และการวนลูป Fallback ออกจาก [`includes/functions.php`](file:///c:/xampp/htdocs/ts-pattani/includes/functions.php) ทำให้ระบบทำงานด้วยข้อมูลจริงจากฐานข้อมูล 100% สะอาดและกระชับตามหลัก DRY
+
+

@@ -299,7 +299,7 @@ if (!function_exists('mask_phone_number')) {
 
 if (!function_exists('get_top_booking_members')) {
     /**
-     * ดึงข้อมูล 3 อันดับสมาชิกที่จองสำเร็จสูงสุด พร้อมระบบ Fallback Mock Data
+     * ดึงข้อมูล 3 อันดับสมาชิกที่จองสำเร็จสูงสุดจากฐานข้อมูลจริง
      */
     function get_top_booking_members(PDO $conn, int $limit = 3): array {
         $results = [];
@@ -319,36 +319,6 @@ if (!function_exists('get_top_booking_members')) {
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             $results = [];
-        }
-
-        // Mock Fallback Data เติมเต็มกรณีข้อมูลจริงไม่ครบ $limit
-        $mock_players = [
-            [
-                'member_name' => 'Farid Cheloh',
-                'member_phone' => '0993241657',
-                'member_level' => 'Gold',
-                'booking_count' => 15,
-                'is_mock' => true
-            ],
-            [
-                'member_name' => 'อานัส เปิ้ล',
-                'member_phone' => '0812345678',
-                'member_level' => 'Silver',
-                'booking_count' => 9,
-                'is_mock' => true
-            ],
-            [
-                'member_name' => 'ก๊วนแบดมินตัน ปัตตานี',
-                'member_phone' => '0899887766',
-                'member_level' => 'Bronze',
-                'booking_count' => 5,
-                'is_mock' => true
-            ]
-        ];
-
-        $current_count = count($results);
-        for ($i = $current_count; $i < $limit; $i++) {
-            $results[] = $mock_players[$i];
         }
 
         return $results;
