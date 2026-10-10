@@ -39,3 +39,15 @@
 * ทุกการแก้ไขและออกแบบ UI/UX ทั้งฝั่ง Member และ Admin ต้องยึดถือกฎใน [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) อย่างเคร่งครัด
 * ก่อนแก้ไข UI/UX ต้องปฏิบัติตามลำดับ 6 ขั้นตอนเสมอ: Understand → Analyze → Propose → Confirm → Modify → Verify
 
+---
+
+### 🛡️ กฎเหล็กและข้อจำกัดการปฏิบัติงาน (System Rules & Strict Operational Constraints)
+* ต้องปฏิบัติตามกฎเหล็กทั้ง 6 ข้อใน [docs/ADDITIONAL_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/ADDITIONAL_RULES.md) อย่างเคร่งครัดเด็ดขาดควบคู่กับ [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) โดยไม่ยกเลิกกฎเดิม
+  1. **DRY Principle & Code Reuse:** ค้นหาก่อนสร้างใหม่ นำฟังก์ชัน/คลาสเดิมมาใช้ซ้ำ ใช้ฟังก์ชันกลางสำหรับ SQL และ Constants
+  2. **Strict Separation of Concerns (CSS):** ห้ามใช้ Inline Styles (ยกเว้น dynamic values) และห้ามแทรก `<style>` กลางไฟล์ PHP แยกสโคปไฟล์ CSS ตามหน้าที่อย่างเคร่งครัด และห้ามใช้ `!important` เพื่อแก้ปัญหาความทับซ้อน
+  3. **Safety First & Blast Radius Control:** ห้ามเปลี่ยน/ลบคลาสเดิม ห้ามเปลี่ยน HTML Nesting โดยไม่สั่ง แก้ไขเฉพาะจุดที่ได้รับมอบหมาย รักษาความเข้ากันได้ย้อนหลัง
+  4. **JavaScript Safety & Event Integrity:** ห้ามผูก Event ซ้ำซ้อน มีกลไกป้องกัน Double Submission เสมอ และห้ามประกาศตัวแปรใน Global Scope
+  5. **Backend Logic & Session Integrity:** ตรวจสอบ Session/Auth ผ่านโมดูลกลางที่หัวไฟล์เท่านั้น และทำ Input Sanitization เสมอ
+  6. **AI Operational Protocol:** วางแผนและวิเคราะห์ผลกระทบก่อนลงมือเสมอ (Plan & Impact Analysis First) และห้ามแก้ไขโค้ดใดๆ โดยไม่รายงาน (No Silent Changes)
+
+
