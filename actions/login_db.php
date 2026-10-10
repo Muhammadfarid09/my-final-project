@@ -35,17 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['member_id'] = $member['member_id'];
                 $_SESSION['member_name'] = $member['member_name'];
                 $_SESSION['member_phone'] = $member['member_phone'];
-                unset($_SESSION['last_phone']);
-
-                // จัดการ Cookie จดจำฉันไว้ในระบบ (Remember Me) 30 วัน
-                $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] == '1';
-                if ($remember_me) {
-                    setcookie('remember_phone', $member_phone, time() + (86400 * 30), "/");
-                } else {
-                    if (isset($_COOKIE['remember_phone'])) {
-                        setcookie('remember_phone', '', time() - 3600, "/");
-                    }
-                }
 
                 // ตรวจสอบปลายทางที่ต้องการให้ Redirect กลับไป
                 $redirect_url = "../index.php";
@@ -69,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (Exception $e) {
         // หากมี Error (รหัสผิด, ข้อมูลไม่ครบ, ถูกระงับสิทธิ์) ให้ส่งข้อความแจ้งเตือนกลับไปที่หน้า login
         $_SESSION['error'] = $e->getMessage();
-        $_SESSION['last_phone'] = $member_phone;
         $redirect_param = trim($_POST['redirect'] ?? '');
         $fallback_login = "../login.php" . (!empty($redirect_param) ? "?redirect=" . urlencode($redirect_param) : "");
         header("Location: " . $fallback_login);
