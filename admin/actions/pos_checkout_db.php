@@ -94,12 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 // 1.3 บังคับคำนวณราคาสนามตามเรทวันในสัปดาห์ฝั่ง Server (Server-side Recalculation)
-                $dow = intval(date('w', strtotime($b_date)));
-                $base_rate = floatval($c_info['court_price_per_hour']) > 0 ? floatval($c_info['court_price_per_hour']) : 180.00;
-                $peak_rate = floatval($c_info['court_peak_price']) > 0 ? floatval($c_info['court_peak_price']) : 200.00;
-                $offpeak_rate = floatval($c_info['court_offpeak_price']) > 0 ? floatval($c_info['court_offpeak_price']) : 150.00;
-                $h_rate = ($dow == 0 || $dow == 6) ? $peak_rate : (($dow == 2 || $dow == 4) ? $offpeak_rate : $base_rate);
-                
+                $h_rate = calculate_court_hourly_rate($c_info, $b_date);
                 $h_diff = max(1, (strtotime($b_end_str) - strtotime($b_start_str)) / 3600);
                 $court_price = $h_rate * $h_diff;
 
@@ -239,35 +234,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // 4. การสะสมคะแนน (มาตรฐานเดียวกัน: 1 คะแนน ต่อ 100 บาท จากยอดบิลรวม)
         // ========================================================
         if ($active_member_id && $server_total_amount >= 100) {
-            $earned_points = floor($server_total_amount / 100);
-            if ($earned_points > 0) {
-                $check_pt = $conn->prepare("SELECT point_id FROM Point WHERE member_id = :mid");
-                $check_pt->execute([':mid' => $active_member_id]);
-                if ($check_pt->fetch()) {
-                    $conn->prepare("UPDATE Point SET point_balance = point_balance + :pt, point_total_earned = point_total_earned + :pt WHERE member_id = :mid")
-                         ->execute([':pt' => $earned_points, ':mid' => $active_member_id]);
-                } else {
-                    $conn->prepare("INSERT INTO Point (member_id, point_balance, point_total_earned, member_level) VALUES (:mid, :pt, :pt, 'Bronze')")
-                         ->execute([':mid' => $active_member_id, ':pt' => $earned_points]);
-                }
-                
-                $conn->prepare("
-                    INSERT INTO Point_Transaction (member_id, booking_id, transaction_type, transaction_point, transaction_note, transaction_date) 
-                    VALUES (:mid, :bid, 'ได้รับ', :pt, 'ได้รับคะแนนจากการซื้อสินค้า/บริการหน้าร้าน (POS)', NOW())
-                ")->execute([
-                    ':mid' => $active_member_id, 
-                    ':bid' => ($last_booking_id > 0 ? $last_booking_id : null), 
-                    ':pt' => $earned_points
-                ]);
-
-                // ตรวจสอบและอัปเกรดระดับสมาชิก (Tier Progression): Bronze -> Silver (500 pts) -> Gold (1000 pts)
-                $stmt_pts = $conn->prepare("SELECT point_total_earned FROM Point WHERE member_id = :mid");
-                $stmt_pts->execute([':mid' => $active_member_id]);
-                $tot = $stmt_pts->fetchColumn() ?: 0;
-                $new_lvl = ($tot >= 1000) ? 'Gold' : (($tot >= 500) ? 'Silver' : 'Bronze');
-                $conn->prepare("UPDATE Point SET member_level = :lvl WHERE member_id = :mid")
-                     ->execute([':lvl' => $new_lvl, ':mid' => $active_member_id]);
-            }
+            award_member_points($conn, $active_member_id, $server_total_amount, ($last_booking_id > 0 ? $last_booking_id : null), 'ได้รับคะแนนจากการซื้อสินค้า/บริการหน้าร้าน (POS)');
         }
 
         $conn->commit();

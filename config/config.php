@@ -21,6 +21,9 @@ try {
     // 4. โหลดระบบป้องกัน CSRF Protection กลาง
     require_once __DIR__ . '/../includes/csrf.php';
 
+    // 5. โหลดฟังก์ชันส่วนกลางและตรรกะคำนวณสากล (DRY Framework)
+    require_once __DIR__ . '/../includes/functions.php';
+
 } catch(PDOException $e) {
     // กรณีเชื่อมต่อไม่สำเร็จ จะหยุดการทำงานและแสดงข้อความแจ้งเตือน
     die("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: " . $e->getMessage());

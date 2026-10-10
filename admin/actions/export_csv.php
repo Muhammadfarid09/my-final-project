@@ -1,11 +1,6 @@
 <?php
-session_start();
-require_once '../../config/config.php';
+require_once '../includes/auth_check.php';
 
-// ตรวจสอบสิทธิ์
-if (!isset($_SESSION['admin_id'])) {
-    die("Access Denied");
-}
 
 $type = isset($_GET['type']) ? $_GET['type'] : '';
 

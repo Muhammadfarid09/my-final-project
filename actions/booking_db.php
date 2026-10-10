@@ -1,13 +1,6 @@
 <?php
-session_start();
-// เรียกใช้ไฟล์ตั้งค่าฐานข้อมูล (จะโหลด includes/csrf.php เข้ามาด้วยอัตโนมัติ)
-require_once '../config/config.php';
+require_once '../includes/auth_check.php';
 
-// ตรวจสอบว่าล็อกอินอยู่หรือไม่
-if (!isset($_SESSION['member_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
@@ -121,18 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ========================================================
         // 3.2 คำนวณราคาค่าบริการตามวันในสัปดาห์ (Server-side Recalculation)
         // ========================================================
-        $dow = intval(date('w', strtotime($booking_date)));
-        $base_rate = floatval($court_data['court_price_per_hour']) > 0 ? floatval($court_data['court_price_per_hour']) : 180.00;
-        $peak_rate = floatval($court_data['court_peak_price']) > 0 ? floatval($court_data['court_peak_price']) : 200.00;
-        $offpeak_rate = floatval($court_data['court_offpeak_price']) > 0 ? floatval($court_data['court_offpeak_price']) : 150.00;
-
-        if ($dow == 0 || $dow == 6) {
-            $hourly_rate = $peak_rate; // เสาร์ - อาทิตย์
-        } elseif ($dow == 2 || $dow == 4) {
-            $hourly_rate = $offpeak_rate; // อังคาร, พฤหัสบดี
-        } else {
-            $hourly_rate = $base_rate; // จันทร์, พุธ, ศุกร์
-        }
+        $hourly_rate = calculate_court_hourly_rate($court_data, $booking_date);
 
         $real_court_price = $hourly_rate * $hours;
         $real_rental_price = 0.00;

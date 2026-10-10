@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../config/config.php';
-
-if (!isset($_SESSION['member_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
+require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_csrf_token();
@@ -13,50 +7,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $member_id = $_SESSION['member_id'];
 
     try {
-        // 1. ตรวจสอบว่ามีการอัปโหลดไฟล์สลิปมาหรือไม่
+        // 1. ตรวจสอบและอัปโหลดไฟล์สลิปหลักฐานการโอนเงิน (DRY Helper)
         if (!isset($_FILES['payment_slip']) || $_FILES['payment_slip']['error'] == UPLOAD_ERR_NO_FILE) {
             throw new Exception("กรุณาแนบสลิปหลักฐานการโอนเงิน");
         }
 
-        $file = $_FILES['payment_slip'];
-        
-        // ตรวจสอบขนาดไฟล์รูปภาพ (ไม่เกิน 5MB)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            throw new Exception("ขนาดไฟล์รูปภาพสลิปต้องไม่เกิน 5MB");
-        }
-        
-        // 2. ตรวจสอบนามสกุลและ MIME Type ไฟล์รูปภาพ
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'webp'];
-        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        if (!in_array($file_extension, $allowed_extensions)) {
-            throw new Exception("รองรับเฉพาะไฟล์รูปภาพ (JPG, JPEG, PNG, WEBP) เท่านั้น");
-        }
-        
-        // ตรวจสอบ MIME Type จริงๆ เพื่อป้องกันการปลอมแปลงนามสกุลไฟล์
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime_type = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
-        
-        $allowed_mimes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (!in_array($mime_type, $allowed_mimes)) {
-            throw new Exception("รูปแบบไฟล์ไม่ถูกต้อง หรือไฟล์ถูกดัดแปลงนามสกุล");
-        }
-
-        // 3. สร้างชื่อไฟล์ใหม่เพื่อป้องกันชื่อซ้ำ
-        $new_filename = "slip_" . $booking_id . "_" . time() . "." . $file_extension;
-        $upload_dir = "../uploads/slips/";
-
-        // สร้างโฟลเดอร์ uploads/slips/ หากยังไม่มี
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-
-        $upload_path = $upload_dir . $new_filename;
-
-        if (!move_uploaded_file($file['tmp_name'], $upload_path)) {
-            throw new Exception("เกิดข้อผิดพลาดในการอัปโหลดรูปภาพสลิป");
-        }
+        $new_filename = handle_secure_image_upload($_FILES['payment_slip'], "../uploads/slips/", 5);
 
         // 4. ดึงข้อมูลการจองและตรวจสอบสถานะ
         $stmt_price = $conn->prepare("SELECT booking_total_price, booking_status, booking_lock_expire FROM Booking WHERE booking_id = :booking_id AND member_id = :member_id");

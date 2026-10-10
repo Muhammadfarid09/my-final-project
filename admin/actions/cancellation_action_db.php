@@ -69,30 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':c_id' => $cancel_id
         ]);
 
-        // 4. อัปเดตสถานะ Booking เป็น 'ยกเลิก' (ปลดล็อกสนามให้ว่างสำหรับผู้อื่น)
-        $conn->prepare("UPDATE Booking SET booking_status = 'ยกเลิก' WHERE booking_id = :b_id")
-             ->execute([':b_id' => $booking_id]);
-
-        // 5. คืนสต็อกอุปกรณ์เช่ากลับเข้าสู่คลังสินค้า (ถ้ามีและยังค้างอยู่ในสถานะกำลังเช่า/รอตรวจสอบ)
-        $stmt_rentals = $conn->prepare("
-            SELECT product_id, rental_quantity 
-            FROM Rental 
-            WHERE booking_id = :b_id AND rental_status IN ('กำลังเช่า', 'รอตรวจสอบ')
-        ");
-        $stmt_rentals->execute([':b_id' => $booking_id]);
-        $rentals = $stmt_rentals->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($rentals as $rent) {
-            $conn->prepare("UPDATE Product SET product_stock = product_stock + :qty WHERE product_id = :p_id")
-                 ->execute([
-                     ':qty' => $rent['rental_quantity'],
-                     ':p_id' => $rent['product_id']
-                 ]);
-        }
-
-        // อัปเดตตาราง Rental เป็น 'ยกเลิก'
-        $conn->prepare("UPDATE Rental SET rental_status = 'ยกเลิก' WHERE booking_id = :b_id AND rental_status != 'ยกเลิก'")
-             ->execute([':b_id' => $booking_id]);
+        // 4. คืนสต็อกอุปกรณ์เช่าและอัปเดตสถานะ Booking/Rental เป็น 'ยกเลิก' (DRY Helper)
+        cancel_booking_and_restore_stock($conn, $booking_id);
 
         // 6. จัดการสถานะใน Payment (กรณีสลิปยังรอตรวจสอบ) เพื่อบันทึกประวัติการตรวจสอบของแอดมิน
         if (!empty($c_info['payment_id']) && $c_info['payment_status'] === 'รอตรวจสอบ') {

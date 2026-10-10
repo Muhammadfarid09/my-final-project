@@ -1,14 +1,7 @@
 <?php
-session_start();
-require_once 'config/config.php';
+require_once 'includes/auth_check.php';
 require_once 'admin/includes/auto_cancel.php';
 
-// บังคับล็อกอิน หากยังไม่ล็อกอินให้ไปหน้า login
-if (!isset($_SESSION['member_id'])) {
-    $_SESSION['error'] = "กรุณาเข้าสู่ระบบก่อนทำการจองสนาม";
-    header("Location: login.php");
-    exit();
-}
 
 try {
     // ดึงข้อมูลสนามทั้งหมด

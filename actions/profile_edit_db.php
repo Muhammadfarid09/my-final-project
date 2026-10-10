@@ -1,12 +1,5 @@
 <?php
-session_start();
-require_once '../config/config.php';
-
-// ตรวจสอบการเข้าสู่ระบบ
-if (!isset($_SESSION['member_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
+require_once '../includes/auth_check.php';
 
 $member_id = intval($_SESSION['member_id']);
 

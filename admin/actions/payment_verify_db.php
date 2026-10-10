@@ -67,48 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
 
             // 5. ระบบแจกคะแนนสะสม (Point) อัตโนมัติ 
-            // ทุกๆ 100 บาท จะได้ 1 พอยท์
-            $earned_points = floor($data['booking_total_price'] / 100); 
-
-            if ($earned_points > 0) {
-                $member_id = $data['member_id'];
-
-                // 5.1 อัปเดตตาราง Point (ถ้ามีข้อมูลอยู่แล้วให้บวกเพิ่ม ถ้ายังไม่มีให้ INSERT)
-                $check_point = $conn->prepare("SELECT point_id FROM Point WHERE member_id = :m_id");
-                $check_point->execute([':m_id' => $member_id]);
-                if ($check_point->fetch()) {
-                    $sql_point = "UPDATE Point SET point_balance = point_balance + :pts, point_total_earned = point_total_earned + :pts WHERE member_id = :m_id";
-                    $conn->prepare($sql_point)->execute([':pts' => $earned_points, ':m_id' => $member_id]);
-                } else {
-                    $sql_point = "INSERT INTO Point (member_id, point_balance, point_total_earned, member_level) VALUES (:m_id, :pts, :pts, 'Bronze')";
-                    $conn->prepare($sql_point)->execute([':m_id' => $member_id, ':pts' => $earned_points]);
-                }
-
-                // 5.2 บันทึกประวัติ Point_Transaction
-                $sql_pt_trans = "INSERT INTO Point_Transaction (member_id, booking_id, transaction_type, transaction_point, transaction_note) 
-                                 VALUES (:m_id, :b_id, 'ได้รับ', :pts, 'ได้รับพอยท์จากการจองสนามออนไลน์')";
-                $conn->prepare($sql_pt_trans)->execute([
-                    ':m_id' => $member_id,
-                    ':b_id' => $booking_id,
-                    ':pts' => $earned_points
-                ]);
-
-                // 5.3 ตรวจสอบและอัปเกรดระดับสมาชิก (Tier Progression): Bronze -> Silver (500 pts) -> Gold (1000 pts)
-                $stmt_pts = $conn->prepare("SELECT point_total_earned FROM Point WHERE member_id = :m_id");
-                $stmt_pts->execute([':m_id' => $member_id]);
-                $total_earned = $stmt_pts->fetchColumn() ?: 0;
-
-                $new_level = 'Bronze';
-                if ($total_earned >= 1000) {
-                    $new_level = 'Gold';
-                } elseif ($total_earned >= 500) {
-                    $new_level = 'Silver';
-                }
-
-                $conn->prepare("UPDATE Point SET member_level = :lvl WHERE member_id = :m_id")->execute([
-                    ':lvl' => $new_level,
-                    ':m_id' => $member_id
-                ]);
+            // 5. การสะสมคะแนน (มาตรฐานเดียวกัน: 1 คะแนน ต่อ 100 บาท) และอัปเกรดระดับสมาชิก
+            if (!empty($data['member_id']) && floatval($data['booking_total_price']) >= 100) {
+                award_member_points($conn, intval($data['member_id']), floatval($data['booking_total_price']), $booking_id, 'ได้รับพอยท์จากการจองสนามออนไลน์');
             }
 
             $_SESSION['success'] = "ยืนยันการชำระเงิน สำเร็จ! และระบบได้อัปเดตรายรับพร้อมแจกคะแนนสะสมเรียบร้อยแล้ว";

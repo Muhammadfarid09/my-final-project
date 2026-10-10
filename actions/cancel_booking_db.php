@@ -1,13 +1,6 @@
 <?php
-session_start();
-// เรียกใช้ไฟล์ตั้งค่าฐานข้อมูล
-require_once '../config/config.php';
+require_once '../includes/auth_check.php';
 
-// ตรวจสอบการเข้าสู่ระบบสมาชิก
-if (!isset($_SESSION['member_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
 
 $member_id = intval($_SESSION['member_id']);
 
@@ -76,30 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // กรณีที่ 1: สถานะ "รอตรวจสอบ" (ยังไม่ได้รับการอนุมัติ)
         // ========================================================
         if ($booking_status === 'รอตรวจสอบ') {
-            // คืนสต็อกอุปกรณ์เช่า (ถ้ามี)
-            $stmt_rentals = $conn->prepare("
-                SELECT product_id, rental_quantity 
-                FROM Rental 
-                WHERE booking_id = :b_id AND rental_status IN ('กำลังเช่า', 'รอตรวจสอบ')
-            ");
-            $stmt_rentals->execute([':b_id' => $booking_id]);
-            $rentals = $stmt_rentals->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($rentals as $rent) {
-                $sql_restore = "UPDATE Product SET product_stock = product_stock + :qty WHERE product_id = :p_id";
-                $conn->prepare($sql_restore)->execute([
-                    ':qty' => $rent['rental_quantity'],
-                    ':p_id' => $rent['product_id']
-                ]);
-            }
-
-            // อัปเดตสถานะในตาราง Rental เป็น 'ยกเลิก'
-            $conn->prepare("UPDATE Rental SET rental_status = 'ยกเลิก' WHERE booking_id = :b_id")
-                 ->execute([':b_id' => $booking_id]);
-
-            // อัปเดตสถานะการจองเป็น 'ยกเลิก' เพื่อปล่อย Slot สนามว่างทันที
-            $conn->prepare("UPDATE Booking SET booking_status = 'ยกเลิก' WHERE booking_id = :b_id")
-                 ->execute([':b_id' => $booking_id]);
+            // คืนสต็อกอุปกรณ์เช่า และอัปเดตสถานะ Booking / Rental เป็น 'ยกเลิก' ผ่านฟังก์ชันกลาง (DRY)
+            cancel_booking_and_restore_stock($conn, $booking_id);
 
             // 1.1 กรณียังไม่ได้แนบสลิป (ลูกค้ายังไม่ได้จ่ายเงิน) -> ยกเลิกทันที ไม่ต้องคืนเงิน
             if (!$has_slip) {

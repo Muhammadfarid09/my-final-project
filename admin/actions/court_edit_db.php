@@ -1,11 +1,5 @@
 <?php
-session_start();
-require_once '../../config/config.php';
-
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: ../../login.php");
-    exit();
-}
+require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $court_id = intval($_POST['court_id']);

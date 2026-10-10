@@ -1,14 +1,9 @@
 <?php
-session_start();
-require_once '../../config/config.php';
+require_once '../includes/auth_check.php';
 
 // คืนค่าเป็น JSON
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['admin_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-    exit();
-}
 
 $member_id = isset($_GET['member_id']) ? intval($_GET['member_id']) : 0;
 $last_id = isset($_GET['last_id']) ? intval($_GET['last_id']) : 0;

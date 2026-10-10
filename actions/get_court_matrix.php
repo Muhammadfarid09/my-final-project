@@ -16,7 +16,7 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
 try {
     // คำนวณวันในสัปดาห์ (0=อาทิตย์, 1=จันทร์, 2=อังคาร, 3=พุธ, 4=พฤหัส, 5=ศุกร์, 6=เสาร์)
     $dow = intval(date('w', strtotime($date)));
-    $day_names = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+    $day_names = get_thai_day_names();
     $day_name = $day_names[$dow];
 
     // กำหนดเรทราคาตามเงื่อนไขของวัน:
@@ -99,17 +99,7 @@ try {
         $c_close = $c['court_close_time'] ? substr($c['court_close_time'], 0, 5) : sprintf("%02d:00", $max_close_hour);
 
         // คำนวณราคาของสนามนี้ตามประเภทวัน
-        $base_rate = floatval($c['court_price_per_hour']) > 0 ? floatval($c['court_price_per_hour']) : 180.00;
-        $peak_rate = floatval($c['court_peak_price']) > 0 ? floatval($c['court_peak_price']) : 200.00;
-        $offpeak_rate = floatval($c['court_offpeak_price']) > 0 ? floatval($c['court_offpeak_price']) : 150.00;
-
-        if ($rate_category === 'weekend') {
-            $slot_price = $peak_rate;
-        } elseif ($rate_category === 'promo') {
-            $slot_price = $offpeak_rate;
-        } else {
-            $slot_price = $base_rate;
-        }
+        $slot_price = calculate_court_hourly_rate($c, $date);
 
         $court_slots = [];
         foreach ($slots as $slot) {

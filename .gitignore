@@ -1,3 +1,7 @@
 # Ignore slip uploads
 uploads/slips/*
 !uploads/slips/.gitkeep
+
+# Ignore news uploads
+uploads/news/*
+!uploads/news/.gitkeep

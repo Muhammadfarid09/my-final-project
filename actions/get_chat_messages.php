@@ -1,13 +1,8 @@
 <?php
-session_start();
-require_once '../config/config.php';
+define('IS_AJAX_AUTH', true);
+require_once '../includes/auth_check.php';
 
 header('Content-Type: application/json');
-
-if (!isset($_SESSION['member_id'])) {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-    exit();
-}
 
 $member_id = intval($_SESSION['member_id']);
 $last_id = isset($_GET['last_id']) ? intval($_GET['last_id']) : 0;

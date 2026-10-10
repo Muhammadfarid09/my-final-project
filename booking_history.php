@@ -1,14 +1,8 @@
 <?php
-session_start();
-require_once 'config/config.php';
-
-// ตรวจสอบการล็อกอิน
-if (!isset($_SESSION['member_id'])) {
-    header("Location: login.php");
-    exit();
-}
+require_once 'includes/auth_check.php';
 
 $member_id = $_SESSION['member_id'];
+
 
 try {
     $stmt = $conn->prepare("SELECT b.*, c.court_name, cn.cancel_id, cn.refund_status as cancel_refund_status 
@@ -110,7 +104,7 @@ try {
                             $can_cancel = false;
                             $cancel_btn_text = 'ยกเลิกการจอง';
 
-                            if ($status === 'ยกเลิก') {
+                            if ($status === STATUS_BOOKING_CANCELLED) {
                                 $status_class = 'status-cancel';
                                 $display_status = 'ยกเลิกแล้ว';
                                 $can_cancel = false;
@@ -118,7 +112,7 @@ try {
                                 $status_class = 'status-pending';
                                 $display_status = 'ขอยกเลิก (รอแอดมินพิจารณา)';
                                 $can_cancel = false;
-                            } elseif ($status === 'จองแล้ว' || $status === 'ชำระเงินแล้ว' || $status === 'อนุมัติแล้ว') {
+                            } elseif ($status === STATUS_BOOKING_CONFIRMED) {
                                 if ($is_past) {
                                     // จองแล้ว และเวลาผ่านไปแล้ว -> แสดง "ใช้บริการแล้ว" / "เสร็จสิ้น"
                                     $status_class = 'status-completed';
@@ -136,7 +130,7 @@ try {
                                     $can_cancel = true;
                                     $cancel_btn_text = 'ขอยกเลิก';
                                 }
-                            } elseif ($status === 'รอตรวจสอบ') {
+                            } elseif ($status === STATUS_BOOKING_PENDING) {
                                 if ($is_past) {
                                     // รายการค้างที่ไม่ได้รับการอนุมัติจนเลยเวลา
                                     $status_class = 'status-cancel';

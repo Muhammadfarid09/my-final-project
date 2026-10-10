@@ -1,18 +1,7 @@
 <?php
-session_start();
-require_once '../config/config.php';
+require_once '../includes/auth_check.php';
 
 $is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') || (isset($_POST['ajax']) && $_POST['ajax'] == '1');
-
-if (!isset($_SESSION['member_id'])) {
-    if ($is_ajax) {
-        header('Content-Type: application/json');
-        echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-        exit();
-    }
-    header("Location: ../login.php");
-    exit();
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $member_id = intval($_SESSION['member_id']);
