@@ -2524,6 +2524,37 @@ body.bg-register {
 .brand-badge-ashaway { border-left: 3px solid #c084fc; }
 .brand-badge-ts { border-left: 3px solid var(--color-gold); }
 
+/* Brand Banner Cards (Official Graphics Display) */
+.brand-banner-card {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: all var(--transition-fast);
+    user-select: none;
+    cursor: pointer;
+}
+.brand-banner-card:hover {
+    border-color: var(--color-gold);
+    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.25);
+    transform: translateY(-2px);
+}
+.brand-banner-img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--transition-fast);
+}
+.brand-banner-card:hover .brand-banner-img {
+    transform: scale(1.04);
+}
+
 /* Section Header Shared */
 .section-header-center {
     text-align: center;
