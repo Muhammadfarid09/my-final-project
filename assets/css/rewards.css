@@ -1,0 +1,892 @@
+/* ==========================================================================
+   T.S. Pattani - Rewards & Loyalty Program Styles (Premium Black & Gold)
+   Scope: rewards.php | Strict Separation of Concerns (Rule 2)
+   ========================================================================== */
+
+/* Main Page Wrapper */
+.rewards-page-wrapper {
+    max-width: 1200px;
+    margin: 35px auto 70px;
+    padding: 0 20px;
+    font-family: 'Prompt', sans-serif;
+}
+
+/* ==========================================================================
+   1. แผงสรุปคะแนนและระดับสมาชิก (Loyalty Hero Card)
+   ========================================================================== */
+.rewards-hero-card {
+    background: linear-gradient(135deg, var(--bg-surface, #191919) 0%, var(--bg-elevated, #242424) 100%);
+    border: 1px solid rgba(255, 185, 29, 0.25);
+    border-radius: var(--radius-lg, 16px);
+    padding: 32px 36px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 0 15px rgba(255, 185, 29, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rewards-hero-card::after {
+    content: '\f06b';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    font-size: 150px;
+    opacity: 0.04;
+    color: var(--color-gold, #FFB91D);
+    pointer-events: none;
+}
+
+.rewards-hero-info {
+    flex: 1;
+    min-width: 280px;
+    z-index: 1;
+}
+
+.rewards-hero-title {
+    margin: 0 0 8px 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rewards-hero-title i {
+    color: var(--color-gold, #FFB91D);
+}
+
+.rewards-hero-desc {
+    margin: 0 0 18px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+/* Tier Progression Bar */
+.loyalty-progress-container {
+    max-width: 440px;
+}
+
+.loyalty-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+.loyalty-progress-label strong {
+    color: var(--color-gold, #FFB91D);
+}
+
+.loyalty-progress-track {
+    background: rgba(255, 255, 255, 0.08);
+    height: 10px;
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.loyalty-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #D4AF37 0%, var(--color-gold, #FFB91D) 100%);
+    border-radius: 9999px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 10px rgba(255, 185, 29, 0.4);
+}
+
+/* Hero Stats Section */
+.rewards-hero-stats {
+    text-align: right;
+    z-index: 1;
+    min-width: 220px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rewards-coins-display {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--color-gold, #FFB91D);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    text-shadow: 0 2px 10px rgba(255, 185, 29, 0.25);
+    letter-spacing: -0.5px;
+}
+
+.rewards-coins-display i {
+    font-size: 28px;
+    color: var(--color-gold, #FFB91D);
+}
+
+.rewards-level-row {
+    font-size: 13px;
+    margin-top: 6px;
+    color: var(--text-secondary, #A3A3A3);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* Loyalty Badges */
+.loyalty-badge {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.loyalty-badge.bronze {
+    background: linear-gradient(135deg, #A85A2A 0%, #83401B 100%);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 6px rgba(131, 64, 27, 0.35);
+}
+
+.loyalty-badge.silver {
+    background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 6px rgba(100, 116, 139, 0.35);
+}
+
+.loyalty-badge.gold {
+    background: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
+    color: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.45);
+}
+
+/* ==========================================================================
+   2. แท็บสลับมุมมอง (Tabs Navigation)
+   ========================================================================== */
+.rewards-tab-nav {
+    display: flex;
+    gap: 16px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 30px;
+}
+
+.rewards-tab-btn {
+    padding: 14px 22px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary, #A3A3A3);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    margin-bottom: -2px;
+}
+
+.rewards-tab-btn:hover:not(.active) {
+    color: var(--color-gold, #FFB91D);
+}
+
+.rewards-tab-btn.active {
+    color: var(--color-gold, #FFB91D);
+    border-bottom-color: var(--color-gold, #FFB91D);
+    font-weight: 700;
+}
+
+.rewards-tab-count {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary, #A3A3A3);
+    padding: 3px 9px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.rewards-tab-btn.active .rewards-tab-count {
+    background: rgba(255, 185, 29, 0.18);
+    color: var(--color-gold, #FFB91D);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+}
+
+.rewards-tab-pane {
+    display: none;
+}
+
+.rewards-tab-pane.active {
+    display: block;
+    animation: rewardFadeIn 0.3s ease-out;
+}
+
+@keyframes rewardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   3. รายการของรางวัล (Reward Cards Grid)
+   ========================================================================== */
+.rewards-catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 26px;
+}
+
+.reward-item-card {
+    background: var(--bg-surface, #191919);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+.reward-item-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 185, 29, 0.4);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 185, 29, 0.15);
+}
+
+/* Thumbnail Box */
+.reward-item-thumb-box {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    background: #111111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reward-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.reward-item-card:hover .reward-item-img {
+    transform: scale(1.06);
+}
+
+.reward-placeholder-icon {
+    font-size: 58px;
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* Badges on Thumbnail */
+.badge-tier-req {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.badge-urgent-stock {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(239, 68, 68, 0.9);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+    animation: pulseBadge 2s infinite;
+}
+
+@keyframes pulseBadge {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(0.97); }
+}
+
+.badge-out-stock {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(30, 30, 30, 0.9);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+}
+
+/* Card Body */
+.reward-item-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.reward-item-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    min-height: 48px;
+}
+
+.reward-item-desc {
+    font-size: 13px;
+    color: var(--text-secondary, #A3A3A3);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.reward-item-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 16px;
+}
+
+.reward-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.reward-cost-tag {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--color-gold, #FFB91D);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reward-cost-tag i {
+    color: var(--color-gold, #FFB91D);
+}
+
+.reward-stock-text {
+    font-size: 12px;
+    color: var(--text-muted, #737373);
+}
+
+.reward-stock-text strong {
+    color: var(--text-primary, #F5F5F5);
+}
+
+/* ==========================================================================
+   4. สถานะปุ่มดำเนินการ (HCI 3 Button States + Locked)
+   ========================================================================== */
+.btn-redeem-action {
+    width: 100%;
+    padding: 11px 18px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* สถานะที่ 1: แต้มพอและมีของ (Active CTA) */
+.btn-redeem-action.active {
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #111111);
+    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.25);
+}
+
+.btn-redeem-action.active:hover {
+    background: var(--color-gold-hover, #DCA017);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.4);
+}
+
+/* สถานะที่ 2: แต้มสะสมไม่พอ (Shortfall) */
+.btn-redeem-action.shortfall {
+    background: rgba(255, 185, 29, 0.08);
+    color: #FBBF24;
+    border: 1px solid rgba(255, 185, 29, 0.2);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+/* สถานะที่ 3: ระดับสมาชิกไม่ถึง (Locked) */
+.btn-redeem-action.locked {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted, #737373);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: not-allowed;
+}
+
+/* สถานะที่ 4: สินค้าหมดชั่วคราว (Out of Stock) */
+.btn-redeem-action.out-of-stock {
+    background: rgba(239, 68, 68, 0.08);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   5. ป็อปอัปยืนยันการแลกของรางวัล (Confirmation Modal)
+   ========================================================================== */
+.redeem-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.redeem-modal-overlay.active {
+    display: flex;
+    animation: modalBackdropFadeIn 0.25s ease-out;
+}
+
+@keyframes modalBackdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.redeem-modal-card {
+    background: var(--bg-surface, #191919);
+    border: 1px solid rgba(255, 185, 29, 0.35);
+    border-radius: var(--radius-lg, 16px);
+    width: 100%;
+    max-width: 480px;
+    padding: 28px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 185, 29, 0.15);
+    animation: modalCardScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+@keyframes modalCardScaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.redeem-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.redeem-modal-header i {
+    color: var(--color-gold, #FFB91D);
+}
+
+.redeem-modal-header h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+}
+
+/* Modal Reward Preview */
+.redeem-preview-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.redeem-preview-thumb {
+    width: 68px;
+    height: 68px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #111111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.redeem-preview-placeholder {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.redeem-preview-info {
+    flex-grow: 1;
+}
+
+.redeem-preview-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    margin-bottom: 4px;
+}
+
+.redeem-preview-cost {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-gold, #FFB91D);
+}
+
+/* Points Breakdown Table */
+.redeem-calc-table {
+    background: var(--bg-elevated, #242424);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.redeem-calc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: var(--text-secondary, #A3A3A3);
+    padding: 5px 0;
+}
+
+.redeem-calc-row strong {
+    color: var(--text-primary, #F5F5F5);
+    font-weight: 600;
+}
+
+.redeem-calc-row strong.text-danger {
+    color: #EF4444;
+}
+
+.redeem-calc-row.final {
+    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    padding-top: 10px;
+    margin-top: 6px;
+    font-weight: 700;
+}
+
+.redeem-calc-row.final strong {
+    color: var(--color-gold, #FFB91D);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* Note Banner */
+.redeem-note-banner {
+    background: rgba(255, 185, 29, 0.08);
+    border: 1px solid rgba(255, 185, 29, 0.25);
+    border-left: 4px solid var(--color-gold, #FFB91D);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-primary, #F5F5F5);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.redeem-note-banner i {
+    color: var(--color-gold, #FFB91D);
+    margin-top: 2px;
+}
+
+/* Modal Footer Buttons */
+.member-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.member-modal-footer .btn-cancel {
+    padding: 11px 22px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-secondary, #A3A3A3);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.member-modal-footer .btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #F5F5F5);
+}
+
+.member-modal-footer .btn-submit-confirm {
+    padding: 11px 24px;
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #111111);
+    border: none;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.3);
+    transition: all 0.25s ease;
+}
+
+.member-modal-footer .btn-submit-confirm:hover {
+    background: var(--color-gold-hover, #DCA017);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.45);
+}
+
+/* ==========================================================================
+   6. ตารางประวัติการแลก (Redemption History Table)
+   ========================================================================== */
+.redemptions-container {
+    background: var(--bg-surface, #191919);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: var(--radius-lg, 16px);
+    padding: 24px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+.redemptions-table-box {
+    overflow-x: auto;
+}
+
+.redemptions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.redemptions-table th {
+    background: var(--bg-elevated, #242424);
+    color: var(--color-gold, #FFB91D);
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 2px solid rgba(255, 185, 29, 0.25);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.redemptions-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-primary, #F5F5F5);
+    vertical-align: middle;
+}
+
+.redemptions-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.badge-rdm-code {
+    background: rgba(255, 185, 29, 0.12);
+    color: var(--color-gold, #FFB91D);
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 185, 29, 0.3);
+}
+
+.badge-rdm-status {
+    background: rgba(255, 185, 29, 0.1);
+    color: var(--color-gold, #FFB91D);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255, 185, 29, 0.25);
+}
+
+.badge-rdm-points {
+    color: #EF4444;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   7. สถานะว่างเปล่า (Empty States)
+   ========================================================================== */
+.rewards-empty-box {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--bg-surface, #191919);
+    border-radius: var(--radius-lg, 16px);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.rewards-empty-icon {
+    font-size: 54px;
+    color: rgba(255, 255, 255, 0.15);
+    margin-bottom: 16px;
+}
+
+.rewards-empty-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    margin: 0 0 8px 0;
+}
+
+.rewards-empty-desc {
+    font-size: 14px;
+    color: var(--text-secondary, #A3A3A3);
+    margin: 0 0 20px 0;
+    line-height: 1.6;
+}
+
+.btn-empty-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #111111);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btn-empty-action:hover {
+    background: var(--color-gold-hover, #DCA017);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.3);
+}
+
+/* ==========================================================================
+   8. การแสดงผลบนอุปกรณ์พกพา (Responsive Breakpoints)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .rewards-page-wrapper {
+        margin: 25px auto 50px;
+        padding: 0 16px;
+    }
+
+    .rewards-hero-card {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 24px 20px;
+    }
+
+    .rewards-hero-title {
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .loyalty-progress-container {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .rewards-hero-stats {
+        text-align: center;
+        min-width: 100%;
+    }
+
+    .rewards-coins-display {
+        justify-content: center;
+        font-size: 32px;
+    }
+
+    .rewards-level-row {
+        justify-content: center;
+    }
+
+    .rewards-tab-nav {
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 8px;
+    }
+
+    .rewards-tab-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    .rewards-catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .redeem-modal-card {
+        padding: 20px;
+    }
+}
