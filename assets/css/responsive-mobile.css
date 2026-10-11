@@ -245,33 +245,7 @@
 }
 
 @media (max-width: 768px) {
-    .nav-dark-toggle {
-        display: inline-flex;
-    }
-    .nav-dark-menu {
-        display: none;
-        position: absolute;
-        top: 72px;
-        left: 0;
-        right: 0;
-        background-color: var(--bg-surface);
-        border-bottom: 1px solid var(--border-color);
-        flex-direction: column;
-        padding: 18px 24px;
-        gap: 8px;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
-        z-index: 999;
-    }
-    .nav-dark-menu.show {
-        display: flex;
-    }
-    .nav-dark-menu li a {
-        width: 100%;
-        padding: 12px 16px;
-    }
-    .nav-dark-actions {
-        display: none;
-    }
+
     .hero-dark-section {
         padding: 60px 16px 70px 16px;
     }
