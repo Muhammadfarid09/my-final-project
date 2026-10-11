@@ -70,3 +70,4 @@
    - ปราศจากคำสั่ง `!important` ในไฟล์ CSS ทั้งหมด
 3. **Safety First & Backward Compatibility:** ไม่กระทบ Logic ของ Session, Remember Me และ Event IDs เดิมของ `member.js`
 4. **HCI Standards:** ยึดหลัก Visual Hierarchy, Form Ergonomics และ Mobile Ergonomics
+
