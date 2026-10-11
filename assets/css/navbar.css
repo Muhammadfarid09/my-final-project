@@ -97,12 +97,13 @@
     gap: 8px;
     padding: 8px 14px;
     border-radius: var(--radius-sm, 6px);
+    background-color: transparent;
     color: var(--text-secondary, #A3A3A3);
     text-decoration: none;
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.2px;
-    transition: color 0.25s ease, background-color 0.25s ease;
+    transition: color 0.25s ease;
     overflow: visible;
 }
 
@@ -130,7 +131,7 @@
 /* สถานะเมื่อเลื่อนเมาส์ชี้ (:hover) */
 .nav-link:hover {
     color: var(--text-primary, #F5F5F5);
-    background-color: rgba(255, 185, 29, 0.05);
+    background-color: transparent;
 }
 
 .nav-link:hover i {
@@ -145,7 +146,7 @@
 .nav-link.active {
     color: var(--color-gold, #FFB91D);
     font-weight: 600;
-    background-color: rgba(255, 185, 29, 0.08);
+    background-color: transparent;
 }
 
 .nav-link.active i {
@@ -494,3 +495,4 @@
         text-align: center;
     }
 }
+
