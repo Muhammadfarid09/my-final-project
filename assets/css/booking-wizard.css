@@ -285,15 +285,21 @@
     font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all 0.15s ease;
     font-family: inherit;
+    outline: none;
 }
-.btn-quick-date:hover {
-    background: var(--bg-elevated);
-    color: var(--text-primary);
+.btn-quick-date:focus {
+    outline: none;
+}
+.btn-quick-date:hover:not(.active) {
+    background: rgba(255, 185, 29, 0.15);
+    color: var(--color-gold);
     border-color: var(--color-gold);
 }
-.btn-quick-date.active {
+.btn-quick-date.active,
+.btn-quick-date.active:hover,
+.btn-quick-date.active:focus {
     background: var(--color-gold);
     color: var(--text-on-gold);
     border-color: var(--color-gold);
@@ -369,31 +375,49 @@
     background: var(--bg-surface);
     position: relative;
     user-select: none;
+    outline: none;
 }
-.calendar-date-cell:hover:not(.disabled) {
-    background: var(--bg-elevated);
+.calendar-date-cell:focus,
+.calendar-date-cell:focus-visible {
+    outline: none;
+}
+.calendar-date-cell:focus:not(.selected) {
+    background: var(--bg-surface);
+}
+.calendar-date-cell:hover:not(.disabled):not(.selected) {
+    background: rgba(255, 185, 29, 0.18);
     border-color: var(--color-gold);
     color: var(--color-gold);
+    box-shadow: 0 2px 8px rgba(255, 185, 29, 0.2);
 }
-.calendar-date-cell.today {
+.calendar-date-cell.today:not(.selected) {
     border-color: var(--color-gold);
     font-weight: 700;
 }
-.calendar-date-cell.selected {
+.calendar-date-cell.selected,
+.calendar-date-cell.selected:hover,
+.calendar-date-cell.selected:focus {
     background: var(--color-gold);
     color: var(--text-on-gold);
     border-color: var(--color-gold);
     font-weight: 700;
-    box-shadow: 0 4px 12px rgba(255, 185, 29, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 185, 29, 0.35);
 }
 .calendar-date-cell.disabled {
     color: #52525b;
     cursor: not-allowed;
     background: var(--bg-primary);
+    border-color: transparent;
+}
+.calendar-date-cell.disabled:hover {
+    background: var(--bg-primary);
+    border-color: transparent;
+    color: #52525b;
 }
 .calendar-date-cell.empty {
     cursor: default;
     background: transparent;
+    border-color: transparent;
 }
 .date-price-banner {
     margin-top: 18px;
