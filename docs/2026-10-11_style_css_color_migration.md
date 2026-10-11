@@ -83,3 +83,4 @@
 - **Zero `!important`:** ปราศจากการใช้ `!important` ในไฟล์ CSS ทั้งหมดตามกฎข้อ 2 ใน `ADDITIONAL_RULES.md`
 - **Zero Inline Styles:** ไม่มีการใช้ Inline Style หรือแทรก `<style>` กลางไฟล์
 - **CSS Architecture:** รักษา Class Name เดิมไว้ครบ 100% (No Breaking Change / Zero Regression)
+

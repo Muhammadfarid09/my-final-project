@@ -335,11 +335,19 @@
         padding: 24px 16px;
         box-sizing: border-box;
     }
-    .login-card-floating {
+    .login-card-floating,
+    .register-card-floating {
         max-width: 100%;
         padding: 28px 20px;
         border-radius: 16px;
         margin: 16px 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .form-row-dark {
+        grid-template-columns: 1fr;
+        gap: 14px;
     }
 }
 

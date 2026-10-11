@@ -128,7 +128,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
             <div class="login-top-utility">
                 <a href="index.php" class="btn-utility-back">
                     <i class="fas fa-arrow-left"></i>
-                    <span>← กลับหน้าหลัก</span>
+                    <span>กลับหน้าหลัก</span>
                 </a>
                 <div class="utility-status-pill">
                     <span class="status-indicator-dot"></span>
