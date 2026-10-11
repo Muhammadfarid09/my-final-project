@@ -1,0 +1,488 @@
+/* ==========================================================================
+   T.S. Pattani Badminton - Payment Page Dedicated Styles (payment.php)
+   Theme: Black & Gold Luxury Design Tokens
+   Strict Separation of Concerns per Additional Rules #2
+   ========================================================================== */
+
+.payment-page-container {
+    max-width: 920px;
+    margin: 36px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1. Countdown Timer Strip (นับถอยหลัง 15 นาที Dark Luxury)
+   ========================================================================== */
+.payment-countdown-card {
+    background: var(--bg-surface, #141414);
+    border: 1px solid rgba(255, 185, 29, 0.35);
+    border-radius: var(--radius-md, 12px);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 15px rgba(255, 185, 29, 0.05);
+}
+
+.countdown-info-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.countdown-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 185, 29, 0.12);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-gold, #FFB91D);
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.countdown-text-box h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.countdown-text-box p {
+    margin: 4px 0 0 0;
+    font-size: 12.5px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+.countdown-timer-badge {
+    background: rgba(255, 185, 29, 0.1);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+    border-radius: 8px;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.countdown-digits {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-gold, #FFB91D);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 185, 29, 0.4);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   2. Main Two-Column Grid
+   ========================================================================== */
+.payment-grid-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+.payment-card {
+    background: var(--bg-surface, #141414);
+    border: 1px solid var(--border-color, #2d2d2d);
+    border-radius: var(--radius-md, 14px);
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-sizing: border-box;
+}
+
+.payment-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    margin: 0 0 18px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 185, 29, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-card-title i {
+    color: var(--color-gold, #FFB91D);
+}
+
+/* ==========================================================================
+   3. QR Code PromptPay Section (ฝั่งซ้าย)
+   ========================================================================== */
+.payment-qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* กรอบสีขาวคมชัดสำหรับ QR Code เพื่อให้แอปธนาคารสแกนได้แม่นยำ */
+.payment-qr-frame {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 185, 29, 0.35);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.promptpay-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #0c2461;
+}
+
+.promptpay-header i {
+    color: #0c2461;
+    font-size: 15px;
+}
+
+.payment-qr-img {
+    width: 210px;
+    height: 210px;
+    object-fit: contain;
+    display: block;
+}
+
+.payment-qr-hint {
+    font-size: 11px;
+    color: #666;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+.payment-bank-info {
+    margin-top: 6px;
+    width: 100%;
+}
+
+.payment-bank-title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.payment-account-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+}
+
+.payment-account-number {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--color-gold, #FFB91D);
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
+
+.btn-copy-account {
+    background: rgba(255, 185, 29, 0.12);
+    border: 1px solid var(--color-gold, #FFB91D);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-gold, #FFB91D);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: inherit;
+}
+
+.btn-copy-account:hover,
+.btn-copy-account:active {
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #000);
+}
+
+.copy-tooltip {
+    display: none;
+    font-size: 12px;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.payment-account-holder {
+    font-size: 12.5px;
+    color: var(--text-secondary, #A3A3A3);
+    margin: 4px 0 0 0;
+}
+
+/* ==========================================================================
+   4. Booking Summary & Slip Upload Form (ฝั่งขวา)
+   ========================================================================== */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    font-size: 13.5px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+.summary-row strong {
+    color: var(--text-primary, #F5F5F5);
+    font-weight: 600;
+}
+
+.payment-divider {
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px dashed rgba(255, 185, 29, 0.2);
+}
+
+.payment-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 16px 0;
+    margin-bottom: 18px;
+    border-top: 1px solid rgba(255, 185, 29, 0.35);
+}
+
+.payment-total-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.payment-total-val {
+    color: var(--color-gold, #FFB91D);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 12px rgba(255, 185, 29, 0.3);
+}
+
+/* กล่องอัปโหลดสลิป Dropzone */
+.payment-upload-label {
+    font-weight: 600;
+    font-size: 13.5px;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.payment-upload-label .required-star {
+    color: #f87171;
+}
+
+.slip-upload-box {
+    border: 2px dashed rgba(255, 185, 29, 0.4);
+    background-color: var(--bg-elevated, #1F1F1F);
+    border-radius: var(--radius-md, 12px);
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    position: relative;
+}
+
+.slip-upload-box:hover,
+.slip-upload-box.dragover {
+    background-color: rgba(255, 185, 29, 0.06);
+    border-color: var(--color-gold, #FFB91D);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 18px rgba(255, 185, 29, 0.15);
+}
+
+.payment-file-input {
+    display: none;
+}
+
+.upload-prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.payment-upload-icon {
+    color: var(--color-gold, #FFB91D);
+    font-size: 36px;
+    margin-bottom: 4px;
+}
+
+.payment-upload-text {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.payment-upload-hint {
+    font-size: 11.5px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+/* Image Preview State */
+.preview-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.preview-img {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+    object-fit: contain;
+}
+
+.payment-file-info {
+    font-size: 12px;
+    color: var(--text-secondary, #A3A3A3);
+    font-weight: 500;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.btn-change-file {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary, #F5F5F5);
+    border: 1px solid var(--border-color, #383838);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-change-file:hover {
+    background: rgba(255, 185, 29, 0.15);
+    border-color: var(--color-gold, #FFB91D);
+    color: var(--color-gold, #FFB91D);
+}
+
+.payment-client-error {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    margin-top: 10px;
+    display: none;
+    text-align: left;
+}
+
+/* ปุ่มยืนยันชำระเงิน Primary CTA */
+.btn-payment-submit {
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #000);
+    width: 100%;
+    border: none;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 16px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(255, 185, 29, 0.3);
+}
+
+.btn-payment-submit:hover:not(:disabled) {
+    background: var(--color-gold-hover, #E5A315);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 185, 29, 0.4);
+}
+
+.btn-payment-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* ==========================================================================
+   5. Mobile Responsive Adjustments (@media max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .payment-page-container {
+        margin: 20px auto;
+        padding: 0 14px;
+        padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .payment-countdown-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px 14px;
+        gap: 12px;
+    }
+
+    .countdown-info-wrap {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .countdown-digits {
+        font-size: 22px;
+    }
+
+    .payment-grid-two-cols {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .payment-card {
+        padding: 18px 16px;
+    }
+
+    .payment-qr-frame {
+        width: 100%;
+        max-width: 250px;
+        box-sizing: border-box;
+    }
+
+    .payment-qr-img {
+        width: 100%;
+        max-width: 200px;
+        height: auto;
+    }
+
+    .payment-account-number {
+        font-size: 17px;
+    }
+
+    .payment-total-val {
+        font-size: 22px;
+    }
+}
