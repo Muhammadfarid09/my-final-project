@@ -155,3 +155,6 @@ if (!isset($member_points) || !isset($member_level)) {
         </button>
     </div>
 </header>
+
+<!-- ผนวก Mobile Bottom Navigation Bar ส่วนกลาง -->
+<?php include_once __DIR__ . '/bottom_nav.php'; ?>
