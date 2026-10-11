@@ -460,7 +460,7 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
         </div>
 
         <div class="steps-cta-bar">
-            <a href="booking.php" class="btn-hero-primary">
+            <a href="booking.php" class="btn-dark-primary-gold">
                 <i class="fas fa-play-circle"></i>
                 <span>ทดลองจองสนามตอนนี้</span>
                 <i class="fas fa-arrow-right mr-6"></i>
