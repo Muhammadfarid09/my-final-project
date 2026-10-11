@@ -1,0 +1,480 @@
+/* ==========================================================================
+   T.S. Pattani - Member Profile Styles (Premium Black & Gold)
+   Scope: profile.php | Strict Separation of Concerns (Rule 2)
+   ========================================================================== */
+
+.profile-container {
+    max-width: 1050px;
+    margin: 35px auto 60px;
+    padding: 0 20px;
+    font-family: 'Prompt', sans-serif;
+}
+
+/* ==========================================================================
+   1. การ์ดส่วนหัวข้อมูลสมาชิก (Profile Header Card)
+   ========================================================================== */
+.profile-header-card {
+    background: linear-gradient(135deg, var(--bg-surface, #191919) 0%, var(--bg-elevated, #292929) 100%);
+    color: var(--text-primary, #F5F5F5);
+    border-radius: var(--radius-lg, 16px);
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 185, 29, 0.25);
+    margin-bottom: 30px;
+}
+
+.profile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--bg-primary, #090909);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: var(--color-gold, #FFB91D);
+    border: 2px solid var(--color-gold, #FFB91D);
+    box-shadow: 0 0 15px rgba(255, 185, 29, 0.25);
+    flex-shrink: 0;
+}
+
+.profile-details h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.profile-details p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+.profile-details p i {
+    color: var(--color-gold, #FFB91D);
+    margin-right: 4px;
+}
+
+/* ป้ายระดับสมาชิก (Tier Badges) */
+.profile-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    border-radius: var(--radius-full, 9999px);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-tier-badge.tier-gold {
+    background: rgba(255, 185, 29, 0.18);
+    color: var(--color-gold, #FFB91D);
+    border: 1px solid var(--color-gold, #FFB91D);
+}
+
+.profile-tier-badge.tier-silver {
+    background: rgba(148, 163, 184, 0.18);
+    color: #cbd5e1;
+    border: 1px solid #94a3b8;
+}
+
+.profile-tier-badge.tier-bronze {
+    background: rgba(205, 127, 50, 0.18);
+    color: #f59e0b;
+    border: 1px solid #cd7f32;
+}
+
+/* สถิติพอยท์สะสมส่วนหัว */
+.profile-stats-group {
+    display: flex;
+    gap: 20px;
+    background: var(--bg-primary, #090909);
+    padding: 14px 24px;
+    border-radius: var(--radius-md, 12px);
+    border: 1px solid var(--border-color, #383838);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-item .stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-gold, #FFB91D);
+    letter-spacing: 0.5px;
+}
+
+.stat-item .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary, #A3A3A3);
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   2. การ์ดฟอร์มและเลย์เอาต์กริด (Profile Cards & Grid)
+   ========================================================================== */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.profile-card {
+    background: var(--bg-surface, #191919);
+    border-radius: var(--radius-lg, 16px);
+    padding: 26px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--border-color, #383838);
+}
+
+.profile-card-mb {
+    margin-bottom: 25px;
+}
+
+.profile-card-mt {
+    margin-top: 30px;
+}
+
+.profile-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary, #F5F5F5);
+    margin-top: 0;
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #383838);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-card-title.space-between {
+    justify-content: space-between;
+}
+
+.profile-card-title i {
+    color: var(--color-gold, #FFB91D);
+}
+
+.profile-subtitle-hint {
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+/* ==========================================================================
+   3. ฟิลด์ข้อมูลและอินพุต (Form Inputs & Validation)
+   ========================================================================== */
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #F5F5F5);
+}
+
+.required-star {
+    color: var(--color-gold, #FFB91D);
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 12px 14px;
+    background-color: var(--bg-elevated, #242424);
+    border: 1px solid var(--border-color, #383838);
+    border-radius: var(--radius-sm, 8px);
+    font-size: 14.5px;
+    color: var(--text-primary, #F5F5F5);
+    font-family: inherit;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-control-custom:focus {
+    border-color: var(--color-gold, #FFB91D);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 185, 29, 0.2);
+}
+
+.form-control-custom::placeholder {
+    color: #666666;
+}
+
+.form-group-custom {
+    margin-bottom: 18px;
+}
+
+.form-row-custom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.profile-btn-mt {
+    margin-top: 26px;
+}
+
+/* ปุ่มบันทึก Primary CTA สีทอง */
+.btn-profile-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 20px;
+    background-color: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #090909);
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md, 10px);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.btn-profile-submit:hover {
+    background-color: var(--color-gold-hover, #E9A812);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(255, 185, 29, 0.35);
+}
+
+.btn-profile-submit:active {
+    transform: scale(0.99);
+}
+
+.btn-profile-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-profile-outline {
+    background-color: var(--bg-elevated, #242424);
+    color: var(--text-primary, #F5F5F5);
+    border: 1px solid var(--border-color, #383838);
+    font-size: 13.5px;
+}
+
+.btn-profile-outline:hover {
+    background-color: var(--bg-surface, #191919);
+    color: var(--color-gold, #FFB91D);
+    border-color: var(--color-gold, #FFB91D);
+    box-shadow: none;
+}
+
+/* ==========================================================================
+   4. สรุปกิจกรรมและลิงก์ด่วน (Activity Summary)
+   ========================================================================== */
+.summary-stats-box {
+    background-color: var(--bg-elevated, #242424);
+    border-radius: var(--radius-md, 10px);
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px dashed var(--border-color, #383838);
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.summary-stat-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-gold, #FFB91D);
+}
+
+.summary-stat-val.stat-green {
+    color: #4ade80;
+}
+
+.summary-stat-val.stat-red {
+    color: #f87171;
+}
+
+.summary-stat-lbl {
+    font-size: 12px;
+    color: var(--text-secondary, #A3A3A3);
+    margin-top: 2px;
+}
+
+.profile-action-links {
+    display: flex;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   5. กล่องแจ้งเตือน (Dark Theme Feedback Alerts)
+   ========================================================================== */
+.alert-box {
+    padding: 14px 18px;
+    border-radius: var(--radius-md, 10px);
+    margin-bottom: 25px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.alert-success-box {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.alert-error-box {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* ==========================================================================
+   6. ตารางประวัติคะแนนสะสม (Point Transaction History Table)
+   ========================================================================== */
+.profile-point-empty {
+    text-align: center;
+    padding: 35px 20px;
+    color: var(--text-secondary, #A3A3A3);
+}
+
+.profile-point-empty i {
+    margin-bottom: 10px;
+    color: #555555;
+}
+
+.profile-point-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.profile-point-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.profile-point-table th {
+    background: var(--bg-elevated, #242424);
+    border-bottom: 1px solid var(--border-color, #383838);
+    color: var(--text-secondary, #A3A3A3);
+    text-align: left;
+    padding: 12px 14px;
+    font-weight: 600;
+}
+
+.profile-point-table th.text-right {
+    text-align: right;
+}
+
+.profile-point-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--text-primary, #F5F5F5);
+}
+
+.profile-point-date {
+    color: var(--text-secondary, #A3A3A3);
+    white-space: nowrap;
+}
+
+.profile-point-desc {
+    color: var(--text-primary, #F5F5F5);
+}
+
+.point-booking-ref {
+    font-size: 12px;
+    color: var(--color-gold, #FFB91D);
+    margin-left: 4px;
+}
+
+.point-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm, 6px);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.point-badge-earned {
+    background: rgba(34, 197, 94, 0.18);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.point-badge-used {
+    background: rgba(239, 68, 68, 0.18);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.point-badge-admin {
+    background: rgba(255, 185, 29, 0.18);
+    color: var(--color-gold, #FFB91D);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+}
+
+.profile-point-amount {
+    text-align: right;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.point-val-earned { color: #4ade80; }
+.point-val-used   { color: #f87171; }
+.point-val-admin  { color: var(--color-gold, #FFB91D); }
+
+/* ==========================================================================
+   7. Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 850px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    .profile-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .profile-stats-group {
+        width: 100%;
+        justify-content: space-around;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 576px) {
+    .profile-container {
+        padding: 0 14px;
+        margin-top: 20px;
+    }
+    .profile-header-card {
+        padding: 20px;
+    }
+    .profile-user-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .form-row-custom {
+        grid-template-columns: 1fr;
+    }
+    .profile-action-links {
+        flex-direction: column;
+    }
+}

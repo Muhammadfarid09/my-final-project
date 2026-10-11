@@ -102,8 +102,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 throw new Exception("รหัสผ่านใหม่ต้องไม่เหมือนกับรหัสผ่านเดิม");
             }
 
-            // เข้ารหัสผ่านใหม่และอัปเดต
-            $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
+            // เข้ารหัสผ่านใหม่และอัปเดต (BCRYPT)
+            $new_hash = password_hash($new_password, PASSWORD_BCRYPT);
             $stmt_update = $conn->prepare("UPDATE Member SET member_password = :hash WHERE member_id = :mid");
             $stmt_update->execute([':hash' => $new_hash, ':mid' => $member_id]);
 

@@ -1,7 +1,6 @@
 <?php
 require_once 'includes/auth_check.php';
 
-
 $member_id = intval($_SESSION['member_id']);
 
 try {
@@ -49,7 +48,7 @@ try {
     $point_transactions = $stmt_point_trans->fetchAll(PDO::FETCH_ASSOC);
 
 } catch(PDOException $e) {
-    die("เกิดข้อผิดพลาดในการโหลดข้อมูล: " . $e->getMessage());
+    die("เกิดข้อผิดพลาดในการโหลดข้อมูล: " . htmlspecialchars($e->getMessage()));
 }
 
 $tier_badge_classes = [
@@ -69,6 +68,7 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
     <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
+    <link rel="stylesheet" href="assets/css/profile.css?v=<?php echo filemtime('assets/css/profile.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -78,18 +78,18 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
 
     <div class="profile-container">
 
-        <!-- กล่องแจ้งเตือนผลลัพธ์ -->
+        <!-- กล่องแจ้งเตือนผลลัพธ์ (Dark Theme Alerts) -->
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert-box alert-success-box">
+            <div class="alert-box alert-success-box" role="alert">
                 <i class="fas fa-check-circle fa-lg"></i>
-                <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <div><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert-box alert-error-box">
+            <div class="alert-box alert-error-box" role="alert">
                 <i class="fas fa-exclamation-circle fa-lg"></i>
-                <div><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <div><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
             </div>
         <?php endif; ?>
 
@@ -101,12 +101,15 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                 </div>
                 <div class="profile-details">
                     <h2>
-                        <?php echo htmlspecialchars($member['member_name']); ?>
+                        <?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?>
                         <span class="profile-tier-badge <?php echo $current_tier_class; ?>">
                             <i class="fas fa-crown"></i> <?php echo htmlspecialchars($member['member_level']); ?>
                         </span>
                     </h2>
-                    <p><i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($member['member_phone']); ?> &bull; สมาชิกตั้งแต่ <?php echo date('d/m/Y', strtotime($member['member_created_at'])); ?></p>
+                    <p>
+                        <i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($member['member_phone'], ENT_QUOTES, 'UTF-8'); ?> 
+                        &bull; สมาชิกตั้งแต่ <?php echo date('d/m/Y', strtotime($member['member_created_at'])); ?>
+                    </p>
                 </div>
             </div>
             
@@ -131,38 +134,38 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                     <i class="fas fa-user-edit"></i> ข้อมูลส่วนตัว
                 </h3>
 
-                <form action="actions/profile_edit_db.php" method="POST">
+                <form action="actions/profile_edit_db.php" method="POST" class="profile-form">
                     <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="update_profile">
 
                     <div class="form-group-custom">
                         <label class="form-label">ชื่อ - นามสกุล <span class="required-star">*</span></label>
-                        <input type="text" name="member_name" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_name']); ?>" required>
+                        <input type="text" name="member_name" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?>" required>
                     </div>
 
                     <div class="form-group-custom">
                         <label class="form-label">เบอร์โทรศัพท์ (ใช้เข้าสู่ระบบ) <span class="required-star">*</span></label>
-                        <input type="text" name="member_phone" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_phone']); ?>" maxlength="10" pattern="[0-9]{10}" placeholder="08xxxxxxxx" required>
+                        <input type="text" name="member_phone" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_phone'], ENT_QUOTES, 'UTF-8'); ?>" maxlength="10" pattern="[0-9]{10}" placeholder="08xxxxxxxx" required>
                     </div>
 
                     <div class="form-row-custom">
                         <div class="form-group-custom">
                             <label class="form-label">เพศ</label>
                             <select name="member_gender" class="form-control-custom">
-                                <option value="ชาย" <?php if($member['member_gender'] == 'ชาย') echo 'selected'; ?>>ชาย</option>
-                                <option value="หญิง" <?php if($member['member_gender'] == 'หญิง') echo 'selected'; ?>>หญิง</option>
-                                <option value="อื่นๆ" <?php if($member['member_gender'] == 'อื่นๆ') echo 'selected'; ?>>อื่นๆ</option>
+                                <option value="ชาย" <?php if($member['member_gender'] === 'ชาย') echo 'selected'; ?>>ชาย</option>
+                                <option value="หญิง" <?php if($member['member_gender'] === 'หญิง') echo 'selected'; ?>>หญิง</option>
+                                <option value="อื่นๆ" <?php if($member['member_gender'] === 'อื่นๆ') echo 'selected'; ?>>อื่นๆ</option>
                             </select>
                         </div>
                         <div class="form-group-custom">
                             <label class="form-label">อายุ (ปี)</label>
-                            <input type="number" name="member_age" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_age'] ?? ''); ?>" min="5" max="120" placeholder="ระบุอายุ">
+                            <input type="number" name="member_age" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_age'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" min="5" max="120" placeholder="ระบุอายุ">
                         </div>
                     </div>
 
                     <div class="form-group-custom">
                         <label class="form-label">อาชีพ</label>
-                        <input type="text" name="member_occupation" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_occupation'] ?? ''); ?>" placeholder="เช่น นักเรียน, ข้าราชการ, พนักงานบริษัท">
+                        <input type="text" name="member_occupation" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_occupation'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="เช่น นักเรียน, ข้าราชการ, พนักงานบริษัท">
                     </div>
 
                     <div class="profile-btn-mt">
@@ -181,7 +184,7 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                         <i class="fas fa-key"></i> เปลี่ยนรหัสผ่าน
                     </h3>
 
-                    <form action="actions/profile_edit_db.php" method="POST">
+                    <form action="actions/profile_edit_db.php" method="POST" class="profile-form">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="change_password">
 
@@ -201,8 +204,8 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                         </div>
 
                         <div class="profile-btn-mt">
-                            <button type="submit" class="btn-profile-submit btn-password-submit">
-                                <i class="fas fa-lock"></i> เปลี่ยนรหัสผ่าน
+                            <button type="submit" class="btn-profile-submit">
+                                <i class="fas fa-lock"></i> บันทึกรหัสผ่านใหม่
                             </button>
                         </div>
                     </form>
@@ -286,7 +289,7 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                                     <td class="profile-point-desc">
                                         <?php echo htmlspecialchars($pt['transaction_note'] ?? '-'); ?>
                                         <?php if (!empty($pt['booking_id'])): ?>
-                                            <span class="point-booking-ref">(การจอง #<?php echo $pt['booking_id']; ?>)</span>
+                                            <span class="point-booking-ref">(การจอง #<?php echo intval($pt['booking_id']); ?>)</span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="profile-point-amount <?php echo $pt_val_class; ?>">
@@ -302,6 +305,20 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
 
     </div>
 
-    <script src="assets/js/member.js?v=1.5"></script>
+    <script src="assets/js/member.js?v=1.6"></script>
+    <script>
+    // ป้องกัน Double Submission ในฟอร์มโปรไฟล์ตามกฎ HCI
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.profile-form').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                var btn = form.querySelector('button[type="submit"]');
+                if (btn && !btn.disabled) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกข้อมูล...';
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>
