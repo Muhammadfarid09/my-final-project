@@ -65,75 +65,16 @@ try {
     <link rel="stylesheet" href="assets/css/global.css?v=<?php echo filemtime('assets/css/global.css'); ?>">
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="assets/css/responsive-mobile.css?v=<?php echo filemtime('assets/css/responsive-mobile.css'); ?>">
+    <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="page-body">
     
     <!-- ============================================== -->
-    <!-- 1. แถบเมนูหลัก (Premium Black & Gold Navbar)   -->
+    <!-- 1. แถบเมนูหลัก (Global Navbar 68px)            -->
     <!-- ============================================== -->
-    <header class="navbar-dark-header">
-        <div class="nav-dark-container">
-            <!-- โลโก้สนาม -->
-            <a href="index.php" class="nav-dark-brand">
-                <i class="fas fa-shuttlecock text-gold"></i>
-                <span>T.S. PATTANI</span>
-            </a>
-            
-            <!-- เมนูนำทางตรงกลาง -->
-            <ul class="nav-dark-menu" id="navMenu">
-                <li><a href="index.php" class="active"><i class="fas fa-home"></i> หน้าแรก</a></li>
-                <li><a href="promotions.php"><i class="fas fa-bullhorn"></i> ข่าวสาร&โปรโมชัน</a></li>
-                <li><a href="booking.php"><i class="fas fa-calendar-check"></i> จองสนาม</a></li>
-                <li><a href="rewards.php"><i class="fas fa-gift"></i> แลกของรางวัล</a></li>
-                <li><a href="chat.php"><i class="fas fa-comments"></i> ติดต่อเรา</a></li>
-            </ul>
-
-            <!-- ปุ่ม Actions ด้านขวา -->
-            <div class="nav-dark-actions">
-                <?php if (isset($_SESSION['member_id'])): ?>
-                    <!-- กรณีสมาชิกเข้าสู่ระบบแล้ว -->
-                    <div class="user-dropdown">
-                        <button type="button" class="dropbtn-dark" onclick="toggleDropdown()">
-                            <i class="fas fa-user-circle"></i>
-                            <span><?php echo htmlspecialchars($_SESSION['member_name']); ?></span>
-                            <span class="badge-level level-<?php echo strtolower($member_level); ?>"><?php echo $member_level; ?></span>
-                            <i class="fas fa-caret-down"></i>
-                        </button>
-                        <div class="dropdown-content dropdown-content-dark" id="userDropdown">
-                            <div class="user-point-info-dark">
-                                <span>คะแนนสะสม: <strong class="text-gold"><?php echo number_format($member_points); ?></strong> พอยท์</span>
-                            </div>
-                            <hr class="dropdown-divider-dark">
-                            <a href="profile.php"><i class="fas fa-id-card"></i> โปรไฟล์ของฉัน</a>
-                            <a href="booking_history.php"><i class="fas fa-history"></i> ประวัติการจอง</a>
-                            <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
-                        </div>
-                    </div>
-                    <a href="booking.php" class="btn-nav-gold">
-                        <i class="fas fa-calendar-plus"></i>
-                        <span>จองสนาม</span>
-                    </a>
-                <?php else: ?>
-                    <!-- กรณีผู้เยี่ยมชมทั่วไป (Guest) -->
-                    <a href="register.php" class="btn-nav-ghost">
-                        <i class="fas fa-user-plus"></i>
-                        <span>สมัครสมาชิก</span>
-                    </a>
-                    <a href="login.php" class="btn-nav-gold">
-                        <i class="fas fa-sign-in-alt"></i>
-                        <span>เข้าสู่ระบบ</span>
-                    </a>
-                <?php endif; ?>
-            </div>
-
-            <!-- ปุ่มเปิดเมนูสำหรับมือถือ (Hamburger Button) -->
-            <button type="button" class="nav-dark-toggle" id="navDarkToggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนูนำทาง">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </header>
+    <?php include_once 'includes/navbar.php'; ?>
 
     <!-- ============================================== -->
     <!-- 2. Hero Section & Key Highlights (Black & Gold) -->

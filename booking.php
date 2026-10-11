@@ -60,13 +60,14 @@ try {
     <link rel="stylesheet" href="assets/css/style.css?v=2.0">
     <link rel="stylesheet" href="assets/css/booking-wizard.css?v=<?php echo filemtime('assets/css/booking-wizard.css'); ?>">
     <link rel="stylesheet" href="assets/css/responsive-mobile.css?v=1.0">
+    <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="booking-page-body" data-logged-in="<?php echo $is_logged_in ? 'true' : 'false'; ?>">
 
     <!-- นำเข้า Navbar -->
-    <?php include 'includes/navbar.php'; ?>
+    <?php include_once 'includes/navbar.php'; ?>
 
     <div class="wizard-page-wrapper">
         

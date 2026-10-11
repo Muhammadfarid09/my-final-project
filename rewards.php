@@ -70,13 +70,14 @@ try {
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.1">
     <link rel="stylesheet" href="assets/css/style.css?v=2.1">
+    <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="booking-page-body">
 
     <!-- นำเข้า Navbar -->
-    <?php include 'includes/navbar.php'; ?>
+    <?php include_once 'includes/navbar.php'; ?>
 
     <div class="rewards-page-wrapper">
         
