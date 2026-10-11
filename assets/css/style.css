@@ -78,60 +78,157 @@ body.bg-register {
 }
 
 /* =========================================
-   Navbar Styles
+   Navbar Styles (Premium Black & Gold)
    ========================================= */
-.navbar {
-    background: #ffffff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+.navbar,
+.navbar-dark-header {
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
-.nav-container {
-    max-width: 1200px;
+.nav-container,
+.nav-dark-container {
+    max-width: 1240px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px;
-}
-
-.nav-brand {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--color-gold);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.nav-menu {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    height: 72px;
     gap: 20px;
 }
 
-.nav-menu a {
+.nav-brand,
+.nav-dark-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
     text-decoration: none;
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 15px;
-    transition: color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
+    transition: color var(--transition-fast);
 }
 
-.nav-menu a:hover {
+.nav-brand:hover,
+.nav-dark-brand:hover {
     color: var(--color-gold);
 }
 
-/* User Dropdown */
-.nav-user {
+.nav-brand i,
+.nav-dark-brand i {
+    color: var(--color-gold);
+    font-size: 22px;
+}
+
+/* 1. การจัดช่องเมนู (Menu Items Spacing & Alignment) */
+.nav-menu,
+.nav-dark-menu {
     display: flex;
     align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+}
+
+.nav-menu li,
+.nav-dark-menu li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* บล็อกช่องเมนู (Clickable Tab Block) */
+.nav-menu li a,
+.nav-dark-menu li a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm, 6px);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: color 0.25s ease, background-color 0.25s ease;
+    overflow: visible;
+}
+
+.nav-menu li a i,
+.nav-dark-menu li a i {
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: color 0.25s ease;
+}
+
+/* 2. ลูกเล่นเส้นใต้สีทอง (Active & Hover Indicator) */
+.nav-menu li a::after,
+.nav-dark-menu li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background-color: var(--color-gold);
+    border-radius: 3px 3px 0 0;
+    box-shadow: 0 0 10px rgba(255, 185, 29, 0.45);
+    transition: width 0.25s ease;
+}
+
+/* เมื่อเลื่อนเมาส์ชี้ (:hover) */
+.nav-menu li a:hover,
+.nav-dark-menu li a:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 185, 29, 0.05);
+}
+
+.nav-menu li a:hover i,
+.nav-dark-menu li a:hover i {
+    color: var(--color-gold);
+}
+
+.nav-menu li a:hover::after,
+.nav-dark-menu li a:hover::after {
+    width: calc(100% - 16px);
+}
+
+/* หน้าปัจจุบัน (.active) */
+.nav-menu li a.active,
+.nav-dark-menu li a.active {
+    color: var(--color-gold);
+    font-weight: 600;
+    background-color: rgba(255, 185, 29, 0.08);
+}
+
+.nav-menu li a.active i,
+.nav-dark-menu li a.active i {
+    color: var(--color-gold);
+}
+
+.nav-menu li a.active::after,
+.nav-dark-menu li a.active::after {
+    width: calc(100% - 16px);
+}
+
+/* User Dropdown */
+.nav-user,
+.nav-dark-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .user-dropdown {
@@ -139,18 +236,27 @@ body.bg-register {
     display: inline-block;
 }
 
-.dropbtn {
-    background: none;
-    border: none;
+.dropbtn,
+.dropbtn-dark {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
     cursor: pointer;
-    font-family: 'Prompt', sans-serif;
-    font-size: 15px;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: 500;
-    color: #343a40;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px;
+    padding: 7px 14px;
+    transition: all var(--transition-fast);
+}
+
+.dropbtn:hover,
+.dropbtn-dark:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
 }
 
 .badge-level {
@@ -162,70 +268,132 @@ body.bg-register {
 }
 .level-bronze { background: #cd7f32; }
 .level-silver { background: #adb5bd; }
-.level-gold { background: #ffc107; color: #343a40; }
+.level-gold { background: var(--color-gold); color: #000000; }
 
-.dropdown-content {
+.dropdown-content,
+.dropdown-content-dark {
     display: none;
     position: absolute;
     right: 0;
-    background-color: #ffffff;
+    top: 100%;
+    margin-top: 8px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
     min-width: 220px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    margin-top: 10px;
+    z-index: 1050;
 }
 
-.dropdown-content.show {
+.dropdown-content.show,
+.dropdown-content-dark.show {
     display: block;
 }
 
-.user-point-info {
-    padding: 15px;
-    background: #f8f9fa;
-    font-size: 14px;
-    color: #343a40;
+.user-point-info,
+.user-point-info-dark {
+    padding: 14px 16px;
+    background: var(--bg-elevated);
+    font-size: 13px;
+    color: var(--text-secondary);
 }
 
-.dropdown-content hr {
+.dropdown-content hr,
+.dropdown-divider-dark {
     margin: 0;
     border: 0;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--border-color);
 }
 
-.dropdown-content a {
-    color: #495057;
-    padding: 12px 15px;
+.dropdown-content a,
+.dropdown-content-dark a {
+    color: var(--text-primary);
+    padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 14px;
-    transition: background 0.2s;
+    transition: all var(--transition-fast);
 }
 
-.dropdown-content a:hover {
-    background-color: #f1f3f5;
+.dropdown-content a:hover,
+.dropdown-content-dark a:hover {
+    background-color: var(--bg-elevated);
+    color: var(--color-gold);
 }
 
 .text-danger { color: var(--status-booked, #ef4444); }
-.btn-login-nav {
-    background: var(--color-gold);
+
+.btn-login-nav,
+.btn-nav-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background-color: var(--color-gold);
     color: var(--text-on-gold);
-    padding: 8px 20px;
-    border-radius: 20px;
-    text-decoration: none;
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius-full);
+    font-size: 14px;
     font-weight: 700;
-    transition: background 0.3s;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.25);
+    transition: all var(--transition-fast);
 }
-.btn-login-nav:hover { background: var(--color-gold-hover); }
+
+.btn-login-nav:hover,
+.btn-nav-gold:hover {
+    background-color: var(--color-gold-hover);
+    border-color: var(--color-gold-hover);
+    color: var(--text-on-gold);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.35);
+}
+
+.btn-nav-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.btn-nav-ghost:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    background: rgba(255, 185, 29, 0.08);
+}
 
 /* Mobile Menu Button */
-.mobile-menu-btn {
+.mobile-menu-btn,
+.nav-dark-toggle {
     display: none;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #343a40;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    font-size: 18px;
     cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.mobile-menu-btn:hover,
+.nav-dark-toggle:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
 }
 
 /* Responsive Navbar */
@@ -3629,217 +3797,7 @@ body.page-body {
     color: var(--text-primary);
 }
 
-/* 2. Navigation Header (Black & Gold Navbar) */
-.navbar-dark-header {
-    background-color: var(--bg-surface);
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.nav-dark-container {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 0 24px;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.nav-dark-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: var(--text-primary);
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    transition: color var(--transition-fast);
-}
-.nav-dark-brand:hover {
-    color: var(--color-gold);
-}
-.nav-dark-brand .text-gold {
-    color: var(--color-gold);
-    font-size: 22px;
-}
-
-.nav-dark-menu {
-    display: flex;
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 8px;
-}
-
-.nav-dark-menu li a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 500;
-    transition: all var(--transition-fast);
-}
-
-.nav-dark-menu li a i {
-    font-size: 14px;
-    color: var(--text-secondary);
-    transition: color var(--transition-fast);
-}
-
-.nav-dark-menu li a:hover,
-.nav-dark-menu li a.active {
-    color: var(--color-gold);
-    background-color: rgba(255, 185, 29, 0.08);
-}
-.nav-dark-menu li a:hover i,
-.nav-dark-menu li a.active i {
-    color: var(--color-gold);
-}
-
-.nav-dark-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.btn-nav-ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 18px;
-    border: 1px solid var(--border-color);
-    background: transparent;
-    color: var(--text-primary);
-    border-radius: var(--radius-full);
-    font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all var(--transition-fast);
-}
-.btn-nav-ghost:hover {
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-    background: rgba(255, 185, 29, 0.08);
-}
-
-.btn-nav-gold {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 20px;
-    background-color: var(--color-gold);
-    color: var(--text-on-gold);
-    border: 1px solid var(--color-gold);
-    border-radius: var(--radius-full);
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.25);
-    transition: all var(--transition-fast);
-}
-.btn-nav-gold:hover {
-    background-color: var(--color-gold-hover);
-    border-color: var(--color-gold-hover);
-    color: var(--text-on-gold);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.35);
-}
-
-/* User Dropdown Dark */
-.dropbtn-dark {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-full);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
-    transition: all var(--transition-fast);
-}
-.dropbtn-dark:hover {
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-}
-.dropdown-content-dark {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 8px;
-    background-color: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    min-width: 220px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    z-index: 1050;
-}
-.dropdown-content-dark.show {
-    display: block;
-}
-.user-point-info-dark {
-    padding: 14px 16px;
-    background: var(--bg-elevated);
-    font-size: 13px;
-    color: var(--text-secondary);
-}
-.user-point-info-dark .text-gold {
-    color: var(--color-gold);
-}
-.dropdown-divider-dark {
-    margin: 0;
-    border: 0;
-    border-top: 1px solid var(--border-color);
-}
-.dropdown-content-dark a {
-    color: var(--text-primary);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    transition: all var(--transition-fast);
-}
-.dropdown-content-dark a:hover {
-    background-color: var(--bg-elevated);
-    color: var(--color-gold);
-}
-
-.nav-dark-toggle {
-    display: none;
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    width: 42px;
-    height: 42px;
-    border-radius: var(--radius-sm);
-    font-size: 18px;
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-}
-.nav-dark-toggle:hover {
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-}
+/* 2. Navigation Header (Black & Gold Navbar) - Consolidated in base Navbar Styles */
 
 /* 3. Hero Dark Section */
 .hero-dark-section {
