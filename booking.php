@@ -289,17 +289,19 @@ try {
                 <div class="sticky-summary-bar" id="stickySummaryBar">
                     <div class="sticky-summary-inner">
                         <div class="sticky-metrics-group">
-                            <div class="sticky-metric-pill">
-                                <i class="fas fa-clock"></i>
-                                <span id="stickyHoursDisplay">[ 0 Hour ]</span>
-                            </div>
-                            <div class="sticky-metric-pill">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span id="stickyCourtDisplay">[ ยังไม่ได้เลือกสนาม ]</span>
-                            </div>
                             <div class="sticky-metric-pill sticky-metric-total">
                                 <i class="fas fa-tag"></i>
                                 <span id="stickyTotalDisplay">[ Total 0 ฿ ]</span>
+                            </div>
+                            <div class="sticky-submetrics-row">
+                                <div class="sticky-metric-pill">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="stickyHoursDisplay">[ 0 Hour ]</span>
+                                </div>
+                                <div class="sticky-metric-pill">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span id="stickyCourtDisplay">[ ยังไม่ได้เลือกสนาม ]</span>
+                                </div>
                             </div>
                         </div>
                         <button type="button" class="btn-sticky-next" id="btnStickyNext" disabled onclick="goToStep(4)">

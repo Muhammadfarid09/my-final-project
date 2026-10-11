@@ -792,6 +792,11 @@
     gap: 20px;
     flex-wrap: wrap;
 }
+.sticky-submetrics-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
 .sticky-metric-pill {
     display: flex;
     align-items: center;
@@ -1296,16 +1301,115 @@
     .btn-guest-register {
         width: 100%;
     }
+
+    /* Sticky Summary Bar: ยกตัวขึ้นเหนือ Mobile Bottom Nav และจัดเป็น Split Dock */
+    .sticky-summary-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 8px 14px;
+        background: rgba(18, 18, 18, 0.96);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(255, 185, 29, 0.3);
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.6);
+        box-sizing: border-box;
+    }
+
+    /* เมื่อมีแถบ Mobile Bottom Nav (สมาชิกเข้าสู่ระบบแล้ว) ให้ลอยตัวอยู่เหนือ Bottom Nav */
+    body:has(.mobile-bottom-nav) .sticky-summary-bar {
+        bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* จัดโครงสร้างเป็น 2 ฝั่ง ซ้าย-ขวา แบบกะทัดรัด (Split Dock ไม่กินพื้นที่หน้าจอ) */
     .sticky-summary-inner {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .sticky-metrics-group {
-        justify-content: space-between;
-    }
-    .btn-sticky-next {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
         width: 100%;
+        max-width: 100%;
+    }
+
+    .sticky-metrics-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
         justify-content: center;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* ยอดรวมเงินเด่นชัด */
+    .sticky-metric-total {
+        background: transparent;
+        border: none;
+        padding: 0;
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--color-gold, #FFB91D);
+        line-height: 1.2;
+        order: -1; /* ย้ายยอดเงินขึ้นบรรทัดบน */
+    }
+
+    .sticky-metric-total span {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--color-gold, #FFB91D);
+    }
+
+    .sticky-metric-total i {
+        display: none;
+    }
+
+    /* แถวย่อย: ชั่วโมงและสนาม */
+    .sticky-submetrics-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .sticky-metric-pill:not(.sticky-metric-total) {
+        font-size: 11px;
+        color: var(--text-secondary, #A3A3A3);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        line-height: 1.2;
+    }
+
+    .sticky-metric-pill:not(.sticky-metric-total) i {
+        font-size: 11px;
+        color: var(--color-gold, #FFB91D);
+        margin-right: 2px;
+    }
+
+    /* ปุ่ม CTA "ต่อไป: บริการเสริม" ปรากฏฝั่งขวาเด่นชัด 100% */
+    .btn-sticky-next {
+        width: auto !important;
+        min-width: 135px;
+        height: 44px;
+        padding: 0 14px;
+        font-size: 13.5px;
+        font-weight: 700;
+        justify-content: center;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border-radius: 8px;
+    }
+
+    /* เพิ่มระยะเลื่อนในขั้นตอนที่ 3 เพื่อไม่ให้คอร์ทสุดท้ายโดนบัง */
+    #stepPanel3 {
+        padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
     }
 }
 
