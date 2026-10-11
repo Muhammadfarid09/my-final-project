@@ -149,10 +149,24 @@ if (!isset($member_points) || !isset($member_level)) {
             <?php endif; ?>
         </div>
 
-        <!-- ปุ่มแฮมเบอร์เกอร์สำหรับมือถือ (Mobile Toggle) -->
-        <button type="button" class="navbar-toggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนูนำทาง">
-            <i class="fas fa-bars"></i>
-        </button>
+        <!-- ส่วนควบคุมบนจอมือถือ (Mobile Top Controls) -->
+        <?php if (isset($_SESSION['member_id'])): ?>
+            <!-- เมื่อล็อกอินแล้ว: แสดงปุ่มโปรไฟล์ย่อ (Mini Profile Pill) แทน Hamburger Menu เพื่อลดความซ้ำซ้อนกับ Bottom Nav -->
+            <a href="profile.php" class="mobile-top-user-pill" aria-label="โปรไฟล์ของฉัน">
+                <div class="user-pill-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-pill-info">
+                    <span class="user-pill-name"><?= htmlspecialchars(mb_substr($_SESSION['member_name'] ?? 'สมาชิก', 0, 10)) ?></span>
+                    <span class="user-pill-tier level-<?= strtolower($member_level) ?>"><?= htmlspecialchars($member_level) ?></span>
+                </div>
+            </a>
+        <?php else: ?>
+            <!-- เมื่อยังไม่ล็อกอิน: แสดงปุ่ม Hamburger Menu ให้ Guest เข้าถึงเมนูและเข้าสู่ระบบได้ -->
+            <button type="button" class="navbar-toggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนูนำทาง">
+                <i class="fas fa-bars"></i>
+            </button>
+        <?php endif; ?>
     </div>
 </header>
 

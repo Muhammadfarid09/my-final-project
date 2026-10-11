@@ -115,14 +115,21 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                 </div>
             </div>
             
-            <div class="profile-stats-group">
-                <div class="stat-item">
-                    <div class="stat-value"><?php echo number_format($member['point_balance']); ?></div>
-                    <div class="stat-label">พอยท์คงเหลือ</div>
+            <div class="profile-header-side">
+                <div class="profile-stats-group">
+                    <div class="stat-item">
+                        <div class="stat-value"><?php echo number_format($member['point_balance']); ?></div>
+                        <div class="stat-label">พอยท์คงเหลือ</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><?php echo number_format($member['point_total_earned']); ?></div>
+                        <div class="stat-label">พอยท์สะสมตลอดชีพ</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?php echo number_format($member['point_total_earned']); ?></div>
-                    <div class="stat-label">พอยท์สะสมตลอดชีพ</div>
+                <div class="profile-header-actions">
+                    <a href="actions/logout.php" class="btn-profile-logout" onclick="return confirm('คุณต้องการออกจากระบบหรือไม่?');">
+                        <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+                    </a>
                 </div>
             </div>
         </div>

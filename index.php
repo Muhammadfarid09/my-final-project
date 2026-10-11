@@ -91,7 +91,7 @@ try {
 
             <!-- พาดหัวหลัก H1 คมชัด -->
             <h1 class="hero-dark-title">
-                ยกระดับทุกการแข่งขัน <br>
+                ยกระดับทุกการแข่งขัน <br class="hero-br-desktop">
                 สัมผัสประสบการณ์ <span class="text-gold-highlight">สนามแบดมินตันระดับพรีเมียม</span>
             </h1>
 
