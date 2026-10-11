@@ -195,9 +195,9 @@
 
 /* สถานะ: ใช้บริการแล้ว (เสร็จสิ้น) */
 .badge-status.status-completed {
-    background: rgba(148, 163, 184, 0.1);
-    color: #94A3B8;
-    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: rgba(148, 184, 153, 0.1);
+    color: #05a91d;
+    border: 1px solid rgba(7, 207, 4, 0.25);
 }
 
 /* สถานะ: รอตรวจสอบ / รอแนบสลิป */
@@ -610,3 +610,4 @@
         font-size: 13px;
     }
 }
+

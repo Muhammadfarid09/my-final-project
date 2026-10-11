@@ -293,28 +293,105 @@
 }
 
 /* ==========================================================================
-   Full Split-Screen Login Mobile Rules (@media max-width: 768px)
+   Full Split-Screen Login & Register Mobile Rules (@media max-width: 768px)
    ========================================================================== */
 @media (max-width: 768px) {
+    body.login-split-body {
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
     .login-split-wrapper {
         flex-direction: column;
         min-height: 100vh;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
     }
+
     .login-visual-panel {
-        display: none; /* ซ่อนฝั่งซ้ายอัตโนมัติบนอุปกรณ์พกพาตามข้อกำหนด */
+        display: none; /* ซ่อนฝั่งซ้ายบนมือถือตามข้อกำหนด */
     }
+
     .login-form-panel {
         width: 100%;
+        max-width: 100%;
         min-height: 100vh;
         padding: 24px 16px;
         box-sizing: border-box;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
     }
+
+    .login-top-utility {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto 20px auto;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
     .login-card-floating,
     .register-card-floating {
-        max-width: 100%;
+        width: 100%;
+        max-width: 420px;
+        box-sizing: border-box;
         padding: 28px 20px;
-        border-radius: 16px;
-        margin: 16px 0;
+        border-radius: 18px;
+        margin: auto;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    /* HCI Mobile Touch Ergonomics: ช่องกรอกและปุ่ม min-height 48px */
+    .form-control-dark {
+        font-size: 16px !important; /* ป้องกัน iOS/Android Auto-zoom */
+        min-height: 48px;
+        box-sizing: border-box;
+    }
+
+    .btn-login-gold-full {
+        min-height: 48px;
+        font-size: 16px;
+        font-weight: 700;
+        box-sizing: border-box;
+    }
+
+    /* แถวควบคุม จดจำการเข้าสู่ระบบ & ลืมรหัสผ่าน ไม่ให้หลุดขอบจอ */
+    .login-control-row-dark {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 16px 0 22px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkbox-label-dark {
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .forgot-link-gold {
+        font-size: 13px;
+        white-space: nowrap;
+        margin-left: auto;
+    }
+
+    .login-form-bottom-info {
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+        margin-top: 20px;
+        padding: 8px 0;
+        font-size: 11px;
     }
 }
 
@@ -322,6 +399,36 @@
     .form-row-dark {
         grid-template-columns: 1fr;
         gap: 14px;
+    }
+}
+
+/* รองรับสมาร์ตโฟนหน้าจอแคบพิเศษ (Screen Width <= 380px) */
+@media (max-width: 380px) {
+    .login-form-panel {
+        padding: 16px 12px;
+    }
+
+    .login-card-floating,
+    .register-card-floating {
+        padding: 22px 14px;
+    }
+
+    .login-card-title {
+        font-size: 22px;
+    }
+
+    .login-control-row-dark {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .forgot-link-gold {
+        margin-left: 0;
+    }
+
+    .btn-utility-back span {
+        display: none; /* ซ่อนข้อความ เหลือเฉพาะไอคอนเพื่อประหยัดพื้นที่ */
     }
 }
 
