@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 32" width="140" height="32" fill="none">
-  <!-- Li-Ning Dynamic Flame / Curve Ribbon -->
-  <g transform="translate(4, 5)">
-    <path d="M2 19 C8 19 14 14 18 8 C16 11 12 13 8 13 C4 13 2 10 3 6 C4 2 8 0 13 0 C21 0 25 8 21 16 C17 23 8 24 0 22 L2 19 Z" fill="#EE1D23"/>
-  </g>
-  <!-- LI-NING Typography -->
-  <text x="36" y="22" font-family="'Kanit', 'Montserrat', 'Segoe UI', sans-serif" font-size="18" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">LI-NING</text>
-</svg>
