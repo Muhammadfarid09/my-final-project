@@ -20,15 +20,15 @@
 
 /* 2. คอนเทนเนอร์ Flexbox 3 ส่วน (Inner Container) */
 .navbar-inner {
-    max-width: 1240px;
+    max-width: 1360px;
     width: 100%;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
+    gap: 16px;
     box-sizing: border-box;
 }
 
@@ -38,14 +38,15 @@
 .navbar-brand {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
     color: var(--text-primary, #F5F5F5);
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 700;
     letter-spacing: 0.5px;
     transition: color 0.2s ease;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .navbar-brand:hover {
@@ -60,6 +61,7 @@
 .navbar-brand .brand-text {
     font-weight: 800;
     letter-spacing: 0.8px;
+    white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -68,7 +70,10 @@
 .navbar-nav {
     display: flex;
     align-items: center;
+    justify-content: center;
     height: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .navbar-nav .nav-list {
@@ -77,7 +82,7 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 10px;
+    gap: 8px;
     height: 100%;
 }
 
@@ -86,6 +91,7 @@
     display: flex;
     align-items: center;
     height: 100%;
+    flex-shrink: 0;
 }
 
 /* บล็อกช่องแท็บเมนู */
@@ -94,17 +100,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 8px 14px;
+    gap: 7px;
+    padding: 8px 12px;
     border-radius: var(--radius-sm, 6px);
     background-color: transparent;
     color: var(--text-secondary, #A3A3A3);
     text-decoration: none;
-    font-size: 15px;
+    font-size: 14.5px;
     font-weight: 500;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
     transition: color 0.25s ease;
     overflow: visible;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .nav-link i {
@@ -112,6 +120,7 @@
     color: var(--text-secondary, #A3A3A3);
     transition: color 0.25s ease;
 }
+
 
 /* เส้นใต้สีทอง ::after (ความหนา 3px สไลด์ขยายจากกึ่งกลาง) */
 .nav-link::after {
@@ -168,8 +177,9 @@
 .navbar-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
 /* ปุ่มสมัครสมาชิก (Ghost Capsule) */
@@ -177,7 +187,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     border: 1px solid var(--border-color, #383838);
     background: transparent;
     color: var(--text-primary, #F5F5F5);
@@ -186,6 +196,8 @@
     font-weight: 500;
     text-decoration: none;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-nav-register:hover {
@@ -199,17 +211,19 @@
 .btn-nav-cta {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 20px;
+    gap: 7px;
+    padding: 8px 16px;
     background-color: var(--color-gold, #FFB91D);
     color: var(--text-on-gold, #090909);
     border: 1px solid var(--color-gold, #FFB91D);
     border-radius: var(--radius-full, 9999px);
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     text-decoration: none;
     box-shadow: 0 4px 14px rgba(255, 185, 29, 0.25);
     transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-nav-login:hover,
@@ -225,6 +239,7 @@
 .navbar-actions .user-dropdown {
     position: relative;
     display: inline-block;
+    flex-shrink: 0;
 }
 
 .navbar-actions .dropbtn {
@@ -233,14 +248,25 @@
     border-radius: var(--radius-full, 9999px);
     cursor: pointer;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--text-primary, #F5F5F5);
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
+    gap: 7px;
+    padding: 7px 12px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.navbar-actions .dropbtn .user-name {
+    display: inline-block;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .navbar-actions .dropbtn:hover {
@@ -344,9 +370,58 @@
 }
 
 /* ==========================================================================
-   Responsive Mobile View (@media max-width: 768px)
+   Responsive Medium View (แล็ปท็อปขนาดเล็กและแท็บเล็ตแนวนอน 993px - 1180px)
    ========================================================================== */
-@media (max-width: 768px) {
+@media (min-width: 993px) and (max-width: 1180px) {
+    .navbar-inner {
+        padding: 0 14px;
+        gap: 8px;
+    }
+
+    .navbar-brand {
+        font-size: 17.5px;
+        gap: 8px;
+    }
+
+    .navbar-nav .nav-list {
+        gap: 3px;
+    }
+
+    .nav-link {
+        padding: 6px 8px;
+        font-size: 13.5px;
+        gap: 5px;
+    }
+
+    .nav-link i {
+        font-size: 13px;
+    }
+
+    .navbar-actions {
+        gap: 6px;
+    }
+
+    .navbar-actions .dropbtn {
+        padding: 6px 10px;
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .navbar-actions .dropbtn .user-name {
+        max-width: 85px;
+    }
+
+    .navbar-actions .btn-nav-cta {
+        padding: 6px 12px;
+        font-size: 13px;
+        gap: 6px;
+    }
+}
+
+/* ==========================================================================
+   Responsive Mobile View (@media max-width: 992px)
+   ========================================================================== */
+@media (max-width: 992px) {
     .navbar-toggle {
         display: inline-flex;
     }
