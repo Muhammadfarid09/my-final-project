@@ -58,3 +58,4 @@
    - ไม่มีคำสั่ง `!important` ในไฟล์ CSS ทั้งหมด
 3. **Safety First & Blast Radius:** ไม่กระทบกับเซกชันอื่น ไม่มีการเปลี่ยนคลาสพื้นฐานของระบบ
 4. **HCI Standards:** ขยายขนาดให้มองเห็นชัดเจนตามหลัก Visual Ergonomics, Hover Micro-interactions ให้การตอบสนองที่ชัดเจนและนุ่มนวล
+

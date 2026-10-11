@@ -32,6 +32,28 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
         $member_level = $nav_data['member_level'];
     }
 }
+
+// 4. ดึงข้อมูลสถิติสนามสำหรับ Live Stats Dashboard
+$court_count = 10;
+try {
+    $stmt_court_count = $conn->query("SELECT COUNT(*) FROM court WHERE court_status != 'ปิดปรับปรุง'");
+    $court_count_db = $stmt_court_count->fetchColumn();
+    if ($court_count_db > 0) {
+        $court_count = $court_count_db;
+    }
+} catch (PDOException $e) {
+    $court_count = 10;
+}
+
+$booking_stat_display = '500+';
+try {
+    $stmt_book_count = $conn->query("SELECT COUNT(*) FROM booking WHERE booking_status = 'จองแล้ว'");
+    $actual_bookings = $stmt_book_count->fetchColumn();
+    $total_stat = max(500, 500 + intval($actual_bookings));
+    $booking_stat_display = number_format($total_stat) . '+';
+} catch (PDOException $e) {
+    $booking_stat_display = '500+';
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -94,14 +116,14 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
                         <span>จองสนาม</span>
                     </a>
                 <?php else: ?>
-                    <!-- กรณีผู้เยี่ยมชมทั่วไป -->
-                    <a href="login.php" class="btn-nav-ghost">
+                    <!-- กรณีผู้เยี่ยมชมทั่วไป (Guest) -->
+                    <a href="register.php" class="btn-nav-ghost">
+                        <i class="fas fa-user-plus"></i>
+                        <span>สมัครสมาชิก</span>
+                    </a>
+                    <a href="login.php" class="btn-nav-gold">
                         <i class="fas fa-sign-in-alt"></i>
                         <span>เข้าสู่ระบบ</span>
-                    </a>
-                    <a href="booking.php" class="btn-nav-gold">
-                        <i class="fas fa-calendar-plus"></i>
-                        <span>จองสนาม</span>
                     </a>
                 <?php endif; ?>
             </div>
@@ -136,49 +158,62 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
                 คอร์ทพื้นยางสังเคราะห์ 5 ชั้นซับแรงกระแทก ระบบไฟ LED Anti-Glare ตัดแสงสะท้อนถนอมสายตา พร้อมระบบจองคิวออนไลน์เรียลไทม์ และสะสมแต้มแลกรับของรางวัลแบบครบวงจร
             </p>
 
-            <!-- ปุ่มคู่ Action -->
+            <!-- ปุ่มคู่ Action (Dual CTAs) -->
             <div class="hero-dark-actions">
                 <a href="booking.php" class="btn-dark-primary-gold">
                     <i class="fas fa-calendar-check"></i>
                     <span>จองสนามทันที</span>
                     <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="#amenities" class="btn-dark-outline">
-                    <i class="fas fa-table"></i>
-                    <span>ดูตารางคอร์ท / ราคา</span>
-                </a>
+                <?php if (isset($_SESSION['member_id'])): ?>
+                    <a href="booking_history.php" class="btn-dark-outline">
+                        <i class="fas fa-history"></i>
+                        <span>ประวัติการจองของฉัน</span>
+                    </a>
+                <?php else: ?>
+                    <a href="login.php" class="btn-dark-outline">
+                        <i class="fas fa-user-lock"></i>
+                        <span>เข้าสู่ระบบสมาชิก</span>
+                    </a>
+                <?php endif; ?>
             </div>
 
-            <!-- การ์ดจุดเด่น 3 จุด (Key Features / Highlights) -->
-            <div class="hero-features-grid">
-                <div class="feature-dark-card">
-                    <div class="feature-icon-box">
-                        <i class="fas fa-award"></i>
+            <!-- แดชบอร์ดสถิติสนาม 4 การ์ด (Stadium Live Stats Dashboard) -->
+            <div class="hero-stats-dashboard">
+                <div class="stat-dashboard-card">
+                    <div class="stat-card-top">
+                        <span class="stat-number"><?php echo htmlspecialchars($court_count); ?></span>
+                        <div class="stat-badge-icon"><i class="fas fa-layer-group"></i></div>
                     </div>
-                    <h3 class="feature-card-title">คอร์ทมาตรฐานพรีเมียม BWF</h3>
-                    <p class="feature-card-desc">
-                        พื้นยาง 5 ชั้นเกรดแข่งขัน ปกป้องข้อต่อและหัวเข่า พร้อมไฟ LED Anti-Glare สว่างคมชัดสบายตา
-                    </p>
+                    <h3 class="stat-card-title">คอร์ทมาตรฐาน BWF</h3>
+                    <p class="stat-card-sub">พื้นยางสังเคราะห์ 5 ชั้น · ไฟ LED Anti-Glare</p>
                 </div>
 
-                <div class="feature-dark-card">
-                    <div class="feature-icon-box">
-                        <i class="fas fa-bolt"></i>
+                <div class="stat-dashboard-card">
+                    <div class="stat-card-top">
+                        <span class="stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></span>
+                        <div class="stat-badge-icon"><i class="fas fa-calendar-check"></i></div>
                     </div>
-                    <h3 class="feature-card-title">จองออนไลน์เรียลไทม์ 24 ชม.</h3>
-                    <p class="feature-card-desc">
-                        เช็คคอร์ทว่างและล็อกเวลาได้ทันใจ พร้อมระบบ Booking Lock 15 นาทีระหว่างชำระเงิน
-                    </p>
+                    <h3 class="stat-card-title">แมตช์ที่จองสำเร็จ</h3>
+                    <p class="stat-card-sub">ระบบจองอัตโนมัติเรียลไทม์ · ล็อกคอร์ท 100%</p>
                 </div>
 
-                <div class="feature-dark-card">
-                    <div class="feature-icon-box">
-                        <i class="fas fa-shield-alt"></i>
+                <div class="stat-dashboard-card">
+                    <div class="stat-card-top">
+                        <span class="stat-number">100%</span>
+                        <div class="stat-badge-icon"><i class="fas fa-star"></i></div>
                     </div>
-                    <h3 class="feature-card-title">สิ่งอำนวยความสะดวกครบครัน</h3>
-                    <p class="feature-card-desc">
-                        ห้องอาบน้ำแยกสัดส่วน ลานจอดรถ CCTV ปลอดภัย พร้อม Pro Shop ขึ้นเอ็นและเครื่องดื่ม
-                    </p>
+                    <h3 class="stat-card-title">มาตรฐานความพึงพอใจ</h3>
+                    <p class="stat-card-sub">สนามอันดับ 1 ที่นักกีฬาไว้วางใจในปัตตานี</p>
+                </div>
+
+                <div class="stat-dashboard-card">
+                    <div class="stat-card-top">
+                        <span class="stat-number">24 ชม.</span>
+                        <div class="stat-badge-icon"><i class="fas fa-clock"></i></div>
+                    </div>
+                    <h3 class="stat-card-title">ระบบบริการครบวงจร</h3>
+                    <p class="stat-card-sub">จองคิวออนไลน์ 24 ชม. · Pro Shop · ห้องอาบน้ำ</p>
                 </div>
             </div>
 

@@ -238,6 +238,10 @@
         grid-template-columns: 1fr;
         gap: 16px;
     }
+    .hero-stats-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -288,6 +292,29 @@
         width: 100%;
         justify-content: center;
         box-sizing: border-box;
+    }
+    .hero-stats-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+    .stat-dashboard-card {
+        padding: 20px 18px;
+    }
+    .stat-number {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-stats-dashboard {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .stat-dashboard-card {
+        padding: 18px 16px;
+    }
+    .stat-number {
+        font-size: 30px;
     }
 }
 
