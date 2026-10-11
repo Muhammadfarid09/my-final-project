@@ -2,7 +2,7 @@
 // ตรวจจับชื่อไฟล์ปัจจุบันสำหรับ Active Navigation Indicator แบบไดนามิก
 $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 $is_home = in_array($current_page, ['index.php', '']);
-$is_promotions = in_array($current_page, ['promotions.php', 'news.php', 'news_detail.php']);
+$is_promotions = in_array($current_page, ['promotions.php', 'promotion.php', 'news.php', 'news_detail.php']);
 $is_booking = in_array($current_page, ['booking.php', 'payment.php']);
 $is_rewards = in_array($current_page, ['rewards.php', 'reward_history.php']);
 $is_chat = in_array($current_page, ['chat.php', 'contact.php']);
