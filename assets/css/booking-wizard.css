@@ -261,24 +261,6 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(255, 185, 29, 0.35);
 }
-.btn-wizard-skip {
-    padding: 10px 20px;
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    font-family: inherit;
-    margin-right: 8px;
-}
-.btn-wizard-skip:hover {
-    background: var(--bg-elevated);
-    color: var(--text-primary);
-    border-color: var(--border-color);
-}
 
 /* ==========================================================================
    Step 1: Visual Interactive Calendar Picker

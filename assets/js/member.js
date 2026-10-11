@@ -141,6 +141,7 @@ function initBookingWizard() {
     renderCalendar();
     loadCourtMatrixForWizard(todayStr);
     updateWizardStepperUI(1);
+    updateStep4NextButton();
 }
 
 // Restore pending booking after login redirect
@@ -793,6 +794,29 @@ function updateStep4Summary() {
     if (stripDate) stripDate.innerText = `วันที่: ${formatDateThai(wizardState.selectedDate)}`;
     if (stripTime) stripTime.innerText = `เวลา: ${inputStart ? inputStart.value : ''} - ${inputEnd ? inputEnd.value : ''} (${wizardState.selectedHours} ชม.)`;
     if (stripCourt) stripCourt.innerText = `สนาม: ${wizardState.selectedCourtName || '-'}`;
+
+    updateStep4NextButton();
+}
+
+function updateStep4NextButton() {
+    let btnNext = document.getElementById('btnStep4Next');
+    if (!btnNext) return;
+
+    let qtyInputs = document.querySelectorAll('.qty-input');
+    let distinctItems = 0;
+
+    qtyInputs.forEach(input => {
+        let q = parseInt(input.value) || 0;
+        if (q > 0) {
+            distinctItems++;
+        }
+    });
+
+    if (distinctItems > 0) {
+        btnNext.innerHTML = `ถัดไป: ตรวจสอบรายการ (เลือกแล้ว ${distinctItems} รายการ) <i class="fas fa-arrow-right"></i>`;
+    } else {
+        btnNext.innerHTML = `ถัดไป: ตรวจสอบรายการ <i class="fas fa-arrow-right"></i>`;
+    }
 }
 
 function adjustProductQty(prodId, delta) {
@@ -860,6 +884,8 @@ function calculateGrandTotal() {
     if (inputRentPrice) inputRentPrice.value = rentTotal;
     if (inputProdPrice) inputProdPrice.value = prodTotal;
     if (inputTotalPrice) inputTotalPrice.value = wizardState.grandTotal;
+
+    updateStep4NextButton();
 }
 
 function updateInvoiceReview() {

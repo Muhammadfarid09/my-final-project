@@ -429,14 +429,9 @@ try {
                         <button type="button" class="btn-wizard-back" onclick="goToStep(3)">
                             <i class="fas fa-arrow-left"></i> ย้อนกลับไปเลือกสนาม
                         </button>
-                        <div>
-                            <button type="button" class="btn-wizard-skip" onclick="goToStep(5)">
-                                ข้ามขั้นตอนนี้ <i class="fas fa-forward"></i>
-                            </button>
-                            <button type="button" class="btn-wizard-next" onclick="goToStep(5)">
-                                ถัดไป: ตรวจสอบรายการ <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
+                        <button type="button" class="btn-wizard-next" id="btnStep4Next" onclick="goToStep(5)">
+                            ถัดไป: ตรวจสอบรายการ <i class="fas fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
