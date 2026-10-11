@@ -3521,6 +3521,397 @@ body.bg-register {
     text-decoration: underline;
 }
 
+/* ==========================================================================
+   T.S. Pattani - Premium Black & Gold Theme (Navbar & Hero Section)
+   HCI Ergonomics, High Contrast (WCAG AAA), Elevation & Micro-interactions
+   ========================================================================== */
+
+/* 1. Page Body Dark Baseline */
+body.page-body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* 2. Navigation Header (Black & Gold Navbar) */
+.navbar-dark-header {
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-dark-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.nav-dark-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: color var(--transition-fast);
+}
+.nav-dark-brand:hover {
+    color: var(--color-gold);
+}
+.nav-dark-brand .text-gold {
+    color: var(--color-gold);
+    font-size: 22px;
+}
+
+.nav-dark-menu {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+}
+
+.nav-dark-menu li a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.nav-dark-menu li a i {
+    font-size: 14px;
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.nav-dark-menu li a:hover,
+.nav-dark-menu li a.active {
+    color: var(--color-gold);
+    background-color: rgba(255, 185, 29, 0.08);
+}
+.nav-dark-menu li a:hover i,
+.nav-dark-menu li a.active i {
+    color: var(--color-gold);
+}
+
+.nav-dark-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-nav-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+.btn-nav-ghost:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    background: rgba(255, 185, 29, 0.08);
+}
+
+.btn-nav-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    background-color: var(--color-gold);
+    color: var(--text-on-gold);
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(255, 185, 29, 0.25);
+    transition: all var(--transition-fast);
+}
+.btn-nav-gold:hover {
+    background-color: var(--color-gold-hover);
+    border-color: var(--color-gold-hover);
+    color: var(--text-on-gold);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.35);
+}
+
+/* User Dropdown Dark */
+.dropbtn-dark {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    transition: all var(--transition-fast);
+}
+.dropbtn-dark:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+.dropdown-content-dark {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    z-index: 1050;
+}
+.dropdown-content-dark.show {
+    display: block;
+}
+.user-point-info-dark {
+    padding: 14px 16px;
+    background: var(--bg-elevated);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+.user-point-info-dark .text-gold {
+    color: var(--color-gold);
+}
+.dropdown-divider-dark {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--border-color);
+}
+.dropdown-content-dark a {
+    color: var(--text-primary);
+    padding: 12px 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    transition: all var(--transition-fast);
+}
+.dropdown-content-dark a:hover {
+    background-color: var(--bg-elevated);
+    color: var(--color-gold);
+}
+
+.nav-dark-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    font-size: 18px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+.nav-dark-toggle:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+}
+
+/* 3. Hero Dark Section */
+.hero-dark-section {
+    position: relative;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 80px 24px 90px 24px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+}
+.hero-dark-section::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: 15%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255, 185, 29, 0.08) 0%, transparent 65%);
+    pointer-events: none;
+}
+.hero-dark-section::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    left: 10%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(255, 185, 29, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero-dark-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+.hero-dark-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 185, 29, 0.1);
+    border: 1px solid rgba(255, 185, 29, 0.3);
+    color: var(--color-gold);
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+.hero-dark-title {
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    max-width: 860px;
+    letter-spacing: -0.5px;
+}
+.text-gold-highlight {
+    color: var(--color-gold);
+    background: linear-gradient(135deg, #FFB91D 0%, #FFE082 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-dark-subtitle {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    margin: 0 0 36px 0;
+    max-width: 760px;
+}
+.hero-dark-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 60px;
+}
+.btn-dark-primary-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: var(--color-gold);
+    color: var(--text-on-gold);
+    padding: 15px 32px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(255, 185, 29, 0.28);
+    transition: all var(--transition-fast);
+}
+.btn-dark-primary-gold:hover {
+    background-color: var(--color-gold-hover);
+    color: var(--text-on-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255, 185, 29, 0.38);
+}
+.btn-dark-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: 1.5px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 15px 28px;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+.btn-dark-outline:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    background: rgba(255, 185, 29, 0.05);
+    transform: translateY(-2px);
+}
+
+/* 4. Highlights / Features 3-Card Grid */
+.hero-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+.feature-dark-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 32px 28px;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+.feature-dark-card:hover {
+    background-color: var(--bg-elevated);
+    border-color: var(--color-gold);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+.feature-icon-box {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 185, 29, 0.12);
+    border: 1px solid rgba(255, 185, 29, 0.25);
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+    transition: transform var(--transition-fast);
+}
+.feature-dark-card:hover .feature-icon-box {
+    transform: scale(1.08);
+}
+.feature-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 10px 0;
+}
+.feature-card-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
 
 
 

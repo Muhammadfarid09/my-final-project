@@ -19,6 +19,19 @@ try {
 } catch(PDOException $e) {
     $news_list = [];
 }
+
+// 3. ดึงข้อมูลคะแนนสะสมและระดับสมาชิก (กรณีเข้าสู่ระบบแล้ว สำหรับ Navbar)
+$member_points = 0;
+$member_level = 'Bronze';
+if (isset($_SESSION['member_id']) && isset($conn)) {
+    $stmt_nav = $conn->prepare("SELECT point_balance, member_level FROM Point WHERE member_id = :mid");
+    $stmt_nav->execute([':mid' => $_SESSION['member_id']]);
+    $nav_data = $stmt_nav->fetch(PDO::FETCH_ASSOC);
+    if ($nav_data) {
+        $member_points = $nav_data['point_balance'];
+        $member_level = $nav_data['member_level'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -35,82 +48,140 @@ try {
 </head>
 <body class="page-body">
     
-    <!-- แถบเมนูหลัก (Navbar) -->
-    <?php include 'includes/navbar.php'; ?>
+    <!-- ============================================== -->
+    <!-- 1. แถบเมนูหลัก (Premium Black & Gold Navbar)   -->
+    <!-- ============================================== -->
+    <header class="navbar-dark-header">
+        <div class="nav-dark-container">
+            <!-- โลโก้สนาม -->
+            <a href="index.php" class="nav-dark-brand">
+                <i class="fas fa-shuttlecock text-gold"></i>
+                <span>T.S. PATTANI</span>
+            </a>
+            
+            <!-- เมนูนำทางตรงกลาง -->
+            <ul class="nav-dark-menu" id="navMenu">
+                <li><a href="index.php" class="active"><i class="fas fa-home"></i> หน้าแรก</a></li>
+                <li><a href="promotions.php"><i class="fas fa-bullhorn"></i> ข่าวสาร&โปรโมชัน</a></li>
+                <li><a href="booking.php"><i class="fas fa-calendar-check"></i> จองสนาม</a></li>
+                <li><a href="rewards.php"><i class="fas fa-gift"></i> แลกของรางวัล</a></li>
+                <li><a href="chat.php"><i class="fas fa-comments"></i> ติดต่อเรา</a></li>
+            </ul>
 
-    <!-- ============================================== -->
-    <!-- 1. Hero Section (ส่วนแบนเนอร์ต้อนรับหลัก) -->
-    <!-- ============================================== -->
-    <section class="landing-hero-section">
-        <div class="hero-container">
-            <div class="hero-badge-tag">
-                <i class="fas fa-star"></i>
-                <span>สนามแบดมินตันมาตรฐานสากล BWF อันดับ 1 ในปัตตานี</span>
+            <!-- ปุ่ม Actions ด้านขวา -->
+            <div class="nav-dark-actions">
+                <?php if (isset($_SESSION['member_id'])): ?>
+                    <!-- กรณีสมาชิกเข้าสู่ระบบแล้ว -->
+                    <div class="user-dropdown">
+                        <button type="button" class="dropbtn-dark" onclick="toggleDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                            <span><?php echo htmlspecialchars($_SESSION['member_name']); ?></span>
+                            <span class="badge-level level-<?php echo strtolower($member_level); ?>"><?php echo $member_level; ?></span>
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content dropdown-content-dark" id="userDropdown">
+                            <div class="user-point-info-dark">
+                                <span>คะแนนสะสม: <strong class="text-gold"><?php echo number_format($member_points); ?></strong> พอยท์</span>
+                            </div>
+                            <hr class="dropdown-divider-dark">
+                            <a href="profile.php"><i class="fas fa-id-card"></i> โปรไฟล์ของฉัน</a>
+                            <a href="booking_history.php"><i class="fas fa-history"></i> ประวัติการจอง</a>
+                            <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
+                        </div>
+                    </div>
+                    <a href="booking.php" class="btn-nav-gold">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>จองสนาม</span>
+                    </a>
+                <?php else: ?>
+                    <!-- กรณีผู้เยี่ยมชมทั่วไป -->
+                    <a href="login.php" class="btn-nav-ghost">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>เข้าสู่ระบบ</span>
+                    </a>
+                    <a href="booking.php" class="btn-nav-gold">
+                        <i class="fas fa-calendar-plus"></i>
+                        <span>จองสนาม</span>
+                    </a>
+                <?php endif; ?>
             </div>
 
-            <h1 class="hero-title">
+            <!-- ปุ่มเปิดเมนูสำหรับมือถือ (Hamburger Button) -->
+            <button type="button" class="nav-dark-toggle" id="navDarkToggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนูนำทาง">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- 2. Hero Section & Key Highlights (Black & Gold) -->
+    <!-- ============================================== -->
+    <section class="hero-dark-section">
+        <div class="hero-dark-container">
+            
+            <!-- ป้ายกำกับเกียรติยศ -->
+            <div class="hero-dark-badge">
+                <i class="fas fa-crown text-gold"></i>
+                <span>สนามแบดมินตันมาตรฐาน BWF อันดับ 1 ในปัตตานี</span>
+            </div>
+
+            <!-- พาดหัวหลัก H1 คมชัด -->
+            <h1 class="hero-dark-title">
                 ยกระดับทุกการแข่งขัน <br>
-                สัมผัสประสบการณ์ <span class="hero-title-gradient">สนามแบดมินตันระดับโปร</span>
+                สัมผัสประสบการณ์ <span class="text-gold-highlight">สนามแบดมินตันระดับพรีเมียม</span>
             </h1>
 
-            <p class="hero-subtitle">
-                พื้นยางสังเคราะห์ 5 ชั้นเกรดแข่งขัน ระบบไฟ LED Anti-Glare ตัดแสงสะท้อนถนอมสายตา บรรยากาศโปร่งสบาย พร้อมระบบจองสนามและสะสมแต้มแลกของรางวัลแบบครบวงจร
+            <!-- สโลแกน / คำอธิบาย -->
+            <p class="hero-dark-subtitle">
+                คอร์ทพื้นยางสังเคราะห์ 5 ชั้นซับแรงกระแทก ระบบไฟ LED Anti-Glare ตัดแสงสะท้อนถนอมสายตา พร้อมระบบจองคิวออนไลน์เรียลไทม์ และสะสมแต้มแลกรับของรางวัลแบบครบวงจร
             </p>
 
-            <div class="hero-actions">
-                <a href="booking.php" class="btn-hero-primary">
+            <!-- ปุ่มคู่ Action -->
+            <div class="hero-dark-actions">
+                <a href="booking.php" class="btn-dark-primary-gold">
                     <i class="fas fa-calendar-check"></i>
                     <span>จองสนามทันที</span>
-                    <i class="fas fa-arrow-right mr-6"></i>
+                    <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="#amenities" class="btn-hero-secondary">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>ดูจุดเด่นสนาม & วิธีการจอง</span>
+                <a href="#amenities" class="btn-dark-outline">
+                    <i class="fas fa-table"></i>
+                    <span>ดูตารางคอร์ท / ราคา</span>
                 </a>
             </div>
 
-            <!-- แถบสถิติสำคัญด้านล่าง Hero -->
-            <div class="hero-stats-strip">
-                <div class="hero-stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-th-large"></i>
+            <!-- การ์ดจุดเด่น 3 จุด (Key Features / Highlights) -->
+            <div class="hero-features-grid">
+                <div class="feature-dark-card">
+                    <div class="feature-icon-box">
+                        <i class="fas fa-award"></i>
                     </div>
-                    <div class="stat-info">
-                        <span class="stat-value">10 คอร์ทมาตรฐาน</span>
-                        <span class="stat-label">พื้นยาง BWF เกรดแข่งขัน</span>
-                    </div>
+                    <h3 class="feature-card-title">คอร์ทมาตรฐานพรีเมียม BWF</h3>
+                    <p class="feature-card-desc">
+                        พื้นยาง 5 ชั้นเกรดแข่งขัน ปกป้องข้อต่อและหัวเข่า พร้อมไฟ LED Anti-Glare สว่างคมชัดสบายตา
+                    </p>
                 </div>
 
-                <div class="hero-stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-lightbulb"></i>
+                <div class="feature-dark-card">
+                    <div class="feature-icon-box">
+                        <i class="fas fa-bolt"></i>
                     </div>
-                    <div class="stat-info">
-                        <span class="stat-value">LED Anti-Glare</span>
-                        <span class="stat-label">ตัดแสงสะท้อน สว่างสบายตา</span>
-                    </div>
+                    <h3 class="feature-card-title">จองออนไลน์เรียลไทม์ 24 ชม.</h3>
+                    <p class="feature-card-desc">
+                        เช็คคอร์ทว่างและล็อกเวลาได้ทันใจ พร้อมระบบ Booking Lock 15 นาทีระหว่างชำระเงิน
+                    </p>
                 </div>
 
-                <div class="hero-stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
+                <div class="feature-dark-card">
+                    <div class="feature-icon-box">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    <div class="stat-info">
-                        <span class="stat-value">เปิดบริการทุกวัน</span>
-                        <span class="stat-label">09:00 - 24:00 น.</span>
-                    </div>
-                </div>
-
-                <div class="hero-stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-coins"></i>
-                    </div>
-                    <div class="stat-info">
-                        <span class="stat-value">สะสมแต้มได้ทันที</span>
-                        <span class="stat-label">แลกของรางวัล & ส่วนลด</span>
-                    </div>
+                    <h3 class="feature-card-title">สิ่งอำนวยความสะดวกครบครัน</h3>
+                    <p class="feature-card-desc">
+                        ห้องอาบน้ำแยกสัดส่วน ลานจอดรถ CCTV ปลอดภัย พร้อม Pro Shop ขึ้นเอ็นและเครื่องดื่ม
+                    </p>
                 </div>
             </div>
+
         </div>
     </section>
 

@@ -217,6 +217,71 @@
         align-items: flex-start;
         gap: 12px;
     }
+
+    .hero-dark-title {
+        font-size: 26px;
+    }
+}
+
+/* ==========================================================================
+   Black & Gold Theme Responsive Enhancements (Navbar & Hero Section)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .hero-features-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-dark-toggle {
+        display: inline-flex;
+    }
+    .nav-dark-menu {
+        display: none;
+        position: absolute;
+        top: 72px;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-surface);
+        border-bottom: 1px solid var(--border-color);
+        flex-direction: column;
+        padding: 18px 24px;
+        gap: 8px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+        z-index: 999;
+    }
+    .nav-dark-menu.show {
+        display: flex;
+    }
+    .nav-dark-menu li a {
+        width: 100%;
+        padding: 12px 16px;
+    }
+    .nav-dark-actions {
+        display: none;
+    }
+    .hero-dark-section {
+        padding: 60px 16px 70px 16px;
+    }
+    .hero-dark-title {
+        font-size: 32px;
+        line-height: 1.3;
+    }
+    .hero-dark-subtitle {
+        font-size: 15px;
+        margin-bottom: 28px;
+    }
+    .hero-dark-actions {
+        flex-direction: column;
+        margin-bottom: 40px;
+    }
+    .btn-dark-primary-gold,
+    .btn-dark-outline {
+        width: 100%;
+        justify-content: center;
+        box-sizing: border-box;
+    }
 }
 
 
