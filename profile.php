@@ -80,16 +80,18 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
 
         <!-- กล่องแจ้งเตือนผลลัพธ์ (Dark Theme Alerts) -->
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert-box alert-success-box" role="alert">
+            <div class="alert-box alert-success-box alert-success" role="alert">
                 <i class="fas fa-check-circle fa-lg"></i>
-                <div><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+                <div class="alert-message"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+                <button type="button" class="alert-close-btn" aria-label="ปิดการแจ้งเตือน" onclick="this.closest('.alert-box').style.display='none'">&times;</button>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert-box alert-error-box" role="alert">
+            <div class="alert-box alert-error-box alert-error" role="alert">
                 <i class="fas fa-exclamation-circle fa-lg"></i>
-                <div><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+                <div class="alert-message"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+                <button type="button" class="alert-close-btn" aria-label="ปิดการแจ้งเตือน" onclick="this.closest('.alert-box').style.display='none'">&times;</button>
             </div>
         <?php endif; ?>
 
@@ -305,7 +307,7 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
 
     </div>
 
-    <script src="assets/js/member.js?v=1.6"></script>
+    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
     <script>
     // ป้องกัน Double Submission ในฟอร์มโปรไฟล์ตามกฎ HCI
     document.addEventListener('DOMContentLoaded', function() {

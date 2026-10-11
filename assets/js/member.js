@@ -25,13 +25,16 @@ function validatePassword() {
 // ฟังก์ชันซ่อน Alert อัตโนมัติ (ใช้ร่วมกันทุกหน้าฝั่งลูกค้า)
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
-        let alerts = document.querySelectorAll('.alert-success, .alert-error');
+        let alerts = document.querySelectorAll('.alert-success, .alert-error, .alert-box, .alert-success-box, .alert-error-box');
         alerts.forEach(alert => {
-            alert.style.transition = "opacity 0.5s";
+            alert.style.transition = "opacity 0.5s ease, transform 0.5s ease";
             alert.style.opacity = "0";
-            setTimeout(() => alert.style.display = 'none', 500);
+            alert.style.transform = "translateY(-6px)";
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 500);
         });
-    }, 3000);
+    }, 3500);
 });
 
 /* =========================================
