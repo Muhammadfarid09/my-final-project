@@ -1,110 +1,134 @@
 <?php
 session_start();
-// หากลูกค้าล็อกอินอยู่แล้ว ให้ข้ามหน้านี้ไปที่หน้าแรก
-if (isset($_SESSION['member_id'])) {
+require_once 'includes/csrf.php';
+
+// หากสมาชิกเข้าสู่ระบบอยู่แล้ว ให้เปลี่ยนเส้นทางไปหน้าแรก
+if (!empty($_SESSION['member_id'])) {
     header("Location: index.php");
     exit();
 }
+
+$flash_error = $_SESSION['error'] ?? null;
+$flash_success = $_SESSION['success'] ?? null;
+$demo_link = $_SESSION['demo_reset_link'] ?? null;
+unset($_SESSION['error'], $_SESSION['success'], $_SESSION['demo_reset_link']);
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลืมรหัสผ่าน - T.S. Pattani</title>
+    <title>ลืมรหัสผ่าน - T.S. Pattani Badminton</title>
     
-    <!-- เรียกใช้ไฟล์ CSS ของฝั่งลูกค้า (v=1.0) -->
-    <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.0">
+    <!-- นำเข้า Global Tokens และ Scoped Recovery Stylesheet -->
+    <link rel="stylesheet" href="assets/css/global.css?v=<?php echo filemtime('assets/css/global.css'); ?>">
+    <link rel="stylesheet" href="assets/css/auth-recovery.css?v=<?php echo filemtime('assets/css/auth-recovery.css'); ?>">
     
-    <!-- นำเข้า Font Awesome สำหรับไอคอน -->
+    <!-- Font Awesome และ Google Font Prompt -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- นำเข้า Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-register">
+<body class="recovery-body">
 
-    <!-- เลเยอร์ทำภาพพื้นหลังให้มืดลง -->
-    <div class="overlay"></div>
+    <!-- แสงเรืองรองและกราฟิกคอร์ทแบดมินตันพื้นหลังระดับ Luxury -->
+    <div class="recovery-ambient-glow"></div>
+    <div class="recovery-ambient-glow-bottom"></div>
+    <div class="recovery-court-pattern"></div>
 
-    <div class="register-container auth-card-md">
-        <!-- ฟอร์มส่งไปประมวลผลที่ actions/forgot_password_db.php -->
-        <form action="actions/forgot_password_db.php" method="POST" onsubmit="return validateResetPassword()">
+    <main class="recovery-container">
+        <div class="recovery-card">
             
-            <div class="register-header auth-header-mb">
-                <h2>ลืมรหัสผ่าน</h2>
-                <p>กรุณากรอกข้อมูลเพื่อยืนยันตัวตนและตั้งรหัสผ่านใหม่</p>
+            <!-- ไอคอนความปลอดภัยสีทอง -->
+            <div class="recovery-icon-badge">
+                <i class="fas fa-shield-halved"></i>
             </div>
 
-            <?php if (isset($_SESSION['error'])): ?>
+            <h1 class="recovery-title">ลืมรหัสผ่าน</h1>
+            <p class="recovery-desc">กรุณากรอกเบอร์โทรศัพท์ที่ลงทะเบียนไว้กับระบบ เพื่อรับลิงก์สำหรับตั้งรหัสผ่านใหม่</p>
+
+            <!-- แจ้งเตือนข้อผิดพลาด -->
+            <?php if ($flash_error): ?>
                 <div class="alert alert-error">
-                    <i class="fas fa-exclamation-circle"></i> 
-                    <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span><?php echo htmlspecialchars($flash_error); ?></span>
                 </div>
             <?php endif; ?>
 
-            <div class="form-group">
-                <label for="member_phone">เบอร์โทรศัพท์ที่ลงทะเบียน</label>
-                <div class="input-group">
-                    <i class="fas fa-phone"></i>
-                    <input type="text" id="member_phone" name="member_phone" class="form-control" placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก" maxlength="10" required>
+            <!-- แจ้งเตือนส่งคำขอสำเร็จ (User Enumeration Prevention) -->
+            <?php if ($flash_success): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span><?php echo htmlspecialchars($flash_success); ?></span>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <div class="form-group">
-                <label for="member_name">ชื่อ-นามสกุลที่ลงทะเบียน</label>
-                <div class="input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="member_name" name="member_name" class="form-control" placeholder="ชื่อ-นามสกุล ที่ใช้สมัคร" required>
+            <!-- โหมดจำลองสำหรับอาจารย์และกรรมการสอบโครงงาน (Demo Mode) -->
+            <?php if ($demo_link): ?>
+                <div class="demo-simulation-box">
+                    <div class="demo-title">
+                        <i class="fas fa-flask"></i> สำหรับการสาธิต / สอบโครงงาน:
+                    </div>
+                    <div>ระบบสร้างโทเค็นรีเซ็ตรหัสผ่านจำลองเรียบร้อย (มีอายุ 30 นาที)</div>
+                    <a href="<?php echo htmlspecialchars($demo_link); ?>" class="btn-demo-link">
+                        คลิกเพื่อตั้งรหัสผ่านใหม่ <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <hr class="divider-dashed">
+            <!-- ฟอร์มส่งคำขอรีเซ็ตรหัสผ่าน -->
+            <form action="actions/forgot_password_db.php" method="POST" class="recovery-form" id="forgotForm">
+                <?php echo csrf_field(); ?>
 
-            <div class="form-group">
-                <label for="new_password">รหัสผ่านใหม่</label>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="new_password" name="new_password" class="form-control" placeholder="ตั้งรหัสผ่านใหม่อย่างน้อย 6 ตัวอักษร" minlength="6" required>
+                <div class="recovery-form-group">
+                    <label for="member_phone" class="recovery-label">เบอร์โทรศัพท์ที่ลงทะเบียน</label>
+                    <div class="recovery-input-wrap">
+                        <i class="fas fa-phone input-icon"></i>
+                        <input type="tel" 
+                               id="member_phone" 
+                               name="member_phone" 
+                               class="recovery-input" 
+                               placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก" 
+                               maxlength="10" 
+                               pattern="[0-9]{10}"
+                               required 
+                               autofocus 
+                               autocomplete="tel">
+                    </div>
                 </div>
+
+                <button type="submit" class="btn-recovery-submit" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>ส่งคำขอรีเซ็ตรหัสผ่าน</span>
+                </button>
+            </form>
+
+            <div class="recovery-back-link">
+                <a href="login.php">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>จำรหัสผ่านได้แล้ว? กลับไปหน้าเข้าสู่ระบบ</span>
+                </a>
             </div>
 
-            <div class="form-group">
-                <label for="confirm_password">ยืนยันรหัสผ่านใหม่</label>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" minlength="6" required>
-                </div>
-            </div>
-            
-            <button type="submit" class="btn-register">รีเซ็ตรหัสผ่าน</button>
+        </div>
+    </main>
 
-            <div class="login-link">
-                จำรหัสผ่านได้แล้ว? <a href="login.php">กลับไปเข้าสู่ระบบ</a>
-            </div>
-        </form>
-    </div>
-
-    <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้า -->
-    <script src="assets/js/member.js?v=1.0"></script>
     <script>
-        function validateResetPassword() {
-            var password = document.getElementById("new_password").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            var phone = document.getElementById("member_phone").value;
+        // ป้องกัน Double Submission & ตรวจสอบเบอร์โทร 10 หลัก Client-side
+        document.getElementById('forgotForm').addEventListener('submit', function(e) {
+            const phoneInput = document.getElementById('member_phone');
+            const phone = phoneInput.value.trim();
 
-            if(!/^[0-9]{10}$/.test(phone)) {
-                alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก (เฉพาะตัวเลขเท่านั้น)");
-                return false;
+            if (!/^[0-9]{10}$/.test(phone)) {
+                e.preventDefault();
+                alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องครบ 10 หลัก (เฉพาะตัวเลขเท่านั้น)');
+                phoneInput.focus();
+                return;
             }
 
-            if (password !== confirmPassword) {
-                alert("รหัสผ่านใหม่และการยืนยันรหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง!");
-                return false;
-            }
-            return true;
-        }
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>กำลังส่งคำขอ...</span>';
+        });
     </script>
 </body>
 </html>
-
