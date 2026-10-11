@@ -1082,10 +1082,34 @@
     gap: 12px;
 }
 
+/* Step 5 Navigation & Submit Actions Bar */
+.step5-wrapper .wizard-nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+.step5-wrapper .wizard-nav-actions .btn-wizard-back {
+    min-height: 48px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    box-sizing: border-box;
+}
+
 /* ปุ่มยืนยันการจอง (Submit CTA) */
 .btn-submit-booking-final {
-    width: 100%;
-    padding: 14px 20px;
+    min-height: 48px;
+    flex: 1;
+    width: auto;
+    padding: 12px 24px;
+    box-sizing: border-box;
     background: var(--color-gold);
     color: var(--text-on-gold);
     border: 1px solid var(--color-gold);
@@ -1260,3 +1284,18 @@
         justify-content: center;
     }
 }
+
+@media (max-width: 576px) {
+    .step5-wrapper .wizard-nav-actions {
+        flex-direction: column-reverse;
+        gap: 12px;
+        align-items: stretch;
+    }
+    .step5-wrapper .wizard-nav-actions .btn-wizard-back,
+    .step5-wrapper .wizard-nav-actions .btn-submit-booking-final {
+        width: 100%;
+        min-height: 48px;
+        justify-content: center;
+    }
+}
+

@@ -535,7 +535,7 @@ try {
 
                         <div class="wizard-nav-actions">
                             <button type="button" class="btn-wizard-back" onclick="goToStep(4)">
-                                <i class="fas fa-arrow-left"></i> กลับไปแก้ไขบริการเสริม
+                                <i class="fas fa-arrow-left"></i> ย้อนกลับไปแก้ไข
                             </button>
                             <?php if ($is_logged_in): ?>
                                 <button type="submit" class="btn-submit-booking-final" id="btnFinalSubmitBooking">
