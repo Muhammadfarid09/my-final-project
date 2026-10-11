@@ -65,15 +65,18 @@
 
     /* Brand Marquee */
     .brand-marquee-section {
-        padding: 20px 0;
+        padding: 24px 0;
     }
     .brand-badge {
         padding: 8px 16px;
         font-size: 13px;
     }
     .brand-banner-card {
-        height: 34px;
-        border-radius: 6px;
+        height: 46px;
+        border-radius: 8px;
+    }
+    .marquee-track {
+        gap: 20px;
     }
 
     /* Leaderboard Podium (Stack Card on Mobile) */

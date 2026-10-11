@@ -2456,18 +2456,18 @@ body.bg-register {
     background: var(--bg-surface);
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
-    padding: 28px 0;
+    padding: 38px 0;
     overflow: hidden;
 }
 .marquee-header {
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 22px;
 }
 .marquee-heading {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     color: var(--text-secondary);
     margin: 0;
 }
@@ -2482,8 +2482,8 @@ body.bg-register {
 .marquee-track {
     display: flex;
     width: max-content;
-    gap: 28px;
-    animation: marqueeScroll 30s linear infinite;
+    gap: 32px;
+    animation: marqueeScroll 32s linear infinite;
 }
 .marquee-track:hover {
     animation-play-state: paused;
@@ -2524,35 +2524,37 @@ body.bg-register {
 .brand-badge-ashaway { border-left: 3px solid #c084fc; }
 .brand-badge-ts { border-left: 3px solid var(--color-gold); }
 
-/* Brand Banner Cards (Official Graphics Display) */
+/* Brand Banner Cards (Official Graphics Display - Upscaled & Premium) */
 .brand-banner-card {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 42px;
+    height: 60px;
     background: var(--bg-elevated);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
     transition: all var(--transition-fast);
     user-select: none;
     cursor: pointer;
 }
 .brand-banner-card:hover {
     border-color: var(--color-gold);
-    box-shadow: 0 6px 18px rgba(255, 185, 29, 0.25);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 185, 29, 0.3);
+    transform: translateY(-4px);
 }
 .brand-banner-img {
     height: 100%;
     width: auto;
     object-fit: cover;
+    border-radius: 8px;
     display: block;
     transition: transform var(--transition-fast);
 }
 .brand-banner-card:hover .brand-banner-img {
-    transform: scale(1.04);
+    transform: scale(1.03);
 }
 
 /* Section Header Shared */

@@ -198,74 +198,74 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
                 <!-- ชุดที่ 1 -->
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="YONEX">
-                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img">
+                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="VICTOR">
-                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img">
+                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="LI-NING">
-                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img">
+                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="MIZUNO">
-                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img">
+                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="DUNLOP">
-                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img">
+                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
-                    <div class="brand-banner-card" title="ASHAWAY">
-                        <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="brand-banner-img">
+                    <div class="brand-banner-card" title="ASICS">
+                        <img src="assets/img/brands/asics.png" alt="ASICS" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="T.S. PRO SHOP">
-                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img">
+                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
 
                 <!-- ชุดที่ 2 (ทำซ้ำเพื่อต่อลูปแบบไร้รอยต่อ Infinite Marquee) -->
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="YONEX">
-                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img">
+                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="VICTOR">
-                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img">
+                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="LI-NING">
-                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img">
+                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="MIZUNO">
-                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img">
+                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="DUNLOP">
-                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img">
+                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
-                    <div class="brand-banner-card" title="ASHAWAY">
-                        <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="brand-banner-img">
+                    <div class="brand-banner-card" title="ASICS">
+                        <img src="assets/img/brands/asics.png" alt="ASICS" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
                 <div class="marquee-item">
                     <div class="brand-banner-card" title="T.S. PRO SHOP">
-                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img">
+                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img" loading="lazy">
                     </div>
                 </div>
             </div>
