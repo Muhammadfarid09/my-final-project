@@ -7,6 +7,7 @@ $is_booking = in_array($current_page, ['booking.php', 'payment.php']);
 $is_rewards = in_array($current_page, ['rewards.php', 'reward_history.php']);
 $is_chat = in_array($current_page, ['chat.php', 'contact.php']);
 $is_profile = in_array($current_page, ['profile.php']);
+$is_booking_history = in_array($current_page, ['booking_history.php']);
 
 // ดึงข้อมูลคะแนนสะสมและระดับสมาชิกของลูกค้าที่ล็อกอินอยู่
 if (!isset($member_points) || !isset($member_level)) {
@@ -94,7 +95,7 @@ if (!isset($member_points) || !isset($member_level)) {
                             </div>
                             <div class="mobile-user-menu">
                                 <a href="profile.php" class="<?= $is_profile ? 'active' : '' ?>"><i class="fas fa-id-card"></i> โปรไฟล์ของฉัน</a>
-                                <a href="booking_history.php"><i class="fas fa-history"></i> ประวัติการจอง</a>
+                                <a href="booking_history.php" class="<?= $is_booking_history ? 'active' : '' ?>"><i class="fas fa-history"></i> ประวัติการจอง</a>
                                 <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                             </div>
                         </div>
@@ -114,7 +115,7 @@ if (!isset($member_points) || !isset($member_level)) {
             <?php if (isset($_SESSION['member_id'])): ?>
                 <!-- ล็อกอินแล้ว: แสดง User Dropdown และปุ่มจองสนาม -->
                 <div class="user-dropdown">
-                    <button type="button" class="dropbtn <?= $is_profile ? 'active' : '' ?>" onclick="toggleDropdown()">
+                    <button type="button" class="dropbtn <?= ($is_profile || $is_booking_history) ? 'active' : '' ?>" onclick="toggleDropdown()">
                         <i class="fas fa-user-circle"></i>
                         <span class="user-name"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
                         <span class="badge-level level-<?= strtolower($member_level) ?>"><?= htmlspecialchars($member_level) ?></span>
@@ -126,7 +127,7 @@ if (!isset($member_points) || !isset($member_level)) {
                         </div>
                         <hr class="dropdown-divider">
                         <a href="profile.php" class="<?= $is_profile ? 'active' : '' ?>"><i class="fas fa-id-card"></i> โปรไฟล์ของฉัน</a>
-                        <a href="booking_history.php"><i class="fas fa-history"></i> ประวัติการจอง</a>
+                        <a href="booking_history.php" class="<?= $is_booking_history ? 'active' : '' ?>"><i class="fas fa-history"></i> ประวัติการจอง</a>
                         <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                     </div>
                 </div>

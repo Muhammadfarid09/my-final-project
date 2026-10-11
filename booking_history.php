@@ -39,6 +39,7 @@ try {
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
     <link rel="stylesheet" href="assets/css/style.css?v=1.7">
     <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
+    <link rel="stylesheet" href="assets/css/booking-history.css?v=<?php echo filemtime('assets/css/booking-history.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -46,22 +47,22 @@ try {
 
     <?php include_once 'includes/navbar.php'; ?>
 
-    <div class="history-wrapper">
+    <main class="history-wrapper">
         
         <div class="booking-header history-header">
-            <h2><i class="fas fa-history"></i> ประวัติการจองสนามและคำสั่งซื้อ</h2>
+            <h2><i class="fas fa-history text-gold"></i> ประวัติการจองสนามและคำสั่งซื้อ</h2>
             <p>ตรวจสอบสถานะการจองสนาม ดูสลิปการโอน หรือขอยกเลิกการจอง</p>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success">
-                <i class="fas fa-check-circle fa-lg"></i> <div><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <i class="fas fa-check-circle fa-lg"></i> <div><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
             </div>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle fa-lg"></i> <div><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <i class="fas fa-exclamation-circle fa-lg"></i> <div><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
             </div>
         <?php endif; ?>
 
@@ -217,7 +218,7 @@ try {
             <?php endif; ?>
         </div>
 
-    </div>
+    </main>
 
     <!-- Modal ยืนยันการขอยกเลิกการจอง -->
     <div id="cancelModal" class="modal-cancel-overlay">
