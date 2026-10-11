@@ -7,40 +7,81 @@
    ยูทิลิตี้เสริม (Utility Classes)
    ========================================= */
 :root {
-    --brand-primary: #1e3c72;
-    --brand-primary-dark: #162c54;
-    --brand-accent: #0284c7;
-    --brand-accent-hover: #0369a1;
-    --brand-highlight: #38bdf8;
-    
-    --gold-color: #f59e0b;
-    --gold-bg: #fef3c7;
-    --silver-color: #64748b;
-    --silver-bg: #f1f5f9;
-    --bronze-color: #b45309;
-    --bronze-bg: #ffedd5;
-    
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    
-    --bg-page: #f8fafc;
-    --bg-card: #ffffff;
-    --bg-alt: #f1f5f9;
-    
-    --border-light: #e2e8f0;
-    --border-subtle: #cbd5e1;
-    
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-    --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.1);
-    --shadow-xl: 0 20px 30px -5px rgba(15, 23, 42, 0.15);
-    
+    /* ----------------------------------------------------------------------
+       1.1 พื้นผิวและพื้นหลัง (Surface & Elevation: 70% / 20%)
+       ---------------------------------------------------------------------- */
+    --bg-primary: #090909;        /* Canvas พื้นหลังหลัก */
+    --bg-surface: #191919;        /* Card, Container, Panel พื้นหลัง */
+    --bg-elevated: #292929;       /* Input Box, Select Box, Hover Surface */
+
+    /* ----------------------------------------------------------------------
+       1.2 โทนสีเน้นแบรนด์ (Brand Accent: 10%)
+       ---------------------------------------------------------------------- */
+    --color-gold: #FFB91D;        /* Primary CTA, Active State, ราคาสำคัญ */
+    --color-gold-hover: #E9A812;  /* Interactive Hover State */
+
+    /* ----------------------------------------------------------------------
+       1.3 ตัวอักษรและอัตราส่วนความคมชัด (Typography & Contrast Ratio)
+       ---------------------------------------------------------------------- */
+    --text-primary: #F5F5F5;      /* Heading, Label, Value บนพื้นหลังมืด */
+    --text-secondary: #A3A3A3;    /* Caption, Placeholder, Helper Text */
+    --text-on-gold: #090909;      /* ข้อความบนปุ่มทอง (บังคับพื้นสีดำเข้ม ห้ามใช้สีขาว) */
+
+    /* ----------------------------------------------------------------------
+       1.4 เส้นขอบและเส้นแบ่ง (Borders & Dividers)
+       ---------------------------------------------------------------------- */
+    --border-color: #383838;      /* Border ของ Container และ Form Elements */
+
+    /* ----------------------------------------------------------------------
+       1.5 สีสถานะการใช้งาน (Domain Status: Court Booking)
+       ---------------------------------------------------------------------- */
+    --status-available: #22C55E;  /* คอร์ทว่าง */
+    --status-booked: #EF4444;     /* คอร์ทติดจอง */
+
+    /* ----------------------------------------------------------------------
+       2.1 การแมปตัวแปรเดิมเพื่อความเข้ากันได้ย้อนหลัง 100% (Backward Compatibility)
+       ---------------------------------------------------------------------- */
+    --brand-primary: var(--color-gold);
+    --brand-primary-dark: var(--color-gold-hover);
+    --brand-accent: var(--color-gold);
+    --brand-accent-hover: var(--color-gold-hover);
+    --brand-highlight: #FDE047;
+
+    --bg-page: var(--bg-primary);
+    --bg-card: var(--bg-surface);
+    --bg-alt: var(--bg-elevated);
+
+    --text-muted: var(--text-secondary);
+
+    --border-light: var(--border-color);
+    --border-subtle: #2D2D2D;
+
+    /* ----------------------------------------------------------------------
+       2.2 ป้ายระดับสมาชิก (Member Tiers) - ปรับระดับความสว่างบนพื้นหลังมืด
+       ---------------------------------------------------------------------- */
+    --gold-color: #FFB91D;
+    --gold-bg: rgba(255, 185, 29, 0.15);
+    --silver-color: #94A3B8;
+    --silver-bg: rgba(148, 163, 184, 0.15);
+    --bronze-color: #CD7F32;
+    --bronze-bg: rgba(205, 127, 50, 0.15);
+
+    /* ----------------------------------------------------------------------
+       2.3 เงาและความลึกบนพื้นหลังมืด (Dark Elevation Shadows)
+       ---------------------------------------------------------------------- */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.7);
+    --shadow-xl: 0 20px 30px -5px rgba(0, 0, 0, 0.85);
+
+    /* ----------------------------------------------------------------------
+       2.4 ขอบมนและแอนิเมชัน (Radii & Transitions)
+       ---------------------------------------------------------------------- */
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-full: 9999px;
-    
+
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
 }
