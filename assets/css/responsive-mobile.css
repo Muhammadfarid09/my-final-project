@@ -318,4 +318,30 @@
     }
 }
 
+/* ==========================================================================
+   Full Split-Screen Login Mobile Rules (@media max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .login-split-wrapper {
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    .login-visual-panel {
+        display: none; /* ซ่อนฝั่งซ้ายอัตโนมัติบนอุปกรณ์พกพาตามข้อกำหนด */
+    }
+    .login-form-panel {
+        width: 100%;
+        min-height: 100vh;
+        padding: 24px 16px;
+        box-sizing: border-box;
+    }
+    .login-card-floating {
+        max-width: 100%;
+        padding: 28px 20px;
+        border-radius: 16px;
+        margin: 16px 0;
+    }
+}
+
+
 

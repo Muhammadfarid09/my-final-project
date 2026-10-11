@@ -30,7 +30,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เข้าสู่ระบบ - T.S. Pattani Badminton</title>
+    <title>เข้าสู่ระบบสมาชิก - T.S. Pattani Badminton</title>
     
     <!-- เรียกใช้ไฟล์ CSS ของระบบ -->
     <link rel="stylesheet" href="assets/css/global.css?v=<?php echo filemtime('assets/css/global.css'); ?>">
@@ -42,83 +42,113 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
     <!-- นำเข้า Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-register">
+<body class="login-split-body">
 
-    <!-- เลเยอร์ทำภาพพื้นหลังให้มืดลงอย่างนุ่มนวล -->
-    <div class="overlay"></div>
-
-    <!-- คอนเทนเนอร์หลัก: Split-Screen 2 หน้าจอซ้าย-ขวาสไตล์เปิดเล่มหนังสือ -->
-    <div class="login-book-wrapper">
+    <!-- Layout Wrapper: Full Split-Screen 50/50 (min-height: 100vh) -->
+    <div class="login-split-wrapper">
         
-        <!-- ฝั่งซ้าย (Cover / Visual Page - หน้าปกต้อนรับ) -->
-        <div class="login-book-cover">
-            <div class="cover-court-lines"></div>
-            
-            <div class="cover-content">
-                <!-- แบรนด์และโลโก้สนาม -->
-                <div class="cover-brand-header">
-                    <div class="cover-logo-icon">
-                        <i class="fas fa-shuttlecock"></i>
+        <!-- ============================================================ -->
+        <!-- ก. ฝั่งซ้าย: Brand & Visual Panel (Dark Black & Gold 50%)    -->
+        <!-- ============================================================ -->
+        <aside class="login-visual-panel">
+            <!-- เส้นกราฟิกสนามคอร์ทมินิมอลและแสงสะท้อนสีทอง -->
+            <div class="visual-court-pattern"></div>
+            <div class="visual-ambient-glow"></div>
+
+            <div class="visual-panel-content">
+                <!-- ส่วนบน: Capsule Badge -->
+                <div class="visual-panel-top">
+                    <div class="visual-badge-capsule">
+                        <i class="fas fa-shuttlecock text-gold"></i>
+                        <span>🏸 T.S. Pattani Badminton Booking Portal</span>
                     </div>
-                    <span class="cover-brand-name">T.S. PATTANI BADMINTON</span>
                 </div>
 
-                <!-- ข้อความต้อนรับและสโลแกน -->
-                <div>
-                    <h1 class="cover-hero-title">
-                        ยินดีต้อนรับสู่ <br>
-                        T.S. Pattani Badminton
-                    </h1>
-                    <p class="cover-hero-slogan">
-                        สนามแบดมินตันมาตรฐาน BWF จองง่าย สะดวก รวดเร็ว พร้อมลุยทุกแมตช์
-                    </p>
+                <!-- ส่วนกลาง: Hero Heading & Floating Highlight Cards -->
+                <div class="visual-panel-center">
+                    <div class="visual-brand-heading">
+                        <h1 class="visual-hero-title">
+                            ยินดีต้อนรับสู่ <br>
+                            <span class="text-gold-highlight">T.S. Pattani Badminton</span>
+                        </h1>
+                        <p class="visual-hero-subtitle">
+                            สนามแบดมินตันมาตรฐาน BWF จองง่าย สะดวก รวดเร็ว พร้อมลุยทุกแมตช์
+                        </p>
+                    </div>
+
+                    <!-- การ์ดสรุปจุดเด่นลอยตัว 3 ใบ -->
+                    <div class="visual-floating-cards">
+                        <div class="visual-highlight-card">
+                            <div class="visual-card-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="visual-card-text">
+                                <h3 class="visual-card-title">คอร์ทมาตรฐาน BWF</h3>
+                                <p class="visual-card-desc">พื้นยาง 5 ชั้น ซับแรงกระแทก เกรดแข่งขันระดับสากล</p>
+                            </div>
+                        </div>
+
+                        <div class="visual-highlight-card">
+                            <div class="visual-card-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="visual-card-text">
+                                <h3 class="visual-card-title">ระบบไฟส่องสว่างระดับแข่งขัน</h3>
+                                <p class="visual-card-desc">LED Anti-Glare ตัดแสงสะท้อน ถนอมสายตาทุกมุมมอง</p>
+                            </div>
+                        </div>
+
+                        <div class="visual-highlight-card">
+                            <div class="visual-card-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="visual-card-text">
+                                <h3 class="visual-card-title">จองคิวออนไลน์เรียลไทม์ 24 ชม.</h3>
+                                <p class="visual-card-desc">เลือกรอบเวลา ล็อกคอร์ทอัตโนมัติ รวดเร็ว 100%</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 3 จุดเด่นสนามพร้อมไอคอน -->
-                <div class="cover-features-list">
-                    <div class="cover-feature-item">
-                        <div class="cover-feature-icon">
-                            <i class="fas fa-award"></i>
-                        </div>
-                        <div class="cover-feature-text">
-                            <span class="cover-feature-title">คอร์ทมาตรฐานพรีเมียม</span>
-                            <span class="cover-feature-desc">พื้นยางเกรดแข่งขันและไฟ LED Anti-Glare ถนอมสายตา</span>
-                        </div>
-                    </div>
-
-                    <div class="cover-feature-item">
-                        <div class="cover-feature-icon">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="cover-feature-text">
-                            <span class="cover-feature-title">ระบบจองคิวออนไลน์ 24 ชม.</span>
-                            <span class="cover-feature-desc">เลือกคอร์ทและเวลาที่ต้องการได้ทันใจ ไม่ต้องรอคิว</span>
-                        </div>
-                    </div>
-
-                    <div class="cover-feature-item">
-                        <div class="cover-feature-icon">
-                            <i class="fas fa-gift"></i>
-                        </div>
-                        <div class="cover-feature-text">
-                            <span class="cover-feature-title">ชุมชนคนรักกีฬา & สะสมแต้ม</span>
-                            <span class="cover-feature-desc">ทุกการจองสะสมแต้มแลกชั่วโมงสนามและของรางวัลพิเศษ</span>
-                        </div>
-                    </div>
+                <!-- ส่วนล่าง: Footer Security & Trust Tag -->
+                <div class="visual-panel-bottom">
+                    <span class="visual-footer-text">
+                        <i class="fas fa-shield-alt text-gold mr-6"></i> ระบบการจองและชำระเงินที่ปลอดภัยมาตรฐานสากล
+                    </span>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- ฝั่งขวา (Form Page - หน้าฟอร์มเข้าสู่ระบบ) -->
-        <div class="login-book-form-section">
-            <div class="login-form-inner">
+        <!-- ============================================================ -->
+        <!-- ข. ฝั่งขวา: Interaction & Form Panel (50%)                   -->
+        <!-- ============================================================ -->
+        <main class="login-form-panel">
+            
+            <!-- แถบเครื่องมือด้านบน (Top Utility Bar) -->
+            <div class="login-top-utility">
+                <a href="index.php" class="btn-utility-back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>← กลับหน้าหลัก</span>
+                </a>
+                <div class="utility-status-pill">
+                    <span class="status-indicator-dot"></span>
+                    <span>ระบบพร้อมให้บริการ</span>
+                </div>
+            </div>
+
+            <!-- กล่องคอนเทนเนอร์การ์ดฟอร์มลอยตัว (Floating Form Card) -->
+            <div class="login-card-floating">
                 
-                <div class="login-header-group">
-                    <h2 class="login-title">เข้าสู่ระบบ</h2>
-                    <p class="login-subtitle">ยินดีต้อนรับกลับมา! กรุณากรอกข้อมูลเพื่อเข้าใช้งาน</p>
+                <div class="login-card-header">
+                    <div class="login-brand-tag">
+                        <i class="fas fa-shuttlecock text-gold"></i>
+                        <span>T.S. PATTANI</span>
+                    </div>
+                    <h2 class="login-card-title">เข้าสู่ระบบสมาชิก</h2>
+                    <p class="login-card-desc">ยินดีต้อนรับกลับมา! กรุณากรอกเบอร์โทรศัพท์เพื่อเข้าใช้งาน</p>
                 </div>
 
-                <!-- พื้นที่แสดงแจ้งเตือน Error ฝั่ง Client-side -->
+                <!-- พื้นที่แสดงแจ้งเตือน Error ฝั่ง Client-side (JS Validation) -->
                 <div id="loginClientAlertBox"></div>
 
                 <!-- แจ้งเตือนเมื่อสมัครสมาชิกสำเร็จแล้วถูกส่งต่อมาหน้านี้ -->
@@ -148,55 +178,66 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                 <form action="actions/login_db.php" method="POST" id="loginForm" novalidate>
                     
                     <!-- ฟิลด์ที่ 1: เบอร์โทรศัพท์ (Username) -->
-                    <div class="form-group">
-                        <label for="member_phone" class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
-                        <div class="input-group">
-                            <i class="fas fa-phone input-icon"></i>
-                            <input type="text" id="member_phone" name="member_phone" class="form-control" placeholder="08X-XXX-XXXX" inputmode="tel" maxlength="10" autocomplete="tel" value="<?php echo $prefilled_phone; ?>" required>
+                    <div class="form-group-dark">
+                        <label for="member_phone" class="form-label-dark">
+                            เบอร์โทรศัพท์ <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group-dark">
+                            <i class="fas fa-phone input-icon-dark"></i>
+                            <input type="text" id="member_phone" name="member_phone" class="form-control-dark" placeholder="08X-XXX-XXXX" inputmode="tel" maxlength="10" autocomplete="tel" value="<?php echo $prefilled_phone; ?>" required>
                         </div>
                     </div>
 
                     <!-- ฟิลด์ที่ 2: รหัสผ่าน พร้อมปุ่ม Toggle ลูกตา -->
-                    <div class="form-group">
-                        <label for="member_password" class="form-label">รหัสผ่าน <span class="text-danger">*</span></label>
-                        <div class="input-group has-toggle">
-                            <i class="fas fa-lock input-icon"></i>
-                            <input type="password" id="member_password" name="member_password" class="form-control" placeholder="กรอกรหัสผ่านของคุณ" autocomplete="current-password" required>
-                            <button type="button" class="btn-toggle-password" id="btnToggleLoginPassword" aria-label="แสดงหรือซ่อนรหัสผ่าน" tabindex="-1">
+                    <div class="form-group-dark">
+                        <label for="member_password" class="form-label-dark">
+                            รหัสผ่าน <span class="text-danger">*</span>
+                        </label>
+                        <div class="input-group-dark has-toggle">
+                            <i class="fas fa-lock input-icon-dark"></i>
+                            <input type="password" id="member_password" name="member_password" class="form-control-dark" placeholder="กรอกรหัสผ่านของคุณ" autocomplete="current-password" required>
+                            <button type="button" class="btn-toggle-password-dark" id="btnToggleLoginPassword" aria-label="แสดงหรือซ่อนรหัสผ่าน" tabindex="-1">
                                 <i class="fas fa-eye" id="toggleLoginPasswordIcon"></i>
                             </button>
                         </div>
                     </div>
                     
                     <!-- แถวควบคุม: Remember Me & Forgot Password -->
-                    <div class="login-control-row">
-                        <label class="checkbox-label">
+                    <div class="login-control-row-dark">
+                        <label class="checkbox-label-dark">
                             <input type="checkbox" name="remember_me" value="1" <?php echo $is_remembered ? 'checked' : ''; ?>>
                             <span>จดจำการเข้าสู่ระบบ</span>
                         </label>
-                        <a href="forgot_password.php" class="forgot-password-link">ลืมรหัสผ่าน?</a>
+                        <a href="forgot_password.php" class="forgot-link-gold">ลืมรหัสผ่าน?</a>
                     </div>
 
                     <!-- รักษาค่า Redirect URL หลังล็อกอินสำเร็จ -->
                     <input type="hidden" name="redirect" value="<?php echo $redirect_target; ?>">
 
-                    <!-- ปุ่มเข้าสู่ระบบ -->
-                    <button type="submit" id="btnLoginSubmit" class="btn-register btn-auth-full">
+                    <!-- ปุ่มเข้าสู่ระบบ (Submit CTA) -->
+                    <button type="submit" id="btnLoginSubmit" class="btn-login-gold-full">
                         <span>เข้าสู่ระบบ</span>
+                        <i class="fas fa-arrow-right"></i>
                     </button>
 
                     <!-- ลิงก์สมัครสมาชิกใหม่ -->
-                    <div class="login-footer-register">
+                    <div class="login-footer-register-dark">
                         ยังไม่มีบัญชีใช่ไหม? <a href="register.php<?php echo !empty($redirect_target) ? '?redirect=' . urlencode($redirect_target) : ''; ?>">สมัครสมาชิกที่นี่</a>
                     </div>
                 </form>
 
             </div>
-        </div>
+
+            <!-- ข้อมูลย่อยท้ายหน้า -->
+            <div class="login-form-bottom-info">
+                <span>© 2026 T.S. Pattani Badminton · ระบบความปลอดภัยมาตรฐาน BWF</span>
+            </div>
+
+        </main>
 
     </div>
 
-    <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้า -->
+    <!-- เรียกใช้ไฟล์ JS ฝั่งลูกค้า (มีระบบ Double Submit Prevention & Input Sanitation) -->
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
 </body>
 </html>
