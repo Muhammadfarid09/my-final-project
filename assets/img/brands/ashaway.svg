@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 155 32" width="155" height="32" fill="none">
+  <!-- Ashaway Starburst / Badminton String Core Symbol -->
+  <g transform="translate(4, 5)">
+    <circle cx="11" cy="11" r="10" fill="#9333EA"/>
+    <path d="M11 2 L13 8 L19 8 L14 12 L16 18 L11 14 L6 18 L8 12 L3 8 L9 8 Z" fill="#FFFFFF"/>
+    <circle cx="11" cy="11" r="3" fill="#FFB91D"/>
+  </g>
+  <!-- ASHAWAY Typography -->
+  <text x="34" y="22" font-family="'Kanit', 'Montserrat', 'Segoe UI', sans-serif" font-size="18" font-weight="900" fill="#FFFFFF" letter-spacing="1.5">ASHAWAY</text>
+</svg>

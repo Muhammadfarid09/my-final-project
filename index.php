@@ -197,48 +197,48 @@ if (isset($_SESSION['member_id']) && isset($conn)) {
             <div class="marquee-track">
                 <!-- ชุดที่ 1 -->
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-yonex"><i class="fas fa-feather-alt text-accent"></i> YONEX</span>
+                    <span class="brand-badge brand-badge-yonex"><img src="assets/img/brands/yonex.svg" alt="YONEX" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-victor"><i class="fas fa-shield-alt text-danger"></i> VICTOR</span>
+                    <span class="brand-badge brand-badge-victor"><img src="assets/img/brands/victor.svg" alt="VICTOR" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-lining"><i class="fas fa-bolt text-warning"></i> LI-NING</span>
+                    <span class="brand-badge brand-badge-lining"><img src="assets/img/brands/lining.svg" alt="LI-NING" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-mizuno"><i class="fas fa-running text-accent"></i> MIZUNO</span>
+                    <span class="brand-badge brand-badge-mizuno"><img src="assets/img/brands/mizuno.svg" alt="MIZUNO" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-dunlop"><i class="fas fa-circle-notch text-success"></i> DUNLOP</span>
+                    <span class="brand-badge brand-badge-dunlop"><img src="assets/img/brands/dunlop.svg" alt="DUNLOP" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-ashaway"><i class="fas fa-certificate text-primary"></i> ASHAWAY</span>
+                    <span class="brand-badge brand-badge-ashaway"><img src="assets/img/brands/ashaway.svg" alt="ASHAWAY" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-ts"><i class="fas fa-award text-warning"></i> T.S. PRO SHOP</span>
+                    <span class="brand-badge brand-badge-ts"><img src="assets/img/brands/ts-proshop.svg" alt="T.S. PRO SHOP" class="brand-logo-img"></span>
                 </div>
 
                 <!-- ชุดที่ 2 (ทำซ้ำเพื่อต่อลูปแบบไร้รอยต่อ Infinite Marquee) -->
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-yonex"><i class="fas fa-feather-alt text-accent"></i> YONEX</span>
+                    <span class="brand-badge brand-badge-yonex"><img src="assets/img/brands/yonex.svg" alt="YONEX" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-victor"><i class="fas fa-shield-alt text-danger"></i> VICTOR</span>
+                    <span class="brand-badge brand-badge-victor"><img src="assets/img/brands/victor.svg" alt="VICTOR" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-lining"><i class="fas fa-bolt text-warning"></i> LI-NING</span>
+                    <span class="brand-badge brand-badge-lining"><img src="assets/img/brands/lining.svg" alt="LI-NING" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-mizuno"><i class="fas fa-running text-accent"></i> MIZUNO</span>
+                    <span class="brand-badge brand-badge-mizuno"><img src="assets/img/brands/mizuno.svg" alt="MIZUNO" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-dunlop"><i class="fas fa-circle-notch text-success"></i> DUNLOP</span>
+                    <span class="brand-badge brand-badge-dunlop"><img src="assets/img/brands/dunlop.svg" alt="DUNLOP" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-ashaway"><i class="fas fa-certificate text-primary"></i> ASHAWAY</span>
+                    <span class="brand-badge brand-badge-ashaway"><img src="assets/img/brands/ashaway.svg" alt="ASHAWAY" class="brand-logo-img"></span>
                 </div>
                 <div class="marquee-item">
-                    <span class="brand-badge brand-badge-ts"><i class="fas fa-award text-warning"></i> T.S. PRO SHOP</span>
+                    <span class="brand-badge brand-badge-ts"><img src="assets/img/brands/ts-proshop.svg" alt="T.S. PRO SHOP" class="brand-logo-img"></span>
                 </div>
             </div>
         </div>
