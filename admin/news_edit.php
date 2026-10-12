@@ -26,20 +26,22 @@ try {
     header("Location: news.php");
     exit();
 }
-?>
-<?php
 $page_title = 'แก้ไขข่าวสาร - Admin T.S. Pattani';
-$page_header = '<i class=\"fas fa-edit\"></i> แก้ไขข่าวสารและโปรโมชั่น';
+$page_header = '<i class="fas fa-edit"></i> แก้ไขข่าวสารและโปรโมชั่น';
 include 'includes/header.php';
-?><div class="admin-card max-w-800 mx-auto">
-                <div class="header-between border-b pb-15 mb-20">
-                    <h4 class="section-header m-0"><i class="fas fa-pen-nib"></i> ข้อมูลข่าวสาร #<?php echo $news_id; ?></h4>
-                    <a href="news.php" class="btn-cancel text-decor-none"><i class="fas fa-arrow-left"></i> ย้อนกลับ</a>
-                </div>
+?>
+<div class="admin-card max-w-800 mx-auto">
+    <div class="header-between border-b pb-15 mb-20">
+        <h4 class="section-header m-0"><i class="fas fa-pen-nib"></i> ข้อมูลข่าวสาร #<?php echo $news_id; ?></h4>
+        <a href="news.php" class="btn-secondary text-decor-none text-14">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </a>
+    </div>
 
-                <form action="actions/news_edit_db.php" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="news_id" value="<?php echo $news_data['news_id']; ?>">
-                    <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($news_data['news_image'] ?? ''); ?>">
+    <form action="actions/news_edit_db.php" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+        <input type="hidden" name="news_id" value="<?php echo $news_data['news_id']; ?>">
+        <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($news_data['news_image'] ?? ''); ?>">
 
                     <div class="form-group">
                         <label>หัวข้อประกาศ <span class="text-danger">*</span></label>
