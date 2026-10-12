@@ -90,15 +90,15 @@ include 'includes/header.php';
     <!-- ฝั่งขวา: หน้าต่างสนทนา -->
     <div class="chat-main">
         <?php if ($active_member_id): ?>
-            <!-- หัวข้อแชท (58px) -->
+            <!-- หัวข้อแชท (64px) -->
             <div class="chat-main-header">
-                <div class="d-flex align-items-center gap-10">
+                <div class="chat-header-user">
                     <div class="chat-avatar">
-                        <i class="fas fa-user-check text-primary"></i>
+                        <i class="fas fa-user-check"></i>
                     </div>
-                    <div>
-                        <div class="font-bold text-dark-custom"><?php echo htmlspecialchars($active_member_name, ENT_QUOTES, 'UTF-8'); ?></div>
-                        <small class="text-small-muted">รหัสสมาชิก #<?php echo intval($active_member_id); ?></small>
+                    <div class="chat-user-details">
+                        <span class="chat-user-name"><?php echo htmlspecialchars($active_member_name, ENT_QUOTES, 'UTF-8'); ?></span>
+                        <span class="chat-user-id">รหัสสมาชิก #<?php echo intval($active_member_id); ?></span>
                     </div>
                 </div>
                 <span class="badge badge-success"><i class="fas fa-circle text-10"></i> กำลังสนทนา</span>
