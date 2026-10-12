@@ -1,41 +1,97 @@
 /* =========================================
-   T.S. Pattani - Admin Stylesheet (v1.40 - Clean Light Theme)
+   T.S. Pattani - Admin Stylesheet (v1.50 - Clean Light Theme)
    Desktop-First Dashboard
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* =========================================
-   0. โทนสีและ Design Tokens (CSS Variables)
-   ดึงชุดสีหลักจากหน้าบ้าน (global.css & style.css) 100%
-   ========================================= */
+/* ==============================================================================
+   0. ศูนย์รวมตัวแปรระบบ (Design Tokens & CSS Variables)
+   👉 แก้ค่าตัวแปรตรงนี้เพื่อเปลี่ยนสี/ขนาดทั้งระบบ
+   ============================================================================== */
 :root {
-    /* โทนสีเน้นแบรนด์ (Brand Gold Accent) */
-    --color-gold: #FFB91D;         /* Primary CTA, Active State */
-    --color-gold-hover: #E9A812;   /* Interactive Hover State */
-    --color-gold-dark: #CA8A04;    /* Warm Gold สำหรับขอบ/ไอคอน/ข้อความ */
-    --color-gold-bg: #FEF9C3;      /* พื้นหลังสีทองอ่อน Active State */
-    --color-gold-border: #FDE047;  /* เส้นขอบสีทอง */
-    --text-on-gold: #090909;       /* ข้อความบนปุ่มทอง (บังคับสีเข้มตามหลัก HCI) */
+    /* --------------------------------------------------
+       1. สีปุ่มและสถานะการทำงาน (Button & Semantic Colors)
+       -------------------------------------------------- */
+    --btn-primary: var(--color-gold, #FFB91D);         /* สีปุ่มหลัก (Brand Gold) */
+    --btn-primary-hover: var(--color-gold-hover, #E9A812); /* Interactive Hover */
+    --btn-primary-text: var(--text-on-gold, #090909);  /* ตัวหนังสือบนปุ่มหลัก */
+    
+    --btn-success: #10B981;                           /* สีปุ่มสำเร็จ/ยืนยัน (Emerald Green) */
+    --btn-success-hover: #059669;                      /* Hover สำเร็จ/ยืนยัน */
+    --btn-success-text: #FFFFFF;                       /* ตัวหนังสือบนปุ่มสำเร็จ */
+    
+    --btn-danger: #EF4444;                            /* สีปุ่มปฏิเสธ/ลบ/ยกเลิก (Rose Red) */
+    --btn-danger-hover: #DC2626;                       /* Hover ปฏิเสธ/ลบ/ยกเลิก */
+    --btn-danger-text: #FFFFFF;                        /* ตัวหนังสือบนปุ่มอันตราย */
+    
+    --btn-secondary: #FFFFFF;                         /* สีปุ่มรอง (Clean White Outline) */
+    --btn-secondary-hover: #F8FAFC;                    /* Hover ปุ่มรอง */
+    --btn-secondary-border: #CBD5E1;                   /* ขอบปุ่มรอง */
+    --btn-secondary-text: #334155;                     /* ตัวหนังสือปุ่มรอง */
+    
+    --btn-warning: #F59E0B;                           /* สีปุ่มเตือน/แก้ไข (Amber) */
+    --btn-warning-hover: #D97706;                      /* Hover เตือน/แก้ไข */
+    --btn-warning-text: #FFFFFF;                       /* ตัวหนังสือปุ่มเตือน */
+    
+    --btn-info: #2563EB;                              /* สีปุ่มข้อมูล/รายละเอียด (Blue) */
+    --btn-info-hover: #1D4ED8;                         /* Hover ข้อมูล */
+    --btn-info-text: #FFFFFF;                          /* ตัวหนังสือปุ่มข้อมูล */
 
-    /* พื้นผิวและพื้นหลัง (Clean White & Subtle Surfaces) */
-    --bg-main: #F8FAFC;            /* พื้นหลัง Canvas ภาพรวม */
-    --bg-white: #FFFFFF;           /* Card, Sidebar, Navbar, Modal */
-    --bg-subtle: #F1F5F9;          /* Table Header, Input background */
-    --bg-hover: #F8FAFC;           /* List/Table Row Hover */
+    /* --------------------------------------------------
+       2. ขนาดและสัดส่วนปุ่มมาตรฐาน (Button Metric Tokens)
+       -------------------------------------------------- */
+    --btn-padding-y: 9px;                             /* ระยะขอบบน-ล่างปุ่มมาตรฐาน */
+    --btn-padding-x: 18px;                            /* ระยะขอบซ้าย-ขวาปุ่มมาตรฐาน */
+    --btn-font-size: 14px;                            /* ขนาดฟอนต์ปุ่มมาตรฐาน */
+    --btn-radius: 8px;                                /* มุมโค้งมนของปุ่ม */
 
-    /* ตัวอักษรและคอนทราสต์ (Typography & Hierarchy) */
-    --text-main: #0F172A;          /* Heading, ค่าสำคัญ */
-    --text-body: #334155;          /* ตัวอักษรทั่วไป, เมนู Sidebar ปกติ */
-    --text-muted: #64748B;         /* ข้อความรอง, ไอคอนทั่วไป */
-    --text-subtle: #94A3B8;        /* Placeholder, Section Header */
+    /* --------------------------------------------------
+       3. โทนสีและพื้นผิวระบบ (Surfaces & Layout Tokens)
+       -------------------------------------------------- */
+    --bg-main: #F8FAFC;                               /* พื้นหลัง Canvas หน้าจอ */
+    --bg-card: #FFFFFF;                               /* พื้นหลัง Card, Modal, Table */
+    --bg-white: #FFFFFF;                              /* สีขาวบริสุทธิ์ */
+    --bg-subtle: #F1F5F9;                             /* พื้นหลังแถบหัวตาราง, ช่องค้นหา */
+    --bg-hover: #F8FAFC;                              /* ไฮไลท์แถวตารางเมื่อ Hover */
+    --border-color: #E2E8F0;                          /* เส้นขอบมาตรฐาน */
+    --border-light: #F1F5F9;                          /* เส้นแบ่งบางเบา */
 
-    /* เส้นขอบและเงา (Borders & Soft Shadows) */
-    --border-color: #E2E8F0;       /* เส้นขอบมาตรฐาน */
-    --border-light: #F1F5F9;       /* เส้นแบ่งบางเบา */
+    /* --------------------------------------------------
+       4. แถบเมนูด้านข้าง (Sidebar Tokens)
+       -------------------------------------------------- */
+    --sidebar-bg: #FFFFFF;                            /* พื้นหลังแถบเมนู */
+    --sidebar-text: #334155;                           /* ตัวอักษรเมนูปกติ */
+    --sidebar-active-bg: var(--color-gold-bg, #FEF9C3);/* พื้นหลังเมนูที่เลือก (Active) */
+    --sidebar-active-text: #854D0E;                    /* ตัวอักษรเมนู Active */
+    --sidebar-active-border: var(--color-gold, #FFB91D);/* ขลิบสีทองเมนู Active */
+
+    /* --------------------------------------------------
+       5. โทนสีเน้นแบรนด์ (Brand Gold Accent - ดึงจากหน้าบ้าน 100%)
+       -------------------------------------------------- */
+    --color-gold: #FFB91D;                            /* Primary CTA, Active State */
+    --color-gold-hover: #E9A812;                      /* Interactive Hover State */
+    --color-gold-dark: #CA8A04;                       /* Warm Gold สำหรับขอบ/ไอคอน/ข้อความ */
+    --color-gold-bg: #FEF9C3;                         /* พื้นหลังสีทองอ่อน Active State */
+    --color-gold-border: #FDE047;                     /* เส้นขอบสีทอง */
+    --text-on-gold: #090909;                          /* ข้อความบนปุ่มทอง (สีเข้มตามหลัก HCI) */
+
+    /* --------------------------------------------------
+       6. ตัวอักษรและคอนทราสต์ (Typography Hierarchy)
+       -------------------------------------------------- */
+    --text-main: #0F172A;                             /* หัวข้อ, ตัวเลขสำคัญ */
+    --text-body: #334155;                             /* ข้อความเนื้อหาทั่วไป */
+    --text-muted: #64748B;                            /* คำอธิบายรอง, ไอคอนทั่วไป */
+    --text-subtle: #94A3B8;                           /* Placeholder, Section Header */
+
+    /* --------------------------------------------------
+       7. เงาและการลอยตัว (Elevations & Shadows)
+       -------------------------------------------------- */
     --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 
-    /* สีสถานะการทำงาน (Semantic Status Colors) */
+    /* --------------------------------------------------
+       8. สีสถานะการทำงาน (Semantic Status Colors)
+       -------------------------------------------------- */
     --status-success: #10B981;
     --status-warning: #F59E0B;
     --status-danger: #EF4444;
@@ -300,12 +356,12 @@ body {
    ========================================= */
 .admin-sidebar { 
     width: 280px; 
-    background-color: #FFFFFF; /* Pure White */
-    color: #334155; 
+    background-color: var(--sidebar-bg, #FFFFFF); /* Pure White */
+    color: var(--sidebar-text, #334155); 
     display: flex; 
     flex-direction: column; 
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03); 
-    border-right: 1px solid #E2E8F0;
+    border-right: 1px solid var(--border-color, #E2E8F0);
     position: fixed; 
     height: 100vh;
     left: 0;
@@ -324,7 +380,7 @@ body {
     background: transparent;
 }
 .admin-sidebar::-webkit-scrollbar-thumb {
-    background: #E2E8F0;
+    background: var(--border-color, #E2E8F0);
     border-radius: 4px;
 }
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
@@ -333,20 +389,20 @@ body {
 
 .admin-sidebar .brand { 
     padding: 24px 20px; 
-    background-color: #FFFFFF; 
+    background-color: var(--sidebar-bg, #FFFFFF); 
     text-align: center; 
-    border-bottom: 1px solid #F1F5F9; 
+    border-bottom: 1px solid var(--border-light, #F1F5F9); 
 }
 .admin-sidebar .brand h2 { 
     margin: 0; 
-    color: #0F172A; 
+    color: var(--text-main, #0F172A); 
     font-size: 20px; 
     font-weight: 700; 
     letter-spacing: 0.5px; 
 }
 .admin-sidebar .brand span { 
     font-size: 12.5px; 
-    color: #64748B; 
+    color: var(--text-muted, #64748B); 
     font-weight: 500; 
     margin-top: 5px; 
     display: inline-flex;
@@ -355,7 +411,7 @@ body {
 }
 .admin-sidebar .brand span i {
     font-size: 8px;
-    color: #10B981;
+    color: var(--status-success, #10B981);
 }
 
 .admin-menu { 
@@ -372,7 +428,7 @@ body {
     align-items: center; 
     min-height: 42px;
     padding: 9px 14px; 
-    color: #334155; /* ข้อความเมนูปกติ: สีเทาเข้ม */
+    color: var(--sidebar-text, #334155); /* ข้อความเมนูปกติ: สีเทาเข้ม */
     text-decoration: none; 
     border-radius: 8px; 
     font-size: 13.5px; 
@@ -389,12 +445,12 @@ body {
     justify-content: center;
     margin-right: 11px; 
     font-size: 15px; 
-    color: #64748B;
+    color: var(--text-muted, #64748B);
     transition: transform 0.2s ease, color 0.2s ease; 
 }
 .admin-menu li a:hover { 
-    background-color: #F8FAFC; 
-    color: #0F172A; 
+    background-color: var(--bg-hover, #F8FAFC); 
+    color: var(--text-main, #0F172A); 
 }
 .admin-menu li a:hover i { 
     transform: translateX(1px);
@@ -402,9 +458,9 @@ body {
 }
 /* เมนู Active: สีทอง/Accent เดียวกับหน้าบ้าน ทั้งขอบไฮไลท์และไอคอน */
 .admin-menu li a.active { 
-    background-color: var(--color-gold-bg, #FEF9C3); 
-    color: #854D0E; 
-    border-left: 3.5px solid var(--color-gold, #FFB91D); /* สีทองแบรนด์หน้าบ้าน */
+    background-color: var(--sidebar-active-bg, #FEF9C3); 
+    color: var(--sidebar-active-text, #854D0E); 
+    border-left: 3.5px solid var(--sidebar-active-border, #FFB91D); /* สีทองแบรนด์หน้าบ้าน */
     padding-left: 10.5px; 
     font-weight: 600; 
     box-shadow: 0 1px 3px rgba(255, 185, 29, 0.15); 
@@ -737,12 +793,12 @@ body {
 .card,
 .admin-card,
 .table-container { 
-    background: #FFFFFF; 
+    background: var(--bg-card, #FFFFFF); 
     padding: 24px; 
     border-radius: 14px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); 
+    box-shadow: var(--shadow-soft); 
     margin-bottom: 24px; 
-    border: 1px solid #E2E8F0; 
+    border: 1px solid var(--border-color, #E2E8F0); 
 }
 .section-header { 
     margin-bottom: 20px; 
@@ -823,71 +879,157 @@ body {
     margin-bottom: 18px;
 }
 
-/* ปุ่ม (Buttons - Symmetrical & Fitts's Law Optimized) */
-.btn-success { 
-    background-color: #10B981; 
-    color: white; 
-    border: none; 
-    padding: 9px 18px; 
-    border-radius: 8px; 
+/* ==============================================================================
+   4. ระบบปุ่มมาตรฐาน (Consolidated Button System - Symmetrical & Fitts's Law)
+   👉 ปรับแต่งขนาดและสีผ่านตัวแปร :root (--btn-*) ด้านบนสุดของไฟล์
+   ============================================================================== */
+
+/* คลาสฐานของปุ่มทั้งหมด (Base Button Class) */
+.btn,
+.btn-primary, .btn-submit, .btn-pos-primary,
+.btn-success, .btn-confirm,
+.btn-danger, .btn-reject, .btn-delete-news,
+.btn-secondary, .btn-cancel,
+.btn-warning, .btn-edit-news,
+.btn-info { 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 6px; 
+    padding: var(--btn-padding-y) var(--btn-padding-x); 
+    font-size: var(--btn-font-size); 
+    font-weight: 500; 
+    border-radius: var(--btn-radius); 
+    line-height: 1.4; 
     cursor: pointer; 
-    transition: all 0.2s ease; 
     text-decoration: none; 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 6px; 
-    font-weight: 500; 
-    font-size: 14px;
-    line-height: 1.4;
-}
-.btn-success:hover { background-color: #059669; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.25); transform: translateY(-1px); }
-
-.btn-reject { 
-    background-color: #EF4444; 
-    padding: 9px 18px; 
-    font-size: 14px; 
-    font-weight: 500; 
-    border: none; 
-    color: white; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    transition: all 0.2s ease;
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 6px; 
-    line-height: 1.4;
-}
-.btn-reject:hover { background-color: #DC2626; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.25); transform: translateY(-1px); }
-
-.btn-disabled { background-color: #E2E8F0; border: 1px solid #CBD5E1; color: #94A3B8; opacity: 0.6; cursor: not-allowed; pointer-events: none; border-radius: 8px; }
-.btn-sm-info { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 6px; color: #2563EB; background: #EFF6FF; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; border: 1px solid #BFDBFE;}
-.btn-sm-info:hover { background: #DBEAFE; }
-
-.btn-secondary { 
-    background-color: #FFFFFF; 
-    color: #334155; 
-    border: 1px solid #CBD5E1; 
-    padding: 8px 16px; 
-    border-radius: 8px; 
-    font-size: 13.5px; 
-    font-weight: 500; 
-    cursor: pointer; 
     transition: all 0.2s ease; 
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-.btn-secondary:hover { 
-    background-color: #F8FAFC; 
-    color: #0F172A; 
-    border-color: #94A3B8; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    box-sizing: border-box; 
+    font-family: inherit; 
+    border: none;
 }
 
+/* ปุ่มหลัก (Primary / Submit / Brand Gold) */
+.btn-primary,
+.btn-submit,
+.btn-pos-primary { 
+    background-color: var(--btn-primary); 
+    color: var(--btn-primary-text); 
+    border: 1px solid var(--color-gold-hover, #E9A812); 
+    font-weight: 700; 
+    box-shadow: 0 2px 4px rgba(255, 185, 29, 0.2); 
+}
+.btn-primary:hover,
+.btn-submit:hover,
+.btn-pos-primary:hover { 
+    background-color: var(--btn-primary-hover); 
+    color: #000000; 
+    border-color: #D97706; 
+    box-shadow: 0 4px 12px rgba(233, 168, 18, 0.35); 
+    transform: translateY(-1px); 
+}
+
+/* ปุ่มสำเร็จ / ยืนยัน (Success / Confirm - Emerald Green) */
+.btn-success,
+.btn-confirm { 
+    background-color: var(--btn-success); 
+    color: var(--btn-success-text); 
+    border: none; 
+}
+.btn-success:hover,
+.btn-confirm:hover { 
+    background-color: var(--btn-success-hover); 
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.25); 
+    transform: translateY(-1px); 
+}
+
+/* ปุ่มอันตราย / ปฏิเสธ / ลบ (Danger / Reject / Delete - Rose Red) */
+.btn-danger,
+.btn-reject,
+.btn-delete-news { 
+    background-color: var(--btn-danger); 
+    color: var(--btn-danger-text); 
+    border: none; 
+}
+.btn-danger:hover,
+.btn-reject:hover,
+.btn-delete-news:hover { 
+    background-color: var(--btn-danger-hover); 
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.25); 
+    transform: translateY(-1px); 
+}
+
+/* ปุ่มรอง / ยกเลิก (Secondary / Cancel - Clean White Outline) */
+.btn-secondary,
+.btn-cancel { 
+    background-color: var(--btn-secondary); 
+    color: var(--btn-secondary-text); 
+    border: 1px solid var(--btn-secondary-border); 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02); 
+}
+.btn-secondary:hover,
+.btn-cancel:hover { 
+    background-color: var(--btn-secondary-hover); 
+    color: var(--text-main, #0F172A); 
+    border-color: #94A3B8; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04); 
+}
+
+/* ปุ่มเตือน / แก้ไข (Warning / Edit - Amber) */
+.btn-warning,
+.btn-edit-news { 
+    background-color: var(--btn-warning); 
+    color: var(--btn-warning-text); 
+    border: none; 
+}
+.btn-warning:hover,
+.btn-edit-news:hover { 
+    background-color: var(--btn-warning-hover); 
+    color: white; 
+    transform: translateY(-1px); 
+}
+
+/* ปุ่มข้อมูล / รายละเอียด (Info - Blue) */
+.btn-info { 
+    background-color: var(--btn-info); 
+    color: var(--btn-info-text); 
+    border: none; 
+}
+.btn-info:hover { 
+    background-color: var(--btn-info-hover); 
+}
+
+/* ปุ่มปิดการใช้งาน (Disabled State) */
+.btn-disabled { 
+    background-color: #E2E8F0; 
+    border: 1px solid #CBD5E1; 
+    color: #94A3B8; 
+    opacity: 0.6; 
+    cursor: not-allowed; 
+    pointer-events: none; 
+    border-radius: var(--btn-radius); 
+}
+
+/* ปุ่มข้อมูลขนาดเล็ก (Small Info Action) */
+.btn-sm-info { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    color: #2563EB; 
+    background: #EFF6FF; 
+    text-decoration: none; 
+    font-size: 13px; 
+    font-weight: 600; 
+    transition: 0.2s; 
+    border: 1px solid #BFDBFE; 
+}
+.btn-sm-info:hover { 
+    background: #DBEAFE; 
+}
+
+/* ปุ่มขนาดกะทัดรัดในตาราง (Table Action Small Button) */
 .btn-action-small { 
     font-size: 13px; 
     padding: 6px 12px; 
@@ -901,73 +1043,41 @@ body {
     gap: 5px; 
     text-decoration: none; 
     cursor: pointer; 
-    transition: all 0.15s ease;
+    transition: all 0.15s ease; 
 }
-.table-actions-group {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-.table-actions-group .btn-action-small {
-    margin-bottom: 0;
-    min-width: 72px;
-    height: 32px;
-    padding: 0 10px;
-    font-size: 12.5px;
-    box-sizing: border-box;
-    border: 1px solid transparent;
-}
-.table-actions-group .btn-secondary.btn-action-small {
-    border-color: #CBD5E1;
-}
-.btn-back { color: #64748B; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-.btn-back:hover { color: #0F172A; }
-
-.btn-warning { 
-    background-color: #F59E0B; 
-    color: white; 
-    border: none; 
-    padding: 9px 18px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 6px; 
-    transition: all 0.2s ease; 
-    text-decoration: none; 
-    font-weight: 500;
-    font-size: 14px;
-}
-.btn-warning:hover { background-color: #D97706; color: white; transform: translateY(-1px); }
-
-.btn-primary,
-.btn-submit { 
-    background-color: var(--color-gold, #FFB91D); 
-    color: var(--text-on-gold, #090909); 
-    border: 1px solid var(--color-gold-hover, #E9A812); 
-    padding: 11px 22px; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    transition: all 0.2s ease; 
-    font-weight: 700; 
+.table-actions-group { 
     display: inline-flex; 
     align-items: center; 
     justify-content: center; 
     gap: 8px; 
-    text-decoration: none; 
-    text-align: center; 
-    font-size: 14.5px;
-    box-shadow: 0 2px 4px rgba(255, 185, 29, 0.2);
+    white-space: nowrap; 
 }
-.btn-primary:hover,
-.btn-submit:hover { 
-    background-color: var(--color-gold-hover, #E9A812); 
-    color: #000000; 
-    border-color: #D97706;
-    box-shadow: 0 4px 12px rgba(233, 168, 18, 0.35); 
-    transform: translateY(-1px); 
+.table-actions-group .btn-action-small { 
+    margin-bottom: 0; 
+    min-width: 72px; 
+    height: 32px; 
+    padding: 0 10px; 
+    font-size: 12.5px; 
+    box-sizing: border-box; 
+    border: 1px solid transparent; 
+}
+.table-actions-group .btn-secondary.btn-action-small { 
+    border-color: #CBD5E1; 
+}
+
+/* ปุ่มย้อนกลับ (Back Navigation Link) */
+.btn-back { 
+    color: #64748B; 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 500; 
+    transition: color 0.2s; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 6px; 
+}
+.btn-back:hover { 
+    color: var(--text-main, #0F172A); 
 }
 
 /* Admin Badges (Cleaned Specificity & No-wrap Protection) */
@@ -1040,8 +1150,38 @@ body {
 .news-img-table { width: 120px; height: 80px; max-width: 120px; max-height: 80px; object-fit: cover; border-radius: 6px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); display: block; }
 .news-table-placeholder { width: 120px; height: 80px; background-color: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94A3B8; font-size: 22px; }
 .news-content-preview { max-width: 480px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block; color: #64748B; font-size: 13px; margin-top: 4px; line-height: 1.4; }
-.btn-edit-news { padding: 6px 12px; font-size: 12px; background: #ffc107; color: #333; border-radius: 4px; text-decoration: none; display: inline-block; }
-.btn-delete-news { padding: 6px 12px; font-size: 12px; background: #dc3545; color: white; border-radius: 4px; text-decoration: none; display: inline-block; }
+.btn-edit-news { 
+    padding: 6px 12px; 
+    font-size: 12.5px; 
+    background-color: var(--btn-warning); 
+    color: var(--btn-warning-text); 
+    border-radius: 6px; 
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-edit-news:hover {
+    background-color: var(--btn-warning-hover);
+}
+.btn-delete-news { 
+    padding: 6px 12px; 
+    font-size: 12.5px; 
+    background-color: var(--btn-danger); 
+    color: var(--btn-danger-text); 
+    border-radius: 6px; 
+    text-decoration: none; 
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-delete-news:hover {
+    background-color: var(--btn-danger-hover);
+}
 
 /* =========================================
    สไตล์สำหรับระบบแท็บและตาราง (Bookings & Slips)
@@ -1049,25 +1189,33 @@ body {
 .page-tabs { margin-bottom: 20px; display: flex; gap: 8px; }
 .tab-btn { 
     padding: 9px 18px; 
-    border-radius: 8px; 
+    border-radius: var(--btn-radius, 8px); 
     text-decoration: none; 
     font-weight: 600; 
     font-size: 14px; 
-    border: 1px solid #CBD5E1; 
+    border: 1px solid var(--border-color, #CBD5E1); 
     transition: all 0.2s ease; 
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
-.tab-inactive { background: #FFFFFF; color: #64748B; }
-.tab-inactive:hover { background: #F8FAFC; color: #1E293B; border-color: #94A3B8; }
-.tab-active { 
-    background: #1E293B; 
-    color: #FFFFFF; 
-    border-color: #1E293B; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+.tab-inactive { 
+    background: var(--bg-white, #FFFFFF); 
+    color: var(--text-muted, #64748B); 
 }
-.tab-counter { background: #EF4444; color: white; padding: 2px 7px; border-radius: 9999px; font-size: 11px; margin-left: 6px; }
+.tab-inactive:hover { 
+    background: var(--bg-hover, #F8FAFC); 
+    color: var(--text-main, #0F172A); 
+    border-color: #94A3B8; 
+}
+.tab-active { 
+    background: var(--btn-primary); 
+    color: var(--btn-primary-text); 
+    border-color: var(--color-gold-hover, #E9A812); 
+    box-shadow: 0 2px 4px rgba(255, 185, 29, 0.2); 
+    font-weight: 700;
+}
+.tab-counter { background: var(--status-danger, #EF4444); color: white; padding: 2px 7px; border-radius: 9999px; font-size: 11px; margin-left: 6px; }
 
 /* การจัดการรูปภาพในตาราง */
 .slip-image { width: 60px; height: 90px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; transition: transform 0.2s; }
@@ -1133,8 +1281,17 @@ body {
 /* POS Specific Styles */
 .payment-methods { display: flex; gap: 8px; margin-bottom: 14px; }
 .payment-btn { flex: 1; height: 40px; padding: 0 10px; border: 1px solid #CBD5E1; border-radius: 8px; background: #FFFFFF; cursor: pointer; font-weight: 600; font-size: 13.5px; transition: all 0.2s ease; color: #475569; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.payment-btn.active { background: #1E293B; color: #FFFFFF; border-color: #1E293B; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.payment-btn:hover:not(.active) { background: #F8FAFC; color: #1E293B; border-color: #94A3B8; }
+.payment-btn.active { 
+    background: var(--color-gold-bg, #FEF9C3); 
+    color: var(--sidebar-active-text, #854D0E); 
+    border-color: var(--color-gold, #FFB91D); 
+    box-shadow: 0 1px 3px rgba(255, 185, 29, 0.15); 
+}
+.payment-btn:hover:not(.active) { 
+    background: var(--bg-hover, #F8FAFC); 
+    color: var(--text-main, #0F172A); 
+    border-color: #94A3B8; 
+}
 #qrPaymentSection { display: none; text-align: center; margin-bottom: 15px; padding: 16px; background: #F8FAFC; border-radius: 8px; border: 1px dashed #CBD5E1; }
 .qr-placeholder { width: 150px; height: 150px; background: white; border: 1px solid #E2E8F0; border-radius: 8px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; position: relative; }
 .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
@@ -1477,11 +1634,7 @@ body {
 .text-left { text-align: left; }
 .w-full { width: 100%; }
 .p-10 { padding: 10px; }
-.btn-danger { background: #EF4444; color: white; border: none; padding: 9px 18px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; font-size: 14px; transition: all 0.2s ease; text-decoration: none; }
-.btn-danger:hover { background: #DC2626; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.25); transform: translateY(-1px); }
-
-.btn-info { background: #2563EB; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; transition: 0.2s; font-size: 13px; font-weight: 500; }
-.btn-info:hover { background: #1D4ED8; }
+/* หมายเหตุ: .btn-danger และ .btn-info ถูกรวมศูนย์ไว้ใน Section 4 (Consolidated Button System) ด้านบน */
 
 /* CSS เฉพาะสำหรับพรีวิวรูปภาพหน้าแก้ไข */
 .img-preview-container { margin-bottom: 15px; padding: 10px; border: 1px dashed #CBD5E1; border-radius: 8px; background-color: #F8FAFC; text-align: center; }
@@ -1886,10 +2039,6 @@ body {
 .modal-footer { margin-top: 20px; display: flex; gap: 10px; }
 .modal-footer .btn-cancel,
 .modal-footer .btn-confirm { flex: 1; }
-.btn-cancel { padding: 9px 16px; background: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
-.btn-cancel:hover { background: #E2E8F0; color: #1E293B; }
-.btn-confirm { padding: 9px 16px; background: #10B981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; }
-.btn-confirm:hover { background: #059669; }
 
 .text-block-alert { display: block; margin-bottom: 3px; }
 .modal-alert-text { font-size: 13px; margin-bottom: 15px; color: #64748B; }
@@ -2441,7 +2590,7 @@ body.receipt-body {
     color: #2563eb;
 }
 .pos-court-name {
-    color: #1e3c72;
+    color: var(--text-main, #0F172A);
     font-size: 15px;
     margin: 5px 0;
 }
@@ -2494,7 +2643,7 @@ body.receipt-body {
     margin: 0 0 15px 0;
     border-bottom: 2px solid #e2e8f0;
     padding-bottom: 10px;
-    color: #1e3c72;
+    color: var(--text-main, #0F172A);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -2556,16 +2705,7 @@ body.receipt-body {
     justify-content: flex-end;
     gap: 10px;
 }
-.btn-pos-primary {
-    background: var(--color-gold, #FFB91D);
-    color: var(--text-on-gold, #090909);
-    border: 1px solid var(--color-gold-hover, #E9A812);
-    font-weight: 700;
-}
-.btn-pos-primary:hover {
-    background: var(--color-gold-hover, #E9A812);
-    color: #000000;
-}
+/* หมายเหตุ: .btn-pos-primary ถูกรวมศูนย์ไว้ใน Section 4 (.btn-primary, .btn-submit, .btn-pos-primary) แล้ว */
 
 /* 7. Equipment Returns & Penalty Management (equipment_returns.php) */
 .stat-card-grid {
