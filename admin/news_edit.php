@@ -39,7 +39,7 @@ include 'includes/header.php';
     </div>
 
     <form action="actions/news_edit_db.php" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+        <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
         <input type="hidden" name="news_id" value="<?php echo $news_data['news_id']; ?>">
         <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($news_data['news_image'] ?? ''); ?>">
 
