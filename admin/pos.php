@@ -24,9 +24,17 @@ $page_header = '<i class="fas fa-cash-register"></i> ระบบขายหน
 include 'includes/header.php';
 ?>
 <div class="pos-container">
-    <!-- ฝั่งซ้าย: รายการสินค้าและสนาม -->
+    <!-- ฝั่งซ้าย: แคตตาล็อกสินค้า / ช่องค้นหา / สนาม Walk-in -->
     <div class="pos-products">
-        <div class="page-tabs m-0">
+        <!-- ช่องค้นหาสินค้า Real-time -->
+        <div class="pos-search-wrapper">
+            <i class="fas fa-search pos-search-icon"></i>
+            <input type="text" id="posProductSearch" class="pos-search-input" placeholder="ค้นหาชื่อสินค้า, อุปกรณ์เช่า หรือสนาม Walk-in..." autocomplete="off" oninput="searchPosProducts()">
+            <button type="button" id="posSearchClear" class="pos-search-clear" onclick="clearPosSearch()"><i class="fas fa-times-circle"></i></button>
+        </div>
+
+        <!-- แถบหมวดหมู่สินค้า -->
+        <div class="page-tabs m-0 mb-15">
             <button type="button" class="tab-btn tab-active" onclick="filterProducts('all', this)">ทั้งหมด</button>
             <button type="button" class="tab-btn tab-inactive" onclick="filterProducts('สินค้าบริโภค', this)"><i class="fas fa-coffee"></i> น้ำดื่ม/ลูกแบด</button>
             <button type="button" class="tab-btn tab-inactive" onclick="filterProducts('อุปกรณ์เช่า', this)"><i class="fas fa-table-tennis"></i> อุปกรณ์เช่า</button>
@@ -40,16 +48,18 @@ include 'includes/header.php';
                 $c_base = floatval($court['court_price_per_hour']) > 0 ? floatval($court['court_price_per_hour']) : 180;
                 $c_peak = floatval($court['court_peak_price']) > 0 ? floatval($court['court_peak_price']) : 200;
                 $c_offpeak = floatval($court['court_offpeak_price']) > 0 ? floatval($court['court_offpeak_price']) : 150;
+                $court_name_escaped = htmlspecialchars($court['court_name'], ENT_QUOTES, 'UTF-8');
             ?>
                 <div class="product-card pos-court-card-active" 
                      data-type="สนาม"
-                     onclick="openWalkInCourtModal(<?php echo $court['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($court['court_name'])); ?>', <?php echo $c_base; ?>, <?php echo $c_peak; ?>, <?php echo $c_offpeak; ?>)">
+                     data-name="<?php echo htmlspecialchars(mb_strtolower($court['court_name'], 'UTF-8'), ENT_QUOTES, 'UTF-8'); ?>"
+                     onclick="openWalkInCourtModal(<?php echo $court['court_id']; ?>, '<?php echo htmlspecialchars(addslashes($court['court_name']), ENT_QUOTES, 'UTF-8'); ?>', <?php echo $c_base; ?>, <?php echo $c_peak; ?>, <?php echo $c_offpeak; ?>)">
                     
                     <div class="product-img-placeholder w-80 h-80 mb-10 pos-court-badge-selected">
                         <i class="fas fa-map-marker-alt fa-2x"></i>
                     </div>
                     
-                    <h5 class="pos-court-name"><?php echo htmlspecialchars($court['court_name']); ?></h5>
+                    <h5 class="pos-court-name"><?php echo $court_name_escaped; ?></h5>
                     <div class="pos-court-rate-box">
                         <div><strong class="pos-rate-std">จ.-พ.-ศ.:</strong> <?php echo number_format($c_base); ?> ฿</div>
                         <div><strong class="pos-rate-peak">ส.-อา.:</strong> <?php echo number_format($c_peak); ?> ฿</div>
@@ -64,22 +74,24 @@ include 'includes/header.php';
             <!-- รายการสินค้าและอุปกรณ์เช่าปกติ -->
             <?php foreach ($products as $row): 
                 $is_out = ($row['product_stock'] <= 0);
+                $p_name_escaped = htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8');
             ?>
                 <div class="product-card <?php echo $is_out ? 'out-of-stock' : ''; ?>" 
-                     data-type="<?php echo htmlspecialchars($row['product_type']); ?>"
-                     onclick="addToCart(<?php echo $row['product_id']; ?>, '<?php echo htmlspecialchars(addslashes($row['product_name'])); ?>', <?php echo $row['product_price']; ?>, <?php echo $row['product_stock']; ?>)">
+                     data-type="<?php echo htmlspecialchars($row['product_type'], ENT_QUOTES, 'UTF-8'); ?>"
+                     data-name="<?php echo htmlspecialchars(mb_strtolower($row['product_name'], 'UTF-8'), ENT_QUOTES, 'UTF-8'); ?>"
+                     onclick="<?php echo $is_out ? 'return false;' : "addToCart({$row['product_id']}, '" . htmlspecialchars(addslashes($row['product_name']), ENT_QUOTES, 'UTF-8') . "', {$row['product_price']}, {$row['product_stock']})"; ?>">
                     
                     <?php if (!empty($row['product_image'])): ?>
-                        <img src="../uploads/products/<?php echo htmlspecialchars($row['product_image']); ?>" alt="Img">
+                        <img src="../uploads/products/<?php echo htmlspecialchars($row['product_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo $p_name_escaped; ?>">
                     <?php else: ?>
                         <div class="product-img-placeholder w-80 h-80 mb-10">
                             <i class="fas fa-image fa-2x"></i>
                         </div>
                     <?php endif; ?>
                     
-                    <h5><?php echo htmlspecialchars($row['product_name']); ?></h5>
+                    <h5><?php echo $p_name_escaped; ?></h5>
                     <p class="price"><?php echo number_format($row['product_price'], 2); ?> ฿</p>
-                    <p class="stock"><i class="fas fa-box"></i> คงเหลือ: <?php echo $row['product_stock']; ?></p>
+                    <p class="stock"><i class="fas fa-box"></i> คงเหลือ: <?php echo intval($row['product_stock']); ?></p>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -87,7 +99,12 @@ include 'includes/header.php';
 
     <!-- ฝั่งขวา: ตะกร้าสินค้าและคิดเงิน -->
     <div class="pos-cart">
-        <h4 class="mt-0 border-b-2 pb-10"><i class="fas fa-shopping-cart"></i> รายการสั่งซื้อ / เปิดสนาม</h4>
+        <div class="pos-cart-header">
+            <h4 class="pos-cart-title"><i class="fas fa-shopping-cart text-primary"></i> รายการสั่งซื้อ / เปิดสนาม</h4>
+            <button type="button" class="btn-clear-cart" id="btnClearCart" onclick="confirmClearCart()" title="ล้างรายการทั้งหมดในตะกร้า">
+                <i class="fas fa-trash-alt"></i> ล้างตะกร้า
+            </button>
+        </div>
         
         <div id="cartEmpty" class="text-center text-gray py-30">
             <i class="fas fa-cart-arrow-down fa-3x mb-10"></i><br>ยังไม่มีรายการในตะกร้า
@@ -97,23 +114,24 @@ include 'includes/header.php';
             <thead>
                 <tr>
                     <th>รายการ</th>
-                    <th class="text-center">จำนวน/เวลา</th>
-                    <th class="text-right">รวม</th>
-                    <th></th>
+                    <th class="text-center" style="width: 85px;">จำนวน</th>
+                    <th class="text-right" style="width: 75px;">รวม (฿)</th>
+                    <th style="width: 32px;"></th>
                 </tr>
             </thead>
             <tbody id="cartBody">
             </tbody>
         </table>
 
+        <!-- กล่องสรุปยอดสุทธิขนาดใหญ่ -->
         <div class="cart-summary">
             <div class="summary-row">
                 <span>จำนวนรายการ:</span>
-                <span id="totalItems">0 ชิ้น</span>
+                <span id="totalItems" class="font-medium text-dark-custom">0 ชิ้น</span>
             </div>
             <div class="summary-row summary-total">
-                <span>ยอดสุทธิ:</span>
-                <span id="totalPrice">0.00 ฿</span>
+                <span class="pos-total-label">ยอดสุทธิ:</span>
+                <span id="totalPrice" class="pos-total-amount">0.00 ฿</span>
             </div>
         </div>
 
@@ -131,12 +149,20 @@ include 'includes/header.php';
 
             <!-- ส่วนชำระเงินสด -->
             <div id="cashPaymentSection">
-                <label class="text-14 text-gray font-bold">รับเงินสดมา (บาท):</label>
+                <label class="text-13 text-gray font-bold mb-6 d-block">รับเงินสดมา (บาท):</label>
                 <input type="number" id="cashReceived" class="money-input" placeholder="0.00" step="0.01" oninput="calculateChange()">
                 
-                <div class="summary-row mb-15 font-bold text-danger">
+                <!-- ปุ่มลัดจำนวนเงินสด (Quick Cash Presets) -->
+                <div class="quick-cash-presets">
+                    <button type="button" class="btn-quick-cash" onclick="setQuickCash('exact')">พอดี</button>
+                    <button type="button" class="btn-quick-cash" onclick="setQuickCash(100)">100</button>
+                    <button type="button" class="btn-quick-cash" onclick="setQuickCash(500)">500</button>
+                    <button type="button" class="btn-quick-cash" onclick="setQuickCash(1000)">1,000</button>
+                </div>
+
+                <div class="summary-row mb-15 font-bold" id="changeRow">
                     <span>เงินทอน:</span>
-                    <span id="changeAmount">0.00 ฿</span>
+                    <span id="changeAmount" class="text-danger-custom font-bold text-16">0.00 ฿</span>
                 </div>
             </div>
 
@@ -145,7 +171,7 @@ include 'includes/header.php';
                 <p class="m-0 mb-10 text-14 font-bold text-dark-custom">สแกนเพื่อชำระเงิน (จำลอง)</p>
                 <div class="qr-placeholder pos-cart-empty-text">
                     <i class="fas fa-qrcode fa-5x text-primary mb-10"></i>
-                    <p class="text-12 text-muted">พร้อมเพย์ 099-324-1657 (ที.เอส. ปัตตานี)</p>
+                    <p class="text-12 text-muted-custom">พร้อมเพย์ 099-324-1657 (ที.เอส. ปัตตานี)</p>
                 </div>
             </div>
 

@@ -44,23 +44,60 @@ document.addEventListener('DOMContentLoaded', function() {
    ระบบ POS ขายหน้าร้าน (admin/pos.php)
    ========================================= */
 let posCart = []; // ใช้ชื่อ posCart ป้องกันตัวแปรซ้ำซ้อนกับหน้าอื่น
+let currentPosCategory = 'all';
 
-// สลับแท็บหมวดหมู่
-function filterProducts(type, btnElement) {
-    document.querySelectorAll('.page-tabs .tab-btn').forEach(btn => {
-        btn.classList.remove('tab-active');
-        btn.classList.add('tab-inactive');
-    });
-    btnElement.classList.remove('tab-inactive');
-    btnElement.classList.add('tab-active');
+// ฟังก์ชันกรองและค้นหาสินค้า POS ร่วมกัน
+function applyPosFilters() {
+    let searchInput = document.getElementById('posProductSearch');
+    let query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    let clearBtn = document.getElementById('posSearchClear');
+
+    if (clearBtn) {
+        clearBtn.style.display = (query.length > 0) ? 'block' : 'none';
+    }
 
     document.querySelectorAll('.product-card').forEach(card => {
-        if (type === 'all' || card.getAttribute('data-type') === type) {
-            card.style.display = 'flex'; // ปรับเป็น flex ตาม CSS ล่าสุด
+        let cardType = card.getAttribute('data-type') || '';
+        let cardName = card.getAttribute('data-name') || '';
+
+        let matchCategory = (currentPosCategory === 'all' || cardType === currentPosCategory);
+        let matchQuery = (query === '' || cardName.includes(query) || cardType.toLowerCase().includes(query));
+
+        if (matchCategory && matchQuery) {
+            card.style.display = 'flex';
         } else {
             card.style.display = 'none';
         }
     });
+}
+
+// สลับแท็บหมวดหมู่
+function filterProducts(type, btnElement) {
+    currentPosCategory = type;
+    document.querySelectorAll('.page-tabs .tab-btn').forEach(btn => {
+        btn.classList.remove('tab-active');
+        btn.classList.add('tab-inactive');
+    });
+    if (btnElement) {
+        btnElement.classList.remove('tab-inactive');
+        btnElement.classList.add('tab-active');
+    }
+    applyPosFilters();
+}
+
+// ค้นหาสินค้า Real-time
+function searchPosProducts() {
+    applyPosFilters();
+}
+
+// เคลียร์คำค้นหา
+function clearPosSearch() {
+    let searchInput = document.getElementById('posProductSearch');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+    applyPosFilters();
 }
 
 // เพิ่มลงตะกร้า
@@ -106,6 +143,63 @@ function removeFromCart(id) {
     updateCartUI();
 }
 
+// ล้างตะกร้าทั้งหมด พร้อมยืนยันด้วย SweetAlert2
+function confirmClearCart() {
+    if (posCart.length === 0) {
+        if (typeof SwalToast === 'function') {
+            SwalToast('info', 'ยังไม่มีรายการในตะกร้า');
+        }
+        return;
+    }
+
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: 'ล้างรายการในตะกร้า?',
+            text: 'ต้องการล้างรายการสินค้าและสนามทั้งหมดในตะกร้าใช่หรือไม่',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#64748B',
+            confirmButtonText: '<i class="fas fa-trash-alt mr-6"></i> ยืนยันล้างตะกร้า',
+            cancelButtonText: 'ยกเลิก',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                posCart = [];
+                let cashInput = document.getElementById('cashReceived');
+                if (cashInput) cashInput.value = '';
+                updateCartUI();
+                if (typeof SwalToast === 'function') {
+                    SwalToast('success', 'ล้างรายการในตะกร้าเรียบร้อยแล้ว');
+                }
+            }
+        });
+    } else {
+        if (confirm('ต้องการล้างรายการในตะกร้าทั้งหมดใช่หรือไม่?')) {
+            posCart = [];
+            let cashInput = document.getElementById('cashReceived');
+            if (cashInput) cashInput.value = '';
+            updateCartUI();
+        }
+    }
+}
+
+// ปุ่มลัดจำนวนเงินสด (Quick Cash Presets)
+function setQuickCash(amount) {
+    let totalAmountInput = document.getElementById('totalAmountInput');
+    let totalPrice = parseFloat(totalAmountInput ? totalAmountInput.value : 0) || 0;
+    let cashInput = document.getElementById('cashReceived');
+
+    if (!cashInput) return;
+
+    if (amount === 'exact') {
+        cashInput.value = (totalPrice > 0) ? totalPrice.toFixed(2) : '';
+    } else {
+        cashInput.value = parseFloat(amount).toFixed(2);
+    }
+    calculateChange();
+}
+
 // อัปเดตหน้าจอ UI
 function updateCartUI() {
     let tbody = document.getElementById('cartBody');
@@ -127,7 +221,6 @@ function updateCartUI() {
     } else {
         emptyDiv.style.display = 'none';
         table.style.display = 'table';
-        // การปิด/เปิดปุ่มชำระเงินจะถูกจัดการใน calculateChange อีกที
 
         posCart.forEach(item => {
             let itemTotal = item.price * item.qty;
@@ -137,20 +230,27 @@ function updateCartUI() {
             let tr = document.createElement('tr');
             let qtyHtml = '';
             if (item.is_court) {
-                qtyHtml = `<span style="font-size:12px; color:#1e3c72; font-weight:bold;">${item.hours || 1} ชม.</span>`;
+                qtyHtml = `<span class="badge-info text-12 font-bold">${item.hours || 1} ชม.</span>`;
             } else {
                 qtyHtml = `
-                    <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
-                    <span style="margin: 0 5px;">${item.qty}</span>
-                    <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                    <div class="cart-qty-ctrl">
+                        <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                        <span class="font-bold text-13 px-4">${item.qty}</span>
+                        <button type="button" class="cart-qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                    </div>
                 `;
             }
 
             tr.innerHTML = `
-                <td><div style="font-weight:bold; font-size: 12px; line-height: 1.2;">${item.name}</div><div style="color:#888; font-size:11px;">@${item.price.toFixed(2)}</div></td>
-                <td style="text-align: center; white-space: nowrap;">${qtyHtml}</td>
-                <td style="text-align: right; color:#28a745; font-weight:bold;">${itemTotal.toFixed(2)}</td>
-                <td style="text-align: center;"><i class="fas fa-times cart-remove" onclick="removeFromCart('${item.id}')"></i></td>
+                <td>
+                    <div class="font-bold text-13 text-dark-custom mb-2">${item.name}</div>
+                    <div class="text-11 text-muted-custom">@${item.price.toFixed(2)} ฿</div>
+                </td>
+                <td class="text-center">${qtyHtml}</td>
+                <td class="text-right text-success font-bold">${itemTotal.toFixed(2)}</td>
+                <td class="text-center">
+                    <i class="fas fa-times cart-remove" title="ลบรายการ" onclick="removeFromCart('${item.id}')"></i>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -177,7 +277,7 @@ function updateCartUI() {
     calculateChange();
 }
 
-// คำนวณเงินทอน (ปรับปรุงใหม่เพื่อรองรับ QR Code)
+// คำนวณเงินทอน
 function calculateChange() {
     let elTotal = document.getElementById('totalAmountInput');
     let elCash = document.getElementById('cashReceived');
@@ -191,7 +291,7 @@ function calculateChange() {
     if (posCart.length === 0) {
         btnCheckout.disabled = true;
         changeSpan.innerText = "0.00 ฿";
-        changeSpan.style.color = '#dc3545';
+        changeSpan.style.color = '#EF4444';
         return;
     }
 
@@ -201,7 +301,7 @@ function calculateChange() {
     if (paymentMethod === 'qr') {
         btnCheckout.disabled = false;
         changeSpan.innerText = "- (โอนเงิน)";
-        changeSpan.style.color = '#666';
+        changeSpan.style.color = '#64748B';
         return;
     }
 
@@ -211,11 +311,12 @@ function calculateChange() {
     
     if (change >= 0 && cashReceived >= totalPrice) {
         changeSpan.innerText = change.toFixed(2) + ' ฿';
-        changeSpan.style.color = '#28a745'; 
+        changeSpan.style.color = '#059669'; 
         btnCheckout.disabled = false;
     } else {
-        changeSpan.innerText = '0.00 ฿';
-        changeSpan.style.color = '#dc3545'; 
+        let missing = totalPrice - cashReceived;
+        changeSpan.innerText = 'ขาดอีก ' + missing.toFixed(2) + ' ฿';
+        changeSpan.style.color = '#EF4444'; 
         btnCheckout.disabled = true;
     }
 }
