@@ -190,11 +190,11 @@ body {
 }
 
 /* =========================================
-   2. Sidebar (Dignified Slate & Clean Light Companion)
+   2. Sidebar (Soft Slate & Clean Light Companion)
    ========================================= */
 .admin-sidebar { 
     width: 280px; 
-    background-color: #0F172A; /* Deep Slate Navy */
+    background-color: #1E293B; /* Soft Slate */
     color: #F8FAFC; 
     display: flex; 
     flex-direction: column; 
@@ -206,7 +206,7 @@ body {
     overflow-y: auto; 
     z-index: 100;
     scrollbar-width: thin;
-    scrollbar-color: #334155 transparent;
+    scrollbar-color: #475569 transparent;
 }
 
 /* Custom Slim Scrollbar for Sidebar */
@@ -217,18 +217,18 @@ body {
     background: transparent;
 }
 .admin-sidebar::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #475569;
     border-radius: 4px;
 }
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #64748B;
 }
 
 .admin-sidebar .brand { 
     padding: 24px 20px; 
-    background-color: #0B1120; 
+    background-color: #0F172A; 
     text-align: center; 
-    border-bottom: 1px solid #1E293B; 
+    border-bottom: 1px solid #334155; 
 }
 .admin-sidebar .brand h2 { 
     margin: 0; 
@@ -264,7 +264,7 @@ body {
     align-items: center; 
     min-height: 42px;
     padding: 9px 14px; 
-    color: #94A3B8; 
+    color: #CBD5E1; 
     text-decoration: none; 
     border-radius: 8px; 
     font-size: 13.5px; 
@@ -284,20 +284,20 @@ body {
     transition: transform 0.2s ease, color 0.2s ease; 
 }
 .admin-menu li a:hover { 
-    background-color: rgba(255, 255, 255, 0.05); 
-    color: #F8FAFC; 
+    background-color: rgba(255, 255, 255, 0.08); 
+    color: #FFFFFF; 
 }
-.admin-menu li a:hover i {
+.admin-menu li a:hover i { 
     transform: translateX(1px);
-    color: #E2E8F0;
+    color: #F1F5F9; 
 }
 .admin-menu li a.active { 
-    background-color: #1E293B; 
+    background-color: #334155; 
     color: #FFFFFF; 
     border-left: 3.5px solid #CA8A04; /* สีทองภูมิฐาน T.S. Pattani */
     padding-left: 10.5px; 
     font-weight: 600; 
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); 
 }
 .admin-menu li a.active i { 
     color: #FBBF24; 
@@ -305,7 +305,7 @@ body {
 
 /* Gestalt Grouping for Section Headers */
 .menu-label { 
-    color: #64748B; 
+    color: #94A3B8; 
     font-size: 11.5px; 
     margin: 24px 12px 8px 14px; 
     font-weight: 700; 
@@ -318,11 +318,11 @@ body {
 .admin-menu li.mt-30 {
     margin-top: 24px !important;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .btn-logout { 
-    background-color: rgba(239, 68, 68, 0.12) !important; 
-    color: #F87171 !important; 
+    background-color: rgba(239, 68, 68, 0.15) !important; 
+    color: #FCA5A5 !important; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -333,7 +333,7 @@ body {
     font-weight: 600; 
     font-size: 13.5px;
     transition: all 0.2s ease;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.25);
     box-sizing: border-box;
 }
 .btn-logout:hover { 
