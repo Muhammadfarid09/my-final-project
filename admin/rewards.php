@@ -38,6 +38,7 @@ include 'includes/header.php';
                     </h4>
                     
                     <form action="actions/reward_add_db.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
                         
                         <div class="form-group">
                             <label for="reward_image">รูปภาพของรางวัล</label>
@@ -74,7 +75,7 @@ include 'includes/header.php';
                             <textarea name="reward_description" id="reward_description" class="form-control" rows="3" placeholder="เช่น จำกัด 1 สิทธิ์ต่อ 1 ใบเสร็จ"></textarea>
                         </div>
 
-                        <button type="submit" class="btn-success w-100">
+                        <button type="submit" class="btn-submit w-100">
                             <i class="fas fa-save"></i> บันทึกเข้าระบบ
                         </button>
                     </form>
@@ -89,18 +90,18 @@ include 'includes/header.php';
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th width="15%">ระดับขั้นต่ำ</th>
-                                <th width="40%">ของรางวัล</th>
-                                <th width="15%">แต้มที่ใช้</th>
-                                <th width="15%">สต๊อกคงเหลือ</th>
-                                <th width="15%">จัดการ</th>
+                                <th class="text-center" style="width: 135px;">ระดับขั้นต่ำ</th>
+                                <th>ของรางวัล</th>
+                                <th class="text-center" style="width: 120px;">แต้มที่ใช้</th>
+                                <th class="text-center" style="width: 130px;">สต๊อกคงเหลือ</th>
+                                <th class="text-center" style="width: 185px;">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (count($rewards) > 0): ?>
                                 <?php foreach ($rewards as $row): ?>
                                 <tr>
-                                    <td>
+                                    <td class="text-center">
                                         <?php 
                                             if ($row['reward_min_level'] == 'Bronze') {
                                                 echo '<span class="badge-bronze"><i class="fas fa-medal"></i> Bronze</span>';
@@ -114,7 +115,7 @@ include 'includes/header.php';
                                     <td>
                                         <div class="table-item-row">
                                             <?php if (!empty($row['reward_image'])): ?>
-                                                <img src="../uploads/rewards/<?php echo htmlspecialchars($row['reward_image']); ?>" 
+                                                <img src="../uploads/rewards/<?php echo htmlspecialchars($row['reward_image'], ENT_QUOTES, 'UTF-8'); ?>" 
                                                      class="table-img-md" alt="reward">
                                             <?php else: ?>
                                                 <div class="table-img-placeholder-md">
@@ -123,35 +124,38 @@ include 'includes/header.php';
                                             <?php endif; ?>
                                             
                                             <div>
-                                                <strong class="text-dark-custom"><?php echo htmlspecialchars($row['reward_name']); ?></strong><br>
-                                                <span class="text-12 text-gray"><?php echo htmlspecialchars($row['reward_description']); ?></span>
+                                                <strong class="text-dark-custom font-bold"><?php echo htmlspecialchars($row['reward_name'], ENT_QUOTES, 'UTF-8'); ?></strong><br>
+                                                <span class="text-12 text-gray"><?php echo htmlspecialchars($row['reward_description'], ENT_QUOTES, 'UTF-8'); ?></span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><strong class="text-success-custom text-16"><?php echo number_format($row['reward_point_cost']); ?></strong></td>
-                                    <td>
+                                    <td class="text-center">
+                                        <strong class="text-success-custom text-16"><?php echo number_format($row['reward_point_cost']); ?></strong>
+                                    </td>
+                                    <td class="text-center">
                                         <?php if($row['reward_stock'] > 0): ?>
-                                            <span class="badge-info"><?php echo $row['reward_stock']; ?> สิทธิ์</span>
+                                            <span class="badge-info"><?php echo intval($row['reward_stock']); ?> สิทธิ์</span>
                                         <?php else: ?>
                                             <span class="badge-danger">หมด</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
-                                        <div class="flex gap-8 flex-wrap">
-                                            <a href="reward_edit.php?id=<?php echo $row['reward_id']; ?>" class="btn-secondary btn-action-small">
+                                    <td class="text-center whitespace-nowrap">
+                                        <div class="table-actions-group">
+                                            <a href="reward_edit.php?id=<?php echo intval($row['reward_id']); ?>" class="btn-secondary btn-action-small" title="แก้ไข">
                                                 <i class="fas fa-edit"></i> แก้ไข
                                             </a>
                                             <button type="button" 
                                                     class="btn-reject btn-action-small" 
                                                     onclick="showActionConfirmModal({
                                                         title: 'ยืนยันการลบของรางวัล',
-                                                        message: 'คุณกำลังจะลบของรางวัล: <strong><?php echo htmlspecialchars(addslashes($row['reward_name'])); ?></strong>',
+                                                        message: 'คุณกำลังจะลบของรางวัล: <strong><?php echo htmlspecialchars(addslashes($row['reward_name']), ENT_QUOTES, 'UTF-8'); ?></strong>',
                                                         consequence: 'ของรางวัลนี้จะไม่สามารถแลกได้อีกต่อไป และข้อมูลของรางวัลจะถูกนำออกจากระบบถาวร ไม่สามารถกู้คืนได้',
                                                         confirmText: 'ยืนยันการลบ',
                                                         type: 'danger',
-                                                        actionUrl: 'actions/reward_delete_db.php?id=<?php echo $row['reward_id']; ?>'
-                                                    })">
-                                                <i class="fas fa-trash"></i> ลบ
+                                                        actionUrl: 'actions/reward_delete_db.php?id=<?php echo intval($row['reward_id']); ?>'
+                                                    })"
+                                                    title="ลบ">
+                                                <i class="fas fa-trash-alt"></i> ลบ
                                             </button>
                                         </div>
                                     </td>
@@ -159,7 +163,10 @@ include 'includes/header.php';
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="5" class="text-center-muted p-20">ยังไม่มีของรางวัลในระบบ</td>
+                                    <td colspan="5" class="table-empty-state">
+                                        <i class="fas fa-gift empty-state-icon"></i>
+                                        <span>ยังไม่มีของรางวัลในระบบ</span>
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>

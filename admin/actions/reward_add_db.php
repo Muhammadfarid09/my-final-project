@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    require_csrf_token();
     $reward_name = trim($_POST['reward_name']);
     $reward_point_cost = intval($_POST['reward_point_cost']);
     $reward_min_level = $_POST['reward_min_level'];

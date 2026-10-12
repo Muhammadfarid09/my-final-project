@@ -24,63 +24,78 @@ try {
 ?>
 <?php
 $page_title = 'แก้ไขของรางวัล - Admin T.S. Pattani';
-$page_header = '<i class="fas fa-edit"></i> แก้ไขของรางวัล: ' . htmlspecialchars($reward['reward_name']);
+$page_header = '<i class="fas fa-edit"></i> แก้ไขของรางวัล: ' . htmlspecialchars($reward['reward_name'], ENT_QUOTES, 'UTF-8');
 include 'includes/header.php';
 ?>
-            <div class="mb-20">
-                <a href="rewards.php" class="text-decor-none text-gray font-medium"><i class="fas fa-arrow-left"></i> กลับไปหน้าระบบของรางวัล</a>
-            </div>
 
-            <div class="admin-card max-w-600">
-                <form action="actions/reward_edit_db.php" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="reward_id" value="<?php echo $reward['reward_id']; ?>">
-                    <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($reward['reward_image']); ?>">
+<div class="admin-card max-w-768 mx-auto">
+    <div class="header-between border-b pb-15 mb-25">
+        <h4 class="section-header m-0">
+            <i class="fas fa-gift text-primary"></i> ข้อมูลของรางวัล #<?php echo $reward_id; ?>
+        </h4>
+        <a href="rewards.php" class="btn-secondary text-decor-none text-14">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </a>
+    </div>
 
-                    <div class="form-group text-center mb-20">
-                        <?php if (!empty($reward['reward_image'])): ?>
-                            <img src="../uploads/rewards/<?php echo htmlspecialchars($reward['reward_image']); ?>" class="img-preview-lg">
-                        <?php else: ?>
-                            <div class="img-placeholder-lg">
-                                <i class="fas fa-image fa-3x"></i>
-                            </div>
-                        <?php endif; ?>
-                        <br>
-                        <label for="reward_image" class="btn-outline-primary"><i class="fas fa-upload"></i> เปลี่ยนรูปภาพใหม่</label>
-                        <input type="file" name="reward_image" id="reward_image" class="form-control d-none" accept="image/png, image/jpeg, image/jpg" onchange="if(this.files[0]) SwalToast('info', 'เลือกไฟล์รูปภาพใหม่: ' + this.files[0].name);">
-                    </div>
+    <form action="actions/reward_edit_db.php" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?php echo get_csrf_token(); ?>">
+        <input type="hidden" name="reward_id" value="<?php echo intval($reward['reward_id']); ?>">
+        <input type="hidden" name="old_image" value="<?php echo htmlspecialchars($reward['reward_image'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
 
-                    <div class="form-group">
-                        <label for="reward_name">ชื่อของรางวัล / โปรโมชั่น *</label>
-                        <input type="text" name="reward_name" id="reward_name" class="form-control" value="<?php echo htmlspecialchars($reward['reward_name']); ?>" required>
-                    </div>
+        <div class="form-group text-center mb-25">
+            <label class="d-block font-medium mb-12">รูปภาพของรางวัล</label>
+            <?php if (!empty($reward['reward_image'])): ?>
+                <img src="../uploads/rewards/<?php echo htmlspecialchars($reward['reward_image'], ENT_QUOTES, 'UTF-8'); ?>" class="img-preview-lg" alt="reward">
+            <?php else: ?>
+                <div class="img-placeholder-lg">
+                    <i class="fas fa-image fa-3x"></i>
+                </div>
+            <?php endif; ?>
+            <label for="reward_image" class="btn-secondary text-decor-none" style="cursor: pointer;">
+                <i class="fas fa-camera"></i> เปลี่ยนรูปภาพใหม่
+            </label>
+            <input type="file" name="reward_image" id="reward_image" class="form-control d-none" accept="image/png, image/jpeg, image/jpg" onchange="if(this.files[0]) SwalToast('info', 'เลือกไฟล์รูปภาพใหม่: ' + this.files[0].name);">
+            <p class="text-small-muted mt-8 mb-0">* รองรับไฟล์ JPG, PNG ขนาดไม่เกิน 2MB (หากไม่ต้องการเปลี่ยนรูปภาพ ให้เว้นว่างไว้)</p>
+        </div>
 
-                    <div class="form-group">
-                        <label for="reward_point_cost">ใช้แต้มแลก (Points) *</label>
-                        <input type="number" name="reward_point_cost" id="reward_point_cost" class="form-control" min="1" value="<?php echo $reward['reward_point_cost']; ?>" required>
-                    </div>
+        <div class="form-group">
+            <label for="reward_name">ชื่อของรางวัล / โปรโมชั่น <span class="text-danger">*</span></label>
+            <input type="text" name="reward_name" id="reward_name" class="form-control" value="<?php echo htmlspecialchars($reward['reward_name'], ENT_QUOTES, 'UTF-8'); ?>" required>
+        </div>
 
-                    <div class="form-group">
-                        <label for="reward_min_level">ระดับสมาชิกขั้นต่ำที่แลกได้ *</label>
-                        <select name="reward_min_level" id="reward_min_level" class="form-control" required>
-                            <option value="Bronze" <?php if($reward['reward_min_level'] == 'Bronze') echo 'selected'; ?>>Bronze (แลกได้ทุกคน)</option>
-                            <option value="Silver" <?php if($reward['reward_min_level'] == 'Silver') echo 'selected'; ?>>Silver (เฉพาะ Silver ขึ้นไป)</option>
-                            <option value="Gold" <?php if($reward['reward_min_level'] == 'Gold') echo 'selected'; ?>>Gold (เฉพาะระดับ Gold เท่านั้น)</option>
-                        </select>
-                    </div>
+        <div class="form-group">
+            <label for="reward_point_cost">ใช้แต้มแลก (Points) <span class="text-danger">*</span></label>
+            <input type="number" name="reward_point_cost" id="reward_point_cost" class="form-control" min="1" value="<?php echo intval($reward['reward_point_cost']); ?>" required>
+        </div>
 
-                    <div class="form-group">
-                        <label for="reward_stock">จำนวนสต๊อกที่แลกได้ *</label>
-                        <input type="number" name="reward_stock" id="reward_stock" class="form-control" min="0" value="<?php echo $reward['reward_stock']; ?>" required>
-                    </div>
+        <div class="form-group">
+            <label for="reward_min_level">ระดับสมาชิกขั้นต่ำที่แลกได้ <span class="text-danger">*</span></label>
+            <select name="reward_min_level" id="reward_min_level" class="form-control" required>
+                <option value="Bronze" <?php if($reward['reward_min_level'] == 'Bronze') echo 'selected'; ?>>Bronze (แลกได้ทุกคน)</option>
+                <option value="Silver" <?php if($reward['reward_min_level'] == 'Silver') echo 'selected'; ?>>Silver (เฉพาะ Silver ขึ้นไป)</option>
+                <option value="Gold" <?php if($reward['reward_min_level'] == 'Gold') echo 'selected'; ?>>Gold (เฉพาะระดับ Gold เท่านั้น)</option>
+            </select>
+        </div>
 
-                    <div class="form-group">
-                        <label for="reward_description">รายละเอียดเงื่อนไข (ถ้ามี)</label>
-                        <textarea name="reward_description" id="reward_description" class="form-control" rows="4"><?php echo htmlspecialchars($reward['reward_description']); ?></textarea>
-                    </div>
+        <div class="form-group">
+            <label for="reward_stock">จำนวนสต๊อกที่แลกได้ <span class="text-danger">*</span></label>
+            <input type="number" name="reward_stock" id="reward_stock" class="form-control" min="0" value="<?php echo intval($reward['reward_stock']); ?>" required>
+        </div>
 
-                    <button type="submit" class="btn-submit w-100 p-15">
-                        <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
-                    </button>
-                </form>
-            </div>
+        <div class="form-group">
+            <label for="reward_description">รายละเอียดเงื่อนไข (ถ้ามี)</label>
+            <textarea name="reward_description" id="reward_description" class="form-control" rows="4"><?php echo htmlspecialchars($reward['reward_description'], ENT_QUOTES, 'UTF-8'); ?></textarea>
+        </div>
+
+        <div class="header-between mt-30 pt-20 border-t">
+            <a href="rewards.php" class="btn-secondary text-decor-none">
+                <i class="fas fa-times"></i> ยกเลิก
+            </a>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
+            </button>
+        </div>
+    </form>
+</div>
 <?php include 'includes/footer.php'; ?>
