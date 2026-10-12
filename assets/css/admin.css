@@ -190,53 +190,161 @@ body {
 }
 
 /* =========================================
-   2. Sidebar (Dignified Slate & Brand Gold Accent)
+   2. Sidebar (Dignified Slate & Clean Light Companion)
    ========================================= */
 .admin-sidebar { 
     width: 280px; 
-    background-color: #0F172A; /* Deep Navy */
+    background-color: #0F172A; /* Deep Slate Navy */
     color: #F8FAFC; 
     display: flex; 
     flex-direction: column; 
-    box-shadow: 4px 0 15px rgba(0,0,0,0.05); 
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08); 
     position: fixed; 
     height: 100vh;
     left: 0;
     top: 0;
     overflow-y: auto; 
     z-index: 100;
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
 }
-.admin-sidebar .brand { padding: 25px 20px; background-color: #0B1120; text-align: center; border-bottom: 1px solid #1E293B; }
-.admin-sidebar .brand h2 { margin: 0; color: #FFFFFF; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
-.admin-sidebar .brand span { font-size: 13px; color: #38BDF8; font-weight: 500; margin-top: 5px; display: inline-block; }
-.admin-menu { list-style: none; padding: 15px; margin: 0; flex-grow: 1; }
-.admin-menu li { margin-bottom: 4px; }
+
+/* Custom Slim Scrollbar for Sidebar */
+.admin-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+.admin-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+.admin-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+.admin-sidebar .brand { 
+    padding: 24px 20px; 
+    background-color: #0B1120; 
+    text-align: center; 
+    border-bottom: 1px solid #1E293B; 
+}
+.admin-sidebar .brand h2 { 
+    margin: 0; 
+    color: #FFFFFF; 
+    font-size: 20px; 
+    font-weight: 700; 
+    letter-spacing: 0.5px; 
+}
+.admin-sidebar .brand span { 
+    font-size: 12.5px; 
+    color: #38BDF8; 
+    font-weight: 500; 
+    margin-top: 5px; 
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.admin-sidebar .brand span i {
+    font-size: 8px;
+}
+
+.admin-menu { 
+    list-style: none; 
+    padding: 14px 12px; 
+    margin: 0; 
+    flex-grow: 1; 
+}
+.admin-menu li { 
+    margin-bottom: 3px; 
+}
 .admin-menu li a { 
     display: flex; 
     align-items: center; 
-    padding: 11px 15px; 
+    min-height: 42px;
+    padding: 9px 14px; 
     color: #94A3B8; 
     text-decoration: none; 
     border-radius: 8px; 
-    font-size: 14px; 
+    font-size: 13.5px; 
     font-weight: 500; 
-    transition: all 0.2s ease; 
+    line-height: 1.4;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    box-sizing: border-box;
 }
-.admin-menu li a i { width: 25px; text-align: center; margin-right: 10px; font-size: 16px; transition: color 0.2s ease; }
-.admin-menu li a:hover { background-color: #1E293B; color: #F1F5F9; }
+.admin-menu li a i { 
+    width: 24px; 
+    min-width: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 11px; 
+    font-size: 15px; 
+    transition: transform 0.2s ease, color 0.2s ease; 
+}
+.admin-menu li a:hover { 
+    background-color: rgba(255, 255, 255, 0.05); 
+    color: #F8FAFC; 
+}
+.admin-menu li a:hover i {
+    transform: translateX(1px);
+    color: #E2E8F0;
+}
 .admin-menu li a.active { 
     background-color: #1E293B; 
-    color: #F8FAFC; 
-    border-left: 4px solid #CA8A04; /* สีทองภูมิฐาน T.S. Pattani */
-    padding-left: 11px; 
+    color: #FFFFFF; 
+    border-left: 3.5px solid #CA8A04; /* สีทองภูมิฐาน T.S. Pattani */
+    padding-left: 10.5px; 
     font-weight: 600; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); 
 }
-.admin-menu li a.active i { color: #FACC15; }
-.menu-label { color: #64748B; font-size: 11px; margin: 20px 0 10px 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; list-style: none; }
-.btn-logout { background-color: rgba(239, 68, 68, 0.1) !important; color: #EF4444 !important; display: flex; justify-content: center; align-items: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s;}
-.btn-logout:hover { background-color: #EF4444 !important; color: #FFFFFF !important; }
-.btn-logout i { margin-right: 8px; }
+.admin-menu li a.active i { 
+    color: #FBBF24; 
+}
+
+/* Gestalt Grouping for Section Headers */
+.menu-label { 
+    color: #64748B; 
+    font-size: 11.5px; 
+    margin: 24px 12px 8px 14px; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 0.8px; 
+    list-style: none; 
+}
+
+/* Logout Zone Separation */
+.admin-menu li.mt-30 {
+    margin-top: 24px !important;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.btn-logout { 
+    background-color: rgba(239, 68, 68, 0.12) !important; 
+    color: #F87171 !important; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    padding: 10px 14px; 
+    min-height: 42px;
+    border-radius: 8px; 
+    text-decoration: none; 
+    font-weight: 600; 
+    font-size: 13.5px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-sizing: border-box;
+}
+.btn-logout:hover { 
+    background-color: #EF4444 !important; 
+    color: #FFFFFF !important; 
+    border-color: #EF4444;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+.btn-logout i { 
+    margin-right: 8px; 
+}
 
 /* 3. Top Navbar */
 .top-navbar { 
