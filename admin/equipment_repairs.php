@@ -21,9 +21,9 @@ include 'includes/header.php';
 ?><div class="admin-card">
                 <div class="header-between">
                     <h4 class="section-header"><i class="fas fa-clipboard-list"></i> รายการส่งซ่อมอุปกรณ์ทั้งหมด</h4>
-                    <a href="products.php?tab=rental" class="btn-back-rental">
-                    <i class="fas fa-arrow-left"></i>
-                         <span>กลับไปหน้าอุปกรณ์เช่า</span>
+                    <a href="products.php?tab=rental" class="btn-secondary btn-back-rental">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>กลับไปหน้าอุปกรณ์เช่า</span>
                     </a>
                 </div>
 
