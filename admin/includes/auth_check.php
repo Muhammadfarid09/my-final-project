@@ -20,5 +20,3 @@ if (!isset($_SESSION['admin_id'])) {
     header("Location: " . $login_path);
     exit();
 }
-?>
-

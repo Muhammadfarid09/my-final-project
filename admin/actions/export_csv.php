@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/auth_check.php';
+require_once __DIR__ . '/../includes/auth_check.php';
 
 
 $type = isset($_GET['type']) ? $_GET['type'] : '';
@@ -8,18 +8,24 @@ if (!in_array($type, ['revenue', 'members', 'bookings'])) {
     die("Invalid Export Type");
 }
 
+// ล้าง Output Buffer ที่อาจตกค้าง เพื่อป้องกันไม่ให้มี whitespace หรือข้อความอื่นก่อนหน้า BOM
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
 // ตั้งค่า Header สำหรับการดาวน์โหลด CSV
 $filename = "export_" . $type . "_" . date('Ymd_His') . ".csv";
 header('Content-Type: text/csv; charset=UTF-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Pragma: no-cache');
 header('Expires: 0');
+header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 
-// เปิด Output Stream
+// ส่ง UTF-8 BOM (Byte Order Mark) ที่ไบต์แรกสุด เพื่อให้ Microsoft Excel เปิดแล้วภาษาไทยไม่เพี้ยน
+echo "\xEF\xBB\xBF";
+
+// เปิด Output Stream สำหรับเขียนข้อมูล CSV
 $output = fopen('php://output', 'w');
-
-// ใส่ BOM (Byte Order Mark) เพื่อให้ Excel อ่านภาษาไทย (UTF-8) ได้ถูกต้อง
-fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
 try {
     if ($type === 'revenue') {
@@ -93,4 +99,3 @@ try {
 
 fclose($output);
 exit();
-?>
