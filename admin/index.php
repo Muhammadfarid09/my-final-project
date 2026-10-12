@@ -196,12 +196,12 @@ $extra_head = <<<HTML
 <!-- นำเข้า Chart.js ตามขอบเขตเครื่องมือพัฒนา -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 HTML;
-$page_header = '<div class="header-between">
-                    <span><i class="fas fa-tachometer-alt"></i> แดชบอร์ดภาพรวมระบบ</span>
-                    <div>
-                        <a href="actions/export_csv.php?type=bookings" class="btn-secondary btn-action-small text-decor-none"><i class="fas fa-file-csv"></i> Export การจอง</a>
-                        <a href="actions/export_csv.php?type=members" class="btn-secondary btn-action-small text-decor-none"><i class="fas fa-file-csv"></i> Export สมาชิก</a>
-                        <a href="actions/export_csv.php?type=revenue" class="btn-success btn-action-small text-decor-none"><i class="fas fa-file-excel"></i> Export รายได้</a>
+$page_header = '<div class="dashboard-header-bar">
+                    <span class="dashboard-title"><i class="fas fa-tachometer-alt"></i> แดชบอร์ดภาพรวมระบบ</span>
+                    <div class="export-btn-group">
+                        <a href="actions/export_csv.php?type=bookings" class="btn-export text-decor-none"><i class="fas fa-file-csv icon-bookings"></i> Export การจอง</a>
+                        <a href="actions/export_csv.php?type=members" class="btn-export text-decor-none"><i class="fas fa-file-csv icon-members"></i> Export สมาชิก</a>
+                        <a href="actions/export_csv.php?type=revenue" class="btn-export text-decor-none"><i class="fas fa-file-excel icon-revenue"></i> Export รายได้</a>
                     </div>
                 </div>';
 include 'includes/header.php';
@@ -331,110 +331,131 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- แบ่งตารางเป็น 2 ฝั่ง ซ้าย/ขวา -->
-<div class="detail-grid">
+<!-- แถวที่ 1: ตารางรายการจองล่าสุด และ แจ้งเตือนสินค้าใกล้หมด (Equal Height Grid) -->
+<div class="dashboard-tables-row">
     
     <!-- ฝั่งซ้าย: ตารางรายการจองล่าสุด -->
     <div class="admin-card">
-        <h4 class="section-header"><i class="fas fa-calendar-check text-primary"></i> รายการจองสนามล่าสุด</h4>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ผู้จอง</th>
-                    <th>สนาม</th>
-                    <th>วันที่จอง</th>
-                    <th class="text-center">สถานะ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($recent_bookings) > 0): ?>
-                    <?php foreach ($recent_bookings as $row): ?>
+        <h4 class="section-header mb-15"><i class="fas fa-calendar-check text-primary"></i> รายการจองสนามล่าสุด</h4>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
                     <tr>
-                        <td>
-                            <strong><?php echo htmlspecialchars($row['member_name']); ?></strong><br>
-                            <span class="text-small-muted">#BK-<?php echo $row['booking_id']; ?></span>
-                        </td>
-                        <td><?php echo htmlspecialchars($row['court_name']); ?></td>
-                        <td><?php echo date('d/m/Y', strtotime($row['booking_date'])); ?></td>
-                        <td class="text-center">
-                            <?php if ($row['booking_status'] == 'รอตรวจสอบ'): ?>
-                                <span class="badge badge-warning">รอตรวจสอบ</span>
-                            <?php elseif ($row['booking_status'] == 'จองแล้ว'): ?>
-                                <span class="badge badge-success">จองแล้ว</span>
-                            <?php else: ?>
-                                <span class="badge badge-danger">ยกเลิก</span>
-                            <?php endif; ?>
-                        </td>
+                        <th>ผู้จอง</th>
+                        <th>สนาม</th>
+                        <th>วันที่จอง</th>
+                        <th class="text-center">สถานะ</th>
                     </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="4" class="table-empty-state">ยังไม่มีรายการจองสนาม</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php if (count($recent_bookings) > 0): ?>
+                        <?php foreach ($recent_bookings as $row): ?>
+                        <tr>
+                            <td>
+                                <strong><?php echo htmlspecialchars($row['member_name'], ENT_QUOTES, 'UTF-8'); ?></strong><br>
+                                <span class="text-small-muted">#BK-<?php echo htmlspecialchars($row['booking_id'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            </td>
+                            <td><?php echo htmlspecialchars($row['court_name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td><?php echo date('d/m/Y', strtotime($row['booking_date'])); ?></td>
+                            <td class="text-center">
+                                <?php if ($row['booking_status'] == 'รอตรวจสอบ'): ?>
+                                    <span class="badge badge-warning">รอตรวจสอบ</span>
+                                <?php elseif ($row['booking_status'] == 'จองแล้ว'): ?>
+                                    <span class="badge badge-success">จองแล้ว</span>
+                                <?php else: ?>
+                                    <span class="badge badge-danger">ยกเลิก</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4" class="table-empty-state">ยังไม่มีรายการจองสนาม</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- ฝั่งขวา: แจ้งเตือนสินค้าใกล้หมด -->
     <div class="admin-card">
-        <div class="header-between">
-            <h4 class="section-header text-danger"><i class="fas fa-exclamation-triangle"></i> แจ้งเตือนสินค้าใกล้หมด</h4>
-            <a href="purchases.php" class="btn-sm-info text-decor-none">
+        <div class="header-between mb-15">
+            <h4 class="section-header text-danger mb-0"><i class="fas fa-exclamation-triangle"></i> แจ้งเตือนสินค้าใกล้หมด</h4>
+            <a href="purchases.php" class="btn-order-more text-decor-none">
                 <i class="fas fa-plus"></i> สั่งซื้อเพิ่ม
             </a>
         </div>
         
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>รายการสินค้า</th>
-                    <th class="text-center">คงเหลือ</th>
-                    <th class="text-center">จุดสั่งซื้อขั้นต่ำ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($low_stock_count > 0): ?>
-                    <?php foreach ($low_stocks as $item): ?>
-                    <tr>
-                        <td><strong><?php echo htmlspecialchars($item['product_name']); ?></strong></td>
-                        <td class="text-center">
-                            <strong class="text-danger"><?php echo $item['product_stock']; ?></strong>
-                        </td>
-                        <td class="text-center text-small-muted">
-                            <?php echo $item['product_min_stock']; ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="3" class="table-empty-state">สต็อกสินค้าเพียงพอทุกรายการ</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+        <?php if ($low_stock_count > 0): ?>
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>รายการสินค้า</th>
+                            <th class="text-center">คงเหลือ</th>
+                            <th class="text-center">จุดสั่งซื้อขั้นต่ำ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($low_stocks as $item): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($item['product_name'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
+                            <td class="text-center">
+                                <strong class="text-danger"><?php echo htmlspecialchars($item['product_stock'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                            </td>
+                            <td class="text-center text-small-muted">
+                                <?php echo htmlspecialchars($item['product_min_stock'], ENT_QUOTES, 'UTF-8'); ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="empty-stock-box">
+                <i class="fas fa-check-circle"></i>
+                <p>สต็อกสินค้าเพียงพอทุกรายการ</p>
+                <span class="text-small-muted mt-5">ไม่มีสินค้าที่ต้องสั่งซื้อด่วนในขณะนี้</span>
+            </div>
+        <?php endif; ?>
     </div>
 
-    <!-- ฝั่งขวา (เพิ่มเติม): ลูกค้าที่ใช้บริการบ่อยสุด -->
-    <div class="admin-card">
-        <h4 class="section-header text-success"><i class="fas fa-medal"></i> ลูกค้าประจำยอดฮิต (Top 5)</h4>
+</div>
+
+<!-- แถวที่ 2: ลูกค้าประจำยอดฮิต (Top 5) (Balanced Layout) -->
+<div class="admin-card mb-24">
+    <div class="header-between mb-15">
+        <h4 class="section-header text-success mb-0"><i class="fas fa-medal"></i> ลูกค้าประจำยอดฮิต (Top 5)</h4>
+        <span class="text-small-muted"><i class="fas fa-info-circle"></i> สมาชิกที่มียอดการจองสำเร็จสูงสุด</span>
+    </div>
+    <div class="table-responsive">
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th style="width: 80px;">อันดับ</th>
                     <th>ชื่อลูกค้า</th>
-                    <th>ระดับสมาชิก</th>
+                    <th>เบอร์โทรศัพท์</th>
+                    <th class="text-center">ระดับสมาชิก</th>
                     <th class="text-center">จำนวนครั้งที่จอง</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (count($top_customers) > 0): ?>
-                    <?php foreach ($top_customers as $cust): ?>
+                    <?php $cust_rank = 1; foreach ($top_customers as $cust): ?>
                     <tr>
                         <td>
-                            <strong><?php echo htmlspecialchars($cust['member_name']); ?></strong><br>
-                            <span class="text-small-muted"><?php echo htmlspecialchars($cust['member_phone']); ?></span>
+                            <span class="badge <?php echo $cust_rank == 1 ? 'badge-warning' : ($cust_rank == 2 ? 'badge-secondary' : 'badge-outline'); ?>">
+                                #<?php echo $cust_rank++; ?>
+                            </span>
                         </td>
                         <td>
+                            <strong><?php echo htmlspecialchars($cust['member_name'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                        </td>
+                        <td>
+                            <span class="text-small-muted"><?php echo htmlspecialchars($cust['member_phone'], ENT_QUOTES, 'UTF-8'); ?></span>
+                        </td>
+                        <td class="text-center">
                             <?php if ($cust['member_level'] == 'Gold'): ?>
                                 <span class="badge-gold">Gold</span>
                             <?php elseif ($cust['member_level'] == 'Silver'): ?>
@@ -444,19 +465,18 @@ include 'includes/header.php';
                             <?php endif; ?>
                         </td>
                         <td class="text-center">
-                            <strong class="text-success"><?php echo $cust['booking_count']; ?></strong> <span class="text-small-muted">ครั้ง</span>
+                            <strong class="text-success"><?php echo number_format($cust['booking_count']); ?></strong> <span class="text-small-muted">ครั้ง</span>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td colspan="3" class="table-empty-state">ยังไม่มีข้อมูลการจอง</td>
+                        <td colspan="5" class="table-empty-state">ยังไม่มีข้อมูลการจอง</td>
                     </tr>
                 <?php endif; ?>
             </tbody>
         </table>
     </div>
-
 </div>
 
 <!-- กราฟประชากรศาสตร์ (Demographic Analytics: เพศ, ช่วงอายุ, อาชีพ) -->

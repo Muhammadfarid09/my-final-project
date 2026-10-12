@@ -190,15 +190,16 @@ body {
 }
 
 /* =========================================
-   2. Sidebar (Soft Slate & Clean Light Companion)
+   2. Sidebar (Clean Light Theme)
    ========================================= */
 .admin-sidebar { 
     width: 280px; 
-    background-color: #1E293B; /* Soft Slate */
-    color: #F8FAFC; 
+    background-color: #FFFFFF; /* Pure White */
+    color: #334155; 
     display: flex; 
     flex-direction: column; 
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08); 
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03); 
+    border-right: 1px solid #E2E8F0;
     position: fixed; 
     height: 100vh;
     left: 0;
@@ -206,7 +207,7 @@ body {
     overflow-y: auto; 
     z-index: 100;
     scrollbar-width: thin;
-    scrollbar-color: #475569 transparent;
+    scrollbar-color: #CBD5E1 transparent;
 }
 
 /* Custom Slim Scrollbar for Sidebar */
@@ -217,29 +218,29 @@ body {
     background: transparent;
 }
 .admin-sidebar::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: #E2E8F0;
     border-radius: 4px;
 }
 .admin-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #64748B;
+    background: #CBD5E1;
 }
 
 .admin-sidebar .brand { 
     padding: 24px 20px; 
-    background-color: #0F172A; 
+    background-color: #FFFFFF; 
     text-align: center; 
-    border-bottom: 1px solid #334155; 
+    border-bottom: 1px solid #F1F5F9; 
 }
 .admin-sidebar .brand h2 { 
     margin: 0; 
-    color: #FFFFFF; 
+    color: #0F172A; 
     font-size: 20px; 
     font-weight: 700; 
     letter-spacing: 0.5px; 
 }
 .admin-sidebar .brand span { 
     font-size: 12.5px; 
-    color: #38BDF8; 
+    color: #64748B; 
     font-weight: 500; 
     margin-top: 5px; 
     display: inline-flex;
@@ -248,6 +249,7 @@ body {
 }
 .admin-sidebar .brand span i {
     font-size: 8px;
+    color: #10B981;
 }
 
 .admin-menu { 
@@ -264,7 +266,7 @@ body {
     align-items: center; 
     min-height: 42px;
     padding: 9px 14px; 
-    color: #CBD5E1; 
+    color: #475569; 
     text-decoration: none; 
     border-radius: 8px; 
     font-size: 13.5px; 
@@ -281,26 +283,27 @@ body {
     justify-content: center;
     margin-right: 11px; 
     font-size: 15px; 
+    color: #64748B;
     transition: transform 0.2s ease, color 0.2s ease; 
 }
 .admin-menu li a:hover { 
-    background-color: rgba(255, 255, 255, 0.08); 
-    color: #FFFFFF; 
+    background-color: #F8FAFC; 
+    color: #0F172A; 
 }
 .admin-menu li a:hover i { 
     transform: translateX(1px);
-    color: #F1F5F9; 
+    color: #334155; 
 }
 .admin-menu li a.active { 
-    background-color: #334155; 
-    color: #FFFFFF; 
-    border-left: 3.5px solid #CA8A04; /* สีทองภูมิฐาน T.S. Pattani */
+    background-color: #F1F5F9; 
+    color: #0F172A; 
+    border-left: 3.5px solid #2563EB; /* Clean Blue Accent */
     padding-left: 10.5px; 
     font-weight: 600; 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
 }
 .admin-menu li a.active i { 
-    color: #FBBF24; 
+    color: #2563EB; 
 }
 
 /* Gestalt Grouping for Section Headers */
@@ -318,11 +321,11 @@ body {
 .admin-menu li.mt-30 {
     margin-top: 24px !important;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid #F1F5F9;
 }
 .btn-logout { 
-    background-color: rgba(239, 68, 68, 0.15) !important; 
-    color: #FCA5A5 !important; 
+    background-color: #FEF2F2 !important; 
+    color: #DC2626 !important; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -333,14 +336,14 @@ body {
     font-weight: 600; 
     font-size: 13.5px;
     transition: all 0.2s ease;
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    border: 1px solid #FECACA;
     box-sizing: border-box;
 }
 .btn-logout:hover { 
     background-color: #EF4444 !important; 
     color: #FFFFFF !important; 
     border-color: #EF4444;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 .btn-logout i { 
     margin-right: 8px; 
@@ -358,10 +361,137 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
     margin-bottom: 25px; 
 }
-.top-navbar h3 { margin: 0; font-size: 19px; color: #1E293B; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.top-navbar h3 { 
+    margin: 0; 
+    font-size: 19px; 
+    color: #1E293B; 
+    font-weight: 600; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    flex: 1;
+    margin-right: 20px;
+}
 .top-navbar h3 i { color: #CA8A04; }
-.user-profile { display: flex; align-items: center; font-weight: 600; gap: 8px; color: #475569; font-size: 14.5px; }
+.user-profile { display: flex; align-items: center; font-weight: 600; gap: 8px; color: #475569; font-size: 14.5px; white-space: nowrap; }
 .user-profile i { font-size: 24px; color: #94A3B8; }
+
+/* Dashboard Top Header & Clean Outline Export Buttons */
+.dashboard-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+}
+.dashboard-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    color: #0F172A;
+    font-weight: 600;
+}
+.dashboard-title i {
+    color: #CA8A04;
+}
+.export-btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-export {
+    height: 36px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+.btn-export:hover {
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
+    color: #0F172A;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
+}
+.btn-export i {
+    font-size: 14px;
+}
+.btn-export .icon-bookings { color: #3B82F6; }
+.btn-export .icon-members { color: #6366F1; }
+.btn-export .icon-revenue { color: #10B981; }
+
+/* Dashboard Tables Equal-Height Grid & Polished Actions */
+.dashboard-tables-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: stretch;
+}
+.dashboard-tables-row .admin-card {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.dashboard-tables-row .admin-card .table-responsive,
+.dashboard-tables-row .admin-card .admin-table {
+    flex: 1;
+}
+.empty-stock-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 200px;
+    padding: 30px 20px;
+    text-align: center;
+    color: #64748B;
+}
+.empty-stock-box i {
+    font-size: 38px;
+    color: #10B981;
+    margin-bottom: 12px;
+    opacity: 0.85;
+}
+.empty-stock-box p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+.btn-order-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #2563EB;
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+.btn-order-more:hover {
+    background-color: #EFF6FF;
+    border-color: #93C5FD;
+    color: #1D4ED8;
+}
 
 /* =========================================
    ยูทิลิตี้เสริม (Utility Classes) สำหรับจัดหน้า
@@ -717,7 +847,7 @@ body {
 .btn-submit:hover { background-color: #1D4ED8; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); transform: translateY(-1px); }
 
 /* Admin Badges (Cleaned Specificity & No-wrap Protection) */
-.badge-success, .badge-warning, .badge-danger, .badge-info, .badge-bronze, .badge-silver, .badge-gold {
+.badge, .badge-success, .badge-warning, .badge-danger, .badge-info, .badge-secondary, .badge-outline, .badge-bronze, .badge-silver, .badge-gold {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -732,6 +862,8 @@ body {
 .badge-warning { background-color: #FFFBEB; color: #F59E0B; border: 1px solid #FDE68A; }
 .badge-danger { background-color: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
 .badge-info { background-color: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.badge-secondary { background-color: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+.badge-outline { background-color: #FFFFFF; color: #64748B; border: 1px solid #E2E8F0; }
 .badge-bronze { background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
 .badge-silver { background-color: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
 .badge-gold { background-color: #FEF08A; color: #CA8A04; border: 1px solid #FDE047; }
