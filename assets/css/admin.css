@@ -4,16 +4,65 @@
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* 1. โครงสร้างหลัก (Layout & Base) */
+/* =========================================
+   0. โทนสีและ Design Tokens (CSS Variables)
+   ดึงชุดสีหลักจากหน้าบ้าน (global.css & style.css) 100%
+   ========================================= */
+:root {
+    /* โทนสีเน้นแบรนด์ (Brand Gold Accent) */
+    --color-gold: #FFB91D;         /* Primary CTA, Active State */
+    --color-gold-hover: #E9A812;   /* Interactive Hover State */
+    --color-gold-dark: #CA8A04;    /* Warm Gold สำหรับขอบ/ไอคอน/ข้อความ */
+    --color-gold-bg: #FEF9C3;      /* พื้นหลังสีทองอ่อน Active State */
+    --color-gold-border: #FDE047;  /* เส้นขอบสีทอง */
+    --text-on-gold: #090909;       /* ข้อความบนปุ่มทอง (บังคับสีเข้มตามหลัก HCI) */
+
+    /* พื้นผิวและพื้นหลัง (Clean White & Subtle Surfaces) */
+    --bg-main: #F8FAFC;            /* พื้นหลัง Canvas ภาพรวม */
+    --bg-white: #FFFFFF;           /* Card, Sidebar, Navbar, Modal */
+    --bg-subtle: #F1F5F9;          /* Table Header, Input background */
+    --bg-hover: #F8FAFC;           /* List/Table Row Hover */
+
+    /* ตัวอักษรและคอนทราสต์ (Typography & Hierarchy) */
+    --text-main: #0F172A;          /* Heading, ค่าสำคัญ */
+    --text-body: #334155;          /* ตัวอักษรทั่วไป, เมนู Sidebar ปกติ */
+    --text-muted: #64748B;         /* ข้อความรอง, ไอคอนทั่วไป */
+    --text-subtle: #94A3B8;        /* Placeholder, Section Header */
+
+    /* เส้นขอบและเงา (Borders & Soft Shadows) */
+    --border-color: #E2E8F0;       /* เส้นขอบมาตรฐาน */
+    --border-light: #F1F5F9;       /* เส้นแบ่งบางเบา */
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+    /* สีสถานะการทำงาน (Semantic Status Colors) */
+    --status-success: #10B981;
+    --status-warning: #F59E0B;
+    --status-danger: #EF4444;
+    --status-info: #3B82F6;
+}
+
+/* 1. โครงสร้างหลัก (Layout & Base - Clean White Background) */
 body { 
     margin: 0; 
-    background-color: #F8FAFC; /* Clean Light Dashboard background */
+    background-color: var(--bg-main, #F8FAFC); 
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #475569;
+    color: var(--text-body, #334155);
     -webkit-font-smoothing: antialiased;
 }
-.admin-layout { display: flex; min-height: 100vh; background-color: #F8FAFC; }
-.admin-content { flex: 1; padding: 30px; margin-left: 280px; min-width: 0; }
+.admin-layout,
+.admin-content,
+.main-content,
+.admin-wrapper { 
+    background-color: var(--bg-main, #F8FAFC); 
+}
+.admin-content,
+.main-content { 
+    flex: 1; 
+    padding: 30px; 
+    margin-left: 280px; 
+    min-width: 0; 
+}
 
 /* =========================================
    หน้าเข้าสู่ระบบ (Login Page) 
@@ -266,7 +315,7 @@ body {
     align-items: center; 
     min-height: 42px;
     padding: 9px 14px; 
-    color: #475569; 
+    color: #334155; /* ข้อความเมนูปกติ: สีเทาเข้ม */
     text-decoration: none; 
     border-radius: 8px; 
     font-size: 13.5px; 
@@ -292,18 +341,19 @@ body {
 }
 .admin-menu li a:hover i { 
     transform: translateX(1px);
-    color: #334155; 
+    color: var(--color-gold-dark, #CA8A04); 
 }
+/* เมนู Active: สีทอง/Accent เดียวกับหน้าบ้าน ทั้งขอบไฮไลท์และไอคอน */
 .admin-menu li a.active { 
-    background-color: #F1F5F9; 
-    color: #0F172A; 
-    border-left: 3.5px solid #2563EB; /* Clean Blue Accent */
+    background-color: var(--color-gold-bg, #FEF9C3); 
+    color: #854D0E; 
+    border-left: 3.5px solid var(--color-gold, #FFB91D); /* สีทองแบรนด์หน้าบ้าน */
     padding-left: 10.5px; 
     font-weight: 600; 
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+    box-shadow: 0 1px 3px rgba(255, 185, 29, 0.15); 
 }
 .admin-menu li a.active i { 
-    color: #2563EB; 
+    color: var(--color-gold-dark, #CA8A04); /* ไอคอนสีทอง */
 }
 
 /* Gestalt Grouping for Section Headers */
@@ -627,11 +677,13 @@ body {
 /* =========================================
    ฟอร์ม และ Card (Forms & Standard 40px Controls)
    ========================================= */
-.admin-card { 
+.card,
+.admin-card,
+.table-container { 
     background: #FFFFFF; 
     padding: 24px; 
     border-radius: 14px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04); 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02); 
     margin-bottom: 24px; 
     border: 1px solid #E2E8F0; 
 }
@@ -757,8 +809,8 @@ body {
 .btn-sm-info:hover { background: #DBEAFE; }
 
 .btn-secondary { 
-    background-color: #F1F5F9; 
-    color: #475569; 
+    background-color: #FFFFFF; 
+    color: #334155; 
     border: 1px solid #CBD5E1; 
     padding: 8px 16px; 
     border-radius: 8px; 
@@ -770,8 +822,14 @@ body {
     align-items: center;
     gap: 6px;
     text-decoration: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
-.btn-secondary:hover { background-color: #E2E8F0; color: #1E293B; border-color: #94A3B8; }
+.btn-secondary:hover { 
+    background-color: #F8FAFC; 
+    color: #0F172A; 
+    border-color: #94A3B8; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
 
 .btn-action-small { 
     font-size: 13px; 
@@ -827,24 +885,33 @@ body {
 }
 .btn-warning:hover { background-color: #D97706; color: white; transform: translateY(-1px); }
 
+.btn-primary,
 .btn-submit { 
-    background-color: #2563EB; 
-    color: white; 
-    border: none; 
+    background-color: var(--color-gold, #FFB91D); 
+    color: var(--text-on-gold, #090909); 
+    border: 1px solid var(--color-gold-hover, #E9A812); 
     padding: 11px 22px; 
     border-radius: 8px; 
     cursor: pointer; 
     transition: all 0.2s ease; 
-    font-weight: 600; 
+    font-weight: 700; 
     display: inline-flex; 
     align-items: center; 
     justify-content: center; 
     gap: 8px; 
     text-decoration: none; 
     text-align: center; 
-    font-size: 15px;
+    font-size: 14.5px;
+    box-shadow: 0 2px 4px rgba(255, 185, 29, 0.2);
 }
-.btn-submit:hover { background-color: #1D4ED8; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); transform: translateY(-1px); }
+.btn-primary:hover,
+.btn-submit:hover { 
+    background-color: var(--color-gold-hover, #E9A812); 
+    color: #000000; 
+    border-color: #D97706;
+    box-shadow: 0 4px 12px rgba(233, 168, 18, 0.35); 
+    transform: translateY(-1px); 
+}
 
 /* Admin Badges (Cleaned Specificity & No-wrap Protection) */
 .badge, .badge-success, .badge-warning, .badge-danger, .badge-info, .badge-secondary, .badge-outline, .badge-bronze, .badge-silver, .badge-gold {
@@ -2433,7 +2500,14 @@ body.receipt-body {
     gap: 10px;
 }
 .btn-pos-primary {
-    background: #2563eb;
+    background: var(--color-gold, #FFB91D);
+    color: var(--text-on-gold, #090909);
+    border: 1px solid var(--color-gold-hover, #E9A812);
+    font-weight: 700;
+}
+.btn-pos-primary:hover {
+    background: var(--color-gold-hover, #E9A812);
+    color: #000000;
 }
 
 /* 7. Equipment Returns & Penalty Management (equipment_returns.php) */
