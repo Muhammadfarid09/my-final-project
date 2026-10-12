@@ -152,8 +152,16 @@ require_once 'config.php';
             echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Rental] มีคอลัมน์ rental_actual_return อยู่แล้ว</div>";
         }
 
-        // 2.4 ปรับค่า ENUM สถานะการเช่า
+        // 2.4 ปรับค่า ENUM สถานะการเช่า และอนุญาตให้ booking_id เป็น NULL พร้อมเพิ่ม member_id
         $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย','ยกเลิก') NOT NULL DEFAULT 'กำลังเช่า'");
+        $conn->exec("ALTER TABLE Rental MODIFY COLUMN booking_id INT(11) NULL DEFAULT NULL");
+        if (!in_array('member_id', $cols_rental)) {
+            $conn->exec("ALTER TABLE Rental ADD COLUMN member_id INT(11) NULL DEFAULT NULL AFTER booking_id");
+            $conn->exec("ALTER TABLE Rental ADD CONSTRAINT `rental_ibfk_3` FOREIGN KEY (`member_id`) REFERENCES `Member` (`member_id`) ON DELETE SET NULL");
+            echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Rental] เพิ่มคอลัมน์ member_id และรองรับการเช่าหน้าร้านแบบไม่ต้องจองสนามสำเร็จ</div>";
+        } else {
+            echo "<div class='log-item log-info'><i class='fas fa-check'></i> [ตาราง Rental] รองรับ booking_id เป็น NULL และมี member_id เรียบร้อยแล้ว</div>";
+        }
         echo "<div class='log-item log-success'><i class='fas fa-check-circle'></i> [ตาราง Rental] ปรับปรุงสถานะ rental_status ให้รองรับ ชำรุด/สูญหาย สำเร็จ</div>";
 
         // 3. ตรวจสอบตาราง Cancellation

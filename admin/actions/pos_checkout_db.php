@@ -31,6 +31,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $last_pos_id = 0;
         $active_member_id = null;
 
+        $customer_phone = trim($_POST['customer_phone'] ?? '');
+        if (!empty($customer_phone)) {
+            $stmt_mem_find = $conn->prepare("SELECT member_id FROM Member WHERE member_phone = :phone AND member_status = 'ปกติ' LIMIT 1");
+            $stmt_mem_find->execute([':phone' => $customer_phone]);
+            $found_mid = $stmt_mem_find->fetchColumn();
+            if ($found_mid) {
+                $active_member_id = intval($found_mid);
+            }
+        }
+
         // ========================================================
         // 1. ประมวลผลรายการเปิดสนาม Walk-in (ถ้ามี)
         // ========================================================
@@ -194,14 +204,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 // ถ้ามีการเช่าอุปกรณ์ ให้ลงตาราง Rental ด้วยเพื่อตรวจรับคืนได้
                 $b_id_for_rental = ($last_booking_id > 0) ? $last_booking_id : null;
+
+                // หากไม่มีการเปิดสนามในบิลนี้ แต่มี active_member_id ลองค้นหา booking วันนี้ของสมาชิกเพื่อผูกข้อมูล
+                if (empty($b_id_for_rental) && !empty($active_member_id)) {
+                    $stmt_b_today = $conn->prepare("
+                        SELECT booking_id FROM Booking 
+                        WHERE member_id = :mid AND booking_date = CURDATE() AND booking_status != 'ยกเลิก' 
+                        ORDER BY booking_id DESC LIMIT 1
+                    ");
+                    $stmt_b_today->execute([':mid' => $active_member_id]);
+                    $today_bid = $stmt_b_today->fetchColumn();
+                    if ($today_bid) {
+                        $b_id_for_rental = intval($today_bid);
+                    }
+                }
+
                 $sql_rental = "
                     INSERT INTO Rental 
-                    (booking_id, product_id, rental_quantity, rental_start_time, rental_return_time, rental_status) 
+                    (booking_id, member_id, product_id, rental_quantity, rental_start_time, rental_return_time, rental_status) 
                     VALUES 
-                    (:bid, :pid, :qty, NOW(), DATE_ADD(NOW(), INTERVAL 2 HOUR), 'กำลังเช่า')
+                    (:bid, :mid, :pid, :qty, NOW(), DATE_ADD(NOW(), INTERVAL 2 HOUR), 'กำลังเช่า')
                 ";
                 $conn->prepare($sql_rental)->execute([
                     ':bid' => $b_id_for_rental,
+                    ':mid' => $active_member_id,
                     ':pid' => $product_id,
                     ':qty' => $qty
                 ]);

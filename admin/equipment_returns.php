@@ -27,7 +27,7 @@ try {
     }
 
     if (!empty($search)) {
-        $where_clauses[] = "(m.member_name LIKE :s OR m.member_phone LIKE :s OR p.product_name LIKE :s OR r.booking_id = :sid)";
+        $where_clauses[] = "(m.member_name LIKE :s OR m.member_phone LIKE :s OR mr.member_name LIKE :s OR mr.member_phone LIKE :s OR p.product_name LIKE :s OR r.booking_id = :sid)";
         $params[':s'] = "%$search%";
         $params[':sid'] = intval($search);
     }
@@ -37,12 +37,14 @@ try {
     $sql = "
         SELECT r.*, 
                p.product_name, p.product_image, p.product_price,
-               m.member_name, m.member_phone,
+               COALESCE(m.member_name, mr.member_name) AS member_name, 
+               COALESCE(m.member_phone, mr.member_phone) AS member_phone,
                b.booking_date, b.booking_status
         FROM Rental r
         JOIN Product p ON r.product_id = p.product_id
         LEFT JOIN Booking b ON r.booking_id = b.booking_id
         LEFT JOIN Member m ON b.member_id = m.member_id
+        LEFT JOIN Member mr ON r.member_id = mr.member_id
         $where_sql
         ORDER BY " . ($active_tab === 'history' ? "r.rental_actual_return DESC" : "r.rental_start_time ASC") . "
     ";

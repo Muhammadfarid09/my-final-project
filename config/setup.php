@@ -223,7 +223,8 @@ try {
     $sql_table_rental = "
         CREATE TABLE IF NOT EXISTS `Rental` (
             `rental_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-            `booking_id` INT(11) NOT NULL,
+            `booking_id` INT(11) NULL DEFAULT NULL,
+            `member_id` INT(11) NULL DEFAULT NULL,
             `product_id` INT(11) NOT NULL,
             `rental_quantity` INT(11) NOT NULL,
             `rental_start_time` DATETIME NOT NULL,
@@ -233,6 +234,7 @@ try {
             `rental_fine_reason` VARCHAR(255) DEFAULT NULL,
             `rental_actual_return` DATETIME DEFAULT NULL,
             FOREIGN KEY (`booking_id`) REFERENCES `Booking`(`booking_id`) ON DELETE CASCADE,
+            FOREIGN KEY (`member_id`) REFERENCES `Member`(`member_id`) ON DELETE SET NULL,
             FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE RESTRICT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ";
@@ -340,6 +342,11 @@ try {
         $conn->exec("ALTER TABLE Rental ADD COLUMN rental_actual_return DATETIME NULL AFTER rental_fine_reason");
     }
     $conn->exec("ALTER TABLE Rental MODIFY COLUMN rental_status ENUM('รอตรวจสอบ','กำลังเช่า','คืนแล้ว','ชำรุด','สูญหาย','ยกเลิก') NOT NULL DEFAULT 'กำลังเช่า'");
+    $conn->exec("ALTER TABLE Rental MODIFY COLUMN booking_id INT(11) NULL DEFAULT NULL");
+    if (!in_array('member_id', $cols_rental)) {
+        $conn->exec("ALTER TABLE Rental ADD COLUMN member_id INT(11) NULL DEFAULT NULL AFTER booking_id");
+        $conn->exec("ALTER TABLE Rental ADD CONSTRAINT `rental_ibfk_3` FOREIGN KEY (`member_id`) REFERENCES `Member` (`member_id`) ON DELETE SET NULL");
+    }
     $conn->exec("ALTER TABLE Booking MODIFY COLUMN member_id INT(11) NULL");
     echo "<h3>20. อัปเดตโครงสร้างฟิลด์และระบบรองรับฟังก์ชันใหม่ล่าสุดสำเร็จ 100%!</h3>";
 

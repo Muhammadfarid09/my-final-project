@@ -141,6 +141,22 @@ include 'includes/header.php';
             <input type="hidden" name="total_amount" id="totalAmountInput">
             <input type="hidden" name="payment_method" id="paymentMethodInput" value="cash">
 
+            <!-- ข้อมูลลูกค้า / สมาชิกสะสมแต้มและบันทึกประวัติเช่า -->
+            <div class="pos-customer-box mb-15">
+                <label class="text-13 text-gray font-bold mb-6 d-block">
+                    <i class="fas fa-user-check text-primary"></i> ลูกค้า / สมาชิก (สะสมแต้ม & ประวัติเช่า):
+                </label>
+                <div class="pos-search-wrapper mb-0">
+                    <i class="fas fa-phone-alt pos-search-icon"></i>
+                    <input type="text" name="customer_phone" id="posCustomerPhone" class="pos-search-input" placeholder="เบอร์โทรศัพท์ 10 หลัก (ถ้ามี)..." list="posMemberList" autocomplete="off" maxlength="10">
+                    <datalist id="posMemberList">
+                        <?php foreach ($members_list as $m): ?>
+                            <option value="<?php echo htmlspecialchars($m['member_phone'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($m['member_name'], ENT_QUOTES, 'UTF-8'); ?> (<?php echo htmlspecialchars($m['member_phone'], ENT_QUOTES, 'UTF-8'); ?>)</option>
+                        <?php endforeach; ?>
+                    </datalist>
+                </div>
+            </div>
+
             <!-- เลือกวิธีชำระเงิน -->
             <div class="payment-methods">
                 <button type="button" class="payment-btn active" id="btnPayCash" onclick="selectPaymentMethod('cash')"><i class="fas fa-money-bill-wave"></i> เงินสด</button>
@@ -396,6 +412,13 @@ function addCourtToCart() {
         end_time: endTimeStr + ':00',
         member_phone: phone
     });
+
+    if (phone) {
+        let custPhoneInput = document.getElementById('posCustomerPhone');
+        if (custPhoneInput && !custPhoneInput.value) {
+            custPhoneInput.value = phone;
+        }
+    }
 
     closeWalkInCourtModal();
     updateCartUI();

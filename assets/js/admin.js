@@ -168,6 +168,8 @@ function confirmClearCart() {
                 posCart = [];
                 let cashInput = document.getElementById('cashReceived');
                 if (cashInput) cashInput.value = '';
+                let custPhoneInput = document.getElementById('posCustomerPhone');
+                if (custPhoneInput) custPhoneInput.value = '';
                 updateCartUI();
                 if (typeof SwalToast === 'function') {
                     SwalToast('success', 'ล้างรายการในตะกร้าเรียบร้อยแล้ว');
@@ -179,6 +181,8 @@ function confirmClearCart() {
             posCart = [];
             let cashInput = document.getElementById('cashReceived');
             if (cashInput) cashInput.value = '';
+            let custPhoneInput = document.getElementById('posCustomerPhone');
+            if (custPhoneInput) custPhoneInput.value = '';
             updateCartUI();
         }
     }
