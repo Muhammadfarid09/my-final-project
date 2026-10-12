@@ -32,10 +32,10 @@ include 'includes/header.php';
     <table class="admin-table">
         <thead>
             <tr>
-                <th style="width: 140px;">ภาพปก</th>
+                <th style="width: 135px;">ภาพปก</th>
                 <th>หัวข้อข่าวสาร / กิจกรรม</th>
-                <th style="width: 160px;">วันที่โพสต์</th>
-                <th style="width: 140px;">ผู้ประกาศ</th>
+                <th style="width: 175px;">วันที่โพสต์</th>
+                <th style="width: 180px;">ผู้ประกาศ</th>
                 <th class="text-center" style="width: 160px;">จัดการ</th>
             </tr>
         </thead>

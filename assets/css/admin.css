@@ -585,14 +585,25 @@ body {
 }
 .btn-submit:hover { background-color: #1D4ED8; color: white; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3); transform: translateY(-1px); }
 
-/* Admin Badges (Cleaned Specificity) */
-.badge-success { background-color: #ECFDF5; color: #10B981; border: 1px solid #A7F3D0; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-warning { background-color: #FFFBEB; color: #F59E0B; border: 1px solid #FDE68A; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-danger { background-color: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-info { background-color: #EFF6FF; color: #3B82F6; border: 1px solid #BFDBFE; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-bronze { background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-silver { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
-.badge-gold { background-color: #FEF08A; color: #CA8A04; border: 1px solid #FDE047; border-radius: 9999px; padding: 4px 10px; font-weight: 600; font-size: 12px; }
+/* Admin Badges (Cleaned Specificity & No-wrap Protection) */
+.badge-success, .badge-warning, .badge-danger, .badge-info, .badge-bronze, .badge-silver, .badge-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    border-radius: 9999px;
+    padding: 4px 12px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.badge-success { background-color: #ECFDF5; color: #10B981; border: 1px solid #A7F3D0; }
+.badge-warning { background-color: #FFFBEB; color: #F59E0B; border: 1px solid #FDE68A; }
+.badge-danger { background-color: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
+.badge-info { background-color: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.badge-bronze { background-color: #FEF3C7; color: #D97706; border: 1px solid #FDE68A; }
+.badge-silver { background-color: #F1F5F9; color: #475569; border: 1px solid #CBD5E1; }
+.badge-gold { background-color: #FEF08A; color: #CA8A04; border: 1px solid #FDE047; }
 
 /* Grid Custom */
 .layout-grid-sidebar { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
