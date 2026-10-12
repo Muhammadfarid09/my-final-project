@@ -14,74 +14,79 @@ if (isset($_SESSION['admin_id'])) {
     <title>เข้าสู่ระบบผู้ดูแลระบบ - T.S. Pattani</title>
     <!-- เรียกใช้ไฟล์ CSS ส่วนกลางและของแอดมิน -->
     <link rel="stylesheet" href="../assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="../assets/css/admin.css?v=1.1">
+    <link rel="stylesheet" href="../assets/css/admin.css?v=1.41">
     <!-- นำเข้า Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="login-page"> <!-- ใช้คลาส login-page เพื่อจัดกลางหน้าจอ -->
+<body class="login-page">
     
     <div class="login-box">
-        <!-- ฝั่งซ้าย: รูปภาพหรือโลโก้สนาม -->
-        <div class="login-image-side">
-            <div class="login-image-content">
-                <!-- หากมีรูปภาพหรือโลโก้สนาม สามารถลบแท็ก <i> ออก แล้วใช้แท็ก <img> ด้านล่างแทนได้เลย -->
-                <!-- <i class="fas fa-volleyball-ball"></i> -->
-                <img src="../assets/img/ts-pattani-generated.jpg" alt="T.S. Pattani Logo" class="stadium-logo-img admin-login-logo">
-                <h2>T.S. Pattani</h2>
-                <p>ระบบบริหารจัดการสนามกีฬาแบบครบวงจร</p>
+        
+        <!-- ส่วนหัว: โลโก้และชื่อระบบ -->
+        <div class="login-header">
+            <div class="login-logo-wrapper">
+                <img src="../assets/img/ts-pattani-generated.jpg" alt="T.S. Pattani Logo" class="login-logo-img">
             </div>
+            <h1 class="login-title">T.S. Pattani</h1>
+            <div class="login-badge">
+                <i class="fas fa-shield-alt"></i> เข้าสู่ระบบผู้ดูแลระบบ
+            </div>
+            <p class="login-subtitle">ระบบบริหารจัดการสนามกีฬาแบบครบวงจร</p>
         </div>
 
-        <!-- ฝั่งขวา: ฟอร์มเข้าสู่ระบบ -->
-        <div class="login-form-side">
-            <form action="actions/login_db.php" method="POST">
-                
-                <div class="login-logo">
-                <i class="fas fa-shield-alt"></i>
-                <h3>Admin Login</h3>
+        <!-- ================= บล็อกแสดงแจ้งเตือน (Alerts) ================= -->
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert-success">
+                <i class="fas fa-check-circle"></i> <span><?php echo htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['success']); ?></span>
             </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert-error">
+                <i class="fas fa-exclamation-circle"></i> <span><?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); unset($_SESSION['error']); ?></span>
+            </div>
+        <?php endif; ?>
+        <!-- ================= สิ้นสุดบล็อกแสดงแจ้งเตือน ================= -->
+
+        <!-- ฟอร์มเข้าสู่ระบบ -->
+        <form action="actions/login_db.php" method="POST" class="login-form">
             
-            <p class="text-center text-gray mb-25">ระบบจัดการหลังบ้าน T.S. Pattani</p>
-
-            <!-- ================= บล็อกแสดงแจ้งเตือน (Alerts) ================= -->
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert-success">
-                    <i class="fas fa-check-circle"></i> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert-error">
-                    <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-                </div>
-            <?php endif; ?>
-            <!-- ================= สิ้นสุดบล็อกแสดงแจ้งเตือน ================= -->
-
             <!-- เบอร์โทรศัพท์สำหรับแอดมิน -->
-            <div class="form-group text-left">
-                <label for="phone">เบอร์โทรศัพท์ (ผู้ดูแลระบบ)</label>
-                <input type="text" id="phone" name="phone" class="form-control" placeholder="กรอกเบอร์โทรศัพท์" maxlength="10" required>
+            <div class="form-group">
+                <label for="phone" class="form-label">
+                    <i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์ (ผู้ดูแลระบบ)
+                </label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="กรอกเบอร์โทรศัพท์ 10 หลัก" maxlength="10" autocomplete="tel" required autofocus>
             </div>
 
             <!-- รหัสผ่าน -->
-            <div class="form-group text-left">
-                <label for="password">รหัสผ่าน</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="กรอกรหัสผ่าน" required>
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i> รหัสผ่าน
+                </label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" required>
             </div>
             
-            <!-- ใช้คลาส btn-submit แบบมีสีแดง -->
-            <button type="submit" class="btn-danger w-full p-10 text-16">เข้าสู่ระบบ (Admin)</button>
+            <!-- ปุ่มเข้าสู่ระบบ ดึงโทนสีทองแบรนด์จาก CSS Variables -->
+            <button type="submit" class="btn-login-submit">
+                <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ (Admin)
+            </button>
 
-            <div class="text-center mt-20">
-                <a href="../index.php" class="btn-back">&larr; กลับหน้าเว็บไซต์หลัก</a>
+            <!-- ลิงก์กลับหน้าหลัก -->
+            <div class="login-footer">
+                <a href="../index.php" class="btn-back-home">
+                    <i class="fas fa-arrow-left"></i> กลับหน้าเว็บไซต์หลัก
+                </a>
             </div>
 
-            </form>
-        </div> <!-- ปิด login-form-side -->
+        </form>
+
     </div> <!-- ปิด login-box -->
 
-    <!-- เรียกใช้สคริปต์กลางเพื่อให้กล่องแจ้งเตือนหายไปเอง (v=1.21) -->
-    <script src="../assets/js/admin.js?v=1.21"></script>
+    <!-- เรียกใช้สคริปต์กลางเพื่อให้กล่องแจ้งเตือนหายไปเอง -->
+    <script src="../assets/js/admin.js?v=1.22"></script>
 
 </body>
 </html>
