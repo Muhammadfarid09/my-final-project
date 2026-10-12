@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     
     // รับค่าจากฟอร์มที่แอดมินพิมพ์ส่งมา
     $admin_id = $_SESSION['admin_id'];
