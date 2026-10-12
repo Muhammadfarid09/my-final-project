@@ -546,6 +546,25 @@ body {
     cursor: pointer; 
     transition: all 0.15s ease;
 }
+.table-actions-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+.table-actions-group .btn-action-small {
+    margin-bottom: 0;
+    min-width: 72px;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12.5px;
+    box-sizing: border-box;
+    border: 1px solid transparent;
+}
+.table-actions-group .btn-secondary.btn-action-small {
+    border-color: #CBD5E1;
+}
 .btn-back { color: #64748B; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; display: inline-flex; align-items: center; gap: 6px; }
 .btn-back:hover { color: #0F172A; }
 

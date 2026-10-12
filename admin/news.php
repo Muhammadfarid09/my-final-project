@@ -34,9 +34,9 @@ include 'includes/header.php';
             <tr>
                 <th style="width: 135px;">ภาพปก</th>
                 <th>หัวข้อข่าวสาร / กิจกรรม</th>
-                <th style="width: 175px;">วันที่โพสต์</th>
-                <th style="width: 180px;">ผู้ประกาศ</th>
-                <th class="text-center" style="width: 160px;">จัดการ</th>
+                <th style="width: 170px;">วันที่โพสต์</th>
+                <th style="width: 165px;">ผู้ประกาศ</th>
+                <th class="text-center" style="width: 190px;">จัดการ</th>
             </tr>
         </thead>
         <tbody>
@@ -66,22 +66,25 @@ include 'includes/header.php';
                             <?php echo htmlspecialchars($row['admin_name'] ?? 'ผู้ดูแลระบบ', ENT_QUOTES, 'UTF-8'); ?>
                         </span>
                     </td>
-                    <td class="text-center">
-                        <a href="news_edit.php?id=<?php echo intval($row['news_id']); ?>" class="btn-secondary btn-action-small">
-                            <i class="fas fa-edit"></i> แก้ไข
-                        </a>
-                        <button type="button" 
-                                class="btn-reject btn-action-small" 
-                                onclick="showActionConfirmModal({
-                                    title: 'ยืนยันการลบข่าวสารและโปรโมชั่น',
-                                    message: 'คุณกำลังจะลบข่าวสาร: <strong><?php echo htmlspecialchars(addslashes($row['news_title']), ENT_QUOTES, 'UTF-8'); ?></strong>',
-                                    consequence: 'ข่าวสารและรูปภาพประกอบนี้จะถูกลบออกจากระบบอย่างถาวร และจะไม่แสดงบนหน้าเว็บไซต์อีกต่อไป',
-                                    confirmText: 'ยืนยันการลบ',
-                                    type: 'danger',
-                                    actionUrl: 'actions/news_delete_db.php?id=<?php echo intval($row['news_id']); ?>'
-                                })">
-                            <i class="fas fa-trash-alt"></i> ลบ
-                        </button>
+                    <td class="text-center whitespace-nowrap">
+                        <div class="table-actions-group">
+                            <a href="news_edit.php?id=<?php echo intval($row['news_id']); ?>" class="btn-secondary btn-action-small" title="แก้ไข">
+                                <i class="fas fa-edit"></i> แก้ไข
+                            </a>
+                            <button type="button" 
+                                    class="btn-reject btn-action-small" 
+                                    onclick="showActionConfirmModal({
+                                        title: 'ยืนยันการลบข่าวสารและโปรโมชั่น',
+                                        message: 'คุณกำลังจะลบข่าวสาร: <strong><?php echo htmlspecialchars(addslashes($row['news_title']), ENT_QUOTES, 'UTF-8'); ?></strong>',
+                                        consequence: 'ข่าวสารและรูปภาพประกอบนี้จะถูกลบออกจากระบบอย่างถาวร และจะไม่แสดงบนหน้าเว็บไซต์อีกต่อไป',
+                                        confirmText: 'ยืนยันการลบ',
+                                        type: 'danger',
+                                        actionUrl: 'actions/news_delete_db.php?id=<?php echo intval($row['news_id']); ?>'
+                                    })"
+                                    title="ลบ">
+                                <i class="fas fa-trash-alt"></i> ลบ
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
