@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once 'includes/csrf.php';
 
 // หากลูกค้าล็อกอินอยู่แล้ว ให้ข้ามหน้าสมัครสมาชิกไปที่หน้าแรกเลย
 if (isset($_SESSION['member_id'])) {
@@ -148,6 +149,7 @@ $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? 
 
                 <!-- ฟอร์มจะถูกส่งไปที่ actions/register_db.php -->
                 <form id="registerForm" action="actions/register_db.php" method="POST" novalidate>
+                    <?php echo csrf_field(); ?>
                     
                     <!-- 1. ชื่อ - นามสกุล -->
                     <div class="form-group-dark">

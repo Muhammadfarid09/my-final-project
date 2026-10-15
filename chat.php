@@ -58,6 +58,7 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="chat-footer">
                 <form action="actions/send_chat_db.php" method="POST" class="chat-input-group" id="chatForm">
+                    <?php echo csrf_field(); ?>
                     <input type="text" name="chat_message" id="chatInput" class="chat-input" placeholder="พิมพ์ข้อความที่นี่..." required autocomplete="off" autofocus>
                     <button type="submit" id="btnSend" class="btn-send"><i class="fas fa-paper-plane"></i> ส่ง</button>
                 </form>
@@ -104,6 +105,9 @@ $chats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 fetch('actions/send_chat_db.php', {
                     method: 'POST',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
                     body: formData
                 })
                 .then(function(res) { return res.json(); })

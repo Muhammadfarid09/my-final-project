@@ -4,6 +4,9 @@ require_once '../includes/auth_check.php';
 $is_ajax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') || (isset($_POST['ajax']) && $_POST['ajax'] == '1');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // ตรวจสอบความปลอดภัย CSRF Token
+    require_csrf_token();
+
     $member_id = intval($_SESSION['member_id']);
     $message = trim($_POST['chat_message'] ?? '');
 

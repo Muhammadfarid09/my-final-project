@@ -101,14 +101,44 @@ foreach ($targetActions as $actionFile) {
 }
 
 if ($allActionsProtected) {
-    echo "[PASS] Test 6: All " . count($targetActions) . " state-changing action files contain require_csrf_token()\n";
+    echo "[PASS] Test 6: All " . count($targetActions) . " admin state-changing action files contain require_csrf_token()\n";
+    $passed++;
+} else {
+    $failed++;
+}
+
+// Test 7: Verify member state-changing action files contain require_csrf_token()
+$memberActions = [
+    'booking_db.php',
+    'cancel_booking_db.php',
+    'forgot_password_db.php',
+    'login_db.php',
+    'payment_db.php',
+    'profile_edit_db.php',
+    'redeem_reward_db.php',
+    'register_db.php',
+    'reset_password_db.php',
+    'send_chat_db.php'
+];
+
+$allMemberActionsProtected = true;
+foreach ($memberActions as $actionFile) {
+    $content = file_get_contents(__DIR__ . '/../actions/' . $actionFile);
+    if (strpos($content, 'require_csrf_token()') === false) {
+        echo "[FAIL] Test 7: {$actionFile} missing require_csrf_token()\n";
+        $allMemberActionsProtected = false;
+    }
+}
+
+if ($allMemberActionsProtected) {
+    echo "[PASS] Test 7: All " . count($memberActions) . " member state-changing action files contain require_csrf_token()\n";
     $passed++;
 } else {
     $failed++;
 }
 
 echo "==========================================================\n";
-echo "SUMMARY: Total: 6 | Passed: {$passed} | Failed: {$failed}\n";
+echo "SUMMARY: Total: 7 | Passed: {$passed} | Failed: {$failed}\n";
 echo "==========================================================\n";
 
 if ($failed > 0) exit(1);

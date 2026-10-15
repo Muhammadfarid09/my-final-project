@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once 'includes/csrf.php';
 
 // หากลูกค้าล็อกอินอยู่แล้ว ให้ข้ามหน้า Login ไปที่หน้าแรก (index.php) ทันที
 if (isset($_SESSION['member_id'])) {
@@ -176,6 +177,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
 
                 <!-- ฟอร์มเข้าสู่ระบบส่งไปยัง actions/login_db.php -->
                 <form action="actions/login_db.php" method="POST" id="loginForm" novalidate>
+                    <?php echo csrf_field(); ?>
                     
                     <!-- ฟิลด์ที่ 1: เบอร์โทรศัพท์ (Username) -->
                     <div class="form-group-dark">

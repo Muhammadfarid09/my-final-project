@@ -4,6 +4,8 @@ session_start();
 require_once '../config/config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // 0. ตรวจสอบความปลอดภัย CSRF Token
+    require_csrf_token();
     
     // 1. รับค่าและทำความสะอาดข้อมูล (ตัดช่องว่างหน้า-หลัง)
     $member_phone = trim($_POST['member_phone'] ?? '');
