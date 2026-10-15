@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     
     // รับค่าจาก Modal 
     $eq_repair_id = intval($_POST['eq_repair_id']);

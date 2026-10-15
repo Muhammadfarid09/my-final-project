@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     $court_id = intval($_POST['court_id']);
     $court_name = trim($_POST['court_name']);
     $court_price_per_hour = floatval($_POST['court_price_per_hour']);

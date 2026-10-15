@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/../config/config.php';
+
 // ถ้าระบบจำได้ว่า Admin ล็อกอินอยู่แล้ว ให้เด้งไปหน้า Dashboard เลย ไม่ต้องล็อกอินซ้ำ
 if (isset($_SESSION['admin_id'])) {
     header("Location: index.php");
@@ -52,6 +54,7 @@ if (isset($_SESSION['admin_id'])) {
 
         <!-- ฟอร์มเข้าสู่ระบบ -->
         <form action="actions/login_db.php" method="POST" class="login-form">
+            <?php echo csrf_field(); ?>
             
             <!-- เบอร์โทรศัพท์สำหรับแอดมิน -->
             <div class="form-group">

@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
 
     // 1. รับค่าจากฟอร์ม
     $member_id = intval($_POST['member_id']);

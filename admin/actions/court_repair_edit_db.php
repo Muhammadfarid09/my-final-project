@@ -2,6 +2,7 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    require_csrf_token();
     
     // รับค่าจากฟอร์มให้ตรงกับ Database
     $repair_id = intval($_POST['repair_id']);

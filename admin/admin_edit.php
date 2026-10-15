@@ -44,6 +44,7 @@ include 'includes/header.php';
     </div>
 
     <form action="actions/admin_edit_db.php" method="POST">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="admin_id" value="<?php echo $admin['admin_id']; ?>">
 
         <div class="form-group">

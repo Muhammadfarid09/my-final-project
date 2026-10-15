@@ -5,6 +5,8 @@ session_start();
 require_once '../../config/config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
+    
     $phone = trim($_POST['phone']);
     $password = $_POST['password'];
 

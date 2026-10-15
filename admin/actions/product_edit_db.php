@@ -2,6 +2,8 @@
 require_once '../includes/auth_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
+    
     $product_id = intval($_POST['product_id']);
     $product_type = $_POST['product_type'];
     $tab_return = $_POST['tab_return'];

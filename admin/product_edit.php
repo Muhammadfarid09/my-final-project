@@ -42,7 +42,7 @@ include 'includes/header.php';
 
                 <!-- ฟอร์มส่งข้อมูลไปที่ product_edit_db.php -->
                 <form action="actions/product_edit_db.php" method="POST" enctype="multipart/form-data">
-                    
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
                     <input type="hidden" name="product_type" value="<?php echo htmlspecialchars($product['product_type']); ?>">
                     <input type="hidden" name="tab_return" value="<?php echo $tab_return; ?>">

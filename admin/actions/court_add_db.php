@@ -3,6 +3,7 @@ require_once '../includes/auth_check.php';
 
 // ตรวจสอบว่ามีการส่งฟอร์มมาแบบ POST หรือไม่
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    require_csrf_token();
     
     // รับค่าจากฟอร์มและตรวจสอบความปลอดภัยเบื้องต้น
     $court_name = trim($_POST['court_name']);

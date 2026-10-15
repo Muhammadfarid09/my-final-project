@@ -1,6 +1,12 @@
 <?php
 // เริ่มต้น Session เพื่อให้สามารถเข้าถึงตัวแปร $_SESSION ได้
 session_start();
+require_once __DIR__ . '/../../includes/csrf.php';
+
+// ป้องกัน Logout CSRF: ตรวจสอบ Token เมื่อส่งคำขอมาแบบ POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf_token();
+}
 
 // ลบตัวแปร Session ทั้งหมดที่เกี่ยวข้องกับ Admin ออก
 unset($_SESSION['admin_id']);

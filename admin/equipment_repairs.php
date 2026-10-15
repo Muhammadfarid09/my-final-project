@@ -119,6 +119,7 @@ include 'includes/header.php';
             <h4 class="modal-header text-success"><i class="fas fa-check-circle"></i> ยืนยันการซ่อมอุปกรณ์เสร็จสิ้น</h4>
             
             <form action="actions/equipment_repair_finish_db.php" method="POST" id="eqFinishForm" onsubmit="return confirmEqFinish(event)">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="eq_repair_id" id="modal_finish_id">
                 <input type="hidden" name="action_type" value="ซ่อมแล้ว">
                 
@@ -144,6 +145,7 @@ include 'includes/header.php';
             <h4 class="modal-header text-danger"><i class="fas fa-times-circle"></i> บันทึกอุปกรณ์เสียหายถาวร</h4>
             
             <form action="actions/equipment_repair_finish_db.php" method="POST" id="eqBrokenForm" onsubmit="return confirmEqBroken(event)">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="eq_repair_id" id="modal_broken_id">
                 <input type="hidden" name="action_type" value="เสียหายถาวร">
                 

@@ -24,6 +24,7 @@ include 'includes/header.php';
 
                 <!-- ฟอร์มส่งข้อมูลไปที่ product_add_db.php (แนบรูปภาพได้) -->
                 <form action="actions/product_add_db.php" method="POST" enctype="multipart/form-data">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="product_type" value="<?php echo htmlspecialchars($product_type); ?>">
                     <input type="hidden" name="tab_return" value="<?php echo $tab_return; ?>">
 

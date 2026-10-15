@@ -1665,7 +1665,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 reverseButtons: true
             }).then((res) => {
                 if (res.isConfirmed) {
-                    window.location.href = logoutUrl;
+                    submitActionFormOrRedirect(logoutUrl, { method: 'POST' });
                 }
             });
         });

@@ -17,7 +17,7 @@ include 'includes/header.php';
 <div class="admin-card">
     <h4 class="section-header"><i class="fas fa-plus"></i> เพิ่มสนามแบดมินตันใหม่</h4>
     <form action="actions/court_add_db.php" method="POST" id="addCourtForm" onsubmit="return handleAddCourtSubmit(event)">
-        
+        <?php echo csrf_field(); ?>
         <div class="form-row-4">
             <div class="form-group">
                 <label>ชื่อสนาม <span class="text-danger">*</span></label>
@@ -141,6 +141,7 @@ include 'includes/header.php';
         <h4 class="modal-header text-danger"><i class="fas fa-tools"></i> บันทึกแจ้งซ่อมบำรุงสนาม</h4>
         
         <form action="actions/court_repair_add_db.php" method="POST" id="courtRepairForm" onsubmit="return handleRepairSubmit(event)">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="court_id" id="modal_court_id">
             
             <p><strong>สนามที่ซ่อม:</strong> <span id="modal_court_name" class="text-primary-bold"></span></p>
@@ -180,6 +181,7 @@ include 'includes/header.php';
         <h4 class="modal-header"><i class="fas fa-edit"></i> แก้ไขข้อมูลสนาม</h4>
         
         <form action="actions/court_edit_db.php" method="POST" id="courtEditForm" onsubmit="return handleCourtEditSubmit(event)">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="court_id" id="edit_court_id">
             
             <div class="form-row-2">

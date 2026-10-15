@@ -21,6 +21,7 @@ include 'includes/header.php';
     </div>
 
     <form action="actions/admin_add_db.php" method="POST">
+        <?php echo csrf_field(); ?>
         <div class="form-group">
             <label for="admin_name">ชื่อ - นามสกุล <span class="text-danger">*</span></label>
             <input type="text" id="admin_name" name="admin_name" class="form-control" required placeholder="เช่น สมชาย ใจดี">

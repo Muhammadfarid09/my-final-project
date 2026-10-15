@@ -55,6 +55,7 @@ include 'includes/header.php';
 
         <!-- ฟอร์มนี้จะส่งไปที่ actions/member_edit_db.php -->
         <form action="actions/member_edit_db.php" method="POST" id="memberEditForm" onsubmit="return confirmMemberEdit(event)">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="member_id" value="<?php echo $member['member_id']; ?>">
             
             <div class="grid-2 gap-20">

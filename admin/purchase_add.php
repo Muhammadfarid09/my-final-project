@@ -22,7 +22,7 @@ include 'includes/header.php';
                 </div>
 
                 <form action="actions/purchase_add_db.php" method="POST">
-                    
+                    <?php echo csrf_field(); ?>
                     <div class="form-group">
                         <label for="product_id">เลือกรายการสินค้าที่รับเข้า <span class="text-danger">*</span></label>
                         <select name="product_id" id="product_id" class="form-control" required>

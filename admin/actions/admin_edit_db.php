@@ -9,6 +9,8 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'Super Admin'
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf_token();
+    
     $admin_id = intval($_POST['admin_id']);
     $admin_name = trim($_POST['admin_name']);
     $admin_phone = trim($_POST['admin_phone']);
