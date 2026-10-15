@@ -299,30 +299,48 @@ function calculateCourtTotal() {
     let offpeakRate = parseFloat(document.getElementById('modal_court_offpeak_price').value) || 150;
     let hours = parseInt(document.getElementById('modal_court_hours').value) || 1;
     let dateVal = document.getElementById('modal_court_date').value;
+    let startTime = document.getElementById('modal_court_start_time').value;
 
-    let rate = baseRate;
-    let badgeText = "ปกติ จ.-พ.-ศ.";
+    let startHour = parseInt(startTime.split(':')[0]);
+    let endHour = startHour + hours;
+
+    let total = 0;
+    let badgeText = "วันธรรมดา";
     let badgeBg = "#e0f2fe";
     let badgeColor = "#0369a1";
 
     if (dateVal) {
         let dateObj = new Date(dateVal + 'T00:00:00');
-        let dow = dateObj.getDay(); // 0=Sun, 6=Sat, 2=Tue, 4=Thu
+        let dow = dateObj.getDay(); // 0=Sun, 6=Sat
         if (dow === 0 || dow === 6) {
-            rate = peakRate;
-            badgeText = "วันหยุด ส.-อา.";
+            total = hours * peakRate;
+            badgeText = "วันหยุด ส.-อา. (200฿)";
             badgeBg = "#fef3c7";
             badgeColor = "#b45309";
-        } else if (dow === 2 || dow === 4) {
-            rate = offpeakRate;
-            badgeText = "โปรฯ อ.-พฤ.";
-            badgeBg = "#dcfce7";
-            badgeColor = "#15803d";
+        } else {
+            let dayHours = Math.max(0, Math.min(endHour, 17) - Math.max(startHour, 8));
+            let eveHours = Math.max(0, Math.min(endHour, 23) - Math.max(startHour, 17));
+            total = (dayHours * offpeakRate) + (eveHours * baseRate);
+            if (dayHours > 0 && eveHours > 0) {
+                badgeText = "คาบเกี่ยว (กลางวัน+เย็น)";
+                badgeBg = "#f3e8ff";
+                badgeColor = "#7e22ce";
+            } else if (dayHours > 0) {
+                badgeText = "กลางวัน (150฿)";
+                badgeBg = "#dcfce7";
+                badgeColor = "#15803d";
+            } else {
+                badgeText = "ช่วงเย็น (180฿)";
+                badgeBg = "#e0f2fe";
+                badgeColor = "#0369a1";
+            }
         }
+    } else {
+        total = hours * baseRate;
     }
 
     let rateElem = document.getElementById('modal_court_price_rate');
-    if (rateElem) rateElem.textContent = parseFloat(rate).toFixed(2);
+    if (rateElem) rateElem.textContent = (hours > 0 ? (total / hours).toFixed(2) : baseRate.toFixed(2));
 
     let badgeElem = document.getElementById('modal_court_rate_badge');
     if (badgeElem) {
@@ -331,7 +349,6 @@ function calculateCourtTotal() {
         badgeElem.style.color = badgeColor;
     }
 
-    let total = rate * hours;
     document.getElementById('modal_court_total_price').textContent = total.toFixed(2);
 }
 
@@ -345,14 +362,6 @@ function addCourtToCart() {
     let date = document.getElementById('modal_court_date').value;
     let startTime = document.getElementById('modal_court_start_time').value;
     let phone = document.getElementById('modal_court_member_phone').value.trim();
-
-    let rate = baseRate;
-    if (date) {
-        let dateObj = new Date(date + 'T00:00:00');
-        let dow = dateObj.getDay();
-        if (dow === 0 || dow === 6) rate = peakRate;
-        else if (dow === 2 || dow === 4) rate = offpeakRate;
-    }
 
     let startHour = parseInt(startTime.split(':')[0]);
     let endHour = startHour + hours;
@@ -370,6 +379,21 @@ function addCourtToCart() {
         return;
     }
     let endTimeStr = (endHour < 10 ? '0' : '') + endHour + ':00';
+
+    let totalPrice = 0;
+    if (date) {
+        let dateObj = new Date(date + 'T00:00:00');
+        let dow = dateObj.getDay();
+        if (dow === 0 || dow === 6) {
+            totalPrice = hours * peakRate;
+        } else {
+            let dayHours = Math.max(0, Math.min(endHour, 17) - Math.max(startHour, 8));
+            let eveHours = Math.max(0, Math.min(endHour, 23) - Math.max(startHour, 17));
+            totalPrice = (dayHours * offpeakRate) + (eveHours * baseRate);
+        }
+    } else {
+        totalPrice = hours * baseRate;
+    }
 
     // ป้องกันการเลือกสนามซ้ำหรือเวลาชนกันในตะกร้า POS
     let isDuplicateCourt = posCart.some(item => {
@@ -395,7 +419,6 @@ function addCourtToCart() {
         return;
     }
 
-    let totalPrice = rate * hours;
     let itemUniqueId = 'court_' + courtId + '_' + Date.now();
 
     posCart.push({

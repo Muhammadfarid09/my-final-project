@@ -19,22 +19,17 @@ try {
     $day_names = get_thai_day_names();
     $day_name = $day_names[$dow];
 
-    // กำหนดเรทราคาตามเงื่อนไขของวัน:
-    // 1. เสาร์ - อาทิตย์ (0, 6) = 200 ฿ (Peak / Weekend Rate)
-    // 2. จันทร์, พุธ, ศุกร์ (1, 3, 5) = 180 ฿ (Standard Weekday Rate)
-    // 3. อังคาร, พฤหัสบดี (2, 4) = 150 ฿ (Promo / Discount Rate)
+    // กำหนดเรทราคาตามเงื่อนไขของวันและช่วงเวลา:
+    // 1. เสาร์ - อาทิตย์ (0, 6) = 200 ฿ (Peak / Weekend Rate ทุกช่วงเวลา)
+    // 2. จันทร์ - ศุกร์ (1-5): กลางวัน (08:00 - 17:00 น.) = 150 ฿, เย็น (17:00 - 23:00 น.) = 180 ฿
     if ($dow == 0 || $dow == 6) {
         $rate_category = 'weekend';
-        $rate_label = 'เสาร์ - อาทิตย์ (200 ฿/ชม.)';
+        $rate_label = 'เสาร์ - อาทิตย์ (ทุกช่วงเวลา 200 ฿/ชม.)';
         $rate_badge = 'เสาร์-อาทิตย์ (200฿)';
-    } elseif ($dow == 2 || $dow == 4) {
-        $rate_category = 'promo';
-        $rate_label = 'อังคาร, พฤหัสบดี (150 ฿/ชม.)';
-        $rate_badge = 'อังคาร-พฤหัส (150฿)';
     } else {
-        $rate_category = 'normal';
-        $rate_label = 'จันทร์, พุธ, ศุกร์ (180 ฿/ชม.)';
-        $rate_badge = 'จันทร์-พุธ-ศุกร์ (180฿)';
+        $rate_category = 'weekday';
+        $rate_label = 'จันทร์ - ศุกร์ (กลางวัน 150 ฿ | เย็น 180 ฿/ชม.)';
+        $rate_badge = 'จ-ศ: กลางวัน 150฿ | เย็น 180฿';
     }
 
     // 1. ดึงข้อมูลสนามทั้งหมด (รวมถึงสนามปิดปรับปรุง เพื่อแสดงสถานะให้ผู้ใช้ทราบ)
@@ -102,12 +97,13 @@ try {
         $base_rate = floatval($c['court_price_per_hour'] ?? 0) > 0 ? floatval($c['court_price_per_hour']) : 180.00;
         $peak_rate = floatval($c['court_peak_price'] ?? 0) > 0 ? floatval($c['court_peak_price']) : 200.00;
         $offpeak_rate = floatval($c['court_offpeak_price'] ?? 0) > 0 ? floatval($c['court_offpeak_price']) : 150.00;
-        $slot_price = calculate_court_hourly_rate($c, $date);
 
         $court_slots = [];
         foreach ($slots as $slot) {
             $slot_start = $slot['start'] . ':00';
             $slot_end = $slot['end'] . ':00';
+            $slot_price = calculate_court_hourly_rate($c, $date, $slot['start']);
+            $slot_category = ($dow == 0 || $dow == 6) ? 'weekend' : (intval(substr($slot['start'], 0, 2)) < 17 ? 'daytime' : 'evening');
 
             // ตรวจสอบว่ามีผู้จองแล้วหรือไม่
             $is_booked = false;
@@ -147,7 +143,7 @@ try {
             $court_slots[$slot['start']] = [
                 'status' => $status,
                 'booked_by' => $booked_by,
-                'rate_category' => $rate_category,
+                'rate_category' => $slot_category,
                 'price' => $slot_price,
                 'slot_start' => $slot['start'],
                 'slot_end' => $slot['end']
@@ -158,10 +154,11 @@ try {
             'court_id' => $c['court_id'],
             'court_name' => $c['court_name'],
             'court_status' => $c_status,
-            'current_rate' => $slot_price,
+            'current_rate' => $base_rate,
             'price_normal' => $base_rate,
             'price_weekend' => $peak_rate,
             'price_promo' => $offpeak_rate,
+            'price_offpeak' => $offpeak_rate,
             'open_time' => $c_open,
             'close_time' => $c_close,
             'slots' => $court_slots

@@ -130,11 +130,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // ========================================================
-        // 3.2 คำนวณราคาค่าบริการตามวันในสัปดาห์ (Server-side Recalculation)
+        // 3.2 คำนวณราคาค่าบริการตามวันและช่วงเวลา (Time-Window & Cross-Window Pricing)
         // ========================================================
-        $hourly_rate = calculate_court_hourly_rate($court_data, $booking_date);
+        $pricing_calc = calculate_court_booking_price($booking_date, $start_time_str, $end_time_str, $court_data);
+        if ($pricing_calc['status'] === 'error') {
+            throw new Exception($pricing_calc['message']);
+        }
 
-        $real_court_price = $hourly_rate * $hours;
+        $real_court_price = $pricing_calc['total_price'];
         $real_rental_price = 0.00;
         $real_product_price = 0.00;
 

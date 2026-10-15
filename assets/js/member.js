@@ -81,9 +81,9 @@ const wizardState = {
     selectedDate: getLocalDateString(new Date()),
     currentCalMonth: new Date().getMonth(),
     currentCalYear: new Date().getFullYear(),
-    dayRateCategory: 'normal',
+    dayRateCategory: 'weekday',
     dayRatePrice: 180,
-    dayRateLabel: 'วันจันทร์ (180 ฿/ชม.)',
+    dayRateLabel: 'จันทร์ - ศุกร์ (กลางวัน 150 ฿ | เย็น 180 ฿/ชม.)',
     selectedStartTime: '',
     bookingNickname: '',
     matrixData: null,
@@ -97,6 +97,75 @@ const wizardState = {
     productPriceTotal: 0,
     grandTotal: 0
 };
+
+// ฟังก์ชันคำนวณราคาสนามแบดมินตันตามวันและช่วงเวลา (Time-Window & Cross-Window Pricing Engine)
+function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRates = null) {
+    if (!startTimeStr || !endTimeStr || !dateStr) {
+        return { status: 'error', message: 'กรุณาระบุวันที่และเวลาให้ครบถ้วน' };
+    }
+
+    let startH = parseInt(startTimeStr.split(':')[0], 10);
+    let endH = parseInt(endTimeStr.split(':')[0], 10);
+
+    if (isNaN(startH) || isNaN(endH)) {
+        return { status: 'error', message: 'รูปแบบเวลาไม่ถูกต้อง' };
+    }
+    if (startH >= endH) {
+        return { status: 'error', message: 'เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด' };
+    }
+    if (startH < 8 || endH > 23) {
+        return { status: 'error', message: 'ช่วงเวลาที่เลือกอยู่นอกเวลาทำการ (08:00 - 23:00 น.)' };
+    }
+
+    let hours = endH - startH;
+    let d = new Date(dateStr);
+    let dow = d.getDay(); // 0 = อาทิตย์, 6 = เสาร์
+
+    let peakRate = (customRates && customRates.peak) ? customRates.peak : 200;
+    let offpeakRate = (customRates && customRates.offpeak) ? customRates.offpeak : 150;
+    let standardRate = (customRates && customRates.standard) ? customRates.standard : 180;
+
+    if (dow === 0 || dow === 6) {
+        let total = hours * peakRate;
+        return {
+            status: 'success',
+            totalPrice: total,
+            totalHours: hours,
+            rateType: 'weekend',
+            daytimeHours: 0,
+            eveningHours: 0,
+            weekendHours: hours,
+            breakdown: [{ label: 'เสาร์ - อาทิตย์ (ทุกช่วงเวลา)', hours: hours, rate: peakRate, subtotal: total }]
+        };
+    }
+
+    // วันจันทร์-ศุกร์: Cross-window 08:00-17:00 (กลางวัน 150) / 17:00-23:00 (เย็น 180)
+    let dayHours = Math.max(0, Math.min(endH, 17) - Math.max(startH, 8));
+    let eveHours = Math.max(0, Math.min(endH, 23) - Math.max(startH, 17));
+
+    let dayPrice = dayHours * offpeakRate;
+    let evePrice = eveHours * standardRate;
+    let total = dayPrice + evePrice;
+
+    let breakdown = [];
+    if (dayHours > 0) {
+        breakdown.push({ label: 'ช่วงกลางวัน (08:00 - 17:00 น.)', hours: dayHours, rate: offpeakRate, subtotal: dayPrice });
+    }
+    if (eveHours > 0) {
+        breakdown.push({ label: 'ช่วงเย็น (17:00 - 23:00 น.)', hours: eveHours, rate: standardRate, subtotal: evePrice });
+    }
+
+    return {
+        status: 'success',
+        totalPrice: total,
+        totalHours: hours,
+        rateType: (dayHours > 0 && eveHours > 0) ? 'cross_window' : (dayHours > 0 ? 'daytime' : 'evening'),
+        daytimeHours: dayHours,
+        eveningHours: eveHours,
+        weekendHours: 0,
+        breakdown: breakdown
+    };
+}
 
 // Thai Month Names for Calendar
 const thaiMonthNames = [
@@ -442,7 +511,7 @@ function loadCourtMatrixForWizard(dateStr) {
             wizardState.dayRateLabel = res.rate_label;
 
             let dow = res.day_of_week;
-            let ratePrice = (dow === 0 || dow === 6) ? 200 : (dow === 2 || dow === 4 ? 150 : 180);
+            let ratePrice = (dow === 0 || dow === 6) ? 200 : 180;
             wizardState.dayRatePrice = ratePrice;
 
             if (banner && textSpan) {
@@ -568,12 +637,17 @@ function renderCourtHourBlocks() {
     // กรองเฉพาะช่วงเวลาที่เริ่มตั้งแต่ selectedStartTime เป็นต้นไป
     let availableSlots = slots.filter(s => parseInt(s.start.split(':')[0]) >= startHour);
 
+    let dow = wizardState.matrixData ? wizardState.matrixData.day_of_week : new Date(wizardState.selectedDate).getDay();
+
     let html = '';
     availableSlots.forEach((slot, index) => {
         let isFirstHour = (index === 0);
         let hourLabel = isFirstHour 
             ? `ชั่วโมงที่ 1 : ${slot.start} - ${slot.end} น.` 
             : `ชั่วโมงถัดไป (จองต่อเนื่อง) : ${slot.start} - ${slot.end} น.`;
+
+        let slotHour = parseInt(slot.start.split(':')[0]);
+        let slotRateLabel = (dow === 0 || dow === 6) ? 'วันหยุด (200 ฿/ชม.)' : (slotHour < 17 ? 'กลางวัน (150 ฿/ชม.)' : 'ช่วงเย็น (180 ฿/ชม.)');
 
         html += `
             <div class="slot-hour-block">
@@ -583,7 +657,7 @@ function renderCourtHourBlocks() {
                         ${hourLabel}
                     </div>
                     <span class="slot-rate-badge">
-                        <i class="fas fa-tag"></i> ${wizardState.dayRateLabel}
+                        <i class="fas fa-tag"></i> ${slotRateLabel}
                     </span>
                 </div>
                 <div class="court-cards-grid">
@@ -593,7 +667,7 @@ function renderCourtHourBlocks() {
             let sInfo = court.slots ? court.slots[slot.start] : null;
             let status = sInfo ? sInfo.status : 'closed';
             let bookedBy = sInfo ? sInfo.booked_by : '';
-            let price = sInfo ? sInfo.price : wizardState.dayRatePrice;
+            let price = sInfo ? sInfo.price : (dow === 0 || dow === 6 ? 200 : (slotHour < 17 ? 150 : 180));
 
             // ตรวจสอบว่า slot นี้ถูกเลือกไว้ใน state หรือไม่
             let isCurrentSlotSelected = false;
@@ -914,15 +988,60 @@ function updateInvoiceReview() {
     if (tableBody) {
         let html = '';
 
-        // 1. ค่าสนาม
-        html += `
-            <tr>
-                <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">${wizardState.dayRateLabel}</small></td>
-                <td>${wizardState.selectedHours} ชม.</td>
-                <td>${wizardState.dayRatePrice.toLocaleString()} ฿</td>
-                <td>${wizardState.courtPriceTotal.toLocaleString()} ฿</td>
-            </tr>
-        `;
+        // 1. ค่าบริการสนาม (รองรับแจกแจงแยกช่วงเวลา Cross-Window / กลางวัน / เย็น / วันหยุด)
+        let daySlots = [];
+        let eveSlots = [];
+        let weekendSlots = [];
+        let dow = wizardState.matrixData ? wizardState.matrixData.day_of_week : new Date(wizardState.selectedDate).getDay();
+
+        wizardState.selectedSlots.forEach(s => {
+            let hr = parseInt(s.slotStart.split(':')[0]);
+            if (dow === 0 || dow === 6) {
+                weekendSlots.push(s);
+            } else if (hr < 17) {
+                daySlots.push(s);
+            } else {
+                eveSlots.push(s);
+            }
+        });
+
+        if (weekendSlots.length > 0) {
+            let wkRate = weekendSlots[0].price || 200;
+            let wkSubtotal = weekendSlots.reduce((sum, s) => sum + s.price, 0);
+            html += `
+                <tr>
+                    <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">เสาร์ - อาทิตย์ (ทุกช่วงเวลา 200 ฿/ชม.)</small></td>
+                    <td>${weekendSlots.length} ชม.</td>
+                    <td>${wkRate.toLocaleString()} ฿</td>
+                    <td>${wkSubtotal.toLocaleString()} ฿</td>
+                </tr>
+            `;
+        } else {
+            if (daySlots.length > 0) {
+                let dayRate = daySlots[0].price || 150;
+                let daySubtotal = daySlots.reduce((sum, s) => sum + s.price, 0);
+                html += `
+                    <tr>
+                        <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">ช่วงกลางวัน (08:00 - 17:00 น.)</small></td>
+                        <td>${daySlots.length} ชม.</td>
+                        <td>${dayRate.toLocaleString()} ฿</td>
+                        <td>${daySubtotal.toLocaleString()} ฿</td>
+                    </tr>
+                `;
+            }
+            if (eveSlots.length > 0) {
+                let eveRate = eveSlots[0].price || 180;
+                let eveSubtotal = eveSlots.reduce((sum, s) => sum + s.price, 0);
+                html += `
+                    <tr>
+                        <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">ช่วงเย็น (17:00 - 23:00 น.)</small></td>
+                        <td>${eveSlots.length} ชม.</td>
+                        <td>${eveRate.toLocaleString()} ฿</td>
+                        <td>${eveSubtotal.toLocaleString()} ฿</td>
+                    </tr>
+                `;
+            }
+        }
 
         // 2. สินค้าและอุปกรณ์เช่า
         let qtyInputs = document.querySelectorAll('.qty-input');

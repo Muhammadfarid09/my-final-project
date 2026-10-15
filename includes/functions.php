@@ -54,14 +54,138 @@ if (!function_exists('format_baht')) {
 // =========================================================================
 // 3. Court & Pricing Business Logic (การคำนวณราคาสนามและตรวจความพร้อม)
 // =========================================================================
+if (!function_exists('calculate_court_booking_price')) {
+    /**
+     * คำนวณราคาค่าบริการสนามแบดมินตันตามวันและช่วงเวลา (Time-Window & Cross-Window Pricing Engine)
+     * - เสาร์-อาทิตย์: ทุกช่วงเวลา (08:00 - 23:00 น.) = 200 ฿/ชม.
+     * - จันทร์-ศุกร์ (กลางวัน): 08:00 - 17:00 น. = 150 ฿/ชม.
+     * - จันทร์-ศุกร์ (ช่วงเย็น): 17:00 - 23:00 น. = 180 ฿/ชม.
+     * รองรับการจองคาบเกี่ยวช่วงเวลา (Cross-window booking เช่น 16:00 - 18:00 น. = 150 + 180 = 330 ฿)
+     *
+     * @param string $date วันที่จอง (YYYY-MM-DD)
+     * @param string $startTime เวลาเริ่ม (เช่น '16:00' หรือ '16:00:00')
+     * @param string $endTime เวลาสิ้นสุด (เช่น '18:00' หรือ '18:00:00')
+     * @param array|null $courtData ข้อมูลสนาม (กรณีดึงเรทเฉพาะสนามหรือเวลาเปิด-ปิด)
+     * @return array ผลลัพธ์การคำนวณพร้อม Breakdown และสถานะความถูกต้อง
+     */
+    function calculate_court_booking_price(string $date, string $startTime, string $endTime, ?array $courtData = null): array {
+        // 1. ตรวจสอบรูปแบบและเวลา
+        $start_ts = strtotime($startTime);
+        $end_ts = strtotime($endTime);
+        if (!$start_ts || !$end_ts) {
+            return ['status' => 'error', 'message' => 'รูปแบบเวลาไม่ถูกต้อง'];
+        }
+        if ($start_ts >= $end_ts) {
+            return ['status' => 'error', 'message' => 'เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด'];
+        }
+
+        $c_open = !empty($courtData['court_open_time']) ? substr($courtData['court_open_time'], 0, 5) : '08:00';
+        $c_close = !empty($courtData['court_close_time']) ? substr($courtData['court_close_time'], 0, 5) : '23:00';
+        $s_hi = date('H:i', $start_ts);
+        $e_hi = date('H:i', $end_ts);
+
+        if ($s_hi < $c_open || $e_hi > $c_close) {
+            return ['status' => 'error', 'message' => "ช่วงเวลาที่เลือกอยู่นอกเวลาทำการ ({$c_open} - {$c_close} น.)"];
+        }
+
+        $hours = ($end_ts - $start_ts) / 3600;
+        if ($hours < 1) {
+            return ['status' => 'error', 'message' => 'ระยะเวลาการจองต้องอย่างน้อย 1 ชั่วโมง'];
+        }
+
+        // 2. กำหนดเรทราคา (ดึงจากฐานข้อมูลสนาม หรือใช้ค่ามาตรฐานระบบ)
+        $peak_rate = !empty($courtData['court_peak_price']) && floatval($courtData['court_peak_price']) > 0
+            ? floatval($courtData['court_peak_price']) : 200.00;
+        $offpeak_rate = !empty($courtData['court_offpeak_price']) && floatval($courtData['court_offpeak_price']) > 0
+            ? floatval($courtData['court_offpeak_price']) : 150.00;
+        $standard_rate = !empty($courtData['court_price_per_hour']) && floatval($courtData['court_price_per_hour']) > 0
+            ? floatval($courtData['court_price_per_hour']) : 180.00;
+
+        $dow = intval(date('w', strtotime($date))); // 0=อาทิตย์, 6=เสาร์
+
+        // 3. กรณีวันเสาร์-อาทิตย์: อัตราเดียวตลอดทั้งวัน (200 ฿/ชม.)
+        if ($dow === 0 || $dow === 6) {
+            $total = round($hours * $peak_rate, 2);
+            return [
+                'status' => 'success',
+                'total_price' => $total,
+                'total_hours' => $hours,
+                'rate_type' => 'weekend',
+                'daytime_hours' => 0,
+                'evening_hours' => 0,
+                'weekend_hours' => $hours,
+                'breakdown' => [
+                    [
+                        'label' => 'เสาร์ - อาทิตย์ (ทุกช่วงเวลา)',
+                        'hours' => $hours,
+                        'rate' => $peak_rate,
+                        'subtotal' => $total
+                    ]
+                ]
+            ];
+        }
+
+        // 4. กรณีวันจันทร์-ศุกร์: คำนวณแบบคาบเกี่ยวช่วงเวลา (Cross-Window: 08:00-17:00 / 17:00-23:00)
+        $day_window_start = strtotime($date . ' 08:00:00');
+        $day_window_end   = strtotime($date . ' 17:00:00');
+        $eve_window_start = strtotime($date . ' 17:00:00');
+        $eve_window_end   = strtotime($date . ' 23:00:00');
+
+        $booking_start = strtotime($date . ' ' . $s_hi . ':00');
+        $booking_end   = strtotime($date . ' ' . $e_hi . ':00');
+
+        // ส่วนที่ทับซ้อนช่วงกลางวัน (08:00 - 17:00)
+        $day_start = max($booking_start, $day_window_start);
+        $day_end   = min($booking_end, $day_window_end);
+        $day_hours = ($day_end > $day_start) ? ($day_end - $day_start) / 3600 : 0;
+        $day_price = round($day_hours * $offpeak_rate, 2);
+
+        // ส่วนที่ทับซ้อนช่วงเย็น (17:00 - 23:00)
+        $eve_start = max($booking_start, $eve_window_start);
+        $eve_end   = min($booking_end, $eve_window_end);
+        $eve_hours = ($eve_end > $eve_start) ? ($eve_end - $eve_start) / 3600 : 0;
+        $eve_price = round($eve_hours * $standard_rate, 2);
+
+        $total = round($day_price + $eve_price, 2);
+        $breakdown = [];
+        if ($day_hours > 0) {
+            $breakdown[] = [
+                'label' => 'ช่วงกลางวัน (08:00 - 17:00 น.)',
+                'hours' => $day_hours,
+                'rate' => $offpeak_rate,
+                'subtotal' => $day_price
+            ];
+        }
+        if ($eve_hours > 0) {
+            $breakdown[] = [
+                'label' => 'ช่วงเย็น (17:00 - 23:00 น.)',
+                'hours' => $eve_hours,
+                'rate' => $standard_rate,
+                'subtotal' => $eve_price
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'total_price' => $total,
+            'total_hours' => $hours,
+            'rate_type' => ($day_hours > 0 && $eve_hours > 0) ? 'cross_window' : ($day_hours > 0 ? 'daytime' : 'evening'),
+            'daytime_hours' => $day_hours,
+            'evening_hours' => $eve_hours,
+            'weekend_hours' => 0,
+            'breakdown' => $breakdown
+        ];
+    }
+}
+
 if (!function_exists('calculate_court_hourly_rate')) {
     /**
-     * คำนวณราคาค่าบริการสนามต่อชั่วโมงตามวันในสัปดาห์ (DOW Rate)
+     * คำนวณราคาค่าบริการสนามต่อชั่วโมง (Backward Compatible Helper)
      * - เสาร์ - อาทิตย์: Peak Price (200 ฿)
-     * - อังคาร, พฤหัสบดี: Off-peak Price (150 ฿)
-     * - จันทร์, พุธ, ศุกร์: Base Standard Price (180 ฿)
+     * - จันทร์ - ศุกร์ (กลางวัน 08:00 - 17:00): Off-peak Price (150 ฿)
+     * - จันทร์ - ศุกร์ (ช่วงเย็น 17:00 - 23:00): Standard Price (180 ฿)
      */
-    function calculate_court_hourly_rate(array $courtData, string $date): float {
+    function calculate_court_hourly_rate(array $courtData, string $date, ?string $slotTime = null): float {
         $dow = intval(date('w', strtotime($date)));
         $base_rate = !empty($courtData['court_price_per_hour']) && floatval($courtData['court_price_per_hour']) > 0
             ? floatval($courtData['court_price_per_hour'])
@@ -75,11 +199,20 @@ if (!function_exists('calculate_court_hourly_rate')) {
 
         if ($dow === 0 || $dow === 6) {
             return $peak_rate;
-        } elseif ($dow === 2 || $dow === 4) {
-            return $offpeak_rate;
-        } else {
-            return $base_rate;
         }
+
+        // กรณีระบุเวลาสล็อต (เช่น '14:00' หรือ '18:00')
+        if ($slotTime !== null) {
+            $slot_hour = intval(substr(trim($slotTime), 0, 2));
+            if ($slot_hour < 17) {
+                return $offpeak_rate;
+            } else {
+                return $base_rate;
+            }
+        }
+
+        // หากไม่ระบุเวลาสล็อต สำหรับวันธรรมดาให้ใช้เรทช่วงเย็นมาตรฐาน (180.00)
+        return $base_rate;
     }
 }
 

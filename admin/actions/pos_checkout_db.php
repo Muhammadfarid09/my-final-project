@@ -103,10 +103,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("สนาม '{$c_info['court_name']}' มีผู้จองหรือใช้งานอยู่ในช่วงเวลาดังกล่าวแล้ว ไม่สามารถเปิดสนามซ้ำได้");
                 }
 
-                // 1.3 บังคับคำนวณราคาสนามตามเรทวันในสัปดาห์ฝั่ง Server (Server-side Recalculation)
-                $h_rate = calculate_court_hourly_rate($c_info, $b_date);
-                $h_diff = max(1, (strtotime($b_end_str) - strtotime($b_start_str)) / 3600);
-                $court_price = $h_rate * $h_diff;
+                // 1.3 บังคับคำนวณราคาสนามตามเรทวันและช่วงเวลาฝั่ง Server (Time-Window & Cross-Window Pricing)
+                $price_calc = calculate_court_booking_price($b_date, $b_start_str, $b_end_str, $c_info);
+                if ($price_calc['status'] === 'error') {
+                    throw new Exception($price_calc['message']);
+                }
+                $court_price = $price_calc['total_price'];
 
                 // ค้นหา member_id จากเบอร์โทรศัพท์ (ถ้ามีการระบุ)
                 $member_id = null;
