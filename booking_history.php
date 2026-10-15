@@ -180,7 +180,7 @@ try {
                                             <i class="fas fa-credit-card"></i> แนบสลิป
                                         </a>
                                     <?php elseif (!empty($slip)): ?>
-                                        <a href="uploads/slips/<?php echo htmlspecialchars($slip); ?>" target="_blank" class="btn-action-sm btn-view-slip">
+                                        <a href="view_slip.php?file=<?php echo urlencode($slip); ?>" target="_blank" class="btn-action-sm btn-view-slip">
                                             <i class="fas fa-receipt"></i> ดูสลิป
                                         </a>
                                     <?php endif; ?>

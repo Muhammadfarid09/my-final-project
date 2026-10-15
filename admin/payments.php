@@ -72,7 +72,7 @@ include 'includes/header.php';
                                         $time = date('d/m/Y H:i', strtotime($row['payment_transfer_time']));
                                         $member = htmlspecialchars($row['member_name']);
                                     ?>
-                                    <img src="../uploads/slips/<?php echo $slip_name; ?>" class="slip-thumbnail" alt="Slip" 
+                                    <img src="../view_slip.php?file=<?php echo urlencode($row['payment_slip_image']); ?>" class="slip-thumbnail" alt="Slip" 
                                          onclick="openVerifyModal(<?php echo $row['payment_id']; ?>, '<?php echo $slip_name; ?>', '<?php echo $amount; ?>', '<?php echo $time; ?>', <?php echo $row['booking_id']; ?>, '<?php echo $member; ?>')">
                                 </td>
                                 <td>

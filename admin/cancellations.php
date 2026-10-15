@@ -95,7 +95,7 @@ include 'includes/header.php';
 
                         <?php if (!empty($row['payment_slip_image'])): ?>
                             <div class="cancellation-mt-5">
-                                <a href="../uploads/slips/<?php echo htmlspecialchars($row['payment_slip_image']); ?>" target="_blank" class="text-11 text-primary"><i class="fas fa-receipt"></i> สลิปที่โอนเข้ามา</a>
+                                <a href="../view_slip.php?file=<?php echo urlencode($row['payment_slip_image']); ?>" target="_blank" class="text-11 text-primary"><i class="fas fa-receipt"></i> สลิปที่โอนเข้ามา</a>
                             </div>
                         <?php endif; ?>
                     </td>

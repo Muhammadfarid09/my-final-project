@@ -823,12 +823,13 @@ function openRefundModal(cancelId, bookingId, price, penaltyAmount, suggestedRef
         let elSlipPreviewLink = document.getElementById('modal_slip_preview_link');
 
         if (slipImage) {
+            let safeSlipUrl = `../view_slip.php?file=${encodeURIComponent(slipImage)}`;
             if (elSlipLink) {
-                elSlipLink.innerHTML = `<a href="../uploads/slips/${slipImage}" target="_blank" class="btn-sm-info text-12" style="text-decoration: none;"><i class="fas fa-receipt"></i> ดูรูปสลิปต้นฉบับ</a>`;
+                elSlipLink.innerHTML = `<a href="${safeSlipUrl}" target="_blank" class="btn-sm-info text-12" style="text-decoration: none;"><i class="fas fa-receipt"></i> ดูรูปสลิปต้นฉบับ</a>`;
             }
             if (elSlipBox && elSlipImg && elSlipPreviewLink) {
-                elSlipImg.src = `../uploads/slips/${slipImage}`;
-                elSlipPreviewLink.href = `../uploads/slips/${slipImage}`;
+                elSlipImg.src = safeSlipUrl;
+                elSlipPreviewLink.href = safeSlipUrl;
                 elSlipBox.style.display = 'block';
             }
         } else {
@@ -1093,7 +1094,7 @@ function openVerifyModal(paymentId, slipImg, amount, time, bookingId, memberName
         document.getElementById('modal_booking_id').value = bookingId;
         
         // เซ็ตข้อมูลรายละเอียดเพื่อแสดงใน Modal
-        document.getElementById('preview_slip_img').src = '../uploads/slips/' + slipImg;
+        document.getElementById('preview_slip_img').src = '../view_slip.php?file=' + encodeURIComponent(slipImg);
         document.getElementById('info_member_name').innerText = memberName;
         document.getElementById('info_amount').innerText = amount + ' บาท';
         document.getElementById('info_time').innerText = time;

@@ -1,6 +1,7 @@
 # Ignore slip uploads
 uploads/slips/*
 !uploads/slips/.gitkeep
+!uploads/slips/.htaccess
 
 # Ignore news uploads
 uploads/news/*
