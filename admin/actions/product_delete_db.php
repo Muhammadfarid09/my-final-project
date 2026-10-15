@@ -1,11 +1,20 @@
 <?php
 require_once '../includes/auth_check.php';
 
-$product_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
-$tab_return = isset($_POST['tab']) ? $_POST['tab'] : (isset($_GET['tab']) ? $_GET['tab'] : 'all');
+// บังคับส่งคำขอผ่าน HTTP POST เท่านั้น ป้องกันการเข้าถึงผ่าน GET โดยตรง
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    $_SESSION['error'] = "ไม่อนุญาตให้ดำเนินการผ่านวิธีนี้ (Method Not Allowed)";
+    header("Location: ../products.php");
+    exit();
+}
+
+// ตรวจสอบความปลอดภัย CSRF Token
+require_csrf_token();
+
+$product_id = intval($_POST['id'] ?? 0);
+$tab_return = trim($_POST['tab'] ?? 'all');
 
 if ($product_id > 0) {
-    require_csrf_token();
 
     try {
         // 1. ดึงข้อมูลรูปภาพของสินค้าที่จะลบก่อน เพื่อเอาชื่อไฟล์ไปลบออกจากโฟลเดอร์

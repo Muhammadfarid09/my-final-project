@@ -1,6 +1,16 @@
 <?php
 require_once '../includes/auth_check.php';
 
+// บังคับส่งคำขอผ่าน HTTP POST เท่านั้น ป้องกันการเข้าถึงผ่าน GET โดยตรง
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    $_SESSION['error'] = "ไม่อนุญาตให้ดำเนินการผ่านวิธีนี้ (Method Not Allowed)";
+    header("Location: ../admins.php");
+    exit();
+}
+
+// ตรวจสอบความปลอดภัย CSRF Token
+require_csrf_token();
+
 // ตรวจสอบสิทธิ์ (RBAC) - อนุญาตเฉพาะ Super Admin
 if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'Super Admin') {
     $_SESSION['error'] = "คุณไม่มีสิทธิ์เข้าถึงการทำงานนี้";
@@ -8,14 +18,12 @@ if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'Super Admin'
     exit();
 }
 
-$admin_id_to_delete = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+$admin_id_to_delete = intval($_POST['id'] ?? 0);
 
 if ($admin_id_to_delete <= 0) {
     header("Location: ../admins.php");
     exit();
 }
-
-require_csrf_token();
 
 // ป้องกันไม่ให้แอดมินลบตัวเอง (รหัสเดียวกับที่ล็อคอินอยู่)
 if ($admin_id_to_delete === intval($_SESSION['admin_id'])) {

@@ -1,10 +1,19 @@
 <?php
 require_once '../includes/auth_check.php';
 
-$court_id = isset($_POST['id']) ? intval($_POST['id']) : (isset($_GET['id']) ? intval($_GET['id']) : 0);
+// บังคับส่งคำขอผ่าน HTTP POST เท่านั้น ป้องกันการเข้าถึงผ่าน GET โดยตรง
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    $_SESSION['error'] = "ไม่อนุญาตให้ดำเนินการผ่านวิธีนี้ (Method Not Allowed)";
+    header("Location: ../courts.php");
+    exit();
+}
+
+// ตรวจสอบความปลอดภัย CSRF Token
+require_csrf_token();
+
+$court_id = intval($_POST['id'] ?? 0);
 
 if ($court_id > 0) {
-    require_csrf_token();
 
     try {
         // 1. เช็คก่อนว่าสนามนี้เคยมีการจอง (BOOKING) หรือยัง

@@ -137,8 +137,38 @@ if ($allMemberActionsProtected) {
     $failed++;
 }
 
+// Test 8: Verify strict HTTP POST enforcement on delete & finish actions (no $_GET allowed)
+$strictPostActions = [
+    'admin_delete_db.php',
+    'court_delete_db.php',
+    'court_repair_finish_db.php',
+    'news_delete_db.php',
+    'product_delete_db.php',
+    'reward_delete_db.php'
+];
+
+$allStrictPostPassed = true;
+foreach ($strictPostActions as $actionFile) {
+    $content = file_get_contents(__DIR__ . '/../admin/actions/' . $actionFile);
+    if (strpos($content, '$_GET') !== false) {
+        echo "[FAIL] Test 8: {$actionFile} still contains \$_GET references\n";
+        $allStrictPostPassed = false;
+    }
+    if (strpos($content, 'REQUEST_METHOD') === false) {
+        echo "[FAIL] Test 8: {$actionFile} missing REQUEST_METHOD check\n";
+        $allStrictPostPassed = false;
+    }
+}
+
+if ($allStrictPostPassed) {
+    echo "[PASS] Test 8: All " . count($strictPostActions) . " delete/finish actions enforce strict POST and contain no \$_GET\n";
+    $passed++;
+} else {
+    $failed++;
+}
+
 echo "==========================================================\n";
-echo "SUMMARY: Total: 7 | Passed: {$passed} | Failed: {$failed}\n";
+echo "SUMMARY: Total: 8 | Passed: {$passed} | Failed: {$failed}\n";
 echo "==========================================================\n";
 
 if ($failed > 0) exit(1);
