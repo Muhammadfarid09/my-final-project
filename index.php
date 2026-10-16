@@ -85,8 +85,13 @@ try {
         <section class="home-hero-section">
             <div class="home-container">
                 <div class="home-hero-content">
+                    <div class="home-hero-badge">
+                        <span class="badge-dot-live"></span>
+                        <span>T.S. BADMINTON PATTANI &bull; มาตรฐาน BWF</span>
+                    </div>
                     <h1 class="home-hero-title">
-                        สนามแบดมินตันมาตรฐาน BWF <span class="text-gold">ใจกลางเมืองปัตตานี</span>
+                        สนามแบดมินตันมาตรฐาน BWF <br class="hero-br-desktop">
+                        <span class="text-gold">ใจกลางเมืองปัตตานี</span>
                     </h1>
                     <p class="home-hero-subtitle">
                         คอร์ทพื้นยาง 5 ชั้น ซับแรงกระแทก ระบบไฟ Anti-Glare พร้อมระบบจองคิวออนไลน์ 24 ชม.
@@ -96,37 +101,69 @@ try {
                             <i class="fas fa-calendar-check"></i>
                             <span>จองสนาม</span>
                         </a>
+                        <?php if (isset($_SESSION['member_id'])): ?>
+                            <a href="profile.php" class="home-btn-secondary">
+                                <i class="fas fa-user-circle"></i>
+                                <span>โปรไฟล์ของฉัน</span>
+                            </a>
+                        <?php else: ?>
+                            <a href="login.php" class="home-btn-secondary">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>เข้าสู่ระบบ</span>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="home-hero-trust-chips">
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> เช็คคอร์ทว่างเรียลไทม์</span>
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> ล็อกคิวอัตโนมัติ</span>
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> สะสมแต้มทุกการเล่น</span>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ============================================== -->
-        <!-- 2. แถบสถิติ/จุดเด่นสั้นๆ (4 บล็อกแนวนอน)      -->
+        <!-- 2. แถบสถิติ/จุดเด่นสั้นๆ (การ์ดสีขาวแถวยาว Half Overlap) -->
         <!-- ============================================== -->
         <section class="home-stats-section">
             <div class="home-container">
-                <div class="home-stats-grid">
-                    <div class="home-stat-card">
-                        <span class="home-stat-number"><?php echo htmlspecialchars($court_count); ?></span>
+                <div class="home-stats-unified-card">
+                    <!-- ช่องที่ 1: คอร์ทมาตรฐาน BWF -->
+                    <div class="home-stat-item">
+                        <div class="home-stat-icon-wrapper">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="home-stat-number"><?php echo htmlspecialchars($court_count); ?></div>
                         <div class="home-stat-title">คอร์ทมาตรฐาน BWF</div>
                         <p class="home-stat-desc">พื้นยาง 5 ชั้น ไฟ Anti-Glare</p>
                     </div>
 
-                    <div class="home-stat-card">
-                        <span class="home-stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></span>
+                    <!-- ช่องที่ 2: แมตช์ที่จองสำเร็จ -->
+                    <div class="home-stat-item">
+                        <div class="home-stat-icon-wrapper">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="home-stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></div>
                         <div class="home-stat-title">แมตช์ที่จองสำเร็จ</div>
                         <p class="home-stat-desc">ล็อกคิวอัตโนมัติเรียลไทม์</p>
                     </div>
 
-                    <div class="home-stat-card">
-                        <span class="home-stat-number">100%</span>
+                    <!-- ช่องที่ 3: มาตรฐานความพึงพอใจ -->
+                    <div class="home-stat-item">
+                        <div class="home-stat-icon-wrapper">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="home-stat-number">100%</div>
                         <div class="home-stat-title">มาตรฐานความพึงพอใจ</div>
                         <p class="home-stat-desc">ผู้เล่นไว้วางใจสูงสุดในปัตตานี</p>
                     </div>
 
-                    <div class="home-stat-card">
-                        <span class="home-stat-number">24 ชม.</span>
+                    <!-- ช่องที่ 4: ระบบบริการครบวงจร -->
+                    <div class="home-stat-item">
+                        <div class="home-stat-icon-wrapper">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="home-stat-number">24 ชม.</div>
                         <div class="home-stat-title">ระบบบริการครบวงจร</div>
                         <p class="home-stat-desc">จองออนไลน์ตลอด 24 ชั่วโมง</p>
                     </div>
@@ -210,42 +247,48 @@ try {
         </section>
 
         <!-- ============================================== -->
-        <!-- 4. สิ่งอำนวยความสะดวก/จุดเด่นสนาม (Key Amenities) -->
+        <!-- 4. สิ่งอำนวยความสะดวก/จุดเด่นสนาม (Key Amenities - Clean Theme) -->
         <!-- ============================================== -->
-        <section class="home-section" id="amenities">
+        <section class="home-amenities-section" id="amenities">
             <div class="home-container">
-                <div class="home-section-header">
-                    <h2 class="home-section-title">สิ่งอำนวยความสะดวก</h2>
-                    <p class="home-section-desc">มาตรฐานสนามระดับสากลเพื่อประสบการณ์การเล่นที่ดีที่สุด</p>
+                <!-- ส่วนหัวข้อและ Tagline สไตล์ Clean & Modern -->
+                <div class="home-amenities-header">
+                    <div class="home-amenities-tag">
+                        <span class="home-amenities-tag-line"></span>
+                        <span class="home-amenities-tag-text">FACILITIES & SERVICES</span>
+                        <span class="home-amenities-tag-line"></span>
+                    </div>
+                    <h2 class="home-amenities-title">สิ่งอำนวยความสะดวกมาตรฐานสากล</h2>
+                    <p class="home-amenities-desc">มาตรฐานสนามระดับสากลเพื่อประสบการณ์การเล่นที่ดีที่สุด</p>
                 </div>
 
                 <div class="home-amenities-grid">
                     <div class="home-amenity-card">
-                        <div class="home-amenity-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="home-amenity-icon-box"><i class="fas fa-layer-group"></i></div>
                         <h3 class="home-amenity-title">พื้นยางมาตรฐาน BWF 5 ชั้น</h3>
                         <p class="home-amenity-desc">ซับแรงกระแทก ปกป้องข้อต่อและหัวเข่า ยึดเกาะดีเยี่ยม ปลอดภัยทุกการเคลื่อนไหว</p>
                     </div>
 
                     <div class="home-amenity-card">
-                        <div class="home-amenity-icon"><i class="fas fa-eye"></i></div>
+                        <div class="home-amenity-icon-box"><i class="fas fa-eye"></i></div>
                         <h3 class="home-amenity-title">ระบบไฟ LED Anti-Glare</h3>
                         <p class="home-amenity-desc">ตัดแสงสะท้อน สว่างสม่ำเสมอทั่วทั้งคอร์ท ไม่เมื่อยล้าสายตา มองเห็นลูกชัดเจน</p>
                     </div>
 
                     <div class="home-amenity-card">
-                        <div class="home-amenity-icon"><i class="fas fa-wind"></i></div>
+                        <div class="home-amenity-icon-box"><i class="fas fa-wind"></i></div>
                         <h3 class="home-amenity-title">ระบบหมุนเวียนอากาศถ่ายเท</h3>
                         <p class="home-amenity-desc">โถงอาคารสูงโปร่ง พัดลมระบายอากาศแรงดันสูงรอบทิศทาง ไม่อับชื้น เล่นได้ต่อเนื่อง</p>
                     </div>
 
                     <div class="home-amenity-card">
-                        <div class="home-amenity-icon"><i class="fas fa-shower"></i></div>
+                        <div class="home-amenity-icon-box"><i class="fas fa-shower"></i></div>
                         <h3 class="home-amenity-title">ห้องน้ำ & ห้องอาบน้ำ</h3>
                         <p class="home-amenity-desc">แยกสัดส่วนชาย-หญิง สะอาด ปลอดภัย พร้อมเครื่องทำน้ำอุ่นและล็อกเกอร์เก็บของ</p>
                     </div>
 
                     <div class="home-amenity-card">
-                        <div class="home-amenity-icon"><i class="fas fa-parking"></i></div>
+                        <div class="home-amenity-icon-box"><i class="fas fa-parking"></i></div>
                         <h3 class="home-amenity-title">ที่จอดรถกว้างขวาง & CCTV</h3>
                         <p class="home-amenity-desc">รองรับรถยนต์และจักรยานยนต์มากกว่า 50 คัน พร้อมกล้องวงจรปิดดูแลตลอด 24 ชม.</p>
                     </div>
@@ -253,132 +296,18 @@ try {
             </div>
         </section>
 
-        <!-- ============================================== -->
-        <!-- 5. ข่าวสารและโปรโมชัน (News & Announcements)    -->
-        <!-- ============================================== -->
-        <section class="home-section" id="news">
-            <div class="home-container">
-                <div class="home-section-header header-split">
-                    <div>
-                        <h2 class="home-section-title">ข่าวสารและโปรโมชัน</h2>
-                        <p class="home-section-desc">อัปเดตกิจกรรมพิเศษและสิทธิประโยชน์ล่าสุดจากทางสนาม</p>
-                    </div>
-                    <a href="promotions.php" class="home-link-gold">
-                        <span>ดูทั้งหมด</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
 
-                <div class="home-news-grid">
-                    <?php if (!empty($news_list) && count($news_list) > 0): ?>
-                        <?php foreach ($news_list as $news): ?>
-                            <article class="home-news-card">
-                                <?php if (!empty($news['news_image'])): ?>
-                                    <img src="uploads/news/<?php echo htmlspecialchars($news['news_image']); ?>" alt="<?php echo htmlspecialchars($news['news_title']); ?>" class="home-news-thumb" loading="lazy">
-                                <?php else: ?>
-                                    <div class="home-news-thumb-placeholder">
-                                        <i class="fas fa-newspaper fa-2x"></i>
-                                    </div>
-                                <?php endif; ?>
-                                <div class="home-news-body">
-                                    <div class="home-news-meta">
-                                        <i class="far fa-clock"></i> <?php echo date('d/m/Y', strtotime($news['news_published_at'])); ?>
-                                    </div>
-                                    <h3 class="home-news-title"><?php echo htmlspecialchars($news['news_title']); ?></h3>
-                                    <p class="home-news-desc"><?php echo htmlspecialchars(strip_tags($news['news_content'])); ?></p>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="home-news-empty">
-                            ยังไม่มีข่าวสารหรือประกาศในขณะนี้
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </section>
 
         <!-- ============================================== -->
-        <!-- 6. สถานที่และเวลาทำการ (Location & Hours)       -->
-        <!-- ============================================== -->
-        <section class="home-section" id="location">
-            <div class="home-container">
-                <div class="home-section-header">
-                    <h2 class="home-section-title">เวลาทำการและที่ตั้ง</h2>
-                    <p class="home-section-desc">ตั้งอยู่ใจกลางเมืองปัตตานี เดินทางสะดวก พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
-                </div>
-
-                <div class="home-location-grid">
-                    <div class="home-info-box">
-                        <div>
-                            <h3 class="home-info-title"><i class="fas fa-clock"></i> เวลาเปิดให้บริการ</h3>
-                            <div class="home-schedule-table">
-                                <div class="home-schedule-row">
-                                    <span class="home-schedule-day">วันจันทร์ - วันศุกร์</span>
-                                    <span class="home-schedule-time">09:00 - 24:00 น.</span>
-                                </div>
-                                <div class="home-schedule-row">
-                                    <span class="home-schedule-day">วันเสาร์ - วันอาทิตย์</span>
-                                    <span class="home-schedule-time">08:00 - 24:00 น.</span>
-                                </div>
-                                <div class="home-schedule-row">
-                                    <span class="home-schedule-day">วันหยุดนักขัตฤกษ์</span>
-                                    <span class="home-schedule-time">เปิดให้บริการตามปกติ</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 class="home-info-title"><i class="fas fa-headset"></i> ช่องทางการติดต่อ</h3>
-                            <div class="home-contact-chips">
-                                <a href="tel:0812345678" class="home-chip">
-                                    <i class="fas fa-phone-alt"></i> 081-234-5678
-                                </a>
-                                <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="home-chip">
-                                    <i class="fab fa-line"></i> @tspattani
-                                </a>
-                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="home-chip">
-                                    <i class="fab fa-facebook-f"></i> T.S. Pattani
-                                </a>
-                                <a href="chat.php" class="home-chip">
-                                    <i class="fas fa-comment-dots"></i> แชทกับเรา
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="home-info-box">
-                        <div>
-                            <h3 class="home-info-title"><i class="fas fa-map-marker-alt"></i> แผนที่การเดินทาง</h3>
-                            <p class="home-address-text">123 ถนนเจริญประดิษฐ์ ตำบลรูสะมิแล อำเภอเมือง จังหวัดปัตตานี 94000 (ใกล้กับมหาวิทยาลัยสงขลานครินทร์ วิทยาเขตปัตตานี)</p>
-                            <div class="home-map-container">
-                                <iframe 
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.916853248356!2d101.24072387588383!3d6.866038419385521!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31b269588b3f63e3%3A0x6b0983199c0957b!2sPattani%20Stadium!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
-                                    allowfullscreen="" 
-                                    loading="lazy" 
-                                    referrerpolicy="no-referrer-when-downgrade"
-                                    title="T.S. Pattani Badminton Location Map">
-                                </iframe>
-                            </div>
-                        </div>
-                        <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="home-map-btn">
-                            <i class="fas fa-directions"></i> นำทางด้วย Google Maps
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ============================================== -->
-        <!-- 7. พันธมิตรของเรา (Our Partners - Matchday Style)-->
+        <!-- 5. พันธมิตรของเรา (Our Partners - Matchday Style)-->
         <!-- ============================================== -->
         <section class="home-partners-section" id="partners">
             <div class="home-container">
                 <div class="home-partners-header">
-                    <h2 class="home-partners-title">พันธมิตรของเรา</h2>
+                    <h2 class="home-partners-title">แบรนด์และอุปกรณ์มาตรฐานสากล</h2>
                     <div class="home-title-accent-line"></div>
                     <p class="home-partners-desc">
-                        เครือข่ายอุปกรณ์กีฬาและพันธมิตรชั้นนำที่ร่วมยกระดับมาตรฐานสนาม T.S. Pattani
+                        คัดสรรอุปกรณ์และแบรนด์ชั้นนำระดับโลก เพื่อยกระดับมาตรฐานสนาม T.S. BADMINTON PATTANI
                     </p>
                 </div>
             </div>
@@ -446,14 +375,14 @@ try {
         </section>
 
         <!-- ============================================== -->
-        <!-- 8. CTA ปิดท้าย (Closing Call to Action)         -->
+        <!-- 6. CTA ปิดท้าย (Closing Call to Action)         -->
         <!-- ============================================== -->
         <section class="home-cta-section">
             <div class="home-container">
                 <div class="home-cta-card">
                     <h2 class="home-cta-title">พร้อมลงสนามแล้วหรือยัง?</h2>
                     <p class="home-cta-desc">เช็คคอร์ทว่างและจองสนามออนไลน์ได้ทันที ตลอด 24 ชั่วโมง</p>
-                    <a href="booking.php" class="home-btn-primary">
+                    <a href="booking.php" class="home-cta-btn">
                         <i class="fas fa-calendar-check"></i>
                         <span>จองสนามเลย</span>
                     </a>
