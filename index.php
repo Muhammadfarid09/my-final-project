@@ -135,32 +135,75 @@ try {
         </section>
 
         <!-- ============================================== -->
-        <!-- 3. 3 ขั้นตอนการใช้งาน (3-Step Booking Guide)   -->
+        <!-- 3. จุดเด่นและบริการ (5 Features Matchday Style)  -->
         <!-- ============================================== -->
-        <section class="home-section" id="how-it-works">
+        <section class="home-features-section" id="features">
             <div class="home-container">
-                <div class="home-section-header">
-                    <h2 class="home-section-title">3 ขั้นตอนการจองสนาม</h2>
-                    <p class="home-section-desc">จองคิวออนไลน์ง่าย สะดวก รวดเร็ว ล็อกเวลาได้แน่นอน</p>
+                <!-- ส่วนหัวข้อและ Tagline สไตล์ Matchday -->
+                <div class="home-features-header">
+                    <div class="home-features-tag">
+                        <span class="home-features-tag-line"></span>
+                        <span class="home-features-tag-text">T.S. BADMINTON PATTANI</span>
+                        <span class="home-features-tag-line"></span>
+                    </div>
+                    <h2 class="home-features-title">สนามแบดมินตันหนึ่งเดียวในปัตตานี</h2>
                 </div>
 
-                <div class="home-steps-grid">
-                    <div class="home-step-card">
-                        <span class="home-step-number">01</span>
-                        <h3 class="home-step-title">เลือกวันและเวลา</h3>
-                        <p class="home-step-desc">เช็คตารางสนามว่างแบบ Real-time พร้อมอัตราค่าบริการรายชั่วโมง</p>
+                <!-- กริด 5 การ์ดจุดเด่น (แบบไม่มีม็อกอัปมือถือ) -->
+                <div class="home-features-grid">
+                    <!-- การ์ด 1: จองง่ายไม่มีสะดุด -->
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon-box">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="home-feature-content">
+                            <h3 class="home-feature-title">จองง่ายไม่มีสะดุด</h3>
+                            <p class="home-feature-desc">เช็กตารางและเลือกล็อกคอร์ดออนไลน์ได้ทันที หมดปัญหาโทรจองซ้ำซ้อน</p>
+                        </div>
                     </div>
 
-                    <div class="home-step-card">
-                        <span class="home-step-number">02</span>
-                        <h3 class="home-step-title">เลือกคอร์ทและอุปกรณ์</h3>
-                        <p class="home-step-desc">เลือกสนามที่ชอบ พร้อมบริการเช่าอุปกรณ์และเครื่องดื่ม</p>
+                    <!-- การ์ด 3: ยืนยันการจองทันที -->
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon-box">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="home-feature-content">
+                            <h3 class="home-feature-title">ยืนยันการจองทันที</h3>
+                            <p class="home-feature-desc">สแกนจ่ายผ่าน QR Code พร้อมระบบตรวจสอบสลิป ล็อกคิวการเล่นได้แน่นอน</p>
+                        </div>
                     </div>
 
-                    <div class="home-step-card">
-                        <span class="home-step-number">03</span>
-                        <h3 class="home-step-title">สแกนจ่ายรับคิวทันที</h3>
-                        <p class="home-step-desc">ชำระผ่าน QR Code พร้อมแนบสลิปเพื่อยืนยันคิวทันที</p>
+                    <!-- การ์ด 2: เช็กตารางว่างแบบเรียลไทม์ -->
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon-box">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="home-feature-content">
+                            <h3 class="home-feature-title">เช็กตารางว่างแบบเรียลไทม์</h3>
+                            <p class="home-feature-desc">อัปเดตสถานะคอร์ดว่างและคำนวณอัตราค่าบริการตามช่วงเวลาจริงแม่นยำ</p>
+                        </div>
+                    </div>
+
+                    <!-- การ์ด 4: อุปกรณ์และบริการครบครัน -->
+                    <div class="home-feature-card">
+                        <div class="home-feature-icon-box">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="home-feature-content">
+                            <h3 class="home-feature-title">อุปกรณ์และบริการครบครัน</h3>
+                            <p class="home-feature-desc">มีบริการเช่าไม้แบด ลูกแบดคุณภาพมาตรฐาน และเครื่องดื่มพร้อมบริการ</p>
+                        </div>
+                    </div>
+
+                    <!-- การ์ด 5: สะสมแต้มทุกการจอง (การ์ดเต็มกึ่งกลางด้านล่าง) -->
+                    <div class="home-feature-card home-feature-card-wide">
+                        <div class="home-feature-icon-box">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="home-feature-content">
+                            <h3 class="home-feature-title">สะสมแต้มทุกการจอง</h3>
+                            <p class="home-feature-desc">รับคะแนนสะสมอัตโนมัติทุกครั้งที่เข้าใช้บริการ เพื่อนำไปแลกรับของรางวัลพิเศษ</p>
+                        </div>
                     </div>
                 </div>
             </div>
