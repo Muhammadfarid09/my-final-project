@@ -618,61 +618,69 @@
 }
 
 /* --------------------------------------------------------------------------
-   7. Partners Showcase (Matchday.co.th Style with Accent Line)
+   7. Partners Showcase (Matchday.co.th Style - Light Section & Large Logos)
    -------------------------------------------------------------------------- */
 .home-partners-section {
-    padding: 64px 0 52px 0;
-    border-top: 1px solid var(--border-color);
+    padding: 80px 0 76px 0;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 @media (max-width: 768px) {
     .home-partners-section {
-        padding: 40px 0 32px 0;
+        padding: 50px 0 44px 0;
     }
 }
 
 .home-partners-header {
     text-align: center;
-    margin-bottom: 36px;
+    margin-bottom: 40px;
 }
 
 .home-partners-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
     margin: 0 0 10px 0;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.4px;
 }
 
 .home-title-accent-line {
-    width: 44px;
-    height: 3px;
+    width: 48px;
+    height: 4px;
     background-color: var(--color-gold);
     border-radius: var(--radius-full);
-    margin: 0 auto 12px auto;
+    margin: 0 auto 14px auto;
 }
 
 .home-partners-desc {
-    font-size: 14.5px;
-    color: var(--text-secondary);
+    font-size: 15px;
+    color: #64748b;
     margin: 0 auto;
-    max-width: 620px;
-    line-height: 1.55;
+    max-width: 640px;
+    line-height: 1.6;
 }
 
 .home-partners-grid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 18px 24px;
-    flex-wrap: wrap;
-    max-width: 1100px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1120px;
     margin: 0 auto;
+}
+
+@media (max-width: 992px) {
+    .home-partners-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
 }
 
 @media (max-width: 768px) {
     .home-partners-grid {
-        gap: 12px 14px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
     }
 }
 
@@ -680,43 +688,50 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 20px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    height: 90px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
     transition: all var(--transition-fast);
-    min-width: 120px;
-    height: 60px;
     box-sizing: border-box;
 }
 
 .home-partner-item:hover {
-    border-color: rgba(255, 185, 29, 0.45);
-    background: var(--bg-elevated);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    border-color: rgba(255, 185, 29, 0.7);
 }
 
 .home-partner-img {
-    max-height: 30px;
-    max-width: 95px;
+    max-height: 52px;
+    max-width: 160px;
+    width: auto;
+    height: auto;
     object-fit: contain;
-    filter: brightness(0.92);
-    transition: filter var(--transition-fast);
+    transition: transform var(--transition-fast);
 }
 
 .home-partner-item:hover .home-partner-img {
-    filter: brightness(1.1);
+    transform: scale(1.05);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+    .home-partners-title {
+        font-size: 24px;
+    }
+    .home-partners-desc {
+        font-size: 13.5px;
+    }
     .home-partner-item {
-        min-width: calc(50% - 8px);
-        height: 52px;
-        padding: 8px 12px;
+        height: 72px;
+        padding: 10px 14px;
+        border-radius: 12px;
     }
     .home-partner-img {
-        max-height: 24px;
-        max-width: 75px;
+        max-height: 40px;
+        max-width: 120px;
     }
 }
 
