@@ -1,8 +1,31 @@
-/* =========================================
-   T.S. Pattani - Member/Frontend JavaScript (v1.7)
-   ========================================= */
+/* ==========================================================================
+   T.S. Pattani - Member / Frontend JavaScript Controller
+   มาตรฐานการจัดการสคริปต์ฝั่งผู้ใช้งาน (Strict Mode & HCI Design Standard)
+   --------------------------------------------------------------------------
+   สารบัญโครงสร้างระบบ 11 หมวดหมู่ (System Architecture Table of Contents):
+   1. ระบบนำทางและเมนูมือถือ (Navigation & Drawer Menu)
+   2. ระบบแจ้งเตือนสากล (Global Alert System)
+   3. ระบบปฏิทินและเลือกวันจอง (Calendar & Date Picker - Wizard Step 1)
+   4. ระบบเลือกเวลาและตารางคอร์ท (Time Slots & Court Matrix - Wizard Step 2 & 3)
+   5. ระบบอุปกรณ์เช่าและบริการเสริม (Add-ons & Rental Selection - Wizard Step 4)
+   6. กลไกการคำนวณราคาแบบ Real-time (Dynamic Pricing Engine)
+   7. ตัวควบคุมขั้นตอน Wizard State Machine (Multi-Step Controller)
+   8. การส่งฟอร์มการจองและการจัดการ Guest (Booking Submission & Interceptor)
+   9. ระบบชำระเงิน แนบสลิป และเวลานับถอยหลัง (Payment, Slip & Countdown - payment.php)
+   10. ระบบสะสมแต้มและแลกของรางวัล (Rewards & Loyalty System - rewards.php)
+   11. ระบบฟอร์มยืนยันตัวตนและความปลอดภัย (Auth & Security Forms - register.php & login.php)
+   ========================================================================== */
 
-// ฟังก์ชันตรวจสอบความถูกต้องของฟอร์มสมัครสมาชิก (register.php)
+/* ==========================================================================
+   หมวดเสริม / Legacy Compatibility: ตรวจสอบความถูกต้องเบื้องต้น
+   ========================================================================== */
+
+/**
+ * ฟังก์ชันตรวจสอบความถูกต้องของฟอร์มสมัครสมาชิก (Legacy Compatibility)
+ * @description ตรวจสอบเบอร์โทรศัพท์ (10 หลัก) และตรวจสอบว่ารหัสผ่านตรงกับช่องยืนยันรหัสผ่านหรือไม่
+ * @returns {boolean} คืนค่า true หากข้อมูลถูกต้อง หรือ false หากข้อมูลไม่ถูกต้องพร้อมแสดง Alert
+ * @element ฟอร์มสมัครสมาชิกแบบดั้งเดิม (register.php)
+ */
 function validatePassword() {
     var password = document.getElementById("password").value;
     var confirmPassword = document.getElementById("confirm_password").value;
@@ -22,7 +45,17 @@ function validatePassword() {
     return true;
 }
 
-// ฟังก์ชันซ่อน Alert อัตโนมัติ (ใช้ร่วมกันทุกหน้าฝั่งลูกค้า)
+/* ==========================================================================
+   หมวดที่ 2: ระบบแจ้งเตือนสากล (Global Alert System)
+   ========================================================================== */
+
+/**
+ * ระบบซ่อนแถบแจ้งเตือนสถานะอัตโนมัติ (Global Auto-dismiss Alert)
+ * @description ดักจับแถบแจ้งเตือนความสำเร็จ/ข้อผิดพลาดทั้งหมดบนหน้าเว็บฝั่ง Member 
+ *              และทำให้ค่อยๆ จางหายไป (Fade Out) พร้อมสไลด์ขึ้นอย่างนุ่มนวลภายในเวลา 3.5 วินาที
+ * @event DOMContentLoaded (ทำงานทันทีเมื่อโครงสร้างหน้าเว็บโหลดเสร็จ)
+ * @element .alert-success, .alert-error, .alert-box, .alert-success-box, .alert-error-box
+ */
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         let alerts = document.querySelectorAll('.alert-success, .alert-error, .alert-box, .alert-success-box, .alert-error-box');
@@ -37,15 +70,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 3500);
 });
 
-/* =========================================
-   Navbar Controls
-   ========================================= */
-// เปิด-ปิด Dropdown โปรไฟล์
+/* ==========================================================================
+   หมวดที่ 1: ระบบนำทางและเมนูมือถือ (Navigation & Drawer Menu)
+   ========================================================================== */
+
+/**
+ * เปิด-ปิด Dropdown เมนูโปรไฟล์ผู้ใช้งาน
+ * @description สลับคลาส 'show' บน Element เมนูโปรไฟล์มุมขวาบนของ Navbar
+ * @element #userDropdown (.user-dropdown / .dropdown-content)
+ * @event onclick บนรูปโปรไฟล์หรือชื่อผู้ใช้งาน
+ */
 function toggleDropdown() {
     document.getElementById("userDropdown").classList.toggle("show");
 }
 
-// เปิด-ปิด เมนูสำหรับมือถือ (แฮมเบอร์เกอร์เดิม)
+/**
+ * เปิด-ปิด เมนูสำหรับมือถือ (Mobile Navbar Collapse)
+ * @description สลับคลาส 'show' บนเมนูหลักของ Navbar เมื่อเปิดดูบนอุปกรณ์หน้าจอเล็ก
+ * @element #navMenu
+ * @event onclick บนปุ่ม Navbar Toggle เดิม
+ */
 function toggleMobileMenu() {
     var navMenu = document.getElementById("navMenu");
     if (navMenu) {
@@ -53,7 +97,13 @@ function toggleMobileMenu() {
     }
 }
 
-// เปิด-ปิด Offcanvas Drawer เมนูด้านข้างสำหรับมือถือ (พร้อมระบบล็อก Scroll)
+/**
+ * เปิด-ปิด Offcanvas Drawer เมนูด้านข้างสำหรับมือถือ (Modern Responsive Drawer)
+ * @description ควบคุมการสไลด์เข้า-ออกของ Drawer เมนู และแผ่นฟิล์ม Backdrop มืด 
+ *              พร้อมทั้งล็อก Scroll ของ Body (body.drawer-open) ป้องกันการเลื่อนทะลุฉากหลัง
+ * @element #mobileDrawer, #drawerBackdrop, body.drawer-open
+ * @event onclick บนปุ่มแฮมเบอร์เกอร์ (☰) และปุ่มปิด Drawer
+ */
 function toggleMobileDrawer() {
     var drawer = document.getElementById("mobileDrawer");
     var backdrop = document.getElementById("drawerBackdrop");
@@ -71,7 +121,12 @@ function toggleMobileDrawer() {
     }
 }
 
-// รองรับการกดปุ่ม Escape เพื่อปิด Drawer อัตโนมัติ (Accessibility Standard)
+/**
+ * ตัวตรวจจับการกดปุ่มคีย์บอร์ด ESC เพื่อปิด Drawer และเมนูอัตโนมัติ (Accessibility Standard)
+ * @description รองรับมาตรฐานการเข้าถึง (Accessibility) เมื่อผู้ใช้กดปุ่ม 'Escape' จะทำการปิด Drawer และ Backdrop ทันที
+ * @param {KeyboardEvent} event - อ็อบเจกต์อีเวนต์การกดคีย์บอร์ด
+ * @event keydown
+ */
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         var drawer = document.getElementById("mobileDrawer");
@@ -84,7 +139,12 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// คลิกที่อื่นบนจอเพื่อปิด Dropdown อัตโนมัติ
+/**
+ * ตัวตรวจจับการคลิกภายนอกพื้นที่เพื่อปิด Dropdown เมนูโปรไฟล์อัตโนมัติ (Click Outside Handler)
+ * @description เมื่อคลิกที่บริเวณใดๆ นอกเหนือจากกล่อง .user-dropdown จะสั่งลบคลาส 'show' เพื่อพับเก็บเมนูทันที
+ * @param {MouseEvent} event - อ็อบเจกต์อีเวนต์การคลิกเมาส์
+ * @event window.onclick
+ */
 window.onclick = function(event) {
     if (!event.target.closest('.user-dropdown')) {
         var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -98,11 +158,15 @@ window.onclick = function(event) {
 }
 
 /* ==========================================================================
-   T.S. Pattani - 5-Step Booking Wizard Controller (HCI & Progressive Disclosure)
-   Zero Inline Style Standard - Complete State & Interaction Management
+   หมวดที่ 6: กลไกการคำนวณราคาแบบ Real-time (Dynamic Pricing Engine)
    ========================================================================== */
 
-// คืนค่าวันที่ในรูปแบบ YYYY-MM-DD ตามเวลาท้องถิ่น (ไม่คลาดเคลื่อนตาม UTC)
+/**
+ * แปลงวัตถุ Date เป็นสตริงวันที่ในรูปแบบ 'YYYY-MM-DD' ตาม Local Timezone
+ * @description ป้องกันปัญหา Timezone Offset (UTC Shift) ที่อาจทำให้วันที่คลาดเคลื่อนถอยหลัง 1 วัน
+ * @param {Date} [d=new Date()] - วัตถุ Date ที่ต้องการแปลง (ค่าเริ่มต้นคือวันและเวลาปัจจุบัน)
+ * @returns {string} สตริงวันที่ในรูปแบบ 'YYYY-MM-DD' เช่น '2026-10-17'
+ */
 function getLocalDateString(d = new Date()) {
     let year = d.getFullYear();
     let month = String(d.getMonth() + 1).padStart(2, '0');
@@ -110,29 +174,22 @@ function getLocalDateString(d = new Date()) {
     return `${year}-${month}-${day}`;
 }
 
-const wizardState = {
-    currentStep: 1,
-    selectedDate: getLocalDateString(new Date()),
-    currentCalMonth: new Date().getMonth(),
-    currentCalYear: new Date().getFullYear(),
-    dayRateCategory: 'weekday',
-    dayRatePrice: 180,
-    dayRateLabel: 'จันทร์ - ศุกร์ (กลางวัน 150 ฿ | เย็น 180 ฿/ชม.)',
-    selectedStartTime: '',
-    bookingNickname: '',
-    matrixData: null,
-    // Map of slotStart => { courtId, courtName, price, slotStart, slotEnd }
-    selectedSlots: new Map(),
-    selectedCourtId: null,
-    selectedCourtName: '',
-    selectedHours: 0,
-    courtPriceTotal: 0,
-    rentalPriceTotal: 0,
-    productPriceTotal: 0,
-    grandTotal: 0
-};
-
-// ฟังก์ชันคำนวณราคาสนามแบดมินตันตามวันและช่วงเวลา (Time-Window & Cross-Window Pricing Engine)
+/**
+ * คำนวณราคาค่าบริการสนามแบดมินตันแบบ Dynamic Pricing Engine
+ * @description หัวใจหลักของการคำนวณราคา:
+ *              1. วันธรรมดา (จันทร์ - ศุกร์):
+ *                 - ช่วงกลางวัน (08:00 - 17:00 น.): 150 บาท/ชม. (Off-peak)
+ *                 - ช่วงค่ำ (17:00 - 23:00 น.): 180 บาท/ชม. (Standard)
+ *              2. วันหยุด (เสาร์ - อาทิตย์): 200 บาท/ชม. ตลอดทั้งวัน (Peak)
+ *              3. การจองคาบเกี่ยวข้ามช่วงเวลา (Cross-Window เช่น 16:00 - 18:00 น.):
+ *                 จะแบ่งคิดคำนวณตามชั่วโมงจริงของแต่ละช่วงแล้วนำมารวมกันอย่างแม่นยำ
+ * @param {string} dateStr - วันที่ที่เลือกในรูปแบบ 'YYYY-MM-DD'
+ * @param {string} startTimeStr - เวลาเริ่มต้น เช่น '16:00'
+ * @param {string} endTimeStr - เวลาสิ้นสุด เช่น '18:00'
+ * @param {Object|null} [customRates=null] - อัตราค่าบริการพิเศษ { peak, offpeak, standard } (ถ้ามี)
+ * @returns {Object} ผลลัพธ์การคำนวณ { status: 'success'|'error', totalPrice, totalHours, rateType, breakdown: [...] }
+ * @element คำนวณอัตโนมัติเมื่อเลือกสล็อตเวลาใน Step 2 & 3 และตรวจสอบในใบแจ้งหนี้ Step 4
+ */
 function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRates = null) {
     if (!startTimeStr || !endTimeStr || !dateStr) {
         return { status: 'error', message: 'กรุณาระบุวันที่และเวลาให้ครบถ้วน' };
@@ -230,14 +287,60 @@ function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRat
     };
 }
 
-// Thai Month Names for Calendar
+/* ==========================================================================
+   หมวดที่ 7: ตัวควบคุมขั้นตอน Wizard State Machine (Multi-Step Controller)
+   ========================================================================== */
+
+/**
+ * อ็อบเจกต์ศูนย์กลางเก็บสถานะการจอง (Central State Machine)
+ * @description จัดเก็บข้อมูลสถานะปัจจุบันทั้งหมดของระบบการจองแบบ 5 ขั้นตอน (Progressive Disclosure)
+ *              รวมถึงวันที่, เดือนที่เปิดดู, สล็อตเวลา, สนามที่เลือก, อุปกรณ์เช่า และยอดเงินรวม
+ */
+const wizardState = {
+    currentStep: 1,
+    selectedDate: getLocalDateString(new Date()),
+    currentCalMonth: new Date().getMonth(),
+    currentCalYear: new Date().getFullYear(),
+    dayRateCategory: 'weekday',
+    dayRatePrice: 180,
+    dayRateLabel: 'จันทร์ - ศุกร์ (กลางวัน 150 ฿ | เย็น 180 ฿/ชม.)',
+    selectedStartTime: '',
+    bookingNickname: '',
+    matrixData: null,
+    // Map of slotStart => { courtId, courtName, price, slotStart, slotEnd }
+    selectedSlots: new Map(),
+    selectedCourtId: null,
+    selectedCourtName: '',
+    selectedHours: 0,
+    courtPriceTotal: 0,
+    rentalPriceTotal: 0,
+    productPriceTotal: 0,
+    grandTotal: 0
+};
+
+/**
+ * รายชื่อเดือนภาษาไทยสำหรับแสดงผลบนปฏิทิน
+ * @type {string[]}
+ */
 const thaiMonthNames = [
     "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
     "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
 ];
+
+/**
+ * รายชื่อวันในสัปดาห์ภาษาไทย (แบบย่อ) สำหรับส่วนหัวของปฏิทิน
+ * @type {string[]}
+ */
 const thaiDayNames = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
 
-// Initialize Booking Wizard
+/**
+ * เริ่มต้นการทำงานของระบบจองสนามแบบ Multi-Step Wizard
+ * @description ตรวจสอบว่ามีข้อมูลการจองที่ค้างอยู่ (Pending Booking จากการล็อกอิน) หรือไม่
+ *              หากมีจะสั่งเรียก restorePendingBooking() เพื่อกู้คืนสถานะ
+ *              หากไม่มี จะกำหนดวันที่เริ่มต้นเป็นวันนี้ เรนเดอร์ปฏิทิน และโหลดข้อมูลสถานะสนามผ่าน AJAX
+ * @element #pendingBookingData, #input_booking_date, #step3_nickname
+ * @event เรียกใช้งานทันทีเมื่อโหลดหน้า booking.php
+ */
 function initBookingWizard() {
     let pendingEl = document.getElementById('pendingBookingData');
     if (pendingEl) {
@@ -279,7 +382,12 @@ function initBookingWizard() {
     updateStep4NextButton();
 }
 
-// Restore pending booking after login redirect
+/**
+ * กู้คืนข้อมูลการจองที่ค้างอยู่กรณีผู้ใช้ทั่วไป (Guest) ไปเข้าสู่ระบบแล้วถูกส่งกลับมา
+ * @description อ่านข้อมูล JSON จาก Session/DOM นำมาเซ็ตค่ากลับคืนใน wizardState ทั้งวันที่, เวลาเริ่มต้น,
+ *              เวลาสิ้นสุด, คอร์ทที่เลือก, อุปกรณ์เช่า, สล็อตชั่วโมง และนำทางตรงไปยังขั้นตอนสรุปรายการ (Step 5)
+ * @param {Object} pData - อ็อบเจกต์ข้อมูลการจองเดิมที่เก็บค้างไว้ใน Session
+ */
 function restorePendingBooking(pData) {
     let nicknameInput = document.getElementById('step3_nickname');
     if (nicknameInput && pData.booking_nickname) {
@@ -361,7 +469,17 @@ function restorePendingBooking(pData) {
 }
 
 
-// Navigate between Wizard Steps
+/**
+ * ควบคุมการเปลี่ยนขั้นตอนใน Booking Wizard พร้อมระบบตรวจสอบความถูกต้อง (Validation Guard)
+ * @description ทำการ Validate เงื่อนไขก่อนก้าวไปข้างหน้า:
+ *              - สเต็ป 2: ต้องเลือกวันที่ก่อน
+ *              - สเต็ป 3: ต้องเลือกเวลาเริ่มต้นก่อน
+ *              - สเต็ป 4: ต้องเลือกสนามอย่างน้อย 1 ช่วงเวลาก่อน
+ *              - สเต็ป 5: อัปเดตใบแจ้งหนี้แจกแจงค่าใช้จ่าย
+ *              เมื่อผ่านจะสลับคลาส active ของแผงสเต็ป และเลื่อนหน้าจอกลับขึ้นด้านบนแบบ Smooth
+ * @param {number} targetStep - หมายเลขขั้นตอนปลายทางที่ต้องการไป (1 - 5)
+ * @element #stepPanel1 - #stepPanel5, .wizard-page-wrapper
+ */
 function goToStep(targetStep) {
     if (targetStep < 1 || targetStep > 5) return;
 
@@ -427,14 +545,24 @@ function goToStep(targetStep) {
     }
 }
 
-// Allow clicking on previous completed steps to jump back
+/**
+ * อนุญาตให้ผู้ใช้คลิกย้อนกลับไปยังขั้นตอนที่ผ่านมาแล้วได้ทันที (Jump Back Handler)
+ * @description ป้องกันไม่ให้คลิกข้ามไปยังขั้นตอนข้างหน้าที่ยังไม่ผ่านการกรอกข้อมูล
+ * @param {number} targetStep - ขั้นตอนที่ต้องการย้อนกลับไป
+ */
 function jumpToWizardStep(targetStep) {
     if (targetStep < wizardState.currentStep) {
         goToStep(targetStep);
     }
 }
 
-// Update Stepper Progress UI
+/**
+ * อัปเดตการแสดงผลของ Stepper Progress Bar ด้านบน
+ * @description ปรับเปลี่ยนสถานะคลาส active, completed, upcoming บนแต่ละปุ่มขั้นตอน
+ *              และคำนวณความกว้างเปอร์เซ็นต์ของแถบสีความคืบหน้า (Fill Bar)
+ * @param {number} currentStep - ขั้นตอนปัจจุบัน (1 - 5)
+ * @element #stepperNode1 - #stepperNode5, #stepperFillBar
+ */
 function updateWizardStepperUI(currentStep) {
     for (let s = 1; s <= 5; s++) {
         let node = document.getElementById('stepperNode' + s);
@@ -458,8 +586,16 @@ function updateWizardStepperUI(currentStep) {
 }
 
 /* ==========================================================================
-   Step 1: Visual Interactive Calendar
+   หมวดที่ 3: ระบบปฏิทินและเลือกวันจอง (Calendar & Date Picker - Wizard Step 1)
    ========================================================================== */
+
+/**
+ * เรนเดอร์ตารางปฏิทินรายเดือนแบบ Interactive พร้อมตรวจสอบสถานะวันที่
+ * @description สร้างเซลล์วันที่ตามปฏิทินจริง พร้อมคำนวณวันเริ่มต้นของสัปดาห์ (Sunday-first),
+ *              กำหนดสีแยกวันหยุดเสาร์-อาทิตย์, ล็อกวันที่ในอดีตไม่ให้คลิกเลือกได้ (disabled),
+ *              และไฮไลต์วันปัจจุบัน (today) รวมถึงวันที่ผู้ใช้กำลังเลือก (selected)
+ * @element #calMonthTitle, #calendarGrid
+ */
 function renderCalendar() {
     let titleEl = document.getElementById('calMonthTitle');
     let gridEl = document.getElementById('calendarGrid');
@@ -509,6 +645,12 @@ function renderCalendar() {
     gridEl.innerHTML = html;
 }
 
+/**
+ * เปลี่ยนเดือนบนหน้าปฏิทิน (ก่อนหน้า / ถัดไป)
+ * @description ปรับค่า currentCalMonth และ currentCalYear ใน wizardState เมื่อข้ามปี แล้วสั่งเรนเดอร์ปฏิทินใหม่
+ * @param {number} dir - ทิศทางการเปลี่ยน (-1 สำหรับเดือนก่อนหน้า, +1 สำหรับเดือนถัดไป)
+ * @element #calPrevMonthBtn, #calNextMonthBtn
+ */
 function navigateCalendarMonth(dir) {
     wizardState.currentCalMonth += dir;
     if (wizardState.currentCalMonth < 0) {
@@ -521,6 +663,12 @@ function navigateCalendarMonth(dir) {
     renderCalendar();
 }
 
+/**
+ * ปุ่มลัดเลือกวันที่ใช้งานอย่างรวดเร็ว (Quick Date Buttons)
+ * @description ช่วยอำนวยความสะดวกให้ผู้ใช้งานสามารถคลิกเลือก "วันนี้" หรือ "พรุ่งนี้" ได้ทันทีในคลิกเดียว
+ * @param {string} type - ชนิดของวันลัด ('today' หรือ 'tomorrow')
+ * @element #btnQuickToday, #btnQuickTomorrow
+ */
 function selectQuickDate(type) {
     let target = new Date();
     if (type === 'tomorrow') {
@@ -538,6 +686,13 @@ function selectQuickDate(type) {
     onSelectCalendarDate(dateStr);
 }
 
+/**
+ * จัดการเมื่อผู้ใช้คลิกเลือกวันที่บนเซลล์ปฏิทิน
+ * @description ทำการเซ็ตค่าวันที่ที่เลือกลงใน State, รีเซ็ตสล็อตเวลาและสนามที่เคยเลือกไว้เดิม (เพื่อป้องกันข้อมูลข้ามวัน),
+ *              ไฮไลต์เซลล์ปฏิทินใหม่ และส่งคำขอ AJAX โหลดตารางสถานะสนามของวันนั้น
+ * @param {string} dateStr - วันที่ที่เลือกในรูปแบบ 'YYYY-MM-DD'
+ * @element #input_booking_date, .calendar-date-cell
+ */
 function onSelectCalendarDate(dateStr) {
     wizardState.selectedDate = dateStr;
     let inputDate = document.getElementById('input_booking_date');
@@ -554,6 +709,14 @@ function onSelectCalendarDate(dateStr) {
     loadCourtMatrixForWizard(dateStr);
 }
 
+/**
+ * โหลดข้อมูล Matrix สถานะสนามและความพร้อมของสล็อตเวลาผ่าน AJAX
+ * @description ติดต่อกับ backend ผ่าน actions/get_court_matrix.php?date=... เพื่อดึงสถานะสนามทั้ง 3 คอร์ท
+ *              พร้อมอัตราค่าบริการของวันนั้น (วันธรรมดา / วันหยุด) และสั่งเรนเดอร์หน้าจอตามขั้นตอนปัจจุบัน
+ * @param {string} dateStr - วันที่ที่ต้องการตรวจสอบสถานะสนาม 'YYYY-MM-DD'
+ * @returns {Promise} สัญญา Promise ของคำขอ fetch
+ * @element #datePriceBanner, #datePriceText, #timeSlotGrid
+ */
 function loadCourtMatrixForWizard(dateStr) {
     let banner = document.getElementById('datePriceBanner');
     let textSpan = document.getElementById('datePriceText');
@@ -611,6 +774,11 @@ function loadCourtMatrixForWizard(dateStr) {
     });
 }
 
+/**
+ * แปลงสตริงวันที่รูปแบบ ISO (YYYY-MM-DD) เป็นรูปแบบวันที่ไทย (DD/MM/YYYY พ.ศ.)
+ * @param {string} dateStr - วันที่ในรูปแบบ 'YYYY-MM-DD'
+ * @returns {string} วันที่ไทย เช่น '17/10/2569' หรือ '-' หากไม่มีข้อมูล
+ */
 function formatDateThai(dateStr) {
     if (!dateStr) return '-';
     let parts = dateStr.split('-');
@@ -619,8 +787,16 @@ function formatDateThai(dateStr) {
 }
 
 /* ==========================================================================
-   Step 2: Operating Hours Grid (Start Time Selection)
+   หมวดที่ 4: ระบบเลือกเวลาและตารางคอร์ท (Time Slots & Court Matrix - Wizard Step 2 & 3)
    ========================================================================== */
+
+/**
+ * เรนเดอร์การ์ดช่วงเวลาเปิดให้บริการเริ่มต้น (Operating Hours Grid)
+ * @description สร้างการ์ดเวลาเริ่มต้นตั้งแต่ 09:00 ถึง 23:00 น. 
+ *              ตรวจสอบช่วงเวลาที่เลยเวลาปัจจุบันแล้ว (Past Hour) หรือช่วงเวลาที่สนามปิดบริการทั้งหมด
+ *              พร้อมปรับสถานะคลาส disabled และป้องกันการคลิก
+ * @element #timeSlotGrid, .time-slot-card
+ */
 function renderTimeSlots() {
     let container = document.getElementById('timeSlotGrid');
     if (!container) return;
@@ -679,6 +855,12 @@ function renderTimeSlots() {
     container.innerHTML = html;
 }
 
+/**
+ * จัดการเมื่อผู้ใช้เลือกเวลาเริ่มต้นที่ต้องการจอง
+ * @description บันทึกค่าเวลาเริ่มต้นลงใน wizardState และ input ซ่อน แล้วนำทางเข้าสู่ Step 3 ทันที (HCI Progressive Disclosure)
+ * @param {string} startStr - เวลาเริ่มต้นที่เลือก เช่น '14:00'
+ * @element #input_start_time
+ */
 function onSelectStartTime(startStr) {
     wizardState.selectedStartTime = startStr;
     let inputStart = document.getElementById('input_start_time');
@@ -688,9 +870,13 @@ function onSelectStartTime(startStr) {
     goToStep(3);
 }
 
-/* ==========================================================================
-   Step 3: Court Selection & Consecutive Slot / Scroll Multi-Hour
-   ========================================================================== */
+/**
+ * เรนเดอร์ตารางเลือกคอร์ทสนามแบบรายชั่วโมง (Court Hour Blocks Grid)
+ * @description สร้างบล็อกชั่วโมงเริ่มต้นตั้งแต่เวลาที่ผู้ใช้เลือก พร้อมทั้งแสดงชั่วโมงถัดไปเพื่อให้สามารถจองต่อเนื่องได้
+ *              ตรวจสอบสถานะแต่ละสนาม (Available ว่าง, Booked จองแล้ว, Pending รอตรวจสอบ, Maintenance ปิดปรับปรุง)
+ *              และไฮไลต์คอร์ทที่ผู้ใช้กำลังเลือกอยู่
+ * @element #courtHourBlocksContainer, .court-card-v2
+ */
 function renderCourtHourBlocks() {
     let container = document.getElementById('courtHourBlocksContainer');
     if (!container || !wizardState.matrixData) return;
@@ -786,7 +972,17 @@ function renderCourtHourBlocks() {
     updateStickySummaryBar();
 }
 
-// Toggle slot selection (consecutive multi-hour support)
+/**
+ * สลับการเลือก/ยกเลิกสล็อตเวลาของคอร์ทสนาม (Consecutive Multi-Hour Engine)
+ * @description จัดการกฎเหล็ก 2 ข้อของการจองสนาม:
+ *              1. กฎสนามเดียวกัน (Same Court Rule): การจองหลายชั่วโมงต้องเป็นคอร์ทเดียวกันเท่านั้น
+ *              2. กฎเวลาต่อเนื่อง (Consecutive Slot Rule): ชั่วโมงที่เลือกเพิ่มต้องติดกับชั่วโมงเดิม ไม่ข้ามชั่วโมง
+ * @param {string} slotStart - เวลาเริ่มต้นของสล็อต เช่น '14:00:00'
+ * @param {string} slotEnd - เวลาสิ้นสุดของสล็อต เช่น '15:00:00'
+ * @param {number} courtId - รหัสสนามคอร์ทแบดมินตัน
+ * @param {string} courtName - ชื่อสนาม เช่น 'คอร์ท 1'
+ * @param {number} price - ราคาของสล็อตเวลานั้น (บาท)
+ */
 function toggleCourtSlot(slotStart, slotEnd, courtId, courtName, price) {
     if (wizardState.selectedSlots.has(slotStart)) {
         let cur = wizardState.selectedSlots.get(slotStart);
@@ -862,6 +1058,12 @@ function toggleCourtSlot(slotStart, slotEnd, courtId, courtName, price) {
     renderCourtHourBlocks();
 }
 
+/**
+ * อัปเดตแถบสรุปยอดและสล็อตสนามที่เลือกลอยตัวด้านล่าง (Sticky Summary Bar)
+ * @description คำนวณจำนวนชั่วโมงรวม, ราคารวมค่าคอร์ท, ช่วงเวลาเริ่มต้น-สิ้นสุด
+ *              และอัปเดตข้อความบน Sticky Bar พร้อมเปิด/ปิดปุ่ม "ถัดไป" (Step 3 Next)
+ * @element #stickyHoursDisplay, #stickyCourtDisplay, #stickyTotalDisplay, #btnStickyNext
+ */
 function updateStickySummaryBar() {
     let hours = wizardState.selectedSlots.size;
     wizardState.selectedHours = hours;
@@ -916,6 +1118,12 @@ function updateStickySummaryBar() {
     calculateGrandTotal();
 }
 
+/**
+ * ซิงค์ชื่อย่อผู้เล่นลงใน Input ซ่อนเพื่อบันทึกลงฐานข้อมูล (PDPA Nickname)
+ * @description ใช้ชื่อย่อสำหรับแสดงผลบนตารางจองสาธารณะ เพื่อรักษาความเป็นส่วนตัวตามกฎหมาย PDPA
+ * @param {string} val - ชื่อย่อหรือฉายาที่กรอกในฟอร์ม
+ * @element #input_booking_nickname, #step3_nickname
+ */
 function syncBookingNickname(val) {
     wizardState.bookingNickname = val.trim();
     let hiddenInput = document.getElementById('input_booking_nickname');
@@ -923,8 +1131,14 @@ function syncBookingNickname(val) {
 }
 
 /* ==========================================================================
-   Step 4: Optional Add-on Services (Quantities & Stepper)
+   หมวดที่ 5: ระบบอุปกรณ์เช่าและบริการเสริม (Add-ons & Rental Selection - Wizard Step 4)
    ========================================================================== */
+
+/**
+ * อัปเดตแถบสรุปข้อมูลการจองย่อในขั้นตอนที่ 4
+ * @description ดึงข้อมูลวันที่, ช่วงเวลา, และชื่อสนามที่เลือกในขั้นตอนก่อนหน้ามาแสดงผลบนหัวข้อของ Step 4
+ * @element #stripDate, #stripTime, #stripCourt
+ */
 function updateStep4Summary() {
     let stripDate = document.getElementById('stripDate');
     let stripTime = document.getElementById('stripTime');
@@ -940,6 +1154,11 @@ function updateStep4Summary() {
     updateStep4NextButton();
 }
 
+/**
+ * อัปเดตข้อความบนปุ่ม "ถัดไป" ในขั้นตอนที่ 4 ตามจำนวนสินค้าและบริการเสริมที่เลือก
+ * @description นับจำนวนสินค้าที่มียอดสั่งซื้อ > 0 เพื่อแสดง badge จำนวนรายการบนปุ่ม เช่น "ถัดไป: ตรวจสอบรายการ (เลือกแล้ว 2 รายการ)"
+ * @element #btnStep4Next, .qty-input
+ */
 function updateStep4NextButton() {
     let btnNext = document.getElementById('btnStep4Next');
     if (!btnNext) return;
@@ -961,6 +1180,14 @@ function updateStep4NextButton() {
     }
 }
 
+/**
+ * ปรับเพิ่มหรือลดจำนวนสินค้า/อุปกรณ์เช่าผ่านปุ่มบวก-ลบ (+ / -)
+ * @description ปรับจำนวนสินค้าในช่อง Input ตาม delta (+1 หรือ -1) 
+ *              พร้อมป้องกันไม่ให้ค่าน้อยกว่า 0 หรือเกินกว่าค่า max ใน attribute ของ DOM
+ * @param {string|number} prodId - รหัสสินค้าหรือบริการเสริม
+ * @param {number} delta - ค่าการเปลี่ยนแปลง (+1 สำหรับเพิ่ม, -1 สำหรับลด)
+ * @element #prod_qty_[prodId]
+ */
 function adjustProductQty(prodId, delta) {
     let input = document.getElementById('prod_qty_' + prodId);
     if (!input) return;
@@ -976,6 +1203,12 @@ function adjustProductQty(prodId, delta) {
     calculateGrandTotal();
 }
 
+/**
+ * จัดการเมื่อผู้ใช้พิมพ์แก้ไขจำนวนสินค้าลงในช่องกรอกตัวเลขโดยตรง
+ * @description ตรวจสอบความถูกต้องของตัวเลข ไม่ให้ติดลบหรือเกินค่า max แล้วสั่งคำนวณราคารวมใหม่ทันที
+ * @param {string|number} prodId - รหัสสินค้าหรือบริการเสริม
+ * @element #prod_qty_[prodId]
+ */
 function onProductQtyChange(prodId) {
     let input = document.getElementById('prod_qty_' + prodId);
     if (!input) return;
@@ -991,8 +1224,15 @@ function onProductQtyChange(prodId) {
 }
 
 /* ==========================================================================
-   Grand Total Calculation & Step 5 Itemized Invoice
+   หมวดที่ 6 (ต่อ): การคำนวณยอดสุทธิและใบแจกแจงค่าใช้จ่าย (Grand Total & Invoice Review)
    ========================================================================== */
+
+/**
+ * คำนวณยอดเงินรวมสุทธิทั้งหมด (Grand Total Calculation)
+ * @description รวมยอดค่าบริการสนาม + ค่าเช่าอุปกรณ์ + ค่าสินค้าเครื่องดื่ม
+ *              และซิงค์ค่ายอดรวมลงใน Hidden Inputs เพื่อเตรียมส่งข้อมูลบันทึกลงฐานข้อมูล
+ * @element #input_court_price, #input_rental_price, #input_product_price, #input_total_price
+ */
 function calculateGrandTotal() {
     let rentTotal = 0;
     let prodTotal = 0;
@@ -1030,6 +1270,14 @@ function calculateGrandTotal() {
     updateStep4NextButton();
 }
 
+/**
+ * เรนเดอร์ใบแจ้งหนี้แจกแจงรายการค่าใช้จ่ายแบบละเอียด (Itemized Invoice Review - Step 5)
+ * @description สร้างตาราง HTML รายการค่าใช้จ่ายแยกระหว่าง:
+ *              1. ค่าบริการสนาม: แจกแจงตามชั่วโมงจริง แยกวันหยุด / กลางวัน / ค่ำ
+ *              2. ค่าสินค้าและอุปกรณ์เช่า: แสดงจำนวน หน่วย และราคารวมย่อย
+ *              พร้อมแสดงยอดเงินรวมสุทธิทั้งสิ้น
+ * @element #invNickname, #invDate, #invTime, #invCourt, #invGrandTotal, #invoiceTableBody
+ */
 function updateInvoiceReview() {
     calculateGrandTotal();
 
@@ -1133,8 +1381,22 @@ function updateInvoiceReview() {
     }
 }
 
-// Form Submission with Loading Spinner Feedback & Double Submit Prevention
+/* ==========================================================================
+   หมวดที่ 8: การส่งฟอร์มการจองและการจัดการ Guest (Booking Submission & Interceptor)
+   ========================================================================== */
+
+/** ตัวแปรแฟล็กป้องกันการกดส่งฟอร์มจองซ้ำ */
 let isBookingSubmitting = false;
+
+/**
+ * ตรวจสอบความถูกต้องและส่งฟอร์มยืนยันการจองสนาม (Final Booking Submission)
+ * @description ตรวจสอบว่ามีการเลือกสนามหรือไม่ และตรวจสอบสถานะการเข้าสู่ระบบ
+ *              หากเป็นผู้ใช้ทั่วไป (Guest) จะส่งต่อไปยัง submitGuestBooking()
+ *              หากล็อกอินแล้ว จะล็อกปุ่มส่งฟอร์ม แสดงไอคอน Spinner หมุน และอนุญาตให้ส่งคำขอ
+ * @param {Event} [event] - อีเวนต์การส่งฟอร์ม
+ * @returns {boolean} คืนค่า true หากพร้อมส่ง หรือ false หากติดเงื่อนไขการตรวจสอบ
+ * @element #btnFinalSubmitBooking, #bookingForm
+ */
 function handleBookingFormSubmit(event) {
     if (isBookingSubmitting) {
         if (event) event.preventDefault();
@@ -1167,9 +1429,13 @@ function handleBookingFormSubmit(event) {
     return true;
 }
 
-/* ==========================================================================
-   Guest Checkout Handler (Single Login Flow - No In-Page Modal)
-   ========================================================================== */
+/**
+ * จัดการกรณีผู้ใช้ทั่วไป (Guest) ยังไม่ได้เข้าสู่ระบบแต่อยากจองสนาม
+ * @description บันทึกข้อมูลการจองปัจจุบันลงในฟอร์ม แล้วนำทางผู้ใช้ไปยังหน้าล็อกอินหรือสมัครสมาชิก
+ *              โดยเซิร์ฟเวอร์จะจดจำ Pending Booking ไว้ และส่งกลับมาหลังยืนยันตัวตนสำเร็จ
+ * @param {string} [authType='login'] - รูปแบบการนำทาง ('login' หรือ 'register')
+ * @element #input_auth_action, #bookingForm
+ */
 function submitGuestBooking(authType = 'login') {
     let bookingForm = document.getElementById('bookingForm');
     if (!bookingForm) return;
@@ -1206,13 +1472,16 @@ function submitGuestBooking(authType = 'login') {
 
 
 /* ==========================================================================
-   Payment Page Countdown Timer & Slip Upload (Existing features maintained)
+   หมวดที่ 9: ระบบชำระเงิน แนบสลิป และเวลานับถอยหลัง (Payment, Slip & Countdown - payment.php)
    ========================================================================== */
 
-
-/* =========================================
-   Payment Countdown Timer (หน้าชำระเงิน)
-   ========================================= */
+/**
+ * ตัวจับเวลานับถอยหลัง 15 นาทีล็อกสนามบนหน้าชำระเงิน (15-Minute Slot Lock Countdown)
+ * @description คำนวณช่วงเวลาที่เหลือก่อนสล็อตสนามจะหมดอายุ (distance = expireTime - now)
+ *              หากเวลาหมดลงจะแจ้งเตือนผู้ใช้งานและยกเลิกการจองพร้อม Redirect กลับไปยังหน้า booking.php ทันที
+ * @param {string} lockExpireStr - สตริงเวลาหมดอายุที่ได้รับจากฐานข้อมูล เช่น '2026-10-17 14:15:00'
+ * @element #countdown
+ */
 function initPaymentCountdown(lockExpireStr) {
     let countdownElement = document.getElementById("countdown");
     if (!countdownElement || !lockExpireStr) return;
@@ -1239,9 +1508,16 @@ function initPaymentCountdown(lockExpireStr) {
     }, 1000);
 }
 
-/* =========================================
-   Payment Page - Slip Upload & Preview (HCI)
-   ========================================= */
+/**
+ * ระบบจัดการอัปโหลดสลิปหลักฐานการโอนเงิน (Slip Upload & Real-time Preview)
+ * @description รองรับการทำงานแบบครบวงจรตามหลัก HCI:
+ *              1. อัปโหลดผ่านการคลิกเลือกไฟล์ หรือลากวาง (Drag & Drop)
+ *              2. ตรวจสอบชนิดไฟล์ (JPG, PNG, WEBP) ฝั่ง Client ทันที
+ *              3. ตรวจสอบขนาดไฟล์ไม่เกิน 5MB ป้องกันการโหลดไฟล์ขนาดใหญ่เกินจำเป็น
+ *              4. แสดงภาพตัวอย่างสลิปโอนเงินทันที (Live Preview) ผ่าน FileReader API
+ *              5. มีระบบป้องกันการกดส่งฟอร์มซ้ำ (Double Submit Prevention) พร้อมปุ่ม Loading Spinner
+ * @element #paymentSlipInput, #slipUploadBox, #slipPreviewImg, #paymentForm, #btnSubmitPayment
+ */
 function initSlipUpload() {
     let fileInput = document.getElementById("paymentSlipInput");
     let uploadBox = document.getElementById("slipUploadBox");
@@ -1388,7 +1664,12 @@ function initSlipUpload() {
     }
 }
 
-// ฟังก์ชันคัดลอกเลขบัญชีธนาคาร
+/**
+ * ฟังก์ชันคัดลอกเลขที่บัญชีธนาคาร 1-Click ลงสู่ Clipboard
+ * @description ใช้ Clipboard API (พร้อม Fallback กรณีเบราว์เซอร์รุ่นเก่า) และแสดงกล่อง Feedback แจ้งเตือนผู้ใช้ 2.5 วินาที
+ * @param {string} accNo - เลขบัญชีธนาคารที่ต้องการคัดลอก
+ * @element #copyFeedback
+ */
 function copyBankAccount(accNo) {
     if (!accNo) return;
     
@@ -1420,9 +1701,15 @@ function copyBankAccount(accNo) {
 }
 
 /* ==========================================================================
-   Rewards Page Controller (Tabs, Redemption Modal & Verification)
+   หมวดที่ 10: ระบบสะสมแต้มและแลกของรางวัล (Rewards & Loyalty System - rewards.php)
    ========================================================================== */
 
+/**
+ * สลับแท็บแสดงของรางวัลตามหมวดหมู่ (Rewards Category Tab Switcher)
+ * @description ปรับเปลี่ยนคลาส active บนปุ่มแท็บและกล่องเนื้อหา pane ที่ตรงกับหมวดที่เลือก (ทั้งหมด, ค่าสนาม, เครื่องดื่ม, อุปกรณ์)
+ * @param {string} targetTab - รหัสแท็บเป้าหมาย เช่น 'all', 'court', 'drink', 'item'
+ * @element .rewards-tab-btn, .rewards-tab-pane
+ */
 function switchRewardsTab(targetTab) {
     let tabButtons = document.querySelectorAll('.rewards-tab-btn');
     let tabPanes = document.querySelectorAll('.rewards-tab-pane');
@@ -1444,6 +1731,17 @@ function switchRewardsTab(targetTab) {
     });
 }
 
+/**
+ * เปิดหน้าต่าง Modal ยืนยันการแลกของรางวัลด้วยแต้มสะสม
+ * @description นำข้อมูลของรางวัลที่เลือกมาแสดงผลบน Modal พร้อมคำนวณและแสดงแจกแจงแต้ม:
+ *              แต้มปัจจุบัน, แต้มที่จะถูกหัก, และแต้มคงเหลือสุทธิหลังการแลก
+ * @param {number|string} rewardId - รหัสของรางวัล
+ * @param {string} rewardName - ชื่อของรางวัล
+ * @param {number} pointCost - จำนวนแต้มที่ต้องใช้แลก
+ * @param {string} rewardImg - ชื่อไฟล์รูปภาพของรางวัล
+ * @param {number} userPoints - จำนวนแต้มสะสมปัจจุบันของผู้ใช้งาน
+ * @element #rewardConfirmModal, #modal_reward_id, #modal_reward_title, #modal_reward_cost, #modal_remain_points
+ */
 function openRedeemModal(rewardId, rewardName, pointCost, rewardImg, userPoints) {
     let modal = document.getElementById('rewardConfirmModal');
     if (!modal) return;
@@ -1489,6 +1787,11 @@ function openRedeemModal(rewardId, rewardName, pointCost, rewardImg, userPoints)
     modal.classList.add('active');
 }
 
+/**
+ * ปิดหน้าต่าง Modal ยืนยันการแลกของรางวัล
+ * @description ลบคลาส 'active' ออกจาก Element #rewardConfirmModal
+ * @element #rewardConfirmModal
+ */
 function closeRedeemModal() {
     let modal = document.getElementById('rewardConfirmModal');
     if (modal) {
@@ -1496,7 +1799,14 @@ function closeRedeemModal() {
     }
 }
 
+/** ตัวแปรแฟล็กป้องกันการกดแลกของรางวัลซ้ำ */
 let isRedeemSubmitting = false;
+
+/**
+ * ส่งฟอร์มคำขอยืนยันการแลกของรางวัล (Execute Redeem Submit)
+ * @description ล็อกปุ่มยืนยัน ป้องกันการ Double Submit และสั่ง Submit ฟอร์มไปยัง backend
+ * @element #btnModalConfirmRedeem, #redeemRewardForm
+ */
 function executeRedeemSubmit() {
     if (isRedeemSubmitting) return false;
 
@@ -1516,9 +1826,11 @@ function executeRedeemSubmit() {
     }
 }
 
-/* =========================================
-   Modal Backdrop Click & ESC Key Guard (Member Modals)
-   ========================================= */
+/**
+ * ดักจับการคลิกภายนอกพื้นที่ (Backdrop Click) และการกดปุ่ม ESC สำหรับปิด Modal ฝั่ง Member ทั้งหมด
+ * @description รองรับการปิด Modal ของรางวัล (#rewardConfirmModal) และ Modal การยกเลิก (#cancelModal) ตามมาตรฐาน HCI
+ * @event click, keydown (Escape)
+ */
 document.addEventListener('DOMContentLoaded', function() {
     // ปิดเมื่อคลิกนอกพื้นที่ Modal Dialog
     document.addEventListener('click', function(e) {
@@ -1553,9 +1865,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ==========================================================================
-   Modern Member Registration Controller (register.php)
-   HCI Real-time Validation, Toggle Visibility & Double Submit Guard
+   หมวดที่ 11: ระบบฟอร์มยืนยันตัวตนและความปลอดภัย (Auth & Security Forms - register.php & login.php)
    ========================================================================== */
+
+/**
+ * โมดูลควบคุมฟอร์มสมัครสมาชิก (Registration Form Controller - register.php)
+ * @description จัดการการตรวจสอบข้อมูลฝั่ง Client-side แบบ Real-time ตามมาตรฐาน HCI:
+ *              1. แสดง/ซ่อนรหัสผ่าน (Password Visibility Toggle) ทั้งสองช่อง
+ *              2. ตัวตรวจจับความตรงกันของรหัสผ่านสด (Live Match Indicator)
+ *              3. กรองเบอร์โทรศัพท์เฉพาะตัวเลข 10 หลักอัตโนมัติ (Numeric Sanitizer)
+ *              4. ตรวจสอบเงื่อนไขความถูกต้อง (ชื่อ, เบอร์โทร 10 หลักขึ้นต้นด้วย 0, อายุ 5-100 ปี, รหัสผ่าน >= 6 ตัว)
+ *              5. แสดง Alert ข้อความเตือนระดับ Client-side โดยไม่ต้องรีเฟรชหน้า
+ *              6. ล็อกปุ่มป้องกันการคลิกส่งซ้ำ (Double Submit Lockout)
+ */
 (function() {
     function initRegisterForm() {
         const form = document.getElementById('registerForm');
@@ -1576,6 +1898,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let isSubmitting = false;
 
+        /**
+         * แสดงกล่องข้อความแจ้งเตือนข้อผิดพลาดบนฟอร์มสมัครสมาชิก
+         * @param {string} msg - ข้อความแจ้งเตือน
+         */
         function showAlert(msg) {
             if (!alertBox) {
                 alert(msg);
@@ -1590,10 +1916,18 @@ document.addEventListener('DOMContentLoaded', function() {
             alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
+        /**
+         * ล้างกล่องแจ้งเตือนข้อผิดพลาด
+         */
         function clearAlert() {
             if (alertBox) alertBox.innerHTML = '';
         }
 
+        /**
+         * ป้องกันช่องโหว่ XSS ด้วยการแปลงอักขระพิเศษเป็น HTML Entities
+         * @param {string} str - ข้อความดิบ
+         * @returns {string} ข้อความที่ผ่านการ Escape แล้ว
+         */
         function escapeHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -1603,7 +1937,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 .replace(/'/g, '&#039;');
         }
 
-        // Toggle Password Visibility
+        /**
+         * ติดตั้งตัวสลับการแสดง/ซ่อนรหัสผ่าน (Password Visibility Toggle)
+         * @param {HTMLElement} btn - ปุ่มไอคอนลูกตา
+         * @param {HTMLInputElement} input - ช่อง Input รหัสผ่าน
+         * @param {HTMLElement} icon - ไอคอน FontAwesome
+         */
         function setupToggle(btn, input, icon) {
             if (!btn || !input || !icon) return;
             btn.addEventListener('click', function(e) {
@@ -1623,7 +1962,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setupToggle(btnTogglePass, passInput, togglePassIcon);
         setupToggle(btnToggleConfirm, confirmPassInput, toggleConfirmIcon);
 
-        // Real-time password match check
+        /**
+         * ตรวจสอบว่ารหัสผ่านและการยืนยันรหัสผ่านตรงกันหรือไม่แบบสด (Live Matching)
+         */
         function checkPasswordMatch() {
             if (!matchHint || !passInput || !confirmPassInput) return;
             const pVal = passInput.value;
@@ -1744,10 +2085,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 })();
 
-/* ==========================================================================
-   Modern Member Login Controller (login.php)
-   Book Split-Screen, Password Visibility Toggle & Double Submit Guard
-   ========================================================================== */
+/**
+ * โมดูลควบคุมฟอร์มเข้าสู่ระบบ (Login Form Controller - login.php)
+ * @description จัดการความปลอดภัยและการตรวจสอบข้อมูลฝั่ง Client-side:
+ *              1. สลับแสดง/ซ่อนรหัสผ่าน (Password Visibility Toggle)
+ *              2. กรองเบอร์โทรศัพท์เฉพาะตัวเลข 10 หลักอัตโนมัติ
+ *              3. ตรวจสอบการกรอกเบอร์โทรศัพท์และรหัสผ่านก่อนส่งฟอร์ม
+ *              4. แสดงข้อความแจ้งเตือนข้อผิดพลาดระดับ Client-side
+ *              5. ป้องกันการกดส่งฟอร์มซ้ำ (Double Submit Prevention) พร้อมปุ่ม Loading
+ */
 (function() {
     function initLoginForm() {
         const form = document.getElementById('loginForm');
@@ -1762,6 +2108,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let isSubmitting = false;
 
+        /**
+         * แสดงกล่องข้อความแจ้งเตือนข้อผิดพลาดบนฟอร์มเข้าสู่ระบบ
+         * @param {string} msg - ข้อความแจ้งเตือน
+         */
         function showAlert(msg) {
             if (!alertBox) {
                 alert(msg);
@@ -1776,10 +2126,18 @@ document.addEventListener('DOMContentLoaded', function() {
             alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
+        /**
+         * ล้างกล่องแจ้งเตือนข้อผิดพลาด
+         */
         function clearAlert() {
             if (alertBox) alertBox.innerHTML = '';
         }
 
+        /**
+         * ป้องกันช่องโหว่ XSS ด้วยการแปลงอักขระพิเศษเป็น HTML Entities
+         * @param {string} str - ข้อความดิบ
+         * @returns {string} ข้อความที่ผ่านการ Escape แล้ว
+         */
         function escapeHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
