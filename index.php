@@ -67,540 +67,284 @@ try {
     <link rel="stylesheet" href="assets/css/responsive-mobile.css?v=<?php echo filemtime('assets/css/responsive-mobile.css'); ?>">
     <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
     <link rel="stylesheet" href="assets/css/promotions.css?v=<?php echo filemtime('assets/css/promotions.css'); ?>">
+    <link rel="stylesheet" href="assets/css/home.css?v=<?php echo filemtime('assets/css/home.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="page-body">
     
     <!-- ============================================== -->
-    <!-- 1. แถบเมนูหลัก (Global Navbar 68px)            -->
+    <!-- 1. แถบเมนูหลัก (Global Navbar)                  -->
     <!-- ============================================== -->
     <?php include_once 'includes/navbar.php'; ?>
 
-    <!-- ============================================== -->
-    <!-- 2. Hero Section & Key Highlights (Black & Gold) -->
-    <!-- ============================================== -->
-    <section class="hero-dark-section">
-        <div class="hero-dark-container">
-            
-            <!-- ป้ายกำกับเกียรติยศ -->
-            <div class="hero-dark-badge">
-                <i class="fas fa-crown text-gold"></i>
-                <span>สนามแบดมินตันมาตรฐาน BWF อันดับ 1 ในปัตตานี</span>
-            </div>
-
-            <!-- พาดหัวหลัก H1 คมชัด -->
-            <h1 class="hero-dark-title">
-                ยกระดับทุกการแข่งขัน <br class="hero-br-desktop">
-                สัมผัสประสบการณ์ <span class="text-gold-highlight">สนามแบดมินตันระดับพรีเมียม</span>
-            </h1>
-
-            <!-- สโลแกน / คำอธิบาย -->
-            <p class="hero-dark-subtitle">
-                คอร์ทพื้นยางสังเคราะห์ 5 ชั้นซับแรงกระแทก ระบบไฟ LED Anti-Glare ตัดแสงสะท้อนถนอมสายตา พร้อมระบบจองคิวออนไลน์เรียลไทม์ และสะสมแต้มแลกรับของรางวัลแบบครบวงจร
-            </p>
-
-            <!-- ปุ่มคู่ Action (Dual CTAs) -->
-            <div class="hero-dark-actions">
-                <a href="booking.php" class="btn-dark-primary-gold">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>จองสนามทันที</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-                <?php if (isset($_SESSION['member_id'])): ?>
-                    <a href="booking_history.php" class="btn-dark-outline">
-                        <i class="fas fa-history"></i>
-                        <span>ประวัติการจองของฉัน</span>
-                    </a>
-                <?php else: ?>
-                    <a href="login.php" class="btn-dark-outline">
-                        <i class="fas fa-user-lock"></i>
-                        <span>เข้าสู่ระบบสมาชิก</span>
-                    </a>
-                <?php endif; ?>
-            </div>
-
-            <!-- แดชบอร์ดสถิติสนาม 4 การ์ด (Stadium Live Stats Dashboard) -->
-            <div class="hero-stats-dashboard">
-                <div class="stat-dashboard-card">
-                    <div class="stat-card-top">
-                        <span class="stat-number"><?php echo htmlspecialchars($court_count); ?></span>
-                        <div class="stat-badge-icon"><i class="fas fa-layer-group"></i></div>
-                    </div>
-                    <h3 class="stat-card-title">คอร์ทมาตรฐาน BWF</h3>
-                    <p class="stat-card-sub">พื้นยางสังเคราะห์ 5 ชั้น · ไฟ LED Anti-Glare</p>
-                </div>
-
-                <div class="stat-dashboard-card">
-                    <div class="stat-card-top">
-                        <span class="stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></span>
-                        <div class="stat-badge-icon"><i class="fas fa-calendar-check"></i></div>
-                    </div>
-                    <h3 class="stat-card-title">แมตช์ที่จองสำเร็จ</h3>
-                    <p class="stat-card-sub">ระบบจองอัตโนมัติเรียลไทม์ · ล็อกคอร์ท 100%</p>
-                </div>
-
-                <div class="stat-dashboard-card">
-                    <div class="stat-card-top">
-                        <span class="stat-number">100%</span>
-                        <div class="stat-badge-icon"><i class="fas fa-star"></i></div>
-                    </div>
-                    <h3 class="stat-card-title">มาตรฐานความพึงพอใจ</h3>
-                    <p class="stat-card-sub">สนามอันดับ 1 ที่นักกีฬาไว้วางใจในปัตตานี</p>
-                </div>
-
-                <div class="stat-dashboard-card">
-                    <div class="stat-card-top">
-                        <span class="stat-number">24 ชม.</span>
-                        <div class="stat-badge-icon"><i class="fas fa-clock"></i></div>
-                    </div>
-                    <h3 class="stat-card-title">ระบบบริการครบวงจร</h3>
-                    <p class="stat-card-sub">จองคิวออนไลน์ 24 ชม. · Pro Shop · ห้องอาบน้ำ</p>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 2. Brand & Sponsor Marquee (Infinite CSS Slider) -->
-    <!-- ============================================== -->
-    <section class="brand-marquee-section">
-        <div class="marquee-header">
-            <h4 class="marquee-heading">พันธมิตรและอุปกรณ์กีฬาที่ได้รับความไว้วางใจ</h4>
-        </div>
-
-        <div class="marquee-container">
-            <div class="marquee-track">
-                <!-- ชุดที่ 1 -->
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="YONEX">
-                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="VICTOR">
-                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="LI-NING">
-                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="MIZUNO">
-                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="DUNLOP">
-                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="ASICS">
-                        <img src="assets/img/brands/asics.png" alt="ASICS" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="T.S. PRO SHOP">
-                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-
-                <!-- ชุดที่ 2 (ทำซ้ำเพื่อต่อลูปแบบไร้รอยต่อ Infinite Marquee) -->
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="YONEX">
-                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="VICTOR">
-                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="LI-NING">
-                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="MIZUNO">
-                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="DUNLOP">
-                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="ASICS">
-                        <img src="assets/img/brands/asics.png" alt="ASICS" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-                <div class="marquee-item">
-                    <div class="brand-banner-card" title="T.S. PRO SHOP">
-                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="brand-banner-img" loading="lazy">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 3. Top Players Leaderboard (Podium Ranking Top 3) -->
-    <!-- ============================================== -->
-    <section class="leaderboard-section">
-        <div class="section-header-center">
-            <span class="section-badge"><i class="fas fa-medal"></i> ทำเนียบเกียรติยศ</span>
-            <h2 class="section-main-title">Top Players Leaderboard</h2>
-            <p class="section-sub-desc">
-                3 อันดับสมาชิกผู้เล่นยอดเยี่ยมที่ไว้วางใจและเข้าใช้บริการสนาม T.S. Pattani สูงสุด
-            </p>
-        </div>
-
-        <div class="podium-container">
-            <!-- อันดับ 2: เหรียญเงิน (Silver - ฝั่งซ้ายบน Desktop) -->
-            <?php if ($rank2_player): ?>
-            <div class="podium-card podium-rank-2">
-                <div class="podium-avatar-wrap">
-                    <i class="fas fa-user-ninja"></i>
-                    <span class="podium-rank-badge">2</span>
-                </div>
-                <h3 class="podium-player-name" title="<?php echo htmlspecialchars($rank2_player['member_name']); ?>">
-                    <?php echo htmlspecialchars($rank2_player['member_name']); ?>
-                </h3>
-                <div class="podium-phone-masked">
-                    <i class="fas fa-phone-alt mr-6"></i><?php echo htmlspecialchars(mask_phone_number($rank2_player['member_phone'])); ?>
-                </div>
-                <div class="podium-meta-row">
-                    <span class="podium-level-pill level-<?php echo strtolower($rank2_player['member_level']); ?>">
-                        <?php echo htmlspecialchars($rank2_player['member_level']); ?>
-                    </span>
-                </div>
-                <div class="podium-pedestal">
-                    <span class="pedestal-count"><?php echo intval($rank2_player['booking_count']); ?> แมตช์</span>
-                    <span class="pedestal-label">รองชนะเลิศอันดับ 1</span>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            <!-- อันดับ 1: เหรียญทอง (Gold - ตรงกลางยกสูงบน Desktop) -->
-            <?php if ($rank1_player): ?>
-            <div class="podium-card podium-rank-1">
-                <div class="podium-crown">
-                    <i class="fas fa-crown"></i>
-                </div>
-                <div class="podium-avatar-wrap">
-                    <i class="fas fa-user-astronaut"></i>
-                    <span class="podium-rank-badge">1</span>
-                </div>
-                <h3 class="podium-player-name" title="<?php echo htmlspecialchars($rank1_player['member_name']); ?>">
-                    <?php echo htmlspecialchars($rank1_player['member_name']); ?>
-                </h3>
-                <div class="podium-phone-masked">
-                    <i class="fas fa-phone-alt mr-6"></i><?php echo htmlspecialchars(mask_phone_number($rank1_player['member_phone'])); ?>
-                </div>
-                <div class="podium-meta-row">
-                    <span class="podium-level-pill level-<?php echo strtolower($rank1_player['member_level']); ?>">
-                        <?php echo htmlspecialchars($rank1_player['member_level']); ?>
-                    </span>
-                </div>
-                <div class="podium-pedestal">
-                    <span class="pedestal-count"><?php echo intval($rank1_player['booking_count']); ?> แมตช์</span>
-                    <span class="pedestal-label">จองสำเร็จสูงสุดอันดับ 1</span>
-                </div>
-            </div>
-            <?php endif; ?>
-
-            <!-- อันดับ 3: เหรียญทองแดง (Bronze - ฝั่งขวาบน Desktop) -->
-            <?php if ($rank3_player): ?>
-            <div class="podium-card podium-rank-3">
-                <div class="podium-avatar-wrap">
-                    <i class="fas fa-user-check"></i>
-                    <span class="podium-rank-badge">3</span>
-                </div>
-                <h3 class="podium-player-name" title="<?php echo htmlspecialchars($rank3_player['member_name']); ?>">
-                    <?php echo htmlspecialchars($rank3_player['member_name']); ?>
-                </h3>
-                <div class="podium-phone-masked">
-                    <i class="fas fa-phone-alt mr-6"></i><?php echo htmlspecialchars(mask_phone_number($rank3_player['member_phone'])); ?>
-                </div>
-                <div class="podium-meta-row">
-                    <span class="podium-level-pill level-<?php echo strtolower($rank3_player['member_level']); ?>">
-                        <?php echo htmlspecialchars($rank3_player['member_level']); ?>
-                    </span>
-                </div>
-                <div class="podium-pedestal">
-                    <span class="pedestal-count"><?php echo intval($rank3_player['booking_count']); ?> แมตช์</span>
-                    <span class="pedestal-label">รองชนะเลิศอันดับ 2</span>
-                </div>
-            </div>
-            <?php endif; ?>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 4. Court Highlights & Amenities (จุดเด่นสนาม BWF) -->
-    <!-- ============================================== -->
-    <section class="amenities-section" id="amenities">
-        <div class="section-header-center">
-            <span class="section-badge"><i class="fas fa-check-circle"></i> มาตรฐานระดับสากล</span>
-            <h2 class="section-main-title">จุดเด่นและสิ่งอำนวยความสะดวกครบครัน</h2>
-            <p class="section-sub-desc">
-                ออกแบบมาเพื่อนักแบดมินตันทุกระดับ ตั้งแต่มือสมัครเล่น ก๊วนก๊วนเพื่อน ไปจนถึงนักกีฬาแข่งขัน
-            </p>
-        </div>
-
-        <div class="amenities-grid">
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-layer-group"></i>
-                </div>
-                <h3 class="amenity-title">พื้นยางมาตรฐาน BWF 5 ชั้น</h3>
-                <p class="amenity-desc">
-                    พื้นยางสังเคราะห์หนานุ่ม ซับแรงกระแทกจากทุกจังหวะกระโดด ช่วยปกป้องข้อต่อและหัวเข่า ยึดเกาะพื้นผิวดีเยี่ยม ปลอดภัยไร้กังวล
-                </p>
-            </div>
-
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-eye"></i>
-                </div>
-                <h3 class="amenity-title">ระบบไฟ LED Anti-Glare</h3>
-                <p class="amenity-desc">
-                    ออกแบบทิศทางแสงสว่างให้ตัดแสงสะท้อนเข้าตา มองเห็นวิถีลูกขนไก่ได้คมชัดทุกลูก สว่างสม่ำเสมอทั่วทั้งคอร์ท ไม่เมื่อยล้าสายตา
-                </p>
-            </div>
-
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-wind"></i>
-                </div>
-                <h3 class="amenity-title">ระบบหมุนเวียนอากาศถ่ายเท</h3>
-                <p class="amenity-desc">
-                    โถงอาคารหลังคาสูงโปร่ง ติดตั้งพัดลมระบายอากาศแรงดันสูงรอบทิศทาง อากาศถ่ายเทสะดวก ไม่อับชื้น เล่นได้สบายยาวนาน
-                </p>
-            </div>
-
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-shower"></i>
-                </div>
-                <h3 class="amenity-title">ห้องน้ำ & ห้องอาบน้ำแยกสัดส่วน</h3>
-                <p class="amenity-desc">
-                    ห้องน้ำและห้องอาบน้ำแยกชาย-หญิง สะอาด ปลอดภัย ดูแลความสะอาดสม่ำเสมอ พร้อมเครื่องทำน้ำอุ่นและล็อกเกอร์เก็บสัมภาระ
-                </p>
-            </div>
-
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-parking"></i>
-                </div>
-                <h3 class="amenity-title">ที่จอดรถกว้างขวาง & CCTV</h3>
-                <p class="amenity-desc">
-                    ลานจอดรถยนต์และจักรยานยนต์รองรับมากกว่า 50 คัน เข้า-ออกสะดวกสบาย พร้อมระบบกล้องวงจรปิด CCTV ดูแลความปลอดภัยตลอด 24 ชม.
-                </p>
-            </div>
-
-            <div class="amenity-card">
-                <div class="amenity-icon-wrap">
-                    <i class="fas fa-store"></i>
-                </div>
-                <h3 class="amenity-title">Pro Shop & จุดบริการเครื่องดื่ม</h3>
-                <p class="amenity-desc">
-                    บริการขึ้นเอ็นไม้แบดโดยช่างผู้ชำนาญ จำหน่ายลูกแบดมินตัน กริปพันด้าม เครื่องดื่มเย็นสดชื่น พร้อมบริการเช่าไม้และรองเท้า
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 5. How It Works (3 ขั้นตอนการจองง่ายๆ) -->
-    <!-- ============================================== -->
-    <section class="how-it-works-section" id="how-it-works">
-        <div class="section-header-center">
-            <span class="section-badge"><i class="fas fa-bolt"></i> สะดวก รวดเร็ว</span>
-            <h2 class="section-main-title">3 ขั้นตอนง่ายๆ ในการจองสนาม</h2>
-            <p class="section-sub-desc">
-                ระบบจองออนไลน์ที่รวดเร็ว ล็อกเวลาได้แน่นอน ไม่ต้องรอคิวหน้าสนาม
-            </p>
-        </div>
-
-        <div class="steps-grid">
-            <div class="step-card">
-                <span class="step-num-pill">ขั้นตอนที่ 1</span>
-                <div class="step-icon-circle">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <h3 class="step-title">เลือกวันและเวลา</h3>
-                <p class="step-desc">
-                    เช็คตารางสนามว่างแบบ Real-time ล่วงหน้าได้ทันที พร้อมดูอัตราค่าบริการตามประเภทวันปกติและวันโปรโมชัน
-                </p>
-            </div>
-
-            <div class="step-card">
-                <span class="step-num-pill">ขั้นตอนที่ 2</span>
-                <div class="step-icon-circle">
-                    <i class="fas fa-table-tennis"></i>
-                </div>
-                <h3 class="step-title">เลือกคอร์ท & อุปกรณ์เสริม</h3>
-                <p class="step-desc">
-                    เลือกสนามที่ชอบ และสามารถสั่งเครื่องดื่มเย็น หรือเลือกเช่าไม้แบดมินตันและรองเท้าเพิ่มได้ในที่เดียว
-                </p>
-            </div>
-
-            <div class="step-card">
-                <span class="step-num-pill">ขั้นตอนที่ 3</span>
-                <div class="step-icon-circle">
-                    <i class="fas fa-qrcode"></i>
-                </div>
-                <h3 class="step-title">สแกนจ่ายรับคิวทันที</h3>
-                <p class="step-desc">
-                    โอนเงินชำระผ่าน QR Code พร้อมแนบสลิป ระบบจะล็อกสนามให้ท่านเป็นเวลา 15 นาที และพร้อมเข้าเล่นได้ทันที
-                </p>
-            </div>
-        </div>
-
-        <div class="steps-cta-bar">
-            <a href="booking.php" class="btn-dark-primary-gold">
-                <i class="fas fa-play-circle"></i>
-                <span>ทดลองจองสนามตอนนี้</span>
-                <i class="fas fa-arrow-right mr-6"></i>
-            </a>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 6. News & Announcements (ข่าวสารและกิจกรรมล่าสุด) -->
-    <!-- ============================================== -->
-    <section class="amenities-section">
-        <div class="section-header-center">
-            <span class="section-badge"><i class="fas fa-bullhorn"></i> ประกาศสำคัญ</span>
-            <h2 class="section-main-title">ข่าวสารและโปรโมชันล่าสุด</h2>
-            <p class="section-sub-desc">
-                ติดตามข่าวสารการแข่งขัน กิจกรรมพิเศษ และโปรโมชันสุดคุ้มจากทางสนาม
-            </p>
-        </div>
-
-        <div class="news-container">
-            <?php if (count($news_list) > 0): ?>
-                <?php foreach ($news_list as $news): ?>
-                    <div class="news-card">
-                        <?php if (!empty($news['news_image'])): ?>
-                            <img src="uploads/news/<?php echo htmlspecialchars($news['news_image']); ?>" alt="News Image" class="news-img">
-                        <?php else: ?>
-                            <div class="news-img-placeholder">
-                                <i class="fas fa-image fa-3x"></i>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <div class="news-content">
-                            <div class="news-date">
-                                <i class="far fa-clock"></i> 
-                                <?php echo date('d/m/Y H:i', strtotime($news['news_published_at'])); ?> น.
-                            </div>
-                            <h3 class="news-title"><?php echo htmlspecialchars($news['news_title']); ?></h3>
-                            <p class="news-desc"><?php echo nl2br(htmlspecialchars($news['news_content'])); ?></p>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="news-empty-state">
-                    <i class="fas fa-info-circle fa-3x news-empty-icon"></i><br>
-                    ยังไม่มีข่าวสารหรือประกาศในขณะนี้
-                </div>
-            <?php endif; ?>
-        </div>
-    </section>
-
-    <!-- ============================================== -->
-    <!-- 7. Location, Hours & Contact (ที่ตั้งและเวลาเปิด-ปิด) -->
-    <!-- ============================================== -->
-    <section class="location-hours-section">
-        <div class="section-header-center">
-            <span class="section-badge"><i class="fas fa-map-marked-alt"></i> การเดินทาง & ติดต่อ</span>
-            <h2 class="section-main-title">เวลาเปิดทำการและที่ตั้งสนาม</h2>
-            <p class="section-sub-desc">
-                ตั้งอยู่ใจกลางเมืองปัตตานี เดินทางสะดวก พร้อมสิ่งอำนวยความสะดวกครบครัน
-            </p>
-        </div>
-
-        <div class="location-grid">
-            <!-- กล่องเวลาเปิด-ปิดและช่องทางติดต่อ -->
-            <div class="info-card">
-                <div>
-                    <h3 class="info-card-title">
-                        <i class="fas fa-clock text-accent"></i> เวลาเปิดให้บริการ
-                    </h3>
-                    
-                    <div class="schedule-table">
-                        <div class="schedule-row">
-                            <span class="schedule-day">วันจันทร์ - วันศุกร์</span>
-                            <span class="schedule-time">09:00 - 24:00 น.</span>
-                        </div>
-                        <div class="schedule-row">
-                            <span class="schedule-day">วันเสาร์ - วันอาทิตย์</span>
-                            <span class="schedule-time">08:00 - 24:00 น.</span>
-                        </div>
-                        <div class="schedule-row">
-                            <span class="schedule-day">วันหยุดนักขัตฤกษ์</span>
-                            <span class="schedule-time">เปิดให้บริการตามปกติ</span>
-                        </div>
-                    </div>
-
-                    <h3 class="info-card-title mt-20">
-                        <i class="fas fa-headset text-accent"></i> ช่องทางการติดต่อ
-                    </h3>
-                    <div class="contact-chips-grid">
-                        <a href="tel:0812345678" class="contact-chip-item">
-                            <i class="fas fa-phone-alt text-success"></i> 081-234-5678
-                        </a>
-                        <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="contact-chip-item">
-                            <i class="fab fa-line text-success"></i> @tspattani
-                        </a>
-                        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="contact-chip-item">
-                            <i class="fab fa-facebook-f text-accent"></i> T.S. Pattani
-                        </a>
-                        <a href="chat.php" class="contact-chip-item">
-                            <i class="fas fa-comment-dots text-primary"></i> แชทกับเจ้าหน้าที่
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- กล่องแผนที่และการเดินทาง -->
-            <div class="info-card">
-                <div>
-                    <h3 class="info-card-title">
-                        <i class="fas fa-map-pin text-danger"></i> แผนที่และการเดินทาง
-                    </h3>
-                    <p class="footer-desc mb-16">
-                        <strong>ที่อยู่:</strong> 123 ถนนเจริญประดิษฐ์ ตำบลรูสะมิแล อำเภอเมือง จังหวัดปัตตานี 94000 (ใกล้กับมหาวิทยาลัยสงขลานครินทร์ วิทยาเขตปัตตานี)
+    <main class="home-page-wrap">
+        <!-- ============================================== -->
+        <!-- 1. Hero Section (Clean & Focused)              -->
+        <!-- ============================================== -->
+        <section class="home-hero-section">
+            <div class="home-container">
+                <div class="home-hero-content">
+                    <h1 class="home-hero-title">
+                        สนามแบดมินตันมาตรฐาน BWF <span class="text-gold">ใจกลางเมืองปัตตานี</span>
+                    </h1>
+                    <p class="home-hero-subtitle">
+                        คอร์ทพื้นยาง 5 ชั้น ซับแรงกระแทก ระบบไฟ Anti-Glare พร้อมระบบจองคิวออนไลน์ 24 ชม.
                     </p>
-                    
-                    <div class="map-visual-box">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.916853248356!2d101.24072387588383!3d6.866038419385521!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31b269588b3f63e3%3A0x6b0983199c0957b!2sPattani%20Stadium!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
-                            allowfullscreen="" 
-                            loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade"
-                            title="T.S. Pattani Badminton Location Map">
-                        </iframe>
+                    <div class="home-hero-actions">
+                        <a href="booking.php" class="home-btn-primary">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>จองสนาม</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 2. แถบสถิติ/จุดเด่นสั้นๆ (4 บล็อกแนวนอน)      -->
+        <!-- ============================================== -->
+        <section class="home-stats-section">
+            <div class="home-container">
+                <div class="home-stats-grid">
+                    <div class="home-stat-card">
+                        <span class="home-stat-number"><?php echo htmlspecialchars($court_count); ?></span>
+                        <div class="home-stat-title">คอร์ทมาตรฐาน BWF</div>
+                        <p class="home-stat-desc">พื้นยาง 5 ชั้น ไฟ Anti-Glare</p>
                     </div>
 
-                    <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="btn-location-action">
-                        <i class="fas fa-directions"></i> เปิดแอปพลิเคชัน Google Maps นำทาง
+                    <div class="home-stat-card">
+                        <span class="home-stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></span>
+                        <div class="home-stat-title">แมตช์ที่จองสำเร็จ</div>
+                        <p class="home-stat-desc">ล็อกคิวอัตโนมัติเรียลไทม์</p>
+                    </div>
+
+                    <div class="home-stat-card">
+                        <span class="home-stat-number">100%</span>
+                        <div class="home-stat-title">มาตรฐานความพึงพอใจ</div>
+                        <p class="home-stat-desc">ผู้เล่นไว้วางใจสูงสุดในปัตตานี</p>
+                    </div>
+
+                    <div class="home-stat-card">
+                        <span class="home-stat-number">24 ชม.</span>
+                        <div class="home-stat-title">ระบบบริการครบวงจร</div>
+                        <p class="home-stat-desc">จองออนไลน์ตลอด 24 ชั่วโมง</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 3. 3 ขั้นตอนการใช้งาน (3-Step Booking Guide)   -->
+        <!-- ============================================== -->
+        <section class="home-section" id="how-it-works">
+            <div class="home-container">
+                <div class="home-section-header">
+                    <h2 class="home-section-title">3 ขั้นตอนการจองสนาม</h2>
+                    <p class="home-section-desc">จองคิวออนไลน์ง่าย สะดวก รวดเร็ว ล็อกเวลาได้แน่นอน</p>
+                </div>
+
+                <div class="home-steps-grid">
+                    <div class="home-step-card">
+                        <span class="home-step-number">01</span>
+                        <h3 class="home-step-title">เลือกวันและเวลา</h3>
+                        <p class="home-step-desc">เช็คตารางสนามว่างแบบ Real-time พร้อมอัตราค่าบริการรายชั่วโมง</p>
+                    </div>
+
+                    <div class="home-step-card">
+                        <span class="home-step-number">02</span>
+                        <h3 class="home-step-title">เลือกคอร์ทและอุปกรณ์</h3>
+                        <p class="home-step-desc">เลือกสนามที่ชอบ พร้อมบริการเช่าอุปกรณ์และเครื่องดื่ม</p>
+                    </div>
+
+                    <div class="home-step-card">
+                        <span class="home-step-number">03</span>
+                        <h3 class="home-step-title">สแกนจ่ายรับคิวทันที</h3>
+                        <p class="home-step-desc">ชำระผ่าน QR Code พร้อมแนบสลิปเพื่อยืนยันคิวทันที</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 4. สิ่งอำนวยความสะดวก/จุดเด่นสนาม (Key Amenities) -->
+        <!-- ============================================== -->
+        <section class="home-section" id="amenities">
+            <div class="home-container">
+                <div class="home-section-header">
+                    <h2 class="home-section-title">สิ่งอำนวยความสะดวก</h2>
+                    <p class="home-section-desc">มาตรฐานสนามระดับสากลเพื่อประสบการณ์การเล่นที่ดีที่สุด</p>
+                </div>
+
+                <div class="home-amenities-grid">
+                    <div class="home-amenity-card">
+                        <div class="home-amenity-icon"><i class="fas fa-layer-group"></i></div>
+                        <h3 class="home-amenity-title">พื้นยางมาตรฐาน BWF 5 ชั้น</h3>
+                        <p class="home-amenity-desc">ซับแรงกระแทก ปกป้องข้อต่อและหัวเข่า ยึดเกาะดีเยี่ยม ปลอดภัยทุกการเคลื่อนไหว</p>
+                    </div>
+
+                    <div class="home-amenity-card">
+                        <div class="home-amenity-icon"><i class="fas fa-eye"></i></div>
+                        <h3 class="home-amenity-title">ระบบไฟ LED Anti-Glare</h3>
+                        <p class="home-amenity-desc">ตัดแสงสะท้อน สว่างสม่ำเสมอทั่วทั้งคอร์ท ไม่เมื่อยล้าสายตา มองเห็นลูกชัดเจน</p>
+                    </div>
+
+                    <div class="home-amenity-card">
+                        <div class="home-amenity-icon"><i class="fas fa-wind"></i></div>
+                        <h3 class="home-amenity-title">ระบบหมุนเวียนอากาศถ่ายเท</h3>
+                        <p class="home-amenity-desc">โถงอาคารสูงโปร่ง พัดลมระบายอากาศแรงดันสูงรอบทิศทาง ไม่อับชื้น เล่นได้ต่อเนื่อง</p>
+                    </div>
+
+                    <div class="home-amenity-card">
+                        <div class="home-amenity-icon"><i class="fas fa-shower"></i></div>
+                        <h3 class="home-amenity-title">ห้องน้ำ & ห้องอาบน้ำ</h3>
+                        <p class="home-amenity-desc">แยกสัดส่วนชาย-หญิง สะอาด ปลอดภัย พร้อมเครื่องทำน้ำอุ่นและล็อกเกอร์เก็บของ</p>
+                    </div>
+
+                    <div class="home-amenity-card">
+                        <div class="home-amenity-icon"><i class="fas fa-parking"></i></div>
+                        <h3 class="home-amenity-title">ที่จอดรถกว้างขวาง & CCTV</h3>
+                        <p class="home-amenity-desc">รองรับรถยนต์และจักรยานยนต์มากกว่า 50 คัน พร้อมกล้องวงจรปิดดูแลตลอด 24 ชม.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 5. ข่าวสารและโปรโมชัน (News & Announcements)    -->
+        <!-- ============================================== -->
+        <section class="home-section" id="news">
+            <div class="home-container">
+                <div class="home-section-header header-split">
+                    <div>
+                        <h2 class="home-section-title">ข่าวสารและโปรโมชัน</h2>
+                        <p class="home-section-desc">อัปเดตกิจกรรมพิเศษและสิทธิประโยชน์ล่าสุดจากทางสนาม</p>
+                    </div>
+                    <a href="promotions.php" class="home-link-gold">
+                        <span>ดูทั้งหมด</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="home-news-grid">
+                    <?php if (!empty($news_list) && count($news_list) > 0): ?>
+                        <?php foreach ($news_list as $news): ?>
+                            <article class="home-news-card">
+                                <?php if (!empty($news['news_image'])): ?>
+                                    <img src="uploads/news/<?php echo htmlspecialchars($news['news_image']); ?>" alt="<?php echo htmlspecialchars($news['news_title']); ?>" class="home-news-thumb" loading="lazy">
+                                <?php else: ?>
+                                    <div class="home-news-thumb-placeholder">
+                                        <i class="fas fa-newspaper fa-2x"></i>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="home-news-body">
+                                    <div class="home-news-meta">
+                                        <i class="far fa-clock"></i> <?php echo date('d/m/Y', strtotime($news['news_published_at'])); ?>
+                                    </div>
+                                    <h3 class="home-news-title"><?php echo htmlspecialchars($news['news_title']); ?></h3>
+                                    <p class="home-news-desc"><?php echo htmlspecialchars(strip_tags($news['news_content'])); ?></p>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="home-news-empty">
+                            ยังไม่มีข่าวสารหรือประกาศในขณะนี้
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 6. สถานที่และเวลาทำการ (Location & Hours)       -->
+        <!-- ============================================== -->
+        <section class="home-section" id="location">
+            <div class="home-container">
+                <div class="home-section-header">
+                    <h2 class="home-section-title">เวลาทำการและที่ตั้ง</h2>
+                    <p class="home-section-desc">ตั้งอยู่ใจกลางเมืองปัตตานี เดินทางสะดวก พร้อมสิ่งอำนวยความสะดวกครบครัน</p>
+                </div>
+
+                <div class="home-location-grid">
+                    <div class="home-info-box">
+                        <div>
+                            <h3 class="home-info-title"><i class="fas fa-clock"></i> เวลาเปิดให้บริการ</h3>
+                            <div class="home-schedule-table">
+                                <div class="home-schedule-row">
+                                    <span class="home-schedule-day">วันจันทร์ - วันศุกร์</span>
+                                    <span class="home-schedule-time">09:00 - 24:00 น.</span>
+                                </div>
+                                <div class="home-schedule-row">
+                                    <span class="home-schedule-day">วันเสาร์ - วันอาทิตย์</span>
+                                    <span class="home-schedule-time">08:00 - 24:00 น.</span>
+                                </div>
+                                <div class="home-schedule-row">
+                                    <span class="home-schedule-day">วันหยุดนักขัตฤกษ์</span>
+                                    <span class="home-schedule-time">เปิดให้บริการตามปกติ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="home-info-title"><i class="fas fa-headset"></i> ช่องทางการติดต่อ</h3>
+                            <div class="home-contact-chips">
+                                <a href="tel:0812345678" class="home-chip">
+                                    <i class="fas fa-phone-alt"></i> 081-234-5678
+                                </a>
+                                <a href="https://line.me" target="_blank" rel="noopener noreferrer" class="home-chip">
+                                    <i class="fab fa-line"></i> @tspattani
+                                </a>
+                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="home-chip">
+                                    <i class="fab fa-facebook-f"></i> T.S. Pattani
+                                </a>
+                                <a href="chat.php" class="home-chip">
+                                    <i class="fas fa-comment-dots"></i> แชทกับเรา
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="home-info-box">
+                        <div>
+                            <h3 class="home-info-title"><i class="fas fa-map-marker-alt"></i> แผนที่การเดินทาง</h3>
+                            <p class="home-address-text">123 ถนนเจริญประดิษฐ์ ตำบลรูสะมิแล อำเภอเมือง จังหวัดปัตตานี 94000 (ใกล้กับมหาวิทยาลัยสงขลานครินทร์ วิทยาเขตปัตตานี)</p>
+                            <div class="home-map-container">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.916853248356!2d101.24072387588383!3d6.866038419385521!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31b269588b3f63e3%3A0x6b0983199c0957b!2sPattani%20Stadium!5e0!3m2!1sen!2sth!4v1700000000000!5m2!1sen!2sth" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    title="T.S. Pattani Badminton Location Map">
+                                </iframe>
+                            </div>
+                        </div>
+                        <a href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="home-map-btn">
+                            <i class="fas fa-directions"></i> นำทางด้วย Google Maps
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 7. CTA ปิดท้าย (Closing Call to Action)         -->
+        <!-- ============================================== -->
+        <section class="home-cta-section">
+            <div class="home-container">
+                <div class="home-cta-card">
+                    <h2 class="home-cta-title">พร้อมลงสนามแล้วหรือยัง?</h2>
+                    <p class="home-cta-desc">เช็คคอร์ทว่างและจองสนามออนไลน์ได้ทันที ตลอด 24 ชั่วโมง</p>
+                    <a href="booking.php" class="home-btn-primary">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>จองสนามเลย</span>
                     </a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- ============================================== -->
-    <!-- 8. Site Footer (ส่วนท้ายของเว็บไซต์) -->
+    <!-- ส่วนท้ายของเว็บไซต์ (Global Footer & Scripts)  -->
     <!-- ============================================== -->
     <?php include 'includes/footer.php'; ?>
 
