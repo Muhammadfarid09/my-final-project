@@ -39,6 +39,11 @@ if (!isset($member_points) || !isset($member_level)) {
 <header class="global-navbar">
     <div class="navbar-inner">
         
+        <!-- ปุ่มแฮมเบอร์เกอร์ (☰) สำหรับเปิด Offcanvas Drawer (มุมซ้ายบน) -->
+        <button type="button" class="navbar-drawer-btn" onclick="toggleMobileDrawer()" aria-label="เปิดเมนูนำทาง" aria-controls="mobileDrawer">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <!-- 1. โลโก้แบรนด์ (ซ้าย) -->
         <a href="index.php" class="navbar-brand">
             <i class="fas fa-shuttlecock brand-icon"></i>
@@ -162,13 +167,123 @@ if (!isset($member_points) || !isset($member_level)) {
                 </div>
             </a>
         <?php else: ?>
-            <!-- เมื่อยังไม่ล็อกอิน: แสดงปุ่ม Hamburger Menu ให้ Guest เข้าถึงเมนูและเข้าสู่ระบบได้ -->
-            <button type="button" class="navbar-toggle" onclick="toggleMobileMenu()" aria-label="เปิดเมนูนำทาง">
-                <i class="fas fa-bars"></i>
-            </button>
+            <!-- เมื่อยังไม่ล็อกอิน: แสดงปุ่มเข้าสู่ระบบด่วน -->
+            <?php $login_redirect = ($current_page === 'booking.php') ? 'login.php?redirect=booking.php' : 'login.php'; ?>
+            <a href="<?= $login_redirect ?>" class="mobile-top-login-btn" aria-label="เข้าสู่ระบบ">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>เข้าสู่ระบบ</span>
+            </a>
         <?php endif; ?>
     </div>
 </header>
+
+<!-- ==========================================================================
+     Offcanvas Drawer Menu (Mobile Navigation Panel with Admin Chat)
+     ========================================================================== -->
+<!-- ม่านฉากหลัง Backdrop สำหรับปิด Drawer เมื่อคลิกนอกกรอบ -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleMobileDrawer()"></div>
+
+<!-- แผง Drawer เมนูด้านข้าง -->
+<aside class="offcanvas-drawer" id="mobileDrawer" aria-label="เมนูนำทางหลัก">
+    <!-- ส่วนหัว Drawer -->
+    <div class="drawer-header">
+        <a href="index.php" class="drawer-brand">
+            <i class="fas fa-shuttlecock brand-icon"></i>
+            <span class="brand-text">T.S. PATTANI</span>
+        </a>
+        <button type="button" class="drawer-close-btn" onclick="toggleMobileDrawer()" aria-label="ปิดเมนู">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- ส่วนข้อมูลผู้ใช้ (Member / Guest) -->
+    <div class="drawer-user-section">
+        <?php if (isset($_SESSION['member_id'])): ?>
+            <div class="drawer-user-card">
+                <div class="drawer-user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="drawer-user-info">
+                    <span class="drawer-user-name"><?= htmlspecialchars($_SESSION['member_name'] ?? 'สมาชิก') ?></span>
+                    <div class="drawer-user-badges">
+                        <span class="badge-level level-<?= strtolower($member_level) ?>"><?= htmlspecialchars($member_level) ?></span>
+                        <span class="drawer-points-pill"><i class="fas fa-coins text-gold"></i> <?= number_format($member_points) ?> พอยท์</span>
+                    </div>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="drawer-guest-box">
+                <p class="drawer-guest-title">ยินดีต้อนรับสู่ T.S. Pattani</p>
+                <div class="drawer-auth-buttons">
+                    <a href="login.php" class="btn-drawer-login"><i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ</a>
+                    <a href="register.php" class="btn-drawer-register"><i class="fas fa-user-plus"></i> สมัครสมาชิก</a>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- รายการเมนูหลักภายใน Drawer -->
+    <nav class="drawer-nav">
+        <div class="drawer-section-title">เมนูนำทางหลัก</div>
+        <ul class="drawer-menu-list">
+            <li>
+                <a href="index.php" class="drawer-nav-link <?= $is_home ? 'active' : '' ?>">
+                    <i class="fas fa-home"></i>
+                    <span>หน้าแรก</span>
+                </a>
+            </li>
+            <li>
+                <a href="booking.php" class="drawer-nav-link <?= $is_booking ? 'active' : '' ?>">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>จองสนามออนไลน์</span>
+                </a>
+            </li>
+            <li>
+                <a href="promotions.php" class="drawer-nav-link <?= $is_promotions ? 'active' : '' ?>">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>ข่าวสารและโปรโมชัน</span>
+                </a>
+            </li>
+            <li>
+                <a href="rewards.php" class="drawer-nav-link <?= $is_rewards ? 'active' : '' ?>">
+                    <i class="fas fa-gift"></i>
+                    <span>แลกของรางวัล (Points)</span>
+                </a>
+            </li>
+            
+            <!-- เมนูแชทติดต่อแอดมิน (แบบมาตรฐานทั่วไป) -->
+            <li>
+                <a href="chat.php" class="drawer-nav-link <?= $is_chat ? 'active' : '' ?>">
+                    <i class="fas fa-comments"></i>
+                    <span>แชทติดต่อแอดมิน</span>
+                </a>
+            </li>
+
+            <?php if (isset($_SESSION['member_id'])): ?>
+                <li class="drawer-divider"></li>
+                <div class="drawer-section-title">บัญชีสมาชิก</div>
+                <li>
+                    <a href="profile.php" class="drawer-nav-link <?= $is_profile ? 'active' : '' ?>">
+                        <i class="fas fa-id-card"></i>
+                        <span>โปรไฟล์ของฉัน</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="booking_history.php" class="drawer-nav-link <?= $is_booking_history ? 'active' : '' ?>">
+                        <i class="fas fa-history"></i>
+                        <span>ประวัติการจอง</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="actions/logout.php" class="drawer-nav-link text-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>ออกจากระบบ</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</aside>
 
 <!-- ผนวก Mobile Bottom Navigation Bar ส่วนกลาง -->
 <?php include_once __DIR__ . '/bottom_nav.php'; ?>

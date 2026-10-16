@@ -45,10 +45,44 @@ function toggleDropdown() {
     document.getElementById("userDropdown").classList.toggle("show");
 }
 
-// เปิด-ปิด เมนูสำหรับมือถือ (แฮมเบอร์เกอร์)
+// เปิด-ปิด เมนูสำหรับมือถือ (แฮมเบอร์เกอร์เดิม)
 function toggleMobileMenu() {
-    document.getElementById("navMenu").classList.toggle("show");
+    var navMenu = document.getElementById("navMenu");
+    if (navMenu) {
+        navMenu.classList.toggle("show");
+    }
 }
+
+// เปิด-ปิด Offcanvas Drawer เมนูด้านข้างสำหรับมือถือ (พร้อมระบบล็อก Scroll)
+function toggleMobileDrawer() {
+    var drawer = document.getElementById("mobileDrawer");
+    var backdrop = document.getElementById("drawerBackdrop");
+    if (!drawer || !backdrop) return;
+
+    var isOpen = drawer.classList.contains("show");
+    if (isOpen) {
+        drawer.classList.remove("show");
+        backdrop.classList.remove("show");
+        document.body.classList.remove("drawer-open");
+    } else {
+        drawer.classList.add("show");
+        backdrop.classList.add("show");
+        document.body.classList.add("drawer-open");
+    }
+}
+
+// รองรับการกดปุ่ม Escape เพื่อปิด Drawer อัตโนมัติ (Accessibility Standard)
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        var drawer = document.getElementById("mobileDrawer");
+        var backdrop = document.getElementById("drawerBackdrop");
+        if (drawer && drawer.classList.contains("show")) {
+            drawer.classList.remove("show");
+            if (backdrop) backdrop.classList.remove("show");
+            document.body.classList.remove("drawer-open");
+        }
+    }
+});
 
 // คลิกที่อื่นบนจอเพื่อปิด Dropdown อัตโนมัติ
 window.onclick = function(event) {

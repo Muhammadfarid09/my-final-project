@@ -733,3 +733,346 @@
     .user-pill-tier.level-gold   { color: var(--color-gold, #FFB91D); }
 }
 
+/* ==========================================================================
+   T.S. Pattani - Offcanvas Drawer Menu & Hamburger Controls (Global Navbar)
+   Scope: Mobile (<= 768px) Touch-first HCI Standard | Desktop (> 768px) Hidden
+   ========================================================================== */
+
+.navbar-drawer-btn,
+.mobile-top-login-btn,
+.drawer-backdrop,
+.offcanvas-drawer {
+    display: none;
+}
+
+body.drawer-open {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
+@media (max-width: 768px) {
+    /* 1. ปุ่มแฮมเบอร์เกอร์ (☰) มุมซ้ายบน */
+    .navbar-drawer-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        background: transparent;
+        border: none;
+        color: var(--text-primary, #F5F5F5);
+        font-size: 20px;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 0;
+        margin-right: 4px;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+        order: -1;
+    }
+
+    .navbar-drawer-btn:hover,
+    .navbar-drawer-btn:active {
+        color: var(--color-gold, #FFB91D);
+        background-color: rgba(255, 185, 29, 0.1);
+    }
+
+    /* ปุ่มเข้าสู่ระบบด่วนที่มุมขวาบน สำหรับ Guest */
+    .mobile-top-login-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        background: rgba(255, 185, 29, 0.1);
+        border: 1px solid rgba(255, 185, 29, 0.35);
+        border-radius: 50px;
+        color: var(--color-gold, #FFB91D);
+        font-size: 12.5px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-top-login-btn:hover,
+    .mobile-top-login-btn:active {
+        background: rgba(255, 185, 29, 0.2);
+        color: #FFFFFF;
+    }
+
+    /* 2. ม่านฉากหลัง Backdrop */
+    .drawer-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s ease;
+    }
+
+    .drawer-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* 3. แผงเมนูด้านข้าง Offcanvas Drawer */
+    .offcanvas-drawer {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 300px;
+        max-width: 85vw;
+        height: 100%;
+        background-color: var(--bg-surface, #141414);
+        border-right: 1px solid var(--border-color, #2d2d2d);
+        box-shadow: 4px 0 28px rgba(0, 0, 0, 0.75);
+        z-index: 1050;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-direction: column;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+    }
+
+    .offcanvas-drawer.show {
+        transform: translateX(0);
+    }
+
+    /* ส่วนหัว Drawer */
+    .drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color, #2d2d2d);
+        background-color: var(--bg-elevated, #1c1c1c);
+        flex-shrink: 0;
+    }
+
+    .drawer-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-primary, #F5F5F5);
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .drawer-brand .brand-icon {
+        color: var(--color-gold, #FFB91D);
+        font-size: 20px;
+    }
+
+    .drawer-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary, #A3A3A3);
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: color 0.2s ease, background-color 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .drawer-close-btn:hover,
+    .drawer-close-btn:active {
+        color: var(--text-primary, #F5F5F5);
+        background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    /* ส่วนข้อมูลผู้ใช้ */
+    .drawer-user-section {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color, #2d2d2d);
+        background: rgba(255, 185, 29, 0.03);
+        flex-shrink: 0;
+    }
+
+    .drawer-user-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .drawer-user-avatar i {
+        font-size: 38px;
+        color: var(--color-gold, #FFB91D);
+    }
+
+    .drawer-user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+    }
+
+    .drawer-user-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary, #F5F5F5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .drawer-user-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 2px;
+    }
+
+    .drawer-points-pill {
+        font-size: 11.5px;
+        color: var(--text-secondary, #A3A3A3);
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .drawer-guest-box {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .drawer-guest-title {
+        font-size: 13px;
+        color: var(--text-secondary, #A3A3A3);
+        margin: 0;
+    }
+
+    .drawer-auth-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-drawer-login {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px;
+        background: var(--color-gold, #FFB91D);
+        color: #0B0F17;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    .btn-drawer-register {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px;
+        background: transparent;
+        border: 1px solid var(--border-color, #2d2d2d);
+        color: var(--text-primary, #F5F5F5);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        min-height: 44px;
+        box-sizing: border-box;
+    }
+
+    /* เมนูนำทางใน Drawer */
+    .drawer-nav {
+        padding: 16px 14px calc(36px + env(safe-area-inset-bottom, 0px)) 14px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .drawer-section-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--text-secondary, #808080);
+        padding: 0 10px 8px 10px;
+    }
+
+    .drawer-menu-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .drawer-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: var(--text-primary, #F5F5F5);
+        text-decoration: none;
+        font-size: 14.5px;
+        font-weight: 500;
+        min-height: 44px;
+        box-sizing: border-box;
+        transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .drawer-nav-link:hover,
+    .drawer-nav-link:active {
+        background: rgba(255, 185, 29, 0.08);
+        color: var(--color-gold, #FFB91D);
+        transform: translateX(3px);
+    }
+
+    .drawer-nav-link.active {
+        background: rgba(255, 185, 29, 0.14);
+        color: var(--color-gold, #FFB91D);
+        font-weight: 700;
+    }
+
+    .drawer-nav-link i {
+        font-size: 16px;
+        width: 22px;
+        text-align: center;
+        color: var(--text-secondary, #A3A3A3);
+        transition: color 0.15s ease;
+    }
+
+    .drawer-nav-link:hover i,
+    .drawer-nav-link.active i {
+        color: var(--color-gold, #FFB91D);
+    }
+
+    .drawer-divider {
+        height: 1px;
+        background: var(--border-color, #2d2d2d);
+        margin: 12px 6px;
+        list-style: none;
+    }
+
+}
+
