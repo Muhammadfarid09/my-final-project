@@ -618,13 +618,14 @@
 }
 
 /* --------------------------------------------------------------------------
-   7. Partners Showcase (Matchday.co.th Style - Light Section & Large Logos)
+   7. Partners Showcase (Matchday.co.th Style - Infinite Loop Marquee)
    -------------------------------------------------------------------------- */
 .home-partners-section {
     padding: 80px 0 76px 0;
     background-color: #f8fafc;
     border-top: 1px solid #e2e8f0;
     border-bottom: 1px solid #e2e8f0;
+    overflow: hidden;
 }
 
 @media (max-width: 768px) {
@@ -635,7 +636,7 @@
 
 .home-partners-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 38px;
 }
 
 .home-partners-title {
@@ -662,25 +663,41 @@
     line-height: 1.6;
 }
 
-.home-partners-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    max-width: 1120px;
-    margin: 0 auto;
+/* Infinite Marquee Viewport & Track (เข้าขวาออกซ้าย วนลูปต่อเนื่อง) */
+.home-marquee-viewport {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 12px 0;
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
-@media (max-width: 992px) {
-    .home-partners-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
+.home-marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: homeMarqueeLoop 30s linear infinite;
+}
+
+.home-marquee-track:hover {
+    animation-play-state: paused;
+}
+
+.home-marquee-group {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-right: 22px;
+    flex-shrink: 0;
+}
+
+@keyframes homeMarqueeLoop {
+    0% {
+        transform: translateX(0);
     }
-}
-
-@media (max-width: 768px) {
-    .home-partners-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
+    100% {
+        transform: translateX(-50%);
     }
 }
 
@@ -688,14 +705,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px 20px;
+    padding: 16px 24px;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
-    height: 90px;
+    width: 210px;
+    height: 92px;
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-    transition: all var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
     box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .home-partner-item:hover {
@@ -706,7 +725,7 @@
 
 .home-partner-img {
     max-height: 52px;
-    max-width: 160px;
+    max-width: 155px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -724,9 +743,14 @@
     .home-partners-desc {
         font-size: 13.5px;
     }
+    .home-marquee-group {
+        gap: 14px;
+        padding-right: 14px;
+    }
     .home-partner-item {
-        height: 72px;
-        padding: 10px 14px;
+        width: 165px;
+        height: 74px;
+        padding: 10px 16px;
         border-radius: 12px;
     }
     .home-partner-img {

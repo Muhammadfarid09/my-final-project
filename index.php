@@ -338,31 +338,65 @@ try {
                         เครือข่ายอุปกรณ์กีฬาและพันธมิตรชั้นนำที่ร่วมยกระดับมาตรฐานสนาม T.S. Pattani
                     </p>
                 </div>
+            </div>
 
-                <div class="home-partners-grid">
-                    <div class="home-partner-item" title="YONEX">
-                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="home-partner-img" loading="lazy">
+            <!-- แถบเลื่อนแบรนด์วนลูปไร้รอยต่อ (Infinite Seamless Marquee เข้าขวาออกซ้าย) -->
+            <div class="home-marquee-viewport">
+                <div class="home-marquee-track">
+                    <!-- ชุดที่ 1 -->
+                    <div class="home-marquee-group">
+                        <div class="home-partner-item" title="YONEX">
+                            <img src="assets/img/brands/yonex.png" alt="YONEX" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="VICTOR">
+                            <img src="assets/img/brands/victor.png" alt="VICTOR" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="LI-NING">
+                            <img src="assets/img/brands/lining.png" alt="LI-NING" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="MIZUNO">
+                            <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="DUNLOP">
+                            <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="ASICS">
+                            <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="ASHAWAY">
+                            <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="T.S. PRO SHOP">
+                            <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
+                        </div>
                     </div>
-                    <div class="home-partner-item" title="VICTOR">
-                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="LI-NING">
-                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="MIZUNO">
-                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="DUNLOP">
-                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="ASICS">
-                        <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="ASHAWAY">
-                        <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
-                    </div>
-                    <div class="home-partner-item" title="T.S. PRO SHOP">
-                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
+
+                    <!-- ชุดที่ 2 (ทำซ้ำเพื่อต่อลูปแบบไร้รอยต่อ 100%) -->
+                    <div class="home-marquee-group" aria-hidden="true">
+                        <div class="home-partner-item" title="YONEX">
+                            <img src="assets/img/brands/yonex.png" alt="YONEX" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="VICTOR">
+                            <img src="assets/img/brands/victor.png" alt="VICTOR" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="LI-NING">
+                            <img src="assets/img/brands/lining.png" alt="LI-NING" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="MIZUNO">
+                            <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="DUNLOP">
+                            <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="ASICS">
+                            <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="ASHAWAY">
+                            <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
+                        </div>
+                        <div class="home-partner-item" title="T.S. PRO SHOP">
+                            <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
+                        </div>
                     </div>
                 </div>
             </div>
