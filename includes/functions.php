@@ -69,31 +69,49 @@ if (!function_exists('calculate_court_booking_price')) {
      * @return array ผลลัพธ์การคำนวณพร้อม Breakdown และสถานะความถูกต้อง
      */
     function calculate_court_booking_price(string $date, string $startTime, string $endTime, ?array $courtData = null): array {
-        // 1. ตรวจสอบรูปแบบและเวลา
-        $start_ts = strtotime($startTime);
-        $end_ts = strtotime($endTime);
-        if (!$start_ts || !$end_ts) {
+        // 1. ตรวจสอบความถูกต้องของวันที่ (YYYY-MM-DD และต้องมีอยู่จริงตามปฏิทิน)
+        $date = trim($date);
+        if (empty($date) || !preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $date, $date_matches)) {
+            return ['status' => 'error', 'message' => 'รูปแบบวันที่ไม่ถูกต้อง'];
+        }
+        $year = intval($date_matches[1]);
+        $month = intval($date_matches[2]);
+        $day = intval($date_matches[3]);
+        if (!checkdate($month, $day, $year)) {
+            return ['status' => 'error', 'message' => 'วันที่ระบุไม่มีอยู่จริงตามปฏิทิน'];
+        }
+
+        // 2. ตรวจสอบรูปแบบเวลาอย่างเข้มงวด (ต้องอยู่ในกรอบ 00:00 - 23:59 เท่านั้น ไม่อนุญาต 24:00)
+        $startTime = trim($startTime);
+        $endTime = trim($endTime);
+        if (!preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $startTime, $start_matches) ||
+            !preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $endTime, $end_matches)) {
             return ['status' => 'error', 'message' => 'รูปแบบเวลาไม่ถูกต้อง'];
         }
-        if ($start_ts >= $end_ts) {
+
+        $s_hi = sprintf('%02d:%02d', intval($start_matches[1]), intval($start_matches[2]));
+        $e_hi = sprintf('%02d:%02d', intval($end_matches[1]), intval($end_matches[2]));
+
+        $s_time_dec = intval($start_matches[1]) + (intval($start_matches[2]) / 60);
+        $e_time_dec = intval($end_matches[1]) + (intval($end_matches[2]) / 60);
+
+        if ($s_time_dec >= $e_time_dec) {
             return ['status' => 'error', 'message' => 'เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด'];
         }
 
         $c_open = !empty($courtData['court_open_time']) ? substr($courtData['court_open_time'], 0, 5) : '08:00';
         $c_close = !empty($courtData['court_close_time']) ? substr($courtData['court_close_time'], 0, 5) : '23:00';
-        $s_hi = date('H:i', $start_ts);
-        $e_hi = date('H:i', $end_ts);
 
         if ($s_hi < $c_open || $e_hi > $c_close) {
             return ['status' => 'error', 'message' => "ช่วงเวลาที่เลือกอยู่นอกเวลาทำการ ({$c_open} - {$c_close} น.)"];
         }
 
-        $hours = ($end_ts - $start_ts) / 3600;
+        $hours = $e_time_dec - $s_time_dec;
         if ($hours < 1) {
             return ['status' => 'error', 'message' => 'ระยะเวลาการจองต้องอย่างน้อย 1 ชั่วโมง'];
         }
 
-        // 2. กำหนดเรทราคา (ดึงจากฐานข้อมูลสนาม หรือใช้ค่ามาตรฐานระบบ)
+        // 3. กำหนดเรทราคา (ดึงจากฐานข้อมูลสนาม หรือใช้ค่ามาตรฐานระบบ)
         $peak_rate = !empty($courtData['court_peak_price']) && floatval($courtData['court_peak_price']) > 0
             ? floatval($courtData['court_peak_price']) : 200.00;
         $offpeak_rate = !empty($courtData['court_offpeak_price']) && floatval($courtData['court_offpeak_price']) > 0
@@ -103,9 +121,12 @@ if (!function_exists('calculate_court_booking_price')) {
 
         $dow = intval(date('w', strtotime($date))); // 0=อาทิตย์, 6=เสาร์
 
-        // 3. กรณีวันเสาร์-อาทิตย์: อัตราเดียวตลอดทั้งวัน (200 ฿/ชม.)
+        // 4. กรณีวันเสาร์-อาทิตย์: อัตราเดียวตลอดทั้งวัน (200 ฿/ชม.)
         if ($dow === 0 || $dow === 6) {
             $total = round($hours * $peak_rate, 2);
+            if ($total <= 0) {
+                return ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการคำนวณราคา'];
+            }
             return [
                 'status' => 'success',
                 'total_price' => $total,
@@ -125,32 +146,41 @@ if (!function_exists('calculate_court_booking_price')) {
             ];
         }
 
-        // 4. กรณีวันจันทร์-ศุกร์: คำนวณแบบคาบเกี่ยวช่วงเวลา (Cross-Window: 08:00-17:00 / 17:00-23:00)
-        $day_window_start = strtotime($date . ' 08:00:00');
+        // 5. กรณีวันจันทร์-ศุกร์: คำนวณแบบคาบเกี่ยวช่วงเวลา (Cross-Window: 08:00-17:00 / 17:00-23:00)
+        $day_open_time = min($c_open, '17:00');
+        $eve_close_time = max($c_close, '17:00');
+
+        $day_window_start = strtotime($date . ' ' . $day_open_time . ':00');
         $day_window_end   = strtotime($date . ' 17:00:00');
         $eve_window_start = strtotime($date . ' 17:00:00');
-        $eve_window_end   = strtotime($date . ' 23:00:00');
+        $eve_window_end   = strtotime($date . ' ' . $eve_close_time . ':00');
 
         $booking_start = strtotime($date . ' ' . $s_hi . ':00');
         $booking_end   = strtotime($date . ' ' . $e_hi . ':00');
 
-        // ส่วนที่ทับซ้อนช่วงกลางวัน (08:00 - 17:00)
+        // ส่วนที่ทับซ้อนช่วงกลางวัน (08:00 - 17:00 หรือเวลาเปิดจริง)
         $day_start = max($booking_start, $day_window_start);
         $day_end   = min($booking_end, $day_window_end);
         $day_hours = ($day_end > $day_start) ? ($day_end - $day_start) / 3600 : 0;
         $day_price = round($day_hours * $offpeak_rate, 2);
 
-        // ส่วนที่ทับซ้อนช่วงเย็น (17:00 - 23:00)
+        // ส่วนที่ทับซ้อนช่วงเย็น (17:00 - 23:00 หรือเวลาปิดจริง)
         $eve_start = max($booking_start, $eve_window_start);
         $eve_end   = min($booking_end, $eve_window_end);
         $eve_hours = ($eve_end > $eve_start) ? ($eve_end - $eve_start) / 3600 : 0;
         $eve_price = round($eve_hours * $standard_rate, 2);
 
         $total = round($day_price + $eve_price, 2);
+
+        // 6. Fail-Safe Circuit Breaker ป้องกัน Zero Price โดยเด็ดขาด
+        if ($total <= 0) {
+            return ['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการคำนวณราคา กรุณาตรวจสอบช่วงเวลาการจอง'];
+        }
+
         $breakdown = [];
         if ($day_hours > 0) {
             $breakdown[] = [
-                'label' => 'ช่วงกลางวัน (08:00 - 17:00 น.)',
+                'label' => 'ช่วงกลางวัน (' . $day_open_time . ' - 17:00 น.)',
                 'hours' => $day_hours,
                 'rate' => $offpeak_rate,
                 'subtotal' => $day_price
@@ -158,7 +188,7 @@ if (!function_exists('calculate_court_booking_price')) {
         }
         if ($eve_hours > 0) {
             $breakdown[] = [
-                'label' => 'ช่วงเย็น (17:00 - 23:00 น.)',
+                'label' => 'ช่วงเย็น (17:00 - ' . $eve_close_time . ' น.)',
                 'hours' => $eve_hours,
                 'rate' => $standard_rate,
                 'subtotal' => $eve_price

@@ -76,6 +76,78 @@ $testCases = [
         'end' => '10:30',
         'expected_status' => 'error',
         'expected_price' => null
+    ],
+    [
+        'name' => 'Case 10: Weekend full day (2026-10-17 08:00-23:00)',
+        'date' => '2026-10-17',
+        'start' => '08:00',
+        'end' => '23:00',
+        'expected_status' => 'success',
+        'expected_price' => 3000.00
+    ],
+    [
+        'name' => 'Case 11: Weekday cross-window (2026-10-19 16:00-18:00)',
+        'date' => '2026-10-19',
+        'start' => '16:00',
+        'end' => '18:00',
+        'expected_status' => 'success',
+        'expected_price' => 330.00
+    ],
+    [
+        'name' => 'Case 12: Weekday full day (2026-10-19 08:00-23:00)',
+        'date' => '2026-10-19',
+        'start' => '08:00',
+        'end' => '23:00',
+        'expected_status' => 'success',
+        'expected_price' => 2430.00
+    ],
+    [
+        'name' => 'Case 13: Time collision start==end (2026-10-19 16:00-16:00)',
+        'date' => '2026-10-19',
+        'start' => '16:00',
+        'end' => '16:00',
+        'expected_status' => 'error',
+        'expected_price' => null
+    ],
+    [
+        'name' => 'Case 14: Fractional hour 1.5h (2026-10-19 16:30-18:00)',
+        'date' => '2026-10-19',
+        'start' => '16:30',
+        'end' => '18:00',
+        'expected_status' => 'success',
+        'expected_price' => 255.00
+    ],
+    [
+        'name' => 'Case 15: Invalid midnight boundary 24:00 (2026-10-19 22:00-24:00)',
+        'date' => '2026-10-19',
+        'start' => '22:00',
+        'end' => '24:00',
+        'expected_status' => 'error',
+        'expected_price' => null
+    ],
+    [
+        'name' => 'Case 16: Non-existent calendar date (2026-02-30 16:00-18:00)',
+        'date' => '2026-02-30',
+        'start' => '16:00',
+        'end' => '18:00',
+        'expected_status' => 'error',
+        'expected_price' => null
+    ],
+    [
+        'name' => 'Case 17: Garbage date string ("garbage" 16:00-18:00)',
+        'date' => 'garbage',
+        'start' => '16:00',
+        'end' => '18:00',
+        'expected_status' => 'error',
+        'expected_price' => null
+    ],
+    [
+        'name' => 'Case 18: Empty date string ("" 16:00-18:00)',
+        'date' => '',
+        'start' => '16:00',
+        'end' => '18:00',
+        'expected_status' => 'error',
+        'expected_price' => null
     ]
 ];
 

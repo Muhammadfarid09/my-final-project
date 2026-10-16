@@ -55,6 +55,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("รหัสสนามที่เปิดใช้งานไม่ถูกต้อง");
                 }
 
+                // ตรวจสอบรูปแบบวันที่ (YYYY-MM-DD และต้องมีอยู่จริงตามปฏิทิน)
+                if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $b_date, $m_bdate) ||
+                    !checkdate(intval($m_bdate[2]), intval($m_bdate[3]), intval($m_bdate[1]))) {
+                    throw new Exception("วันที่เปิดสนามไม่ถูกต้องหรือไม่พบในปฏิทิน");
+                }
+
+                // ตรวจสอบรูปแบบเวลาอย่างเข้มงวด (00:00 - 23:59 ไม่อนุญาต 24:00)
+                if (!preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $b_start, $m_bstart) ||
+                    !preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $b_end, $m_bend)) {
+                    throw new Exception("รูปแบบเวลาเปิดสนามไม่ถูกต้อง");
+                }
+
+                $b_start_str = sprintf('%02d:%02d:00', intval($m_bstart[1]), intval($m_bstart[2]));
+                $b_end_str = sprintf('%02d:%02d:00', intval($m_bend[1]), intval($m_bend[2]));
+
+                $s_time_dec = intval($m_bstart[1]) + (intval($m_bstart[2]) / 60);
+                $e_time_dec = intval($m_bend[1]) + (intval($m_bend[2]) / 60);
+
+                if ($s_time_dec >= $e_time_dec) {
+                    throw new Exception("เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด");
+                }
+
                 // 1.1 ล็อกแถวสนามด้วย SELECT ... FOR UPDATE เพื่อป้องกันการจองชนกัน
                 $c_stmt = $conn->prepare("
                     SELECT court_name, court_status, court_price_per_hour, court_peak_price, court_offpeak_price, court_open_time, court_close_time 
@@ -73,13 +95,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("ขออภัย สนาม '{$c_info['court_name']}' อยู่ในระหว่างปิดปรับปรุง ไม่สามารถเปิดใช้งานได้");
                 }
 
-                $b_start_str = date('H:i:s', strtotime($b_start));
-                $b_end_str = date('H:i:s', strtotime($b_end));
-
                 $c_open = !empty($c_info['court_open_time']) ? $c_info['court_open_time'] : '08:00:00';
                 $c_close = !empty($c_info['court_close_time']) ? $c_info['court_close_time'] : '23:00:00';
 
-                if ($b_start_str < $c_open || $b_end_str > $c_close || $b_start_str >= $b_end_str) {
+                if ($b_start_str < $c_open || $b_end_str > $c_close) {
                     throw new Exception("เวลาเปิดสนาม ({$b_start_str} - {$b_end_str}) อยู่นอกเวลาทำการของสนาม '{$c_info['court_name']}'");
                 }
 
@@ -109,6 +128,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception($price_calc['message']);
                 }
                 $court_price = $price_calc['total_price'];
+                if ($court_price <= 0) {
+                    throw new Exception("ยอดค่าบริการสนามไม่ถูกต้อง ไม่สามารถเปิดสนามในราคา 0 บาทได้");
+                }
 
                 // ค้นหา member_id จากเบอร์โทรศัพท์ (ถ้ามีการระบุ)
                 $member_id = null;

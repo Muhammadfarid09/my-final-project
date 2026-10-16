@@ -104,22 +104,44 @@ function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRat
         return { status: 'error', message: 'กรุณาระบุวันที่และเวลาให้ครบถ้วน' };
     }
 
-    let startH = parseInt(startTimeStr.split(':')[0], 10);
-    let endH = parseInt(endTimeStr.split(':')[0], 10);
+    // 1. ตรวจสอบความถูกต้องของวันที่ (YYYY-MM-DD และต้องมีอยู่จริงตามปฏิทิน)
+    let dateParts = dateStr.trim().split('-');
+    if (dateParts.length !== 3) {
+        return { status: 'error', message: 'รูปแบบวันที่ไม่ถูกต้อง' };
+    }
+    let yr = parseInt(dateParts[0], 10);
+    let mo = parseInt(dateParts[1], 10);
+    let da = parseInt(dateParts[2], 10);
+    let checkD = new Date(yr, mo - 1, da);
+    if (checkD.getFullYear() !== yr || checkD.getMonth() !== (mo - 1) || checkD.getDate() !== da) {
+        return { status: 'error', message: 'วันที่ระบุไม่มีอยู่จริงตามปฏิทิน' };
+    }
 
-    if (isNaN(startH) || isNaN(endH)) {
+    // 2. ตรวจสอบรูปแบบเวลาอย่างเข้มงวด (00:00 - 23:59 ไม่อนุญาต 24:00)
+    let timeRegex = /^([01]\d|2[0-3]):([0-5]\d)/;
+    let sMatch = startTimeStr.trim().match(timeRegex);
+    let eMatch = endTimeStr.trim().match(timeRegex);
+    if (!sMatch || !eMatch) {
         return { status: 'error', message: 'รูปแบบเวลาไม่ถูกต้อง' };
     }
-    if (startH >= endH) {
+
+    let startDec = parseInt(sMatch[1], 10) + (parseInt(sMatch[2], 10) / 60);
+    let endDec = parseInt(eMatch[1], 10) + (parseInt(eMatch[2], 10) / 60);
+
+    if (startDec >= endDec) {
         return { status: 'error', message: 'เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด' };
     }
-    if (startH < 8 || endH > 23) {
+    if (startDec < 8 || endDec > 23) {
         return { status: 'error', message: 'ช่วงเวลาที่เลือกอยู่นอกเวลาทำการ (08:00 - 23:00 น.)' };
     }
 
-    let hours = endH - startH;
-    let d = new Date(dateStr);
-    let dow = d.getDay(); // 0 = อาทิตย์, 6 = เสาร์
+    let hours = endDec - startDec;
+    if (hours < 1) {
+        return { status: 'error', message: 'ระยะเวลาการจองต้องอย่างน้อย 1 ชั่วโมง' };
+    }
+
+    // 3. กำหนดวันในสัปดาห์แบบ Local Time (ป้องกันปัญหา UTC Timezone Shift)
+    let dow = checkD.getDay(); // 0 = อาทิตย์, 6 = เสาร์
 
     let peakRate = (customRates && customRates.peak) ? customRates.peak : 200;
     let offpeakRate = (customRates && customRates.offpeak) ? customRates.offpeak : 150;
@@ -127,6 +149,9 @@ function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRat
 
     if (dow === 0 || dow === 6) {
         let total = hours * peakRate;
+        if (total <= 0) {
+            return { status: 'error', message: 'เกิดข้อผิดพลาดในการคำนวณราคา' };
+        }
         return {
             status: 'success',
             totalPrice: total,
@@ -139,13 +164,17 @@ function calculateCourtBookingPrice(dateStr, startTimeStr, endTimeStr, customRat
         };
     }
 
-    // วันจันทร์-ศุกร์: Cross-window 08:00-17:00 (กลางวัน 150) / 17:00-23:00 (เย็น 180)
-    let dayHours = Math.max(0, Math.min(endH, 17) - Math.max(startH, 8));
-    let eveHours = Math.max(0, Math.min(endH, 23) - Math.max(startH, 17));
+    // 4. วันจันทร์-ศุกร์: Cross-window 08:00-17:00 (กลางวัน 150) / 17:00-23:00 (เย็น 180)
+    let dayHours = Math.max(0, Math.min(endDec, 17) - Math.max(startDec, 8));
+    let eveHours = Math.max(0, Math.min(endDec, 23) - Math.max(startDec, 17));
 
     let dayPrice = dayHours * offpeakRate;
     let evePrice = eveHours * standardRate;
     let total = dayPrice + evePrice;
+
+    if (total <= 0) {
+        return { status: 'error', message: 'เกิดข้อผิดพลาดในการคำนวณราคา กรุณาตรวจสอบช่วงเวลาการจอง' };
+    }
 
     let breakdown = [];
     if (dayHours > 0) {
@@ -263,8 +292,10 @@ function restorePendingBooking(pData) {
         for (let h = startH; h < endH; h++) {
             let sStart = String(h).padStart(2, '0') + ':00:00';
             let sEnd = String(h + 1).padStart(2, '0') + ':00:00';
-            let sInfo = (targetCourt && targetCourt.slots) ? targetCourt.slots[sStart] : null;
-            let sPrice = sInfo ? sInfo.price : wizardState.dayRatePrice;
+            let sStartKey = String(h).padStart(2, '0') + ':00';
+            let sInfo = (targetCourt && targetCourt.slots) ? (targetCourt.slots[sStartKey] || targetCourt.slots[sStart]) : null;
+            let dow = wizardState.matrixData ? wizardState.matrixData.day_of_week : new Date(dateStr).getDay();
+            let sPrice = sInfo ? sInfo.price : (dow === 0 || dow === 6 ? 200 : (h < 17 ? 150 : 180));
 
             wizardState.selectedSlots.set(sStart, {
                 courtId: targetCourtId,

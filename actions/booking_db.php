@@ -53,24 +53,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("กรุณาเลือกสนาม วันที่ และเวลาให้ครบถ้วน");
         }
 
-        // ตรวจสอบรูปแบบวันที่ (YYYY-MM-DD)
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $booking_date)) {
+        // ตรวจสอบรูปแบบวันที่ (YYYY-MM-DD และต้องมีอยู่จริงตามปฏิทิน)
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $booking_date, $m_bdate)) {
             throw new Exception("รูปแบบวันที่ไม่ถูกต้อง");
         }
+        if (!checkdate(intval($m_bdate[2]), intval($m_bdate[3]), intval($m_bdate[1]))) {
+            throw new Exception("วันที่ระบุไม่มีอยู่จริงตามปฏิทิน");
+        }
 
-        $start_time_ts = strtotime($start_time);
-        $end_time_ts = strtotime($end_time);
-
-        if (!$start_time_ts || !$end_time_ts) {
+        // ตรวจสอบรูปแบบเวลาอย่างเข้มงวด (00:00 - 23:59 ไม่อนุญาต 24:00)
+        if (!preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $start_time, $m_start) ||
+            !preg_match('/^([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/', $end_time, $m_end)) {
             throw new Exception("รูปแบบเวลาไม่ถูกต้อง");
         }
 
-        if ($start_time_ts >= $end_time_ts) {
+        $start_time_str = sprintf('%02d:%02d:00', intval($m_start[1]), intval($m_start[2]));
+        $end_time_str = sprintf('%02d:%02d:00', intval($m_end[1]), intval($m_end[2]));
+
+        $s_time_dec = intval($m_start[1]) + (intval($m_start[2]) / 60);
+        $e_time_dec = intval($m_end[1]) + (intval($m_end[2]) / 60);
+
+        if ($s_time_dec >= $e_time_dec) {
             throw new Exception("เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด");
         }
-
-        $start_time_str = date('H:i:s', $start_time_ts);
-        $end_time_str = date('H:i:s', $end_time_ts);
 
         // 2.2 ตรวจสอบไม่ให้จองวันหรือเวลาย้อนหลัง
         $booking_start_datetime = strtotime($booking_date . ' ' . $start_time_str);
@@ -80,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // 2.4 ตรวจสอบความยาวการจองอย่างน้อย 1 ชั่วโมง
-        $hours = ($end_time_ts - $start_time_ts) / 3600;
+        $hours = $e_time_dec - $s_time_dec;
         if ($hours < 1) {
             throw new Exception("ระยะเวลาการจองต้องอย่างน้อย 1 ชั่วโมง");
         }
@@ -138,6 +143,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $real_court_price = $pricing_calc['total_price'];
+        if ($real_court_price <= 0) {
+            throw new Exception("ยอดค่าบริการสนามไม่ถูกต้อง ไม่สามารถดำเนินการได้");
+        }
         $real_rental_price = 0.00;
         $real_product_price = 0.00;
 
