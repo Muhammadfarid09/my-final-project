@@ -607,11 +607,21 @@ body {
     margin-bottom: 0;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
     height: 100%;
 }
 .dashboard-tables-row .admin-card .table-responsive,
 .dashboard-tables-row .admin-card .admin-table {
     flex: 1;
+}
+@media (max-width: 992px) {
+    .dashboard-tables-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .dashboard-tables-row .admin-card {
+        height: auto;
+    }
 }
 .empty-stock-box {
     display: flex;
@@ -799,6 +809,7 @@ body {
     box-shadow: var(--shadow-soft); 
     margin-bottom: 24px; 
     border: 1px solid var(--border-color, #E2E8F0); 
+    box-sizing: border-box;
 }
 .section-header { 
     margin-bottom: 20px; 
