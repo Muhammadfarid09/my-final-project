@@ -86,22 +86,13 @@ cd C:\xampp\htdocs
 git clone https://github.com/Muhammadfarid09/my-final-project.git ts-pattani
 ```
 
-### 3. ติดตั้งฐานข้อมูล (Database Setup)
+### 3. ติดตั้งฐานข้อมูลและสร้างบัญชีผู้ดูแลระบบเริ่มต้น (Database Setup & Seed Admin)
 1. เปิดโปรแกรม **XAMPP Control Panel** และกด Start บริการ **Apache** และ **MySQL**
-2. เปิดเบราว์เซอร์แล้วเข้าไปที่ URL ด้านล่างนี้เพื่อรันสคริปต์สร้างฐานข้อมูลและตารางอัตโนมัติ:
+2. เปิดเบราว์เซอร์แล้วเข้าไปที่ URL ด้านล่างนี้เพื่อรันสคริปต์สร้างฐานข้อมูล 19 ตาราง พร้อมบันทึกบัญชีแอดมินเริ่มต้นอัตโนมัติในขั้นตอนเดียว:
    ```text
    http://localhost/ts-pattani/config/setup.php
    ```
-3. (ทางเลือก) หากต้องการตรวจสอบการอัปเกรดโครงสร้างตารางล่าสุด:
-   ```text
-   http://localhost/ts-pattani/config/update_database.php
-   ```
-
-### 4. สร้างบัญชีผู้ดูแลระบบเริ่มต้น (Seed Admin)
-เปิด Command Prompt / PowerShell แล้วรันคำสั่ง:
-```bash
-C:\xampp\php\php.exe C:\xampp\htdocs\ts-pattani\config\seed_admin.php
-```
+   *(หรือสามารถรันผ่าน Command Line: `C:\xampp\php\php.exe C:\xampp\htdocs\ts-pattani\config\setup.php`)*
 
 ---
 
@@ -147,8 +138,7 @@ ts-pattani/
 │
 ├── config/                   # การตั้งค่าฐานข้อมูลและสคริปต์เริ่มต้นระบบ
 │   ├── config.php            # การเชื่อมต่อฐานข้อมูล PDO
-│   ├── setup.php             # สคริปต์ติดตั้งตารางฐานข้อมูลทั้งหมด
-│   └── seed_admin.php        # สคริปต์สร้างแอดมินเริ่มต้น
+│   └── setup.php             # สคริปต์ติดตั้งตารางฐานข้อมูลครบ 19 ตารางและบันทึกแอดมินเริ่มต้น
 │
 ├── docs/                     # เอกสารการพัฒนาระบบ, บันทึกรายวัน และกฎการออกแบบ UI/UX (PROJECT_HCI_RULES.md)
 ├── uploads/                  # โฟลเดอร์จัดเก็บไฟล์อัปโหลด (สลิป, รูปข่าว, รูปสินค้า)
