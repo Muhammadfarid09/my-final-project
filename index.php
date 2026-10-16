@@ -327,7 +327,49 @@ try {
         </section>
 
         <!-- ============================================== -->
-        <!-- 7. CTA ปิดท้าย (Closing Call to Action)         -->
+        <!-- 7. พันธมิตรของเรา (Our Partners - Matchday Style)-->
+        <!-- ============================================== -->
+        <section class="home-partners-section" id="partners">
+            <div class="home-container">
+                <div class="home-partners-header">
+                    <h2 class="home-partners-title">พันธมิตรของเรา</h2>
+                    <div class="home-title-accent-line"></div>
+                    <p class="home-partners-desc">
+                        เครือข่ายอุปกรณ์กีฬาและพันธมิตรชั้นนำที่ร่วมยกระดับมาตรฐานสนาม T.S. Pattani
+                    </p>
+                </div>
+
+                <div class="home-partners-grid">
+                    <div class="home-partner-item" title="YONEX">
+                        <img src="assets/img/brands/yonex.png" alt="YONEX" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="VICTOR">
+                        <img src="assets/img/brands/victor.png" alt="VICTOR" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="LI-NING">
+                        <img src="assets/img/brands/lining.png" alt="LI-NING" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="MIZUNO">
+                        <img src="assets/img/brands/mizuno.png" alt="MIZUNO" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="DUNLOP">
+                        <img src="assets/img/brands/dunlop.png" alt="DUNLOP" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="ASICS">
+                        <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="ASHAWAY">
+                        <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
+                    </div>
+                    <div class="home-partner-item" title="T.S. PRO SHOP">
+                        <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 8. CTA ปิดท้าย (Closing Call to Action)         -->
         <!-- ============================================== -->
         <section class="home-cta-section">
             <div class="home-container">

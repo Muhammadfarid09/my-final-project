@@ -618,7 +618,110 @@
 }
 
 /* --------------------------------------------------------------------------
-   7. Closing Call-To-Action (Minimal CTA Card)
+   7. Partners Showcase (Matchday.co.th Style with Accent Line)
+   -------------------------------------------------------------------------- */
+.home-partners-section {
+    padding: 64px 0 52px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .home-partners-section {
+        padding: 40px 0 32px 0;
+    }
+}
+
+.home-partners-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.home-partners-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 10px 0;
+    letter-spacing: -0.3px;
+}
+
+.home-title-accent-line {
+    width: 44px;
+    height: 3px;
+    background-color: var(--color-gold);
+    border-radius: var(--radius-full);
+    margin: 0 auto 12px auto;
+}
+
+.home-partners-desc {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    margin: 0 auto;
+    max-width: 620px;
+    line-height: 1.55;
+}
+
+.home-partners-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px 24px;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .home-partners-grid {
+        gap: 12px 14px;
+    }
+}
+
+.home-partner-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    min-width: 120px;
+    height: 60px;
+    box-sizing: border-box;
+}
+
+.home-partner-item:hover {
+    border-color: rgba(255, 185, 29, 0.45);
+    background: var(--bg-elevated);
+    transform: translateY(-2px);
+}
+
+.home-partner-img {
+    max-height: 30px;
+    max-width: 95px;
+    object-fit: contain;
+    filter: brightness(0.92);
+    transition: filter var(--transition-fast);
+}
+
+.home-partner-item:hover .home-partner-img {
+    filter: brightness(1.1);
+}
+
+@media (max-width: 480px) {
+    .home-partner-item {
+        min-width: calc(50% - 8px);
+        height: 52px;
+        padding: 8px 12px;
+    }
+    .home-partner-img {
+        max-height: 24px;
+        max-width: 75px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   8. Closing Call-To-Action (Minimal CTA Card)
    -------------------------------------------------------------------------- */
 .home-cta-section {
     padding: 24px 0 56px 0;
@@ -659,3 +762,4 @@
         margin-bottom: 20px;
     }
 }
+
