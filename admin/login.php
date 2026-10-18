@@ -29,7 +29,7 @@ if (isset($_SESSION['admin_id'])) {
         <!-- ส่วนหัว: โลโก้และชื่อระบบ -->
         <div class="login-header">
             <div class="login-logo-wrapper">
-                <img src="../assets/img/ts-pattani-generated.jpg" alt="T.S. Pattani Logo" class="login-logo-img">
+                <img src="../assets/img/ts-pattani-generated.jpg?v=<?php echo file_exists(__DIR__ . '/../assets/img/ts-pattani-generated.jpg') ? filemtime(__DIR__ . '/../assets/img/ts-pattani-generated.jpg') : time(); ?>" alt="T.S. Pattani Logo" class="login-logo-img">
             </div>
             <h1 class="login-title">T.S. Pattani</h1>
             <div class="login-badge">
