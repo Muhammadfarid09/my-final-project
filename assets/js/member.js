@@ -70,6 +70,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 3500);
 });
 
+/**
+ * ระบบควบคุมการส่งฟอร์มส่วนกลาง (Global Form Submission Interceptor)
+ * @description ดักจับการส่งฟอร์มเพื่อป้องกัน Double Submission และแสดงสถานะกำลังโหลด (Loading State)
+ *              ครอบคลุมฟอร์มโปรไฟล์ (.profile-form), ฟอร์มลืมรหัสผ่าน (#forgotForm), และฟอร์มที่มีคลาส .prevent-double-submit
+ * @event submit บน document
+ */
+document.addEventListener('submit', function(e) {
+    let form = e.target;
+    if (!form || form.tagName !== 'FORM') return;
+
+    // หากฟอร์มมี HTML5 Validation และข้อมูลยังไม่ผ่านเกณฑ์ ให้ยกเลิกและปล่อยให้เบราว์เซอร์แจ้งเตือน
+    if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+        return;
+    }
+
+    // กรณีฟอร์มลืมรหัสผ่าน (#forgotForm) ตรวจสอบเบอร์โทร 10 หลัก
+    if (form.id === 'forgotForm') {
+        let phoneInput = form.querySelector('#member_phone');
+        if (phoneInput) {
+            let phone = phoneInput.value.trim();
+            if (!/^[0-9]{10}$/.test(phone)) {
+                e.preventDefault();
+                alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องครบ 10 หลัก (เฉพาะตัวเลขเท่านั้น)');
+                phoneInput.focus();
+                return;
+            }
+        }
+    }
+
+    // ตรวจสอบว่าเป็นฟอร์มที่ต้องการป้องกัน Double Submission หรือไม่
+    if (form.classList.contains('profile-form') || form.classList.contains('prevent-double-submit') || form.id === 'forgotForm') {
+        let submitBtn = form.querySelector('button[type="submit"]:not(:disabled)');
+        if (submitBtn) {
+            if (!submitBtn.dataset.originalHtml) {
+                submitBtn.dataset.originalHtml = submitBtn.innerHTML;
+            }
+            let loadingText = submitBtn.dataset.loadingText || (form.id === 'forgotForm' ? 'กำลังส่งคำขอ...' : 'กำลังบันทึกข้อมูล...');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-6"></i> <span>${loadingText}</span>`;
+        }
+    }
+});
+
 /* ==========================================================================
    หมวดที่ 1: ระบบนำทางและเมนูมือถือ (Navigation & Drawer Menu)
    ========================================================================== */

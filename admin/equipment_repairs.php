@@ -164,40 +164,6 @@ include 'includes/header.php';
             </form>
         </div>
     </div>
-    
-    <script src="../assets/js/admin.js?v=1.30"></script>
-    <script>
-    function confirmEqFinish(e) {
-        e.preventDefault();
-        const name = document.getElementById('modal_finish_name').innerText;
-        const cost = document.querySelector('#eqFinishModal input[name="repair_cost"]').value || '0.00';
-        SwalConfirmAction({
-            title: 'ยืนยันการซ่อมเสร็จสิ้น?',
-            message: 'ยืนยันว่าการซ่อม <strong>' + name + '</strong> เสร็จเรียบร้อยแล้ว ค่าใช้จ่าย <strong>' + parseFloat(cost).toFixed(2) + ' ฿</strong>',
-            consequence: 'อุปกรณ์ชิ้นนี้จะถูกนำกลับเข้าสู่สต็อกพร้อมให้เช่าทันที',
-            type: 'success',
-            confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันและคืนสต็อก',
-            onConfirm: function() {
-                document.getElementById('eqFinishForm').submit();
-            }
-        });
-        return false;
-    }
-
-    function confirmEqBroken(e) {
-        e.preventDefault();
-        const name = document.getElementById('modal_broken_name').innerText;
-        SwalConfirmDelete({
-            title: 'ยืนยันตัดจำหน่ายอุปกรณ์?',
-            message: 'คุณกำลังจะบันทึกว่า <strong>' + name + '</strong> เสียหายถาวร ไม่สามารถซ่อมแซมได้',
-            consequence: 'อุปกรณ์ชิ้นนี้จะถูกตัดออกจากระบบอย่างถาวรและจะไม่ถูกนำกลับเข้าสต็อก',
-            confirmText: '<i class="fas fa-times-circle mr-6"></i> ยืนยันตัดเป็นของเสีย',
-            onConfirm: function() {
-                document.getElementById('eqBrokenForm').submit();
-            }
-        });
-        return false;
-    }
-    </script>
+    <script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
 </body>
 </html>

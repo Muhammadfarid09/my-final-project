@@ -253,47 +253,5 @@ include 'includes/header.php';
 
 <!-- เรียกใช้ไฟล์ JS ส่วนกลาง -->
 <script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
-<script>
-let isRefundSubmitting = false;
-
-function confirmRefundDecision(e) {
-    e.preventDefault();
-    if (isRefundSubmitting) return false;
-
-    const status = document.getElementById('refund_status').value;
-    if (!status) {
-        if (typeof SwalToast === 'function') {
-            SwalToast('warning', 'กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
-        } else {
-            alert('กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
-        }
-        return false;
-    }
-    const refundPrice = document.getElementById('modal_suggested_refund').innerText;
-    const points = document.querySelector('input[name="refund_point"]').value || 0;
-    const isRefund = (status === 'คืนแล้ว');
-
-    SwalConfirmAction({
-        title: isRefund ? 'ยืนยันการโอนเงินคืนลูกค้า?' : 'ยืนยันปฏิเสธการคืนเงิน?',
-        message: isRefund 
-            ? 'ยืนยันว่าได้โอนเงินคืนลูกค้าผ่านบัญชีธนาคาร/พร้อมเพย์ จำนวน <strong>' + refundPrice + ' ฿</strong> เรียบร้อยแล้ว' + (parseInt(points) > 0 ? ' และคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : '')
-            : 'ยืนยันไม่คืนเงินค่าจอง (ปฏิเสธคำขอ)' + (parseInt(points) > 0 ? ' โดยคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : ''),
-        consequence: 'การตัดสินใจนี้จะปรับสถานะการจอง ปลดล็อกสนาม คืนสต็อกอุปกรณ์ และปรับปรุงยอดบัญชีโอนคืนเรียบร้อย',
-        type: isRefund ? 'success' : 'warning',
-        confirmText: '<i class="fas fa-save mr-6"></i> ยืนยันบันทึกผล',
-        onConfirm: function() {
-            if (isRefundSubmitting) return;
-            isRefundSubmitting = true;
-            const submitBtn = document.querySelector('#refundForm button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกผล...';
-            }
-            document.getElementById('refundForm').submit();
-        }
-    });
-    return false;
-}
-</script>
 </body>
 </html>

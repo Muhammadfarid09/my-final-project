@@ -56,6 +56,37 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
+/**
+ * ยืนยันการแก้ไขข้อมูลสมาชิก หรือระงับสิทธิ์การใช้งาน (จาก admin/member_edit.php)
+ * @param {Event} e - Submit Event จากฟอร์ม #memberEditForm
+ */
+function confirmMemberEdit(e) {
+    const statusEl = document.getElementById('member_status');
+    const status = statusEl ? statusEl.value : '';
+    if (status === 'ระงับสิทธิ์') {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        SwalConfirmAction({
+            title: 'ยืนยันการระงับสิทธิ์สมาชิก?',
+            message: 'คุณกำลังตั้งค่าสถานะบัญชีของสมาชิกท่านนี้เป็น <strong>"ระงับสิทธิ์"</strong>',
+            consequence: 'คำเตือน: สมาชิกนี้จะไม่สามารถเข้าสู่ระบบเพื่อจองสนาม หรือทำรายการใดๆ บนเว็บไซต์ได้จนกว่าจะเปิดสิทธิ์ใหม่อีกครั้ง',
+            type: 'danger',
+            confirmText: '<i class="fas fa-user-slash mr-6"></i> ยืนยันระงับสิทธิ์',
+            onConfirm: function() {
+                const submitBtn = document.querySelector('#memberEditForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+                }
+                const form = document.getElementById('memberEditForm');
+                if (form) form.submit();
+            }
+        });
+        return false;
+    }
+    return true;
+}
+window.confirmMemberEdit = confirmMemberEdit;
+
 /* ==============================================================================
    หมวดที่ 2: ระบบเปิดหน้าต่างใบเสร็จอัตโนมัติ (Receipt Auto-trigger - admin/pos.php)
    ตรวจสอบทริกเกอร์หลังการบันทึกรายการขาย POS เพื่อเปิดหน้าต่างใบเสร็จขึ้นมาพิมพ์
@@ -943,6 +974,56 @@ function togglePointInput() {
     }
 }
 
+/**
+ * ยืนยันการพิจารณาคำขอยกเลิกและคืนเงินค่าจองสนาม พร้อมป้องกัน Double Submission
+ * @param {Event} e - Submit Event จากฟอร์ม #refundForm
+ */
+let isRefundSubmitting = false;
+
+function confirmRefundDecision(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (isRefundSubmitting) return false;
+
+    const statusEl = document.getElementById('refund_status');
+    const status = statusEl ? statusEl.value : '';
+    if (!status) {
+        if (typeof SwalToast === 'function') {
+            SwalToast('warning', 'กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
+        } else {
+            alert('กรุณาเลือกการตัดสินใจพิจารณาคืนเงิน');
+        }
+        return false;
+    }
+    const refundPriceEl = document.getElementById('modal_suggested_refund');
+    const refundPrice = refundPriceEl ? refundPriceEl.innerText : '0';
+    const pointsInput = document.querySelector('input[name="refund_point"]');
+    const points = pointsInput ? (pointsInput.value || 0) : 0;
+    const isRefund = (status === 'คืนแล้ว');
+
+    SwalConfirmAction({
+        title: isRefund ? 'ยืนยันการโอนเงินคืนลูกค้า?' : 'ยืนยันปฏิเสธการคืนเงิน?',
+        message: isRefund 
+            ? 'ยืนยันว่าได้โอนเงินคืนลูกค้าผ่านบัญชีธนาคาร/พร้อมเพย์ จำนวน <strong>' + refundPrice + ' ฿</strong> เรียบร้อยแล้ว' + (parseInt(points) > 0 ? ' และคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : '')
+            : 'ยืนยันไม่คืนเงินค่าจอง (ปฏิเสธคำขอ)' + (parseInt(points) > 0 ? ' โดยคืนแต้มชดเชย <strong>' + points + ' พอยท์</strong>' : ''),
+        consequence: 'การตัดสินใจนี้จะปรับสถานะการจอง ปลดล็อกสนาม คืนสต็อกอุปกรณ์ และปรับปรุงยอดบัญชีโอนคืนเรียบร้อย',
+        type: isRefund ? 'success' : 'warning',
+        confirmText: '<i class="fas fa-save mr-6"></i> ยืนยันบันทึกผล',
+        onConfirm: function() {
+            if (isRefundSubmitting) return;
+            isRefundSubmitting = true;
+            const submitBtn = document.querySelector('#refundForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึกผล...';
+            }
+            const form = document.getElementById('refundForm');
+            if (form) form.submit();
+        }
+    });
+    return false;
+}
+window.confirmRefundDecision = confirmRefundDecision;
+
 /* ==============================================================================
    หมวดที่ 8: ระบบจัดการและแจ้งซ่อมสนาม (Court Maintenance - admin/courts.php)
    เปิดและปิด Modal สำหรับแจ้งปิดปรับปรุง/ส่งซ่อมสนามแบดมินตัน
@@ -969,6 +1050,116 @@ function closeRepairModal() {
     let modal = document.getElementById('repairModal');
     if (modal) modal.style.display = 'none';
 }
+
+let isAddCourtSubmitting = false;
+let isRepairSubmitting = false;
+let isEditSubmitting = false;
+
+/**
+ * ป้องกันการกดบันทึกเพิ่มสนามซ้ำ (Double Submission)
+ * @param {Event} e - Submit Event
+ */
+function handleAddCourtSubmit(e) {
+    if (isAddCourtSubmitting) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        return false;
+    }
+    isAddCourtSubmitting = true;
+    const btn = document.querySelector('#addCourtForm button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+    }
+    return true;
+}
+
+/**
+ * เปิด Modal แก้ไขข้อมูลสนามแบดมินตัน
+ * @param {number} id - รหัสสนาม
+ * @param {string} name - ชื่อสนาม
+ * @param {number} price - ราคามาตรฐาน
+ * @param {string} openTime - เวลาเปิด
+ * @param {string} closeTime - เวลาปิด
+ * @param {number|null} peakPrice - ราคาวันหยุด/พีค
+ * @param {number|null} offpeakPrice - ราคากลางวัน/ออฟพีค
+ */
+function openCourtEditModal(id, name, price, openTime, closeTime, peakPrice, offpeakPrice) {
+    let editId = document.getElementById('edit_court_id');
+    let editName = document.getElementById('edit_court_name');
+    let editPrice = document.getElementById('edit_court_price');
+    let editOpen = document.getElementById('edit_open_time');
+    let editClose = document.getElementById('edit_close_time');
+    let editPeak = document.getElementById('edit_peak_price');
+    let editOffpeak = document.getElementById('edit_offpeak_price');
+    let modal = document.getElementById('courtEditModal');
+
+    if (editId) editId.value = id;
+    if (editName) editName.value = name;
+    if (editPrice) editPrice.value = price;
+    if (editOpen) editOpen.value = openTime;
+    if (editClose) editClose.value = closeTime;
+    if (peakPrice !== null && editPeak) editPeak.value = peakPrice;
+    if (offpeakPrice !== null && editOffpeak) editOffpeak.value = offpeakPrice;
+
+    isEditSubmitting = false;
+    const btn = document.querySelector('#courtEditForm button[type="submit"]');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = 'บันทึกการเปลี่ยนแปลง';
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+/**
+ * ปิด Modal แก้ไขข้อมูลสนามแบดมินตัน
+ */
+function closeCourtEditModal() {
+    isEditSubmitting = false;
+    let modal = document.getElementById('courtEditModal');
+    if (modal) modal.style.display = 'none';
+}
+
+/**
+ * ป้องกันการกดบันทึกแก้ไขข้อมูลสนามซ้ำ (Double Submission)
+ * @param {Event} e - Submit Event
+ */
+function handleCourtEditSubmit(e) {
+    if (isEditSubmitting) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        return false;
+    }
+    isEditSubmitting = true;
+    const btn = document.querySelector('#courtEditForm button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+    }
+    return true;
+}
+
+/**
+ * ป้องกันการกดบันทึกแจ้งซ่อมสนามซ้ำ (Double Submission)
+ * @param {Event} e - Submit Event
+ */
+function handleRepairSubmit(e) {
+    if (isRepairSubmitting) {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        return false;
+    }
+    isRepairSubmitting = true;
+    const btn = document.querySelector('#courtRepairForm button[type="submit"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+    }
+    return true;
+}
+
+window.handleAddCourtSubmit = handleAddCourtSubmit;
+window.openCourtEditModal = openCourtEditModal;
+window.closeCourtEditModal = closeCourtEditModal;
+window.handleCourtEditSubmit = handleCourtEditSubmit;
+window.handleRepairSubmit = handleRepairSubmit;
 
 /* ==============================================================================
    หมวดที่ 9: ระบบจัดการและส่งซ่อมอุปกรณ์ (Equipment Repairs - admin/products.php & equipment_repairs.php)
@@ -1047,6 +1238,103 @@ function closeEqModal(modalId) {
     }
 }
 
+let isEqRepairSubmitting = false;
+
+/**
+ * ยืนยันการตัดสต็อกส่งซ่อมอุปกรณ์เช่า (จาก admin/products.php)
+ * @param {Event} e - Submit Event
+ */
+function confirmSendToRepair(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (isEqRepairSubmitting) return false;
+
+    const nameEl = document.getElementById('modal_eq_name');
+    const qtyEl = document.getElementById('modal_eq_qty');
+    const name = nameEl ? nameEl.innerText : '';
+    const qty = qtyEl ? qtyEl.value : 1;
+
+    SwalConfirmAction({
+        title: 'ยืนยันการส่งซ่อมอุปกรณ์?',
+        message: 'คุณกำลังจะบันทึกส่งซ่อม <strong>' + name + '</strong> จำนวน <strong>' + qty + ' ชิ้น</strong>',
+        consequence: 'สต็อกของอุปกรณ์พร้อมใช้งานจะถูกตัดออกจำนวน ' + qty + ' ชิ้น และเข้าสู่คิวรอการซ่อมทันที',
+        type: 'warning',
+        confirmText: '<i class="fas fa-tools mr-6"></i> ยืนยันตัดสต็อกและส่งซ่อม',
+        onConfirm: function() {
+            if (isEqRepairSubmitting) return;
+            isEqRepairSubmitting = true;
+            const submitBtn = document.querySelector('#eqRepairForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังส่งซ่อม...';
+            }
+            const form = document.getElementById('eqRepairForm');
+            if (form) form.submit();
+        }
+    });
+    return false;
+}
+
+/**
+ * ยืนยันการซ่อมอุปกรณ์เสร็จสิ้นและคืนสต็อก (จาก admin/equipment_repairs.php)
+ * @param {Event} e - Submit Event
+ */
+function confirmEqFinish(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const nameEl = document.getElementById('modal_finish_name');
+    const costInput = document.querySelector('#eqFinishModal input[name="repair_cost"]');
+    const name = nameEl ? nameEl.innerText : '';
+    const cost = costInput ? (costInput.value || '0.00') : '0.00';
+
+    SwalConfirmAction({
+        title: 'ยืนยันการซ่อมเสร็จสิ้น?',
+        message: 'ยืนยันว่าการซ่อม <strong>' + name + '</strong> เสร็จเรียบร้อยแล้ว ค่าใช้จ่าย <strong>' + parseFloat(cost).toFixed(2) + ' ฿</strong>',
+        consequence: 'อุปกรณ์ชิ้นนี้จะถูกนำกลับเข้าสู่สต็อกพร้อมให้เช่าทันที',
+        type: 'success',
+        confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันและคืนสต็อก',
+        onConfirm: function() {
+            const submitBtn = document.querySelector('#eqFinishForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+            }
+            const form = document.getElementById('eqFinishForm');
+            if (form) form.submit();
+        }
+    });
+    return false;
+}
+
+/**
+ * ยืนยันตัดจำหน่ายอุปกรณ์ที่ชำรุดถาวร (จาก admin/equipment_repairs.php)
+ * @param {Event} e - Submit Event
+ */
+function confirmEqBroken(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const nameEl = document.getElementById('modal_broken_name');
+    const name = nameEl ? nameEl.innerText : '';
+
+    SwalConfirmDelete({
+        title: 'ยืนยันตัดจำหน่ายอุปกรณ์?',
+        message: 'คุณกำลังจะบันทึกว่า <strong>' + name + '</strong> เสียหายถาวร ไม่สามารถซ่อมแซมได้',
+        consequence: 'อุปกรณ์ชิ้นนี้จะถูกตัดออกจากระบบอย่างถาวรและจะไม่ถูกนำกลับเข้าสต็อก',
+        confirmText: '<i class="fas fa-times-circle mr-6"></i> ยืนยันตัดเป็นของเสีย',
+        onConfirm: function() {
+            const submitBtn = document.querySelector('#eqBrokenForm button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังบันทึก...';
+            }
+            const form = document.getElementById('eqBrokenForm');
+            if (form) form.submit();
+        }
+    });
+    return false;
+}
+
+window.confirmSendToRepair = confirmSendToRepair;
+window.confirmEqFinish = confirmEqFinish;
+window.confirmEqBroken = confirmEqBroken;
+
 /* ==============================================================================
    หมวดที่ 10: หน้าข่าวสารและประชาสัมพันธ์ (News & Announcements - admin/news.php)
    เปิดและปิด Modal สำหรับเพิ่มข่าวสารและโปรโมชั่นของสนาม
@@ -1112,6 +1400,65 @@ function closeVerifyModal() {
         modal.style.display = 'none';
     }
 }
+
+let isVerifySubmitting = false;
+
+/**
+ * ยืนยันยอดชำระเงินถูกต้องและอนุมัติการจอง (จาก admin/payments.php)
+ */
+function confirmApprovePayment() {
+    if (isVerifySubmitting) return;
+    let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
+    let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
+    let amount = document.getElementById('info_amount') ? document.getElementById('info_amount').innerText : '';
+    
+    SwalConfirmAction({
+        title: 'ยืนยันยอดชำระเงินถูกต้อง?',
+        message: 'ยืนยันว่าการชำระเงินของ <strong>' + memberName + '</strong> (รายการ ' + bookingId + ') ยอดเงิน <strong>' + amount + '</strong> ถูกต้องเรียบร้อยแล้ว',
+        consequence: 'สถานะการจองจะเปลี่ยนเป็น "จองแล้ว" และระบบจะบันทึกรายได้พร้อมเพิ่มแต้มสะสมให้สมาชิกทันที',
+        confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันยอดถูกต้อง',
+        type: 'success',
+        onConfirm: function() {
+            if (isVerifySubmitting) return;
+            isVerifySubmitting = true;
+            const buttons = document.querySelectorAll('#verifyPaymentForm button');
+            buttons.forEach(btn => btn.disabled = true);
+            const statusInput = document.getElementById('verify_action_status');
+            if (statusInput) statusInput.value = 'ยืนยันแล้ว';
+            const form = document.getElementById('verifyPaymentForm');
+            if (form) form.submit();
+        }
+    });
+}
+
+/**
+ * ปฏิเสธสลิปการชำระเงินและยกเลิกรายการจอง (จาก admin/payments.php)
+ */
+function confirmRejectPayment() {
+    if (isVerifySubmitting) return;
+    let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
+    let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
+    
+    SwalConfirmDelete({
+        title: 'ยืนยันการปฏิเสธสลิปการโอนเงิน?',
+        message: 'คุณกำลังจะปฏิเสธสลิปสำหรับรายการจอง <strong>' + bookingId + '</strong> (' + memberName + ')',
+        consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และ Slot เวลาของสนามจะถูกปล่อยคืนสู่ระบบทันที',
+        confirmText: 'ยืนยันปฏิเสธสลิป',
+        onConfirm: function() {
+            if (isVerifySubmitting) return;
+            isVerifySubmitting = true;
+            const buttons = document.querySelectorAll('#verifyPaymentForm button');
+            buttons.forEach(btn => btn.disabled = true);
+            const statusInput = document.getElementById('verify_action_status');
+            if (statusInput) statusInput.value = 'ปฏิเสธ';
+            const form = document.getElementById('verifyPaymentForm');
+            if (form) form.submit();
+        }
+    });
+}
+
+window.confirmApprovePayment = confirmApprovePayment;
+window.confirmRejectPayment = confirmRejectPayment;
 
 /* ==============================================================================
    หมวดที่ 12: หน้าแดชบอร์ดและกราฟสถิติ (Dashboard Visualization / Chart.js - admin/index.php)
@@ -1697,6 +2044,39 @@ document.addEventListener("DOMContentLoaded", function() {
                     closeActiveAdminModal(modal);
                 }
             });
+        }
+    });
+
+    // --------------------------------------------------------------------------
+    // 5. Centralized Form Submission Interceptor (Double-Submission Prevention)
+    // ดักจับการส่งฟอร์มเพื่อป้องกัน Double Submission และแสดงสถานะกำลังบันทึก
+    // --------------------------------------------------------------------------
+    document.addEventListener('submit', function(e) {
+        let form = e.target;
+        if (!form || form.tagName !== 'FORM') return;
+
+        // หากฟอร์มมี HTML5 Validation และข้อมูลยังไม่ผ่านเกณฑ์ ให้ปล่อยให้เบราว์เซอร์แจ้งเตือน
+        if (typeof form.checkValidity === 'function' && !form.checkValidity()) {
+            return;
+        }
+
+        if (form.classList.contains('prevent-double-submit') || 
+            form.id === 'memberEditForm' || 
+            form.id === 'addCourtForm' || 
+            form.id === 'courtRepairForm' || 
+            form.id === 'courtEditForm') {
+            
+            let submitBtn = form.querySelector('button[type="submit"]:not(:disabled)');
+            if (submitBtn) {
+                if (!submitBtn.dataset.originalHtml) {
+                    submitBtn.dataset.originalHtml = submitBtn.innerHTML;
+                }
+                let loadingText = submitBtn.dataset.loadingText || 'กำลังบันทึก...';
+                setTimeout(function() {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-6"></i> <span>${loadingText}</span>`;
+                }, 10);
+            }
         }
     });
 });

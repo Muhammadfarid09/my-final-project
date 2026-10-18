@@ -112,23 +112,6 @@ unset($_SESSION['error'], $_SESSION['success'], $_SESSION['demo_reset_link']);
         </div>
     </main>
 
-    <script>
-        // ป้องกัน Double Submission & ตรวจสอบเบอร์โทร 10 หลัก Client-side
-        document.getElementById('forgotForm').addEventListener('submit', function(e) {
-            const phoneInput = document.getElementById('member_phone');
-            const phone = phoneInput.value.trim();
-
-            if (!/^[0-9]{10}$/.test(phone)) {
-                e.preventDefault();
-                alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้องครบ 10 หลัก (เฉพาะตัวเลขเท่านั้น)');
-                phoneInput.focus();
-                return;
-            }
-
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>กำลังส่งคำขอ...</span>';
-        });
-    </script>
+    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
 </body>
 </html>

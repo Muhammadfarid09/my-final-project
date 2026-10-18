@@ -176,54 +176,5 @@ include 'includes/header.php';
 
     <!-- เรียกใช้ไฟล์ JS กลาง -->
     <script src="../assets/js/admin.js?v=<?php echo filemtime('../assets/js/admin.js'); ?>"></script>
-    <script>
-    (function() {
-        let isVerifySubmitting = false;
-
-        window.confirmApprovePayment = function() {
-            if (isVerifySubmitting) return;
-            let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
-            let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
-            let amount = document.getElementById('info_amount') ? document.getElementById('info_amount').innerText : '';
-            
-            SwalConfirmAction({
-                title: 'ยืนยันยอดชำระเงินถูกต้อง?',
-                message: 'ยืนยันว่าการชำระเงินของ <strong>' + memberName + '</strong> (รายการ ' + bookingId + ') ยอดเงิน <strong>' + amount + '</strong> ถูกต้องเรียบร้อยแล้ว',
-                consequence: 'สถานะการจองจะเปลี่ยนเป็น "จองแล้ว" และระบบจะบันทึกรายได้พร้อมเพิ่มแต้มสะสมให้สมาชิกทันที',
-                confirmText: '<i class="fas fa-check-circle mr-6"></i> ยืนยันยอดถูกต้อง',
-                type: 'success',
-                onConfirm: function() {
-                    if (isVerifySubmitting) return;
-                    isVerifySubmitting = true;
-                    const buttons = document.querySelectorAll('#verifyPaymentForm button');
-                    buttons.forEach(btn => btn.disabled = true);
-                    document.getElementById('verify_action_status').value = 'ยืนยันแล้ว';
-                    document.getElementById('verifyPaymentForm').submit();
-                }
-            });
-        };
-
-        window.confirmRejectPayment = function() {
-            if (isVerifySubmitting) return;
-            let bookingId = document.getElementById('info_booking_id') ? document.getElementById('info_booking_id').innerText : '';
-            let memberName = document.getElementById('info_member_name') ? document.getElementById('info_member_name').innerText : '';
-            
-            SwalConfirmDelete({
-                title: 'ยืนยันการปฏิเสธสลิปการโอนเงิน?',
-                message: 'คุณกำลังจะปฏิเสธสลิปสำหรับรายการจอง <strong>' + bookingId + '</strong> (' + memberName + ')',
-                consequence: 'คำเตือน: เมื่อปฏิเสธสลิป รายการจองนี้จะถูกยกเลิก และ Slot เวลาของสนามจะถูกปล่อยคืนสู่ระบบทันที',
-                confirmText: 'ยืนยันปฏิเสธสลิป',
-                onConfirm: function() {
-                    if (isVerifySubmitting) return;
-                    isVerifySubmitting = true;
-                    const buttons = document.querySelectorAll('#verifyPaymentForm button');
-                    buttons.forEach(btn => btn.disabled = true);
-                    document.getElementById('verify_action_status').value = 'ปฏิเสธ';
-                    document.getElementById('verifyPaymentForm').submit();
-                }
-            });
-        };
-    })();
-    </script>
 </body>
 </html>

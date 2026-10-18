@@ -315,19 +315,5 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
     </div>
 
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
-    <script>
-    // ป้องกัน Double Submission ในฟอร์มโปรไฟล์ตามกฎ HCI
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.profile-form').forEach(function(form) {
-            form.addEventListener('submit', function() {
-                var btn = form.querySelector('button[type="submit"]');
-                if (btn && !btn.disabled) {
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกข้อมูล...';
-                }
-            });
-        });
-    });
-    </script>
 </body>
 </html>
