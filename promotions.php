@@ -36,7 +36,7 @@ $initial_news_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
     <?php include_once 'includes/navbar.php'; ?>
 
-    <main class="news-page-wrapper">
+    <main class="news-page-wrapper" data-initial-id="<?php echo $initial_news_id; ?>">
         
         <!-- แบนเนอร์ส่วนหัว ธีม Black & Gold -->
         <div class="news-header-banner">
@@ -165,123 +165,5 @@ $initial_news_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     </div>
 
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
-    <script>
-    // 1. ระบบแท็บตัวกรอง (Filter Tabs)
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterBtns = document.querySelectorAll('.btn-filter-tab');
-        const cards = document.querySelectorAll('.news-card');
-        const filterEmpty = document.getElementById('filterEmptyState');
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(b => {
-                    b.classList.remove('active');
-                    b.setAttribute('aria-selected', 'false');
-                });
-                this.classList.add('active');
-                this.setAttribute('aria-selected', 'true');
-
-                const filter = this.dataset.filter;
-                let visibleCount = 0;
-
-                cards.forEach(card => {
-                    const cardType = card.dataset.type;
-                    if (filter === 'all' || cardType === filter) {
-                        card.style.display = 'flex';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-
-                if (filterEmpty) {
-                    if (visibleCount === 0 && cards.length > 0) {
-                        filterEmpty.classList.remove('d-none');
-                    } else {
-                        filterEmpty.classList.add('d-none');
-                    }
-                }
-            });
-        });
-
-        // 2. ตรวจสอบหากมี ?id=... ส่งมา ให้เปิด Modal ทันที
-        const initId = <?php echo $initial_news_id; ?>;
-        if (initId > 0) {
-            openNewsDetailModal(initId);
-        }
-    });
-
-    // 3. ฟังก์ชันเปิด Modal อย่างปลอดภัย (อ่านจาก Template หรือ Fetch API)
-    function openNewsDetailModal(newsId) {
-        const idInt = parseInt(newsId, 10);
-        if (!idInt || idInt <= 0) return;
-
-        const tpl = document.getElementById('news-data-' + idInt);
-        if (tpl) {
-            const payload = tpl.content.querySelector('.template-payload');
-            if (payload) {
-                renderModalData(
-                    payload.dataset.title,
-                    payload.dataset.date,
-                    payload.dataset.type,
-                    payload.dataset.image,
-                    payload.dataset.content
-                );
-                return;
-            }
-        }
-
-        // กรณีไม่พบใน template ให้เรียกผ่าน AJAX API
-        fetch('actions/get_news_detail.php?id=' + idInt)
-            .then(res => res.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    renderModalData(res.data.title, res.data.published_at, res.data.type, res.data.image, res.data.content);
-                } else {
-                    alert(res.message || 'ไม่สามารถโหลดข้อมูลข่าวสารได้');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-            });
-    }
-
-    function renderModalData(title, date, type, image, content) {
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('modalDate').textContent = date;
-        document.getElementById('modalTypeBadge').textContent = type || 'ข่าวสารและกิจกรรม';
-        document.getElementById('modalContent').innerHTML = content;
-
-        const imgContainer = document.getElementById('modalImgContainer');
-        const imgTag = document.getElementById('modalImg');
-        if (image && image !== '') {
-            imgTag.src = image;
-            imgContainer.classList.remove('d-none');
-        } else {
-            imgContainer.classList.add('d-none');
-            imgTag.src = '';
-        }
-
-        const modal = document.getElementById('newsModal');
-        modal.classList.add('show');
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeNewsDetailModal() {
-        const modal = document.getElementById('newsModal');
-        modal.classList.remove('show');
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-    }
-
-    // ปิด Modal เมื่อกด ESC บนแป้นพิมพ์ (HCI Keyboard Accessibility)
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeNewsDetailModal();
-        }
-    });
-    </script>
 </body>
 </html>

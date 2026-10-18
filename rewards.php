@@ -377,28 +377,7 @@ try {
         </div>
     </div>
 
-    <!-- เรียกใช้ JavaScript -->
-    <script src="assets/js/member.js?v=2.1"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ปรับความกว้างของหลอดระดับสมาชิกตาม Data Attribute
-            let pFill = document.getElementById('loyaltyProgressFill');
-            if (pFill && pFill.dataset.progress) {
-                pFill.style.width = pFill.dataset.progress + '%';
-            }
-
-            let rModal = document.getElementById('rewardConfirmModal');
-            if (rModal) {
-                // ปิด Modal เมื่อคลิกด้านนอก
-                rModal.addEventListener('click', function(e) {
-                    if (e.target === rModal) closeRedeemModal();
-                });
-            }
-            // ปิด Modal เมื่อกด ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeRedeemModal();
-            });
-        });
-    </script>
+    <!-- เรียกใช้ JavaScript ส่วนกลาง (ระบบจะเริ่มต้นและจัดการ Modal อัตโนมัติ) -->
+    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
 </body>
 </html>

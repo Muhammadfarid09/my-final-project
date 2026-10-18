@@ -105,7 +105,9 @@ include 'includes/header.php';
             </div>
 
             <!-- พื้นที่แสดงข้อความ (Scrollable) -->
-            <div class="chat-messages" id="chatMessagesBox">
+            <div class="chat-messages" id="chatMessagesBox"
+                 data-last-id="<?php echo !empty($messages) ? intval(end($messages)['chat_id']) : 0; ?>"
+                 data-member-id="<?php echo intval($active_member_id); ?>">
                 <?php if (count($messages) > 0): ?>
                     <?php foreach ($messages as $msg): ?>
                         <?php $is_admin = ($msg['chat_sender'] == 'Admin'); ?>
@@ -133,57 +135,6 @@ include 'includes/header.php';
                     <i class="fas fa-paper-plane"></i> ส่งข้อความ
                 </button>
             </form>
-
-            <script>
-                (function() {
-                    let lastChatId = <?php echo !empty($messages) ? intval(end($messages)['chat_id']) : 0; ?>;
-                    const currentMemberId = <?php echo intval($active_member_id); ?>;
-                    const chatBox = document.getElementById('chatMessagesBox');
-                    const chatForm = document.getElementById('adminChatForm');
-                    const btnChatSend = document.getElementById('btnChatSend');
-
-                    // ฟังก์ชันเลื่อนลงล่างสุดอัตโนมัติ
-                    function scrollChatToBottom() {
-                        if (chatBox) {
-                            chatBox.scrollTop = chatBox.scrollHeight;
-                        }
-                    }
-
-                    // เลื่อนลงล่างทันทีเมื่อโหลดหน้าเว็บเสร็จ
-                    scrollChatToBottom();
-
-                    // ป้องกันการคลิกส่งซ้ำ (Double Submission Prevention)
-                    if (chatForm && btnChatSend) {
-                        chatForm.addEventListener('submit', function() {
-                            btnChatSend.disabled = true;
-                            btnChatSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
-                        });
-                    }
-
-                    // Real-time Polling ดึงข้อความใหม่ทุก 4 วินาที
-                    setInterval(() => {
-                        fetch(`actions/chat_messages_db.php?member_id=${currentMemberId}&last_id=${lastChatId}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.status === 'success' && data.data && data.data.length > 0) {
-                                    data.data.forEach(msg => {
-                                        const is_admin = (msg.chat_sender === 'Admin');
-                                        const bubbleClass = is_admin ? 'admin' : 'member';
-                                        
-                                        const msgDiv = document.createElement('div');
-                                        msgDiv.className = `chat-bubble ${bubbleClass}`;
-                                        msgDiv.innerHTML = `${msg.chat_message} <span class="chat-time">${msg.chat_datetime_formatted} น.</span>`;
-                                        
-                                        chatBox.appendChild(msgDiv);
-                                        lastChatId = msg.chat_id;
-                                    });
-                                    scrollChatToBottom();
-                                }
-                            })
-                            .catch(err => console.error('Error fetching chats:', err));
-                    }, 4000);
-                })();
-            </script>
         <?php else: ?>
             <div class="chat-messages-empty" style="margin: auto;">
                 <i class="fas fa-inbox fa-3x mb-15 text-muted"></i>

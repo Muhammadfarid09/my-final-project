@@ -1700,18 +1700,65 @@ document.addEventListener("DOMContentLoaded", function() {
 
 /* ==============================================================================
    หมวดที่ 13: หน้าต่างสนทนากับสมาชิก (Live Chat Interface - admin/chats.php)
-   จัดการพฤติกรรมการเลื่อนตำแหน่งกล่องข้อความสนทนา
+   จัดการพฤติกรรมการสนทนาสด, เลื่อน Scrollbar, และ Polling ข้อความอัตโนมัติ
    ============================================================================== */
 
 /**
- * ดักจับการโหลดหน้าแชท เพื่อเลื่อน Scrollbar ของกล่องข้อความลงล่างสุดอัตโนมัติ
- * ทำให้ผู้ดูแลระบบเห็นข้อความล่าสุดทันทีโดยไม่ต้องเลื่อนด้วยมือ
+ * ดักจับการโหลดหน้าแชท เพื่อเริ่มต้นระบบแชทสดฝั่งแอดมิน (Live Chat Engine)
+ * อ่านค่า data-last-id และ data-member-id จาก Element #chatMessagesBox (ป้องกัน XSS และแยก Concerns 100%)
  */
 document.addEventListener("DOMContentLoaded", function() {
-    let chatBox = document.getElementById("chatMessagesBox");
-    if (chatBox) {
+    const chatBox = document.getElementById("chatMessagesBox");
+    const chatForm = document.getElementById("adminChatForm");
+    const btnChatSend = document.getElementById("btnChatSend");
+
+    if (!chatBox) return;
+
+    // ฟังก์ชันเลื่อนกล่องข้อความลงล่างสุดอัตโนมัติ
+    function scrollChatToBottom() {
         chatBox.scrollTop = chatBox.scrollHeight;
     }
+
+    // เลื่อนลงล่างทันทีเมื่อโหลดหน้าเว็บเสร็จ
+    scrollChatToBottom();
+
+    // ดึงค่าเริ่มต้นผ่าน Data Attributes ป้องกัน XSS
+    let lastChatId = parseInt(chatBox.dataset.lastId || '0', 10);
+    const currentMemberId = parseInt(chatBox.dataset.memberId || '0', 10);
+
+    // ป้องกันการคลิกส่งซ้ำ (Double Submission Prevention)
+    if (chatForm && btnChatSend) {
+        chatForm.addEventListener('submit', function() {
+            btnChatSend.disabled = true;
+            btnChatSend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...';
+        });
+    }
+
+    // หากไม่มีการเลือกห้องแชท (currentMemberId === 0) ให้หยุด ไม่ต้องเริ่ม Polling
+    if (!currentMemberId || currentMemberId <= 0) return;
+
+    // Real-time Polling ดึงข้อความใหม่ทุก 4 วินาที
+    setInterval(() => {
+        fetch(`actions/chat_messages_db.php?member_id=${currentMemberId}&last_id=${lastChatId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' && data.data && data.data.length > 0) {
+                    data.data.forEach(msg => {
+                        const is_admin = (msg.chat_sender === 'Admin');
+                        const bubbleClass = is_admin ? 'admin' : 'member';
+                        
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `chat-bubble ${bubbleClass}`;
+                        msgDiv.innerHTML = `${msg.chat_message} <span class="chat-time">${msg.chat_datetime_formatted} น.</span>`;
+                        
+                        chatBox.appendChild(msgDiv);
+                        lastChatId = msg.chat_id;
+                    });
+                    scrollChatToBottom();
+                }
+            })
+            .catch(err => console.error('Error fetching chats:', err));
+    }, 4000);
 });
 
 /* ==============================================================================

@@ -94,7 +94,7 @@ try {
             </div>
             <!-- ตัวจับเวลาถอยหลัง -->
             <div class="countdown-timer-badge">
-                <span id="countdown" class="countdown-digits">15:00</span>
+                <span id="countdown" class="countdown-digits" data-expire="<?php echo htmlspecialchars($booking['booking_lock_expire'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">15:00</span>
             </div>
         </div>
 
@@ -217,14 +217,7 @@ try {
         </div>
     </main>
 
-    <!-- เรียกใช้ไฟล์ JS หลัก และสั่งรันฟังก์ชันนับถอยหลังโดยส่งค่าเวลาเข้าไป -->
+    <!-- เรียกใช้ไฟล์ JS หลัก (ระบบจะอ่านค่าเวลาจาก data-expire อัตโนมัติ) -->
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let lockExpire = "<?php echo htmlspecialchars($booking['booking_lock_expire'] ?? ''); ?>";
-            initPaymentCountdown(lockExpire);
-            initSlipUpload();
-        });
-    </script>
 </body>
 </html>

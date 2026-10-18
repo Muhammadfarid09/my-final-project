@@ -558,15 +558,7 @@ try {
     </div>
 
 
-    <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard -->
+    <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard (ระบบจะเริ่มต้นอัตโนมัติเมื่อพบ .wizard-page-wrapper) -->
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // เริ่มต้นระบบ 5-Step Booking Wizard
-            if (typeof initBookingWizard === 'function') {
-                initBookingWizard();
-            }
-        });
-    </script>
 </body>
 </html>

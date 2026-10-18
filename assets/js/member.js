@@ -2,7 +2,7 @@
    T.S. Pattani - Member / Frontend JavaScript Controller
    มาตรฐานการจัดการสคริปต์ฝั่งผู้ใช้งาน (Strict Mode & HCI Design Standard)
    --------------------------------------------------------------------------
-   สารบัญโครงสร้างระบบ 11 หมวดหมู่ (System Architecture Table of Contents):
+   สารบัญโครงสร้างระบบ 13 หมวดหมู่ (System Architecture Table of Contents):
    1. ระบบนำทางและเมนูมือถือ (Navigation & Drawer Menu)
    2. ระบบแจ้งเตือนสากล (Global Alert System)
    3. ระบบปฏิทินและเลือกวันจอง (Calendar & Date Picker - Wizard Step 1)
@@ -14,6 +14,8 @@
    9. ระบบชำระเงิน แนบสลิป และเวลานับถอยหลัง (Payment, Slip & Countdown - payment.php)
    10. ระบบสะสมแต้มและแลกของรางวัล (Rewards & Loyalty System - rewards.php)
    11. ระบบฟอร์มยืนยันตัวตนและความปลอดภัย (Auth & Security Forms - register.php & login.php)
+   12. ระบบประวัติการจองและขอยกเลิก (Booking History & Cancellation - booking_history.php)
+   13. ระบบข่าวสารและโปรโมชัน (Promotions & Announcements - promotions.php)
    ========================================================================== */
 
 /* ==========================================================================
@@ -1540,7 +1542,13 @@ function submitGuestBooking(authType = 'login') {
  */
 function initPaymentCountdown(lockExpireStr) {
     let countdownElement = document.getElementById("countdown");
-    if (!countdownElement || !lockExpireStr) return;
+    if (!countdownElement) return;
+
+    // หากไม่ได้ส่งค่า lockExpireStr เข้ามา ให้อ่านจาก data-expire บน element #countdown โดยตรง
+    if (!lockExpireStr && countdownElement.dataset && countdownElement.dataset.expire) {
+        lockExpireStr = countdownElement.dataset.expire;
+    }
+    if (!lockExpireStr) return;
 
     let expireTime = new Date(lockExpireStr.replace(/-/g, "/")).getTime();
 
@@ -1888,24 +1896,49 @@ function executeRedeemSubmit() {
  * @event click, keydown (Escape)
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // ปิดเมื่อคลิกนอกพื้นที่ Modal Dialog
+    // ----------------------------------------------------------------------
+    // 1. ดักจับการคลิกภายนอกพื้นที่ (Backdrop Click) สำหรับปิด Modal ฝั่ง Member
+    // ----------------------------------------------------------------------
     document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('member-modal-overlay') || e.target.classList.contains('modal-overlay')) {
+        if (e.target.classList.contains('member-modal-overlay') || 
+            e.target.classList.contains('modal-overlay') || 
+            e.target.classList.contains('modal-cancel-overlay') ||
+            e.target.id === 'newsModal') {
+            
             if (e.target.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                 closeRedeemModal();
             } else if (e.target.id === 'cancelModal' && typeof closeCancelModal === 'function') {
                 closeCancelModal();
+            } else if (e.target.id === 'newsModal' && typeof closeNewsDetailModal === 'function') {
+                closeNewsDetailModal();
             } else {
                 e.target.style.display = 'none';
-                e.target.classList.remove('active');
+                e.target.classList.remove('active', 'show');
             }
         }
     });
 
-    // ปิดเมื่อกดปุ่ม ESC
+    // ----------------------------------------------------------------------
+    // 2. ปิดเมื่อกดปุ่ม ESC (HCI Keyboard Accessibility)
+    // ----------------------------------------------------------------------
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
-            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay.active, .modal-overlay[style*="display: flex"]');
+            // Modal ข่าวสาร (promotions.php)
+            let newsModal = document.getElementById('newsModal');
+            if (newsModal && newsModal.classList.contains('show') && typeof closeNewsDetailModal === 'function') {
+                closeNewsDetailModal();
+                return;
+            }
+
+            // Modal ขอยกเลิกการจอง (booking_history.php)
+            let cancelModal = document.getElementById('cancelModal');
+            if (cancelModal && (cancelModal.style.display === 'flex' || cancelModal.classList.contains('active')) && typeof closeCancelModal === 'function') {
+                closeCancelModal();
+                return;
+            }
+
+            // Modal อื่นๆ
+            let activeOverlay = document.querySelector('.member-modal-overlay.active, .modal-overlay.active, .modal-cancel-overlay[style*="display: flex"], .modal-overlay[style*="display: flex"]');
             if (activeOverlay) {
                 if (activeOverlay.id === 'rewardConfirmModal' && typeof closeRedeemModal === 'function') {
                     closeRedeemModal();
@@ -1918,6 +1951,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // ----------------------------------------------------------------------
+    // 3. เริ่มต้นระบบอัตโนมัติตามองค์ประกอบที่พบบนหน้าจอ (Automatic Lifecycle Inits)
+    // ----------------------------------------------------------------------
+    
+    // หน้าชำระเงิน (payment.php): อ่าน data-expire แล้วเริ่มนับถอยหลังและตั้งค่าอัปโหลดสลิป
+    let countdownEl = document.getElementById('countdown');
+    if (countdownEl) {
+        initPaymentCountdown();
+        if (typeof initSlipUpload === 'function') {
+            initSlipUpload();
+        }
+    }
+
+    // หน้าจองสนาม (booking.php): เริ่มต้นระบบ 5-Step Wizard
+    if (document.querySelector('.wizard-page-wrapper') || document.getElementById('stepPanel1')) {
+        if (typeof initBookingWizard === 'function') {
+            initBookingWizard();
+        }
+    }
+
+    // หน้าสะสมแต้มและของรางวัล (rewards.php): ปรับหลอดความคืบหน้าระดับสมาชิกตาม data-progress
+    let pFill = document.getElementById('loyaltyProgressFill');
+    if (pFill && pFill.dataset && pFill.dataset.progress) {
+        pFill.style.width = pFill.dataset.progress + '%';
+    }
+
+    // หน้าข่าวสารและโปรโมชัน (promotions.php): เปิดระบบแท็บตัวกรองและตรวจจับ data-initial-id
+    if (document.querySelector('.news-page-wrapper') && typeof initPromotionsPage === 'function') {
+        initPromotionsPage();
+    }
 });
 
 /* ==========================================================================
@@ -2274,4 +2338,285 @@ document.addEventListener('DOMContentLoaded', function() {
         initLoginForm();
     }
 })();
+
+/* ==========================================================================
+   หมวดที่ 12: ระบบประวัติการจองและขอยกเลิก (Booking History & Cancellation - booking_history.php)
+   ========================================================================== */
+
+let isCancelSubmitting = false;
+
+/**
+ * เปิด Modal ขอยกเลิกการจองสนามและคำนวณนโยบายการคืนเงิน
+ * @description ดึงค่าเริ่มต้นชื่อและเบอร์โทรจาก data-default-name และ data-default-phone บน #cancelModal (ป้องกัน XSS)
+ * @param {number|string} id - รหัสการจอง
+ * @param {string} court - ชื่อสนาม
+ * @param {string} date - วันที่จอง
+ * @param {string} time - เวลาที่จอง
+ * @param {string} price - ยอดเงินรวม
+ * @param {string} status - สถานะการจอง (เช่น 'รอตรวจสอบ', 'จองแล้ว')
+ * @param {boolean} hasSlip - มีการแนบสลิปแล้วหรือไม่
+ */
+function openCancelModal(id, court, date, time, price, status, hasSlip) {
+    let idInput = document.getElementById('modal_cancel_booking_id');
+    let idText = document.getElementById('modal_cancel_id_text');
+    let courtText = document.getElementById('modal_cancel_court');
+    let dateText = document.getElementById('modal_cancel_date');
+    let timeText = document.getElementById('modal_cancel_time');
+    let priceText = document.getElementById('modal_cancel_price');
+
+    if (idInput) idInput.value = id;
+    if (idText) idText.textContent = id;
+    if (courtText) courtText.textContent = court;
+    if (dateText) dateText.textContent = date;
+    if (timeText) timeText.textContent = time;
+    if (priceText) priceText.textContent = price;
+
+    const unverifiedNotice = document.getElementById('modal_unverified_notice');
+    const unverifiedSlipNotice = document.getElementById('modal_unverified_slip_notice');
+    const policyBox = document.getElementById('modal_refund_policy_box');
+    const accountSection = document.getElementById('modal_refund_account_section');
+    const titleText = document.getElementById('modal_cancel_title_text');
+    const submitText = document.getElementById('modal_cancel_submit_text');
+    const submitBtn = document.getElementById('modal_cancel_submit_btn');
+
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+    }
+    isCancelSubmitting = false;
+
+    // ดึงค่าเริ่มต้นของสมาชิกจาก Data Attributes บน #cancelModal (ป้องกัน XSS และแยก Concerns 100%)
+    const modal = document.getElementById('cancelModal');
+    const defaultMemberName = modal ? (modal.dataset.defaultName || '') : '';
+    const defaultMemberPhone = modal ? (modal.dataset.defaultPhone || '') : '';
+
+    const accNoInput = document.getElementById('cancel_refund_account_no');
+    const accNameInput = document.getElementById('cancel_refund_account_name');
+
+    // เติมค่าเริ่มต้นเพื่อลดภาระการพิมพ์ (HCI: Avoid Redundant User Input)
+    if (accNoInput && !accNoInput.value) accNoInput.value = defaultMemberPhone;
+    if (accNameInput && !accNameInput.value) accNameInput.value = defaultMemberName;
+
+    if (status === 'รอตรวจสอบ' && !hasSlip) {
+        // กรณีที่ 1: รอแนบสลิป (ยังไม่จ่าย)
+        if (unverifiedNotice) unverifiedNotice.style.display = 'block';
+        if (unverifiedSlipNotice) unverifiedSlipNotice.style.display = 'none';
+        if (policyBox) policyBox.style.display = 'none';
+        if (accountSection) accountSection.style.display = 'none';
+        if (accNoInput) accNoInput.removeAttribute('required');
+        if (accNameInput) accNameInput.removeAttribute('required');
+        if (titleText) titleText.textContent = 'ยกเลิกการจองสนาม (ก่อนชำระเงิน)';
+        if (submitText) submitText.textContent = 'ยืนยันยกเลิกการจอง';
+    } else if (status === 'รอตรวจสอบ' && hasSlip) {
+        // กรณีที่ 2: แนบสลิปแล้ว แต่อยู่ระหว่างรอตรวจ (จ่ายแล้ว)
+        if (unverifiedNotice) unverifiedNotice.style.display = 'none';
+        if (unverifiedSlipNotice) unverifiedSlipNotice.style.display = 'block';
+        if (policyBox) policyBox.style.display = 'none';
+        if (accountSection) accountSection.style.display = 'block';
+        if (accNoInput) accNoInput.setAttribute('required', 'required');
+        if (accNameInput) accNameInput.setAttribute('required', 'required');
+        if (titleText) titleText.textContent = 'ขอยกเลิกและขอคืนเงิน (แนบสลิปแล้ว)';
+        if (submitText) submitText.textContent = 'ส่งคำขอยกเลิกและขอคืนเงิน';
+    } else {
+        // กรณีที่ 3: จองแล้ว (แอดมินอนุมัติแล้ว)
+        if (unverifiedNotice) unverifiedNotice.style.display = 'none';
+        if (unverifiedSlipNotice) unverifiedSlipNotice.style.display = 'none';
+        if (policyBox) policyBox.style.display = 'block';
+        if (accountSection) accountSection.style.display = 'block';
+        if (accNoInput) accNoInput.setAttribute('required', 'required');
+        if (accNameInput) accNameInput.setAttribute('required', 'required');
+        if (titleText) titleText.textContent = 'ขอยกเลิกการจองสนาม (เพื่อขอคืนเงิน)';
+        if (submitText) submitText.textContent = 'ส่งคำขอยกเลิกการจอง';
+    }
+
+    if (modal) modal.style.display = 'flex';
+}
+
+/**
+ * ปิด Modal ขอยกเลิกการจองสนาม
+ */
+function closeCancelModal() {
+    const modal = document.getElementById('cancelModal');
+    if (modal) modal.style.display = 'none';
+    const form = document.getElementById('cancelBookingForm');
+    if (form) form.reset();
+    const submitBtn = document.getElementById('modal_cancel_submit_btn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+    }
+    isCancelSubmitting = false;
+}
+
+/**
+ * ป้องกันการกดส่งคำขอยกเลิกการจองซ้ำ (Double Submission Prevention)
+ * @param {Event} event - Submit Event
+ */
+function handleCancelBookingSubmit(event) {
+    if (isCancelSubmitting) {
+        if (event && typeof event.preventDefault === 'function') event.preventDefault();
+        return false;
+    }
+
+    isCancelSubmitting = true;
+    const submitBtn = document.getElementById('modal_cancel_submit_btn');
+    const submitText = document.getElementById('modal_cancel_submit_text');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.75';
+        submitBtn.style.cursor = 'not-allowed';
+    }
+    if (submitText) {
+        submitText.innerHTML = '<i class="fas fa-spinner fa-spin mr-6"></i> กำลังส่งคำขอยกเลิก...';
+    }
+    return true;
+}
+
+window.openCancelModal = openCancelModal;
+window.closeCancelModal = closeCancelModal;
+window.handleCancelBookingSubmit = handleCancelBookingSubmit;
+
+/* ==========================================================================
+   หมวดที่ 13: ระบบข่าวสารและโปรโมชัน (Promotions & Announcements - promotions.php)
+   ========================================================================== */
+
+/**
+ * เริ่มต้นการทำงานของหน้าข่าวสารและโปรโมชัน
+ * จัดการระบบแท็บตัวกรอง (Filter Tabs) และตรวจสอบการเปิด Modal ทันทีผ่าน data-initial-id หรือ Query String ?id=...
+ */
+function initPromotionsPage() {
+    const pageWrapper = document.querySelector('.news-page-wrapper');
+    if (!pageWrapper) return;
+
+    const filterBtns = document.querySelectorAll('.btn-filter-tab');
+    const cards = document.querySelectorAll('.news-card');
+    const filterEmpty = document.getElementById('filterEmptyState');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterBtns.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
+            this.classList.add('active');
+            this.setAttribute('aria-selected', 'true');
+
+            const filter = this.dataset.filter;
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardType = card.dataset.type;
+                if (filter === 'all' || cardType === filter) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (filterEmpty) {
+                if (visibleCount === 0 && cards.length > 0) {
+                    filterEmpty.classList.remove('d-none');
+                } else {
+                    filterEmpty.classList.add('d-none');
+                }
+            }
+        });
+    });
+
+    // ตรวจสอบ Parameter ID จาก data-initial-id หรือ Query String เพื่อเปิด Modal อัตโนมัติ
+    const initId = parseInt(pageWrapper.dataset.initialId || new URLSearchParams(window.location.search).get('id') || '0', 10);
+    if (initId > 0) {
+        openNewsDetailModal(initId);
+    }
+}
+
+/**
+ * เปิด Modal รายละเอียดข่าวสาร/โปรโมชัน
+ * @param {number|string} newsId - รหัสข่าวสาร
+ */
+function openNewsDetailModal(newsId) {
+    const idInt = parseInt(newsId, 10);
+    if (!idInt || idInt <= 0) return;
+
+    const tpl = document.getElementById('news-data-' + idInt);
+    if (tpl && tpl.content) {
+        const payload = tpl.content.querySelector('.template-payload');
+        if (payload && payload.dataset) {
+            renderModalData(
+                payload.dataset.title,
+                payload.dataset.date,
+                payload.dataset.type,
+                payload.dataset.image,
+                payload.dataset.content
+            );
+            return;
+        }
+    }
+
+    // กรณีไม่พบใน template บนหน้าเว็บ ให้เรียกผ่าน AJAX API
+    fetch('actions/get_news_detail.php?id=' + idInt)
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success' && res.data) {
+                renderModalData(res.data.title, res.data.published_at, res.data.type, res.data.image, res.data.content);
+            } else {
+                alert(res.message || 'ไม่สามารถโหลดข้อมูลข่าวสารได้');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        });
+}
+
+/**
+ * เรนเดอร์ข้อมูลลงในองค์ประกอบต่างๆ ของ Modal ข่าวสาร
+ */
+function renderModalData(title, date, type, image, content) {
+    let modalTitle = document.getElementById('modalTitle');
+    let modalDate = document.getElementById('modalDate');
+    let modalType = document.getElementById('modalTypeBadge');
+    let modalContent = document.getElementById('modalContent');
+
+    if (modalTitle) modalTitle.textContent = title;
+    if (modalDate) modalDate.textContent = date;
+    if (modalType) modalType.textContent = type || 'ข่าวสารและกิจกรรม';
+    if (modalContent) modalContent.innerHTML = content;
+
+    const imgContainer = document.getElementById('modalImgContainer');
+    const imgTag = document.getElementById('modalImg');
+    if (image && image !== '') {
+        if (imgTag) imgTag.src = image;
+        if (imgContainer) imgContainer.classList.remove('d-none');
+    } else {
+        if (imgContainer) imgContainer.classList.add('d-none');
+        if (imgTag) imgTag.src = '';
+    }
+
+    const modal = document.getElementById('newsModal');
+    if (modal) {
+        modal.classList.add('show');
+        modal.setAttribute('aria-hidden', 'false');
+    }
+    document.body.style.overflow = 'hidden';
+}
+
+/**
+ * ปิด Modal รายละเอียดข่าวสาร/โปรโมชัน
+ */
+function closeNewsDetailModal() {
+    const modal = document.getElementById('newsModal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+    document.body.style.overflow = '';
+}
+
+window.openNewsDetailModal = openNewsDetailModal;
+window.closeNewsDetailModal = closeNewsDetailModal;
+
 
