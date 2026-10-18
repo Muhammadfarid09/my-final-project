@@ -84,58 +84,39 @@ try {
         <!-- ============================================== -->
         <section class="home-hero-section">
             <div class="home-container">
-                <div class="home-hero-grid">
-                    <div class="home-hero-content">
-                        <div class="home-hero-badge">
-                            <span class="badge-dot-live"></span>
-                            <span>T.S. BADMINTON PATTANI &bull; มาตรฐาน BWF</span>
-                        </div>
-                        <h1 class="home-hero-title">
-                            สนามแบดมินตันมาตรฐาน BWF <br class="hero-br-desktop">
-                            <span class="text-gold">ใจกลางเมืองปัตตานี</span>
-                        </h1>
-                        <p class="home-hero-subtitle">
-                            คอร์ทพื้นยาง 5 ชั้น ซับแรงกระแทก ระบบไฟ Anti-Glare พร้อมระบบจองคิวออนไลน์ 24 ชม.
-                        </p>
-                        <div class="home-hero-actions">
-                            <a href="booking.php" class="home-btn-primary">
-                                <i class="fas fa-calendar-check"></i>
-                                <span>จองสนาม</span>
-                            </a>
-                            <?php if (isset($_SESSION['member_id'])): ?>
-                                <a href="profile.php" class="home-btn-secondary">
-                                    <i class="fas fa-user-circle"></i>
-                                    <span>โปรไฟล์ของฉัน</span>
-                                </a>
-                            <?php else: ?>
-                                <a href="login.php" class="home-btn-secondary">
-                                    <i class="fas fa-sign-in-alt"></i>
-                                    <span>เข้าสู่ระบบ</span>
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                        <div class="home-hero-trust-chips">
-                            <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> เช็คคอร์ทว่างเรียลไทม์</span>
-                            <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> ล็อกคิวอัตโนมัติ</span>
-                            <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> สะสมแต้มทุกการเล่น</span>
-                        </div>
+                <div class="home-hero-content">
+                    <div class="home-hero-badge">
+                        <span class="badge-dot-live"></span>
+                        <span>T.S. BADMINTON PATTANI &bull; มาตรฐาน BWF</span>
                     </div>
-                    <div class="home-hero-mascot-col" aria-label="T.S. Pattani Mascot">
-                        <div class="mascot-ambient-glow"></div>
-                        <div class="mascot-wrapper">
-                            <img src="assets/img/mascot-hero-player.png?v=<?php echo file_exists(__DIR__ . '/assets/img/mascot-hero-player.png') ? filemtime(__DIR__ . '/assets/img/mascot-hero-player.png') : time(); ?>" 
-                                 alt="T.S. Pattani Badminton Mascot" 
-                                 class="home-hero-mascot-img" 
-                                 width="460" 
-                                 height="460"
-                                 loading="eager">
-                            <div class="mascot-shadow"></div>
-                            <div class="mascot-floating-tag">
-                                <span class="tag-live-dot"></span>
-                                <i class="fas fa-bolt text-gold"></i>
-                                <span>พร้อมเสิร์ฟความสนุก!</span>
-                            </div>
-                        </div>
+                    <h1 class="home-hero-title">
+                        สนามแบดมินตันมาตรฐาน BWF <br class="hero-br-desktop">
+                        <span class="text-gold">ใจกลางเมืองปัตตานี</span>
+                    </h1>
+                    <p class="home-hero-subtitle">
+                        คอร์ทพื้นยาง 5 ชั้น ซับแรงกระแทก ระบบไฟ Anti-Glare พร้อมระบบจองคิวออนไลน์ 24 ชม.
+                    </p>
+                    <div class="home-hero-actions">
+                        <a href="booking.php" class="home-btn-primary">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>จองสนาม</span>
+                        </a>
+                        <?php if (isset($_SESSION['member_id'])): ?>
+                            <a href="profile.php" class="home-btn-secondary">
+                                <i class="fas fa-user-circle"></i>
+                                <span>โปรไฟล์ของฉัน</span>
+                            </a>
+                        <?php else: ?>
+                            <a href="login.php" class="home-btn-secondary">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>เข้าสู่ระบบ</span>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="home-hero-trust-chips">
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> เช็คคอร์ทว่างเรียลไทม์</span>
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> ล็อกคิวอัตโนมัติ</span>
+                        <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> สะสมแต้มทุกการเล่น</span>
                     </div>
                 </div>
             </div>
