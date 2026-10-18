@@ -12,7 +12,7 @@
                 <!-- คอลัมน์ 1: ข้อมูลสนามและสโลแกน -->
                 <div class="footer-col footer-col-brand">
                     <a href="index.php" class="footer-brand">
-                        <i class="fas fa-shuttlecock text-accent mr-8"></i> T.S. Pattani
+                        <i class="fas fa-shuttlecock text-accent mr-8"></i> T.S. Badminton Pattani
                     </a>
                     <p class="footer-desc">
                         สนามแบดมินตันมาตรฐานสากล BWF ใจกลางเมืองปัตตานี พร้อมระบบจองสนามออนไลน์ สะสมแต้มรับของรางวัล และสิ่งอำนวยความสะดวกครบครันเพื่อคนรักสุขภาพ

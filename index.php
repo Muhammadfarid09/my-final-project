@@ -335,8 +335,8 @@ try {
                         <div class="home-partner-item" title="ASICS">
                             <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
                         </div>
-                        <div class="home-partner-item" title="ASHAWAY">
-                            <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
+                        <div class="home-partner-item" title="KAWASAKI">
+                            <img src="assets/img/brands/Kawasaki_logo.png" alt="KAWASAKI" class="home-partner-img" loading="lazy">
                         </div>
                         <div class="home-partner-item" title="T.S. PRO SHOP">
                             <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
@@ -363,8 +363,8 @@ try {
                         <div class="home-partner-item" title="ASICS">
                             <img src="assets/img/brands/asics.png" alt="ASICS" class="home-partner-img" loading="lazy">
                         </div>
-                        <div class="home-partner-item" title="ASHAWAY">
-                            <img src="assets/img/brands/ashaway.png" alt="ASHAWAY" class="home-partner-img" loading="lazy">
+                        <div class="home-partner-item" title="KAWASAKI">
+                            <img src="assets/img/brands/Kawasaki_logo.png" alt="KAWASAKI" class="home-partner-img" loading="lazy">
                         </div>
                         <div class="home-partner-item" title="T.S. PRO SHOP">
                             <img src="assets/img/brands/ts-proshop.png" alt="T.S. PRO SHOP" class="home-partner-img" loading="lazy">
