@@ -87,7 +87,7 @@
    1. Modern Hero Section (Matchday Sport Aesthetic - Clean Left-Aligned)
    -------------------------------------------------------------------------- */
 .home-hero-section {
-    padding: 76px 0 54px 0;
+    padding: 76px 0 60px 0;
     text-align: left;
     background: radial-gradient(circle at 80% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
                 radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.12) 0%, transparent 50%),
@@ -96,10 +96,161 @@
     overflow: hidden;
 }
 
-.home-hero-content {
-    max-width: 780px;
+.home-hero-grid {
+    display: grid;
+    grid-template-columns: 1.18fr 0.82fr;
+    align-items: center;
+    gap: 40px;
     position: relative;
     z-index: 2;
+}
+
+.home-hero-content {
+    max-width: 680px;
+    position: relative;
+    z-index: 2;
+}
+
+.home-hero-mascot-col {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 440px;
+    user-select: none;
+}
+
+/* Ambient Radial Glow Behind Mascot */
+.mascot-ambient-glow {
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0, 180, 255, 0.22) 0%, rgba(245, 158, 11, 0.14) 45%, transparent 70%);
+    filter: blur(36px);
+    pointer-events: none;
+    z-index: 1;
+    animation: mascotGlowPulse 5s ease-in-out infinite;
+}
+
+/* Mascot Wrapper */
+.mascot-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+/* Mascot Image with Floating Motion */
+.home-hero-mascot-img {
+    width: 100%;
+    max-width: 440px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+    animation: heroMascotFloat 4.2s ease-in-out infinite;
+    transform-origin: center bottom;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease;
+    cursor: pointer;
+}
+
+.home-hero-mascot-img:hover {
+    transform: translateY(-20px) scale(1.05) rotate(-2deg);
+    filter: drop-shadow(0 24px 38px rgba(0, 180, 255, 0.35));
+}
+
+/* Dynamic Shadow Beneath Floating Mascot */
+.mascot-shadow {
+    width: 220px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, transparent 75%);
+    margin-top: -12px;
+    animation: heroMascotShadow 4.2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Modern Floating Tag Badge */
+.mascot-floating-tag {
+    position: absolute;
+    bottom: 24px;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+    font-size: 13px;
+    font-weight: 700;
+    color: #F8FAFC;
+    animation: heroTagFloat 3.6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.mascot-floating-tag .tag-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #10B981;
+    box-shadow: 0 0 8px #10B981;
+}
+
+/* Animation Keyframes */
+@keyframes heroMascotFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-16px) rotate(1.5deg);
+    }
+}
+
+@keyframes heroMascotShadow {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(0.82);
+        opacity: 0.25;
+    }
+}
+
+@keyframes mascotGlowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.65;
+    }
+    50% {
+        transform: scale(1.12);
+        opacity: 0.95;
+    }
+}
+
+@keyframes heroTagFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-hero-mascot-img,
+    .mascot-shadow,
+    .mascot-ambient-glow,
+    .mascot-floating-tag {
+        animation: none !important;
+        transition: none !important;
+    }
 }
 
 .home-hero-badge {
@@ -223,9 +374,46 @@
     gap: 7px;
 }
 
+@media (max-width: 1024px) {
+    .home-hero-grid {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+    }
+    .home-hero-mascot-img {
+        max-width: 360px;
+    }
+    .mascot-ambient-glow {
+        width: 300px;
+        height: 300px;
+    }
+}
+
 @media (max-width: 768px) {
     .home-hero-section {
-        padding: 48px 0 32px 0;
+        padding: 42px 0 32px 0;
+    }
+    .home-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+    .home-hero-mascot-col {
+        min-height: auto;
+        order: 2;
+        margin-top: 8px;
+    }
+    .home-hero-mascot-img {
+        max-width: 260px;
+    }
+    .mascot-ambient-glow {
+        width: 220px;
+        height: 220px;
+    }
+    .mascot-floating-tag {
+        bottom: 4px;
+        right: 50%;
+        transform: translateX(50%);
+        animation: none;
+        white-space: nowrap;
     }
     .home-hero-title {
         font-size: 28px;
