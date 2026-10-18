@@ -928,36 +928,49 @@ function renderCourtHourBlocks() {
             }
 
             let cardClass = 'court-card-v2 ';
-            let badgeHtml = '';
+            let userContent = '';
+            let userTitle = '';
+            let badgeText = '';
             let clickAttr = '';
+
+            let safeBookedBy = String(bookedBy || 'ผู้ใช้งาน').replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[m]));
 
             if (isCurrentSlotSelected) {
                 cardClass += 'status-selected';
-                badgeHtml = '<span class="court-card-badge">✓ กำลังเลือก</span>';
+                badgeText = '✓ กำลังเลือก';
                 clickAttr = `onclick="toggleCourtSlot('${slot.start}', '${slot.end}', ${court.court_id}, '${court.court_name}', ${price})"`;
             } else if (status === 'available') {
                 cardClass += 'status-available';
-                badgeHtml = '<span class="court-card-badge">● ว่าง</span>';
+                badgeText = '● ว่าง';
                 clickAttr = `onclick="toggleCourtSlot('${slot.start}', '${slot.end}', ${court.court_id}, '${court.court_name}', ${price})"`;
             } else if (status === 'pending') {
                 cardClass += 'status-pending';
-                badgeHtml = `<span class="court-card-badge" title="รอตรวจสอบ">● รอตรวจสอบ (${bookedBy || 'ผู้ใช้งาน'})</span>`;
+                userContent = `<i class="fas fa-user-clock"></i> <span class="booked-name">${safeBookedBy}</span>`;
+                userTitle = `รอตรวจสอบการชำระเงิน (${safeBookedBy})`;
+                badgeText = '● รอตรวจสอบ';
             } else if (status === 'booked') {
                 cardClass += 'status-booked';
-                badgeHtml = `<span class="court-card-badge" title="จองแล้ว">● จองแล้ว (${bookedBy || 'ผู้ใช้งาน'})</span>`;
+                userContent = `<i class="fas fa-user"></i> <span class="booked-name">${safeBookedBy}</span>`;
+                userTitle = `จองแล้ว (${safeBookedBy})`;
+                badgeText = '● จองแล้ว';
             } else if (status === 'maintenance') {
                 cardClass += 'status-maintenance';
-                badgeHtml = '<span class="court-card-badge">● ปิดปรับปรุง</span>';
+                badgeText = '● ปิดปรับปรุง';
             } else {
                 cardClass += 'status-maintenance';
-                badgeHtml = '<span class="court-card-badge">● ปิดบริการ</span>';
+                badgeText = '● ปิดบริการ';
             }
+
+            let userHtml = userContent ? `<div class="court-card-user" title="${userTitle}">${userContent}</div>` : '';
 
             html += `
                 <div class="${cardClass}" ${clickAttr}>
                     <i class="fas fa-map-marker-alt court-card-icon"></i>
                     <h4 class="court-card-title">${court.court_name}</h4>
-                    ${badgeHtml}
+                    ${userHtml}
+                    <span class="court-card-badge">${badgeText}</span>
                 </div>
             `;
         });

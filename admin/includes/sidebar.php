@@ -5,7 +5,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <aside class="admin-sidebar">
     <div class="brand">
-        <h2>T.S. Pattani</h2>
+        <h2>T.S. BADMINTON</h2>
         <span><i class="fas fa-circle"></i> ระบบผู้ดูแลระบบ</span>
     </div>
     
