@@ -45,9 +45,8 @@ if (!isset($member_points) || !isset($member_level)) {
         </button>
 
         <!-- 1. โลโก้แบรนด์ (ซ้าย) -->
-        <a href="index.php" class="navbar-brand">
-            <i class="fas fa-shuttlecock brand-icon"></i>
-            <span class="brand-text">T.S. PATTANI</span>
+        <a href="index.php" class="navbar-brand" aria-label="T.S. Badminton Pattani หน้าแรก">
+            <img src="assets/img/logo-ts-badminton.png?v=<?php echo file_exists(__DIR__ . '/../assets/img/logo-ts-badminton.png') ? filemtime(__DIR__ . '/../assets/img/logo-ts-badminton.png') : '1.0'; ?>" alt="T.S. Badminton Pattani" class="navbar-brand-logo">
         </a>
 
         <!-- 2. เมนูนำทางตรงกลาง (Center Menu + ขีดใต้ทองตาม $current_page) -->
@@ -187,9 +186,8 @@ if (!isset($member_points) || !isset($member_level)) {
 <aside class="offcanvas-drawer" id="mobileDrawer" aria-label="เมนูนำทางหลัก">
     <!-- ส่วนหัว Drawer -->
     <div class="drawer-header">
-        <a href="index.php" class="drawer-brand">
-            <i class="fas fa-shuttlecock brand-icon"></i>
-            <span class="brand-text">T.S. PATTANI</span>
+        <a href="index.php" class="drawer-brand" aria-label="T.S. Badminton Pattani หน้าแรก">
+            <img src="assets/img/logo-ts-badminton.png?v=<?php echo file_exists(__DIR__ . '/../assets/img/logo-ts-badminton.png') ? filemtime(__DIR__ . '/../assets/img/logo-ts-badminton.png') : '1.0'; ?>" alt="T.S. Badminton Pattani" class="drawer-brand-logo">
         </a>
         <button type="button" class="drawer-close-btn" onclick="toggleMobileDrawer()" aria-label="ปิดเมนู">
             <i class="fas fa-times"></i>
