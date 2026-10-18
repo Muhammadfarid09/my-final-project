@@ -66,9 +66,9 @@
 
 /* โลโก้ภาพ T.S. Badminton Pattani บน Header หลัก (Transparent PNG) */
 .navbar-brand-logo {
-    height: 30px;
+    height: 34px;
     width: auto;
-    max-width: 250px;
+    max-width: 270px;
     object-fit: contain;
     display: block;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), filter 0.2s ease;
@@ -81,31 +81,31 @@
 
 /* โลโก้ภาพในแผง Offcanvas Drawer เมนูด้านข้างบนมือถือ */
 .drawer-brand-logo {
-    height: 28px;
+    height: 30px;
     width: auto;
-    max-width: 220px;
+    max-width: 235px;
     object-fit: contain;
     display: block;
 }
 
 @media (max-width: 1180px) {
     .navbar-brand-logo {
-        height: 26px;
-        max-width: 210px;
+        height: 28px;
+        max-width: 220px;
     }
 }
 
 @media (max-width: 768px) {
     .navbar-brand-logo {
-        height: 24px;
-        max-width: 190px;
+        height: 20px;
+        max-width: 155px;
     }
 }
 
 @media (max-width: 480px) {
     .navbar-brand-logo {
-        height: 21px;
-        max-width: 165px;
+        height: 19px;
+        max-width: 145px;
     }
 }
 
@@ -760,7 +760,7 @@
         font-size: 12px;
         font-weight: 600;
         color: var(--text-primary, #F5F5F5);
-        max-width: 85px;
+        max-width: 100px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
