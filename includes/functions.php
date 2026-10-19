@@ -335,18 +335,33 @@ if (!function_exists('award_member_points')) {
             ':note' => $tx_note
         ]);
 
-        // 3. คำนวณและยกระดับสมาชิก (Tier Progression): Bronze -> Silver (500 pts) -> Gold (1000 pts)
-        $stmt_tot = $conn->prepare("SELECT point_total_earned FROM Point WHERE member_id = :mid");
+        // 3. คำนวณและยกระดับสมาชิก (Tier Progression): Bronze (0-99) -> Silver (100-199 pts) -> Gold (200+ pts)
+        $stmt_tot = $conn->prepare("SELECT point_balance, point_total_earned FROM Point WHERE member_id = :mid");
         $stmt_tot->execute([':mid' => $memberId]);
-        $total_earned = intval($stmt_tot->fetchColumn() ?: 0);
+        $pt_data = $stmt_tot->fetch(PDO::FETCH_ASSOC);
+
+        $total_earned = intval($pt_data['point_total_earned'] ?? 0);
+        $balance = intval($pt_data['point_balance'] ?? 0);
+        // ประเมินจากค่าสูงสุดระหว่างแต้มสะสมตลอดชีพกับแต้มคงเหลือ เพื่อป้องกันปัญหาแต้มเหลื่อมล้ำ
+        $eval_points = max($total_earned, $balance);
+
         $new_level = 'Bronze';
-        if ($total_earned >= 1000) {
+        if ($eval_points >= 200) {
             $new_level = 'Gold';
-        } elseif ($total_earned >= 500) {
+        } elseif ($eval_points >= 100) {
             $new_level = 'Silver';
         }
-        $conn->prepare("UPDATE Point SET member_level = :lvl WHERE member_id = :mid")
-             ->execute([':lvl' => $new_level, ':mid' => $memberId]);
+
+        $conn->prepare("
+            UPDATE Point 
+            SET member_level = :lvl, 
+                point_total_earned = GREATEST(point_total_earned, :eval_pt) 
+            WHERE member_id = :mid
+        ")->execute([
+            ':lvl' => $new_level, 
+            ':eval_pt' => $eval_points, 
+            ':mid' => $memberId
+        ]);
 
         return $earned_points;
     }

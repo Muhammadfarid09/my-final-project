@@ -2003,6 +2003,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('registerForm');
         if (!form) return;
 
+        const firstNameInput = document.getElementById('first_name');
+        const lastNameInput = document.getElementById('last_name');
         const nameInput = document.getElementById('member_name');
         const phoneInput = document.getElementById('member_phone');
         const ageInput = document.getElementById('member_age');
@@ -2129,16 +2131,32 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             clearAlert();
 
-            const name = nameInput ? nameInput.value.trim() : '';
+            const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+            const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+            const legacyName = nameInput ? nameInput.value.trim() : '';
             const phone = phoneInput ? phoneInput.value.trim() : '';
             const password = passInput ? passInput.value : '';
             const confirmPass = confirmPassInput ? confirmPassInput.value : '';
             const ageVal = ageInput && ageInput.value ? parseInt(ageInput.value) : null;
 
-            if (!name) {
+            // ตรวจสอบชื่อและนามสกุล (รองรับทั้งแบบแยกช่องและแบบเดิม)
+            if (firstNameInput || lastNameInput) {
+                if (!firstName) {
+                    e.preventDefault();
+                    showAlert('กรุณากรอกชื่อจริง');
+                    if (firstNameInput) firstNameInput.focus();
+                    return;
+                }
+                if (!lastName) {
+                    e.preventDefault();
+                    showAlert('กรุณากรอกนามสกุล');
+                    if (lastNameInput) lastNameInput.focus();
+                    return;
+                }
+            } else if (nameInput && !legacyName) {
                 e.preventDefault();
                 showAlert('กรุณากรอกชื่อ - นามสกุล');
-                if (nameInput) nameInput.focus();
+                nameInput.focus();
                 return;
             }
 

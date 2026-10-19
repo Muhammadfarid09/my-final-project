@@ -24,19 +24,24 @@ try {
     $user_rank = $level_rank[$current_level] ?? 1;
 
     // คำนวณความคืบหน้าสู่ระดับถัดไป (Tier Progression)
-    // Bronze -> Silver (500 pts) -> Gold (1000 pts)
+    // Bronze (0-99) -> Silver (100-199 pts) -> Gold (200+ pts)
+    $silver_threshold = 100;
+    $gold_threshold = 200;
+    $eval_earned = max($total_earned, $current_points);
+
     $next_level_name = '';
     $points_to_next = 0;
     $progress_percent = 0;
 
     if ($current_level === 'Bronze') {
         $next_level_name = 'Silver';
-        $points_to_next = max(0, 500 - $total_earned);
-        $progress_percent = min(100, max(0, round(($total_earned / 500) * 100)));
+        $points_to_next = max(0, $silver_threshold - $eval_earned);
+        $progress_percent = min(100, max(0, round(($eval_earned / $silver_threshold) * 100)));
     } elseif ($current_level === 'Silver') {
         $next_level_name = 'Gold';
-        $points_to_next = max(0, 1000 - $total_earned);
-        $progress_percent = min(100, max(0, round((($total_earned - 500) / 500) * 100)));
+        $points_to_next = max(0, $gold_threshold - $eval_earned);
+        $span = max(1, $gold_threshold - $silver_threshold);
+        $progress_percent = min(100, max(0, round((($eval_earned - $silver_threshold) / $span) * 100)));
     } else {
         $next_level_name = 'Gold';
         $points_to_next = 0;
@@ -111,7 +116,7 @@ try {
                     <div class="loyalty-progress-label">
                         <?php if ($current_level === 'Gold'): ?>
                             <span>ระดับสมาชิก: <strong>สูงสุดแล้ว (Gold Tier)</strong></span>
-                            <span>สะสมครบ 1,000+ แต้ม</span>
+                            <span>สะสมครบ <?php echo number_format($gold_threshold); ?>+ แต้ม</span>
                         <?php else: ?>
                             <span>เลื่อนสู่ระดับ <strong><?php echo $next_level_name; ?></strong>: อีก <strong><?php echo number_format($points_to_next); ?></strong> แต้ม</span>
                             <span><?php echo $progress_percent; ?>%</span>

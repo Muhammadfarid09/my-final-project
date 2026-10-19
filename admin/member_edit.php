@@ -29,6 +29,11 @@ try {
     $current_point = $member['point_balance'] ?? 0;
     $current_level = $member['member_level'] ?? 'Bronze';
 
+    // แยกชื่อและนามสกุลสำหรับฟอร์มแก้ไข (Smart UI Split)
+    $name_parts = explode(' ', trim($member['member_name'] ?? ''), 2);
+    $member_firstname = $name_parts[0] ?? '';
+    $member_lastname = $name_parts[1] ?? '';
+
 } catch(PDOException $e) {
     $_SESSION['error'] = "เกิดข้อผิดพลาด: " . $e->getMessage();
     header("Location: members.php");
@@ -62,9 +67,15 @@ include 'includes/header.php';
                 <!-- คอลัมน์ซ้าย: ข้อมูลส่วนตัว -->
                 <div>
                     <h5 class="m-0 text-gray border-b pb-10">ข้อมูลทั่วไป</h5>
-                    <div class="form-group">
-                        <label for="member_name">ชื่อ - นามสกุล *</label>
-                        <input type="text" name="member_name" id="member_name" class="form-control" value="<?php echo htmlspecialchars($member['member_name']); ?>" required>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="first_name">ชื่อ *</label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" value="<?php echo htmlspecialchars($member_firstname); ?>" placeholder="ระบุชื่อจริง" autocomplete="given-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">นามสกุล *</label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" value="<?php echo htmlspecialchars($member_lastname); ?>" placeholder="ระบุนามสกุล" autocomplete="family-name" required>
+                        </div>
                     </div>
 
                     <div class="form-group">

@@ -57,6 +57,11 @@ $tier_badge_classes = [
     'Gold'   => 'tier-gold'
 ];
 $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bronze';
+
+// แยกชื่อและนามสกุลสำหรับฟอร์มแก้ไข (Smart UI Split)
+$name_parts = explode(' ', trim($member['member_name'] ?? ''), 2);
+$member_firstname = $name_parts[0] ?? '';
+$member_lastname = $name_parts[1] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -147,9 +152,15 @@ $current_tier_class = $tier_badge_classes[$member['member_level']] ?? 'tier-bron
                     <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="update_profile">
 
-                    <div class="form-group-custom">
-                        <label class="form-label">ชื่อ - นามสกุล <span class="required-star">*</span></label>
-                        <input type="text" name="member_name" class="form-control-custom" value="<?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?>" required>
+                    <div class="form-row-custom">
+                        <div class="form-group-custom">
+                            <label class="form-label">ชื่อ <span class="required-star">*</span></label>
+                            <input type="text" name="first_name" class="form-control-custom" value="<?php echo htmlspecialchars($member_firstname, ENT_QUOTES, 'UTF-8'); ?>" placeholder="ระบุชื่อจริง" autocomplete="given-name" required>
+                        </div>
+                        <div class="form-group-custom">
+                            <label class="form-label">นามสกุล <span class="required-star">*</span></label>
+                            <input type="text" name="last_name" class="form-control-custom" value="<?php echo htmlspecialchars($member_lastname, ENT_QUOTES, 'UTF-8'); ?>" placeholder="ระบุนามสกุล" autocomplete="family-name" required>
+                        </div>
                     </div>
 
                     <div class="form-group-custom">

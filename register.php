@@ -151,12 +151,21 @@ $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? 
                 <form id="registerForm" action="actions/register_db.php" method="POST" novalidate>
                     <?php echo csrf_field(); ?>
                     
-                    <!-- 1. ชื่อ - นามสกุล -->
-                    <div class="form-group-dark">
-                        <label for="member_name" class="form-label-dark">ชื่อ - นามสกุล <span class="text-danger">*</span></label>
-                        <div class="input-group-dark">
-                            <i class="fas fa-user input-icon-dark"></i>
-                            <input type="text" id="member_name" name="member_name" class="form-control-dark" placeholder="กรอกชื่อ-นามสกุล" autocomplete="name" required>
+                    <!-- 1. ชื่อ และ นามสกุล (แยก 2 ช่องตามหลัก HCI ป้องกันการไม่เว้นวรรค) -->
+                    <div class="form-row-dark">
+                        <div class="form-group-dark">
+                            <label for="first_name" class="form-label-dark">ชื่อ <span class="text-danger">*</span></label>
+                            <div class="input-group-dark">
+                                <i class="fas fa-user input-icon-dark"></i>
+                                <input type="text" id="first_name" name="first_name" class="form-control-dark" placeholder="ระบุชื่อจริง" autocomplete="given-name" required>
+                            </div>
+                        </div>
+                        <div class="form-group-dark">
+                            <label for="last_name" class="form-label-dark">นามสกุล <span class="text-danger">*</span></label>
+                            <div class="input-group-dark">
+                                <i class="fas fa-user input-icon-dark"></i>
+                                <input type="text" id="last_name" name="last_name" class="form-control-dark" placeholder="ระบุนามสกุล" autocomplete="family-name" required>
+                            </div>
                         </div>
                     </div>
 
@@ -203,10 +212,10 @@ $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? 
                             <select id="member_occupation" name="member_occupation" class="form-control-dark select-control-dark">
                                 <option value="" disabled selected>เลือกอาชีพ</option>
                                 <option value="นักเรียน / นักศึกษา">นักเรียน / นักศึกษา</option>
-                                <option value="พนักงานบริษัท / เอกชน">พนักงานบริษัท / เอกชน</option>
-                                <option value="ข้าราชการ / รัฐวิสาหกิจ">ข้าราชการ / รัฐวิสาหกิจ</option>
-                                <option value="ธุรกิจส่วนตัว / ค้าขาย">ธุรกิจส่วนตัว / ค้าขาย</option>
-                                <option value="ฟรีแลนซ์ / รับจ้างทั่วไป">ฟรีแลนซ์ / รับจ้างทั่วไป</option>
+                                <option value="พนักงานบริษัท / เอกชน">พนักงานบริษัท</option>
+                                <option value="ข้าราชการ / รัฐวิสาหกิจ">ข้าราชการ</option>
+                                <option value="ธุรกิจส่วนตัว / ค้าขาย">ธุรกิจส่วนตัว</option>
+                                <option value="ฟรีแลนซ์ / รับจ้างทั่วไป">ฟรีแลนซ์</option>
                                 <option value="อื่นๆ">อื่นๆ</option>
                             </select>
                         </div>

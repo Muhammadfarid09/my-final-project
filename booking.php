@@ -74,7 +74,6 @@ try {
         <!-- Header Banner -->
         <div class="wizard-header-banner">
             <h2><i class="fas fa-calendar-check"></i> จองสนามแบดมินตัน</h2>
-            <p>ระบบจองสนามและบริการเสริมทีละขั้นตอน พร้อมคำนวณราคาจริงตามวันในสัปดาห์</p>
         </div>
 
         <?php if (isset($_SESSION['error'])): ?>

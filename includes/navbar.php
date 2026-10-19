@@ -233,7 +233,7 @@ if (!isset($member_points) || !isset($member_level)) {
             <li>
                 <a href="booking.php" class="drawer-nav-link <?= $is_booking ? 'active' : '' ?>">
                     <i class="fas fa-calendar-check"></i>
-                    <span>จองสนามออนไลน์</span>
+                    <span>จองสนาม</span>
                 </a>
             </li>
             <li>
@@ -245,7 +245,7 @@ if (!isset($member_points) || !isset($member_level)) {
             <li>
                 <a href="rewards.php" class="drawer-nav-link <?= $is_rewards ? 'active' : '' ?>">
                     <i class="fas fa-gift"></i>
-                    <span>แลกของรางวัล (Points)</span>
+                    <span>แลกของรางวัล</span>
                 </a>
             </li>
             

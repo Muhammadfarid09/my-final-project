@@ -11,7 +11,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // กรณีที่ 1: แก้ไขข้อมูลส่วนตัวทั่วไป
     // ==========================================
     if ($action === 'update_profile') {
-        $member_name = trim($_POST['member_name'] ?? '');
+        $first_name = trim($_POST['first_name'] ?? '');
+        $last_name = trim($_POST['last_name'] ?? '');
+
+        // รองรับทั้งแบบแยกชื่อ-นามสกุล (Smart UI Split) และแบบรวมเดิม
+        if (!empty($first_name) || !empty($last_name)) {
+            if (empty($first_name) || empty($last_name)) {
+                throw new Exception("กรุณากรอกทั้งชื่อและนามสกุลให้ครบถ้วน");
+            }
+            $member_name = $first_name . ' ' . $last_name;
+        } else {
+            $member_name = trim($_POST['member_name'] ?? '');
+        }
+
         $member_phone = trim($_POST['member_phone'] ?? '');
         $member_gender = $_POST['member_gender'] ?? 'อื่นๆ';
         $member_age = !empty($_POST['member_age']) ? intval($_POST['member_age']) : null;
@@ -19,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         try {
             if (empty($member_name) || empty($member_phone)) {
-                throw new Exception("กรุณากรอกชื่อ-นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน");
+                throw new Exception("กรุณากรอกชื่อ นามสกุล และเบอร์โทรศัพท์ให้ครบถ้วน");
             }
 
             if (!preg_match('/^[0-9]{10}$/', $member_phone)) {

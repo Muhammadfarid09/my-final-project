@@ -6,8 +6,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 1. รับค่าจากฟอร์ม
     $member_id = intval($_POST['member_id']);
-    $member_name = trim($_POST['member_name']);
-    $member_phone = trim($_POST['member_phone']);
+    
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+
+    // รองรับทั้งแบบแยกชื่อ-นามสกุล (Smart UI Split) และแบบรวมเดิม
+    if (!empty($first_name) || !empty($last_name)) {
+        if (empty($first_name) || empty($last_name)) {
+            throw new Exception("กรุณากรอกทั้งชื่อจริงและนามสกุลให้ครบถ้วน");
+        }
+        $member_name = $first_name . ' ' . $last_name;
+    } else {
+        $member_name = trim($_POST['member_name'] ?? '');
+    }
+
+    $member_phone = trim($_POST['member_phone'] ?? '');
     $member_gender = $_POST['member_gender'];
     // เช็คค่าอายุ ถ้าไม่กรอกให้เป็นค่าว่าง (NULL)
     $member_age = !empty($_POST['member_age']) ? intval($_POST['member_age']) : null;
@@ -65,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             $sql_point = "UPDATE Point 
                           SET point_balance = :pts, 
+                              point_total_earned = GREATEST(point_total_earned, :pts),
                               member_level = :lvl 
                           WHERE member_id = :id";
             $conn->prepare($sql_point)->execute([

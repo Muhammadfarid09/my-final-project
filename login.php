@@ -219,7 +219,6 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                     <!-- ปุ่มเข้าสู่ระบบ (Submit CTA) -->
                     <button type="submit" id="btnLoginSubmit" class="btn-login-gold-full">
                         <span>เข้าสู่ระบบ</span>
-                        <i class="fas fa-arrow-right"></i>
                     </button>
 
                     <!-- ลิงก์สมัครสมาชิกใหม่ -->
@@ -232,7 +231,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
 
             <!-- ข้อมูลย่อยท้ายหน้า -->
             <div class="login-form-bottom-info">
-                <span>© 2026 T.S. Pattani Badminton · ระบบความปลอดภัยมาตรฐาน BWF</span>
+                <span>© 2026 T.S. BADMINTON PATTANI · ระบบความปลอดภัยมาตรฐาน BWF</span>
             </div>
 
         </main>

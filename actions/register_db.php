@@ -8,7 +8,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     require_csrf_token();
     
     // 1. รับค่าและทำความสะอาดข้อมูลที่ส่งมาจากฟอร์ม
-    $member_name = trim($_POST['member_name'] ?? '');
+    $first_name = trim($_POST['first_name'] ?? '');
+    $last_name = trim($_POST['last_name'] ?? '');
+
+    // รองรับทั้งแบบแยกชื่อ-นามสกุล (Smart UI Split) และแบบรวมเดิม
+    if (!empty($first_name) || !empty($last_name)) {
+        if (empty($first_name) || empty($last_name)) {
+            throw new Exception("กรุณากรอกทั้งชื่อจริงและนามสกุลให้ครบถ้วน");
+        }
+        $member_name = $first_name . ' ' . $last_name;
+    } else {
+        $member_name = trim($_POST['member_name'] ?? '');
+    }
+
     $raw_phone = trim($_POST['member_phone'] ?? '');
     $member_phone = preg_replace('/[^0-9]/', '', $raw_phone);
     $member_gender = trim($_POST['member_gender'] ?? 'อื่นๆ / ไม่ระบุ');
@@ -22,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
         // 2. ตรวจสอบความสมบูรณ์ของข้อมูลเบื้องต้น (Backend Validation)
         if (empty($member_name) || empty($member_phone) || empty($password)) {
-            throw new Exception("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน");
+            throw new Exception("กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อ, นามสกุล, เบอร์โทรศัพท์, รหัสผ่าน)");
         }
 
         if (strlen($member_phone) !== 10 || substr($member_phone, 0, 1) !== '0') {
