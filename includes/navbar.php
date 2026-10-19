@@ -2,7 +2,7 @@
 // ตรวจจับชื่อไฟล์ปัจจุบันสำหรับ Active Navigation Indicator แบบไดนามิก
 $current_page = basename($_SERVER['PHP_SELF'] ?? '');
 $is_home = in_array($current_page, ['index.php', '']);
-$is_promotions = in_array($current_page, ['promotions.php', 'promotion.php', 'news.php', 'news_detail.php']);
+$is_promotions = in_array($current_page, ['news.php', 'news_detail.php']);
 $is_booking = in_array($current_page, ['booking.php', 'payment.php']);
 $is_rewards = in_array($current_page, ['rewards.php', 'reward_history.php']);
 $is_chat = in_array($current_page, ['chat.php', 'contact.php']);
@@ -59,7 +59,7 @@ if (!isset($member_points) || !isset($member_level)) {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="promotions.php" class="nav-link <?= $is_promotions ? 'active' : '' ?>">
+                    <a href="news.php" class="nav-link <?= $is_promotions ? 'active' : '' ?>">
                         <i class="fas fa-bullhorn"></i>
                         <span>ข่าวสาร&โปรโมชัน</span>
                     </a>
@@ -237,7 +237,7 @@ if (!isset($member_points) || !isset($member_level)) {
                 </a>
             </li>
             <li>
-                <a href="promotions.php" class="drawer-nav-link <?= $is_promotions ? 'active' : '' ?>">
+                <a href="news.php" class="drawer-nav-link <?= $is_promotions ? 'active' : '' ?>">
                     <i class="fas fa-bullhorn"></i>
                     <span>ข่าวสารและโปรโมชัน</span>
                 </a>

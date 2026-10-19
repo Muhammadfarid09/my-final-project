@@ -70,7 +70,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                     <div class="visual-brand-heading">
                         <h1 class="visual-hero-title">
                             ยินดีต้อนรับสู่ <br>
-                            <span class="text-gold-highlight">T.S. Pattani Badminton</span>
+                            <span class="text-gold-highlight">T.S. BADMINTON PATTANI</span>
                         </h1>
                         <p class="visual-hero-subtitle">
                             สนามแบดมินตันมาตรฐาน BWF จองง่าย สะดวก รวดเร็ว พร้อมลุยทุกแมตช์
@@ -143,7 +143,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                 <div class="login-card-header">
                     <div class="login-brand-tag">
                         <i class="fas fa-shuttlecock text-gold"></i>
-                        <span>T.S. PATTANI</span>
+                        <span>T.S. BADMINTON PATTANI</span>
                     </div>
                     <h2 class="login-card-title">เข้าสู่ระบบสมาชิก</h2>
                     <p class="login-card-desc">ยินดีต้อนรับกลับมา! กรุณากรอกเบอร์โทรศัพท์เพื่อเข้าใช้งาน</p>

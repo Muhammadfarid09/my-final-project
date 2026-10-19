@@ -27,8 +27,8 @@ $initial_news_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
     <link rel="stylesheet" href="assets/css/style.css?v=1.7">
-    <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
-    <link rel="stylesheet" href="assets/css/promotions.css?v=<?php echo filemtime('assets/css/promotions.css'); ?>">
+    <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo file_exists('assets/css/navbar.css') ? filemtime('assets/css/navbar.css') : time(); ?>">
+    <link rel="stylesheet" href="assets/css/news.css?v=<?php echo file_exists('assets/css/news.css') ? filemtime('assets/css/news.css') : time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -164,6 +164,7 @@ $initial_news_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         </div>
     </div>
 
-    <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
+    <script src="assets/js/member.js?v=<?php echo file_exists('assets/js/member.js') ? filemtime('assets/js/member.js') : time(); ?>"></script>
 </body>
 </html>
+

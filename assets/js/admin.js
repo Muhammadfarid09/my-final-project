@@ -54,6 +54,28 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 3000); 
     }
 
+    // --------------------------------------------------------------------------
+    // รองรับปุ่มสลับแสดง/ซ่อนรหัสผ่านในหน้าเข้าสู่ระบบ (#togglePasswordBtn)
+    // --------------------------------------------------------------------------
+    var togglePwdBtn = document.getElementById("togglePasswordBtn");
+    if (togglePwdBtn) {
+        togglePwdBtn.addEventListener("click", function() {
+            var pwdInput = document.getElementById("password");
+            var pwdIcon = document.getElementById("togglePasswordIcon");
+            if (pwdInput && pwdIcon) {
+                if (pwdInput.type === "password") {
+                    pwdInput.type = "text";
+                    pwdIcon.classList.remove("fa-eye");
+                    pwdIcon.classList.add("fa-eye-slash");
+                } else {
+                    pwdInput.type = "password";
+                    pwdIcon.classList.remove("fa-eye-slash");
+                    pwdIcon.classList.add("fa-eye");
+                }
+            }
+        });
+    }
+
 });
 
 /**

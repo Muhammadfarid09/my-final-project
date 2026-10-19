@@ -36,7 +36,7 @@
                     <ul class="footer-nav-list">
                         <li><a href="index.php"><i class="fas fa-angle-right"></i> หน้าแรก</a></li>
                         <li><a href="booking.php"><i class="fas fa-angle-right"></i> จองสนามออนไลน์</a></li>
-                        <li><a href="promotions.php"><i class="fas fa-angle-right"></i> ข่าวสารและโปรโมชัน</a></li>
+                        <li><a href="news.php"><i class="fas fa-angle-right"></i> ข่าวสารและโปรโมชัน</a></li>
                         <li><a href="rewards.php"><i class="fas fa-angle-right"></i> แลกของรางวัล (Points)</a></li>
                         <li><a href="chat.php"><i class="fas fa-angle-right"></i> ติดต่อเจ้าหน้าที่</a></li>
                     </ul>
