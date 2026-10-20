@@ -25,6 +25,17 @@ try {
     $default_member_name = $current_member['member_name'] ?? '';
     $default_member_phone = $current_member['member_phone'] ?? '';
 
+    // ดึงข้อมูลรายการอุปกรณ์/สินค้าที่ผูกกับการจองของสมาชิก เพื่อนำไปแสดงในใบเสร็จ (E-Receipt) แบบ Pre-fetch
+    $stmt_items = $conn->prepare("
+        SELECT r.booking_id, r.rental_quantity, p.product_name, p.product_price, p.product_type 
+        FROM Rental r 
+        JOIN Product p ON r.product_id = p.product_id 
+        JOIN Booking b ON r.booking_id = b.booking_id 
+        WHERE b.member_id = :member_id
+    ");
+    $stmt_items->execute([':member_id' => $member_id]);
+    $booking_items_grouped = $stmt_items->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
+
 } catch(PDOException $e) {
     die("เกิดข้อผิดพลาด: " . $e->getMessage());
 }
@@ -185,6 +196,26 @@ try {
                                         </a>
                                     <?php endif; ?>
 
+                                    <?php if ($row['booking_status'] === 'จองแล้ว'): ?>
+                                        <button type="button" class="btn-action-sm btn-view-receipt" 
+                                                onclick='openReceiptModal(<?php echo json_encode([
+                                                    "id" => $row["booking_id"],
+                                                    "court" => $row["court_name"],
+                                                    "date" => date("d/m/Y", strtotime($row["booking_date"])),
+                                                    "time" => substr($row["booking_start_time"], 0, 5) . " - " . substr($row["booking_end_time"], 0, 5),
+                                                    "court_price" => number_format($row["booking_court_price"], 2),
+                                                    "rental_price" => number_format($row["booking_rental_price"], 2),
+                                                    "product_price" => number_format($row["booking_product_price"], 2),
+                                                    "total_price" => number_format($row["booking_total_price"], 2),
+                                                    "customer_name" => !empty($row["booking_nickname"]) ? ($default_member_name ? $default_member_name . " (" . $row["booking_nickname"] . ")" : $row["booking_nickname"]) : $default_member_name,
+                                                    "customer_phone" => $default_member_phone,
+                                                    "created_at" => date("d/m/Y H:i", strtotime($row["booking_created_at"])),
+                                                    "items" => $booking_items_grouped[$row["booking_id"]] ?? []
+                                                ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>)'>
+                                            <i class="fas fa-file-invoice"></i> ใบเสร็จ
+                                        </button>
+                                    <?php endif; ?>
+
                                     <?php if ($can_cancel): ?>
                                         <button type="button" class="btn-cancel-booking" 
                                                 onclick="openCancelModal(
@@ -317,6 +348,167 @@ try {
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    
+    <!-- ==========================================================================
+         Modal แสดงใบเสร็จรับเงินอิเล็กทรอนิกส์ (E-Receipt Modal)
+         Strict Separation of Concerns & Black-Gold Brand Identity
+         ========================================================================== -->
+    <div id="receiptModal" class="receipt-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="receiptModalTitle">
+        <div class="receipt-modal-card">
+            <!-- Modal Header (Close button for screen view) -->
+            <button type="button" class="receipt-modal-close-btn" onclick="closeReceiptModal()" aria-label="ปิดหน้าต่าง">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Printable Receipt Container -->
+            <div class="receipt-paper" id="receiptPrintArea">
+                <!-- Receipt Header -->
+                <div class="receipt-brand-header">
+                    <div class="receipt-brand-logo">
+                        <i class="fas fa-feather-alt text-gold"></i>
+                    </div>
+                    <div class="receipt-brand-info">
+                        <h3 class="receipt-brand-title" id="receiptModalTitle">สนามแบดมินตัน ที.เอส. ปัตตานี</h3>
+                        <p class="receipt-brand-eng">T.S. PATTANI BADMINTON COURT</p>
+                        <p class="receipt-brand-contact">
+                            <i class="fas fa-map-marker-alt"></i> ถนนหนองจิก ต.รูสะมิแล อ.เมือง จ.ปัตตานี 94000 &nbsp;|&nbsp;
+                            <i class="fas fa-phone-alt"></i> 073-xxx-xxxx
+                        </p>
+                    </div>
+                    <div class="receipt-badge-title">
+                        <span class="receipt-doc-badge">ใบเสร็จรับเงินอิเล็กทรอนิกส์</span>
+                        <span class="receipt-doc-sub">ELECTRONIC RECEIPT</span>
+                    </div>
+                </div>
+
+                <div class="receipt-divider-gold"></div>
+
+                <!-- Receipt Meta & Customer Details -->
+                <div class="receipt-meta-grid">
+                    <div class="receipt-meta-col">
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">เลขที่ใบเสร็จ:</span>
+                            <strong class="receipt-meta-value text-gold" id="receipt_id_text">#REC-BK0000</strong>
+                        </div>
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">วันที่ทำรายการ:</span>
+                            <span class="receipt-meta-value" id="receipt_created_at">-</span>
+                        </div>
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">ช่องทางชำระเงิน:</span>
+                            <span class="receipt-meta-value">โอนเงินผ่านธนาคาร / QR Code</span>
+                        </div>
+                    </div>
+                    <div class="receipt-meta-col">
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">ชื่อผู้จอง:</span>
+                            <strong class="receipt-meta-value" id="receipt_customer_name">-</strong>
+                        </div>
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">เบอร์โทรศัพท์:</span>
+                            <span class="receipt-meta-value" id="receipt_customer_phone">-</span>
+                        </div>
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">สถานะการชำระ:</span>
+                            <span class="receipt-status-pill">
+                                <i class="fas fa-check-circle"></i> ชำระเงินเรียบร้อยแล้ว (PAID)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Court Reservation Info Box -->
+                <div class="receipt-court-box">
+                    <div class="receipt-court-item">
+                        <i class="fas fa-table-tennis text-gold"></i>
+                        <div>
+                            <span class="receipt-court-label">สนามที่จอง:</span>
+                            <strong id="receipt_court_name" class="receipt-court-val">-</strong>
+                        </div>
+                    </div>
+                    <div class="receipt-court-item">
+                        <i class="far fa-calendar-alt text-gold"></i>
+                        <div>
+                            <span class="receipt-court-label">วันที่ใช้งาน:</span>
+                            <strong id="receipt_booking_date" class="receipt-court-val">-</strong>
+                        </div>
+                    </div>
+                    <div class="receipt-court-item">
+                        <i class="far fa-clock text-gold"></i>
+                        <div>
+                            <span class="receipt-court-label">ช่วงเวลา:</span>
+                            <strong id="receipt_booking_time" class="receipt-court-val">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Breakdown Table -->
+                <div class="receipt-table-wrapper">
+                    <table class="receipt-items-table">
+                        <thead>
+                            <tr>
+                                <th class="receipt-col-seq">ลำดับ</th>
+                                <th class="receipt-col-desc">รายการ (Description)</th>
+                                <th class="receipt-col-qty">จำนวน</th>
+                                <th class="receipt-col-unit">ราคาต่อหน่วย</th>
+                                <th class="receipt-col-total">รวมเงิน (฿)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receipt_items_body">
+                            <!-- Injected dynamically via JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="receipt-subtotal-row">
+                                <td colspan="4" class="text-right">ค่าบริการสนาม (Court Fee):</td>
+                                <td class="text-right" id="receipt_court_subtotal">0.00</td>
+                            </tr>
+                            <tr class="receipt-subtotal-row" id="receipt_rental_row">
+                                <td colspan="4" class="text-right">ค่าเช่าอุปกรณ์ (Equipment Rental):</td>
+                                <td class="text-right" id="receipt_rental_subtotal">0.00</td>
+                            </tr>
+                            <tr class="receipt-subtotal-row" id="receipt_product_row">
+                                <td colspan="4" class="text-right">ค่าสินค้า/เครื่องดื่ม (Products):</td>
+                                <td class="text-right" id="receipt_product_subtotal">0.00</td>
+                            </tr>
+                            <tr class="receipt-total-highlight-row">
+                                <td colspan="4" class="text-right font-bold">ยอดรวมสุทธิ (Total Amount Paid):</td>
+                                <td class="text-right font-bold text-gold receipt-grand-total" id="receipt_grand_total">0.00 ฿</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Receipt Note & Sign off -->
+                <div class="receipt-footer-note">
+                    <div class="receipt-note-left">
+                        <p class="receipt-note-title"><i class="fas fa-info-circle text-gold"></i> ข้อความชี้แจง:</p>
+                        <ul class="receipt-note-list">
+                            <li>กรุณาแสดงใบเสร็จนี้หรือแจ้งชื่อ-เบอร์โทรแก่เจ้าหน้าที่ก่อนลงสนาม</li>
+                            <li>เอกสารนี้เป็นใบเสร็จรับเงินอิเล็กทรอนิกส์ที่ออกโดยระบบอัตโนมัติ</li>
+                        </ul>
+                    </div>
+                    <div class="receipt-note-right text-center">
+                        <div class="receipt-stamp-box">
+                            <i class="fas fa-stamp text-gold"></i>
+                            <span>T.S. PATTANI</span>
+                            <small class="receipt-stamp-approved">VERIFIED & PAID</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons (Screen only) -->
+            <div class="receipt-actions-footer">
+                <button type="button" class="btn-receipt-dismiss" onclick="closeReceiptModal()">
+                    <i class="fas fa-times"></i> ปิด
+                </button>
+                <button type="button" class="btn-receipt-print" onclick="window.print()">
+                    <i class="fas fa-print"></i> พิมพ์ / บันทึก PDF
+                </button>
+            </div>
         </div>
     </div>
 

@@ -2496,6 +2496,141 @@ window.openCancelModal = openCancelModal;
 window.closeCancelModal = closeCancelModal;
 window.handleCancelBookingSubmit = handleCancelBookingSubmit;
 
+/**
+ * เปิด Modal ใบเสร็จรับเงินอิเล็กทรอนิกส์ (E-Receipt)
+ * @param {Object} data ข้อมูลการจองและรายการสินค้า/อุปกรณ์
+ */
+function openReceiptModal(data) {
+    if (!data) return;
+
+    const modal = document.getElementById('receiptModal');
+    if (!modal) return;
+
+    // เติมข้อมูลหลักของเอกสาร
+    const idText = document.getElementById('receipt_id_text');
+    const createdAt = document.getElementById('receipt_created_at');
+    const customerName = document.getElementById('receipt_customer_name');
+    const customerPhone = document.getElementById('receipt_customer_phone');
+    const courtName = document.getElementById('receipt_court_name');
+    const bookingDate = document.getElementById('receipt_booking_date');
+    const bookingTime = document.getElementById('receipt_booking_time');
+
+    if (idText) idText.textContent = '#REC-BK' + String(data.id).padStart(4, '0');
+    if (createdAt) createdAt.textContent = data.created_at || '-';
+    if (customerName) customerName.textContent = data.customer_name || 'ลูกค้าทั่วไป';
+    if (customerPhone) customerPhone.textContent = data.customer_phone || '-';
+    if (courtName) courtName.textContent = data.court || '-';
+    if (bookingDate) bookingDate.textContent = data.date || '-';
+    if (bookingTime) bookingTime.textContent = (data.time ? data.time + ' น.' : '-');
+
+    // เติมรายการในตารางแจกแจง
+    const tbody = document.getElementById('receipt_items_body');
+    if (tbody) {
+        tbody.innerHTML = '';
+        let itemIndex = 1;
+
+        // 1. แถวค่าบริการสนาม
+        const trCourt = document.createElement('tr');
+        trCourt.innerHTML = `
+            <td class="receipt-col-seq">${itemIndex++}</td>
+            <td class="receipt-col-desc">
+                <strong>ค่าบริการสนาม: ${escapeReceiptHtml(data.court || '-')}</strong>
+                <div class="text-xs-muted">วันที่ ${escapeReceiptHtml(data.date || '-')} เวลา ${escapeReceiptHtml(data.time || '-')} น.</div>
+            </td>
+            <td class="receipt-col-qty">1 คอร์ท</td>
+            <td class="receipt-col-unit">${data.court_price}</td>
+            <td class="receipt-col-total font-bold">${data.court_price}</td>
+        `;
+        tbody.appendChild(trCourt);
+
+        // 2. แถวอุปกรณ์เช่า / สินค้า (ถ้ามี)
+        if (Array.isArray(data.items) && data.items.length > 0) {
+            data.items.forEach(item => {
+                const trItem = document.createElement('tr');
+                const qty = parseInt(item.rental_quantity, 10) || 1;
+                const unitPrice = parseFloat(item.product_price) || 0;
+                const lineTotal = (qty * unitPrice).toFixed(2);
+                const typeBadge = item.product_type === 'อุปกรณ์เช่า' ? ' [เช่า]' : ' [สินค้า]';
+
+                trItem.innerHTML = `
+                    <td class="receipt-col-seq">${itemIndex++}</td>
+                    <td class="receipt-col-desc">
+                        <span>${escapeReceiptHtml(item.product_name)}</span>
+                        <span class="text-xs-muted">${typeBadge}</span>
+                    </td>
+                    <td class="receipt-col-qty">${qty} ชิ้น</td>
+                    <td class="receipt-col-unit">${unitPrice.toFixed(2)}</td>
+                    <td class="receipt-col-total font-bold">${lineTotal}</td>
+                `;
+                tbody.appendChild(trItem);
+            });
+        }
+    }
+
+    // ยอดรวมและการแจกแจง Subtotals
+    const courtSubtotal = document.getElementById('receipt_court_subtotal');
+    const rentalSubtotal = document.getElementById('receipt_rental_subtotal');
+    const productSubtotal = document.getElementById('receipt_product_subtotal');
+    const grandTotal = document.getElementById('receipt_grand_total');
+
+    const rentalRow = document.getElementById('receipt_rental_row');
+    const productRow = document.getElementById('receipt_product_row');
+
+    if (courtSubtotal) courtSubtotal.textContent = data.court_price + ' ฿';
+
+    const rentalVal = parseFloat(String(data.rental_price).replace(/,/g, '')) || 0;
+    const productVal = parseFloat(String(data.product_price).replace(/,/g, '')) || 0;
+
+    if (rentalSubtotal) rentalSubtotal.textContent = data.rental_price + ' ฿';
+    if (rentalRow) rentalRow.style.display = rentalVal > 0 ? '' : 'none';
+
+    if (productSubtotal) productSubtotal.textContent = data.product_price + ' ฿';
+    if (productRow) productRow.style.display = productVal > 0 ? '' : 'none';
+
+    if (grandTotal) grandTotal.textContent = data.total_price + ' ฿';
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * ปิด Modal ใบเสร็จรับเงินอิเล็กทรอนิกส์
+ */
+function closeReceiptModal() {
+    const modal = document.getElementById('receiptModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function escapeReceiptHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Event Listeners สำหรับการปิด Modal ด้วย Escape หรือคลิกพื้นที่ภายนอก (HCI Standard)
+document.addEventListener('DOMContentLoaded', function() {
+    const receiptModal = document.getElementById('receiptModal');
+    if (receiptModal) {
+        receiptModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReceiptModal();
+            }
+        });
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeReceiptModal();
+    }
+});
+
+window.openReceiptModal = openReceiptModal;
+window.closeReceiptModal = closeReceiptModal;
+
 /* ==========================================================================
    หมวดที่ 13: ระบบข่าวสารและโปรโมชัน (Promotions & Announcements - promotions.php)
    ========================================================================== */

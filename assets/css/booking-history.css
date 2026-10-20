@@ -298,6 +298,22 @@
     color: var(--color-gold, #FFB91D);
 }
 
+/* ปุ่มดูใบเสร็จรับเงิน (Gold Accent Button) */
+.btn-view-receipt {
+    background: rgba(255, 185, 29, 0.12);
+    color: var(--color-gold, #FFB91D);
+    border: 1px solid rgba(255, 185, 29, 0.4);
+    box-shadow: 0 2px 8px rgba(255, 185, 29, 0.15);
+}
+
+.btn-view-receipt:hover {
+    background: var(--color-gold, #FFB91D);
+    color: #111111;
+    border-color: var(--color-gold, #FFB91D);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 185, 29, 0.35);
+}
+
 /* ปุ่มยกเลิกการจอง (Caution Red Button) */
 .btn-cancel-booking {
     background: rgba(239, 68, 68, 0.15);
