@@ -51,8 +51,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql_book = "UPDATE Booking SET booking_status = 'จองแล้ว' WHERE booking_id = :b_id";
             $conn->prepare($sql_book)->execute([':b_id' => $booking_id]);
 
-            // อัปเดตสถานะ Rental สำหรับการจองนี้เป็น 'กำลังเช่า' (สำหรับอุปกรณ์เช่าที่รอตรวจสอบอยู่)
-            $sql_rental_active = "UPDATE Rental SET rental_status = 'กำลังเช่า' WHERE booking_id = :b_id AND rental_status = 'รอตรวจสอบ'";
+            // อัปเดตสถานะ Rental: อุปกรณ์เช่าเป็น 'กำลังเช่า', ส่วนสินค้าบริโภคเป็น 'คืนแล้ว' (ส่งมอบสำเร็จทันที ไม่ต้องรอตรวจรับคืน)
+            $sql_rental_active = "
+                UPDATE Rental r
+                JOIN Product p ON r.product_id = p.product_id
+                SET r.rental_status = CASE 
+                    WHEN p.product_type = 'อุปกรณ์เช่า' THEN 'กำลังเช่า'
+                    ELSE 'คืนแล้ว'
+                END,
+                r.rental_actual_return = CASE 
+                    WHEN p.product_type = 'อุปกรณ์เช่า' THEN NULL
+                    ELSE NOW()
+                END
+                WHERE r.booking_id = :b_id AND r.rental_status = 'รอตรวจสอบ'
+            ";
             $conn->prepare($sql_rental_active)->execute([':b_id' => $booking_id]);
 
             // 4. บันทึกรายรับลงตาราง Revenue (แยกหมวดหมู่ชัดเจน)

@@ -5,20 +5,23 @@ $active_tab = $_GET['tab'] ?? 'active';
 $search = trim($_GET['search'] ?? '');
 
 try {
-    // 1. ดึงสถิติภาพรวม
+    // 1. ดึงสถิติภาพรวม (เฉพาะอุปกรณ์กีฬาสำหรับเช่าเท่านั้น ไม่นับรวมสินค้าบริโภค)
     $stats_query = "
         SELECT 
-            SUM(CASE WHEN rental_status IN ('กำลังเช่า', 'รอตรวจสอบ') THEN rental_quantity ELSE 0 END) AS active_qty,
-            COUNT(CASE WHEN rental_status = 'กำลังเช่า' AND rental_return_time < NOW() THEN 1 END) AS overdue_count,
-            COUNT(CASE WHEN rental_status IN ('คืนแล้ว', 'ชำรุด', 'สูญหาย') AND DATE(rental_actual_return) = CURDATE() THEN 1 END) AS returned_today,
-            COALESCE(SUM(rental_fine), 0) AS total_fines
-        FROM Rental
+            SUM(CASE WHEN r.rental_status IN ('กำลังเช่า', 'รอตรวจสอบ') THEN r.rental_quantity ELSE 0 END) AS active_qty,
+            COUNT(CASE WHEN r.rental_status = 'กำลังเช่า' AND r.rental_return_time < NOW() THEN 1 END) AS overdue_count,
+            COUNT(CASE WHEN r.rental_status IN ('คืนแล้ว', 'ชำรุด', 'สูญหาย') AND DATE(r.rental_actual_return) = CURDATE() THEN 1 END) AS returned_today,
+            COALESCE(SUM(r.rental_fine), 0) AS total_fines
+        FROM Rental r
+        JOIN Product p ON r.product_id = p.product_id
+        WHERE p.product_type = 'อุปกรณ์เช่า'
     ";
     $stats = $conn->query($stats_query)->fetch(PDO::FETCH_ASSOC);
 
     // 2. ดึงรายการตามแท็บ
     $where_clauses = [];
     $params = [];
+    $where_clauses[] = "p.product_type = 'อุปกรณ์เช่า'"; // กรองเฉพาะอุปกรณ์เช่า ไม่รวมสินค้าบริโภค
 
     if ($active_tab === 'history') {
         $where_clauses[] = "r.rental_status IN ('คืนแล้ว', 'ชำรุด', 'สูญหาย')";

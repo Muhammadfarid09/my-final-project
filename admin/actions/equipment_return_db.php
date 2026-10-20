@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // 1. ตรวจสอบข้อมูลรายการเช่า
         $stmt_check = $conn->prepare("
-            SELECT r.*, p.product_name, p.product_stock 
+            SELECT r.*, p.product_name, p.product_stock, p.product_type 
             FROM Rental r
             JOIN Product p ON r.product_id = p.product_id
             WHERE r.rental_id = :r_id
@@ -32,6 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (!$rental) {
             throw new Exception("ไม่พบข้อมูลรายการเช่าอุปกรณ์นี้ในระบบ");
+        }
+
+        if ($rental['product_type'] !== 'อุปกรณ์เช่า') {
+            throw new Exception("สินค้านี้เป็นสินค้าบริโภค ไม่จำเป็นต้องตรวจรับคืนอุปกรณ์");
         }
 
         if (in_array($rental['rental_status'], ['คืนแล้ว', 'สูญหาย'])) {
