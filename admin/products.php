@@ -125,10 +125,16 @@ include 'includes/header.php';
 
                                 <td class="text-center">
                                     
-                                    <?php if ($active_tab == 'rental' && $row['product_stock'] > 0): ?>
-                                        <button onclick="openEqRepairModal(<?php echo $row['product_id']; ?>, '<?php echo htmlspecialchars($row['product_name']); ?>', <?php echo $row['product_stock']; ?>)" class="btn-danger btn-action-small">
-                                            <i class="fas fa-tools"></i> ส่งซ่อม
-                                        </button>
+                                    <?php if ($active_tab == 'rental'): ?>
+                                        <?php if ($row['stock_in_repair'] > 0): ?>
+                                            <a href="equipment_repairs.php" class="btn-warning btn-action-small text-decor-none" title="อุปกรณ์นี้กำลังอยู่ระหว่างส่งซ่อม คลิกเพื่อไปหน้าประวัติการซ่อม">
+                                                <i class="fas fa-clock"></i> ซ่อมอยู่
+                                            </a>
+                                        <?php elseif ($row['product_stock'] > 0): ?>
+                                            <button onclick="openEqRepairModal(<?php echo $row['product_id']; ?>, '<?php echo htmlspecialchars($row['product_name']); ?>', <?php echo $row['product_stock']; ?>)" class="btn-danger btn-action-small">
+                                                <i class="fas fa-tools"></i> ส่งซ่อม
+                                            </button>
+                                        <?php endif; ?>
                                     <?php endif; ?>
 
                                     <a href="product_edit.php?id=<?php echo $row['product_id']; ?>" class="btn-warning btn-action-small text-decor-none">

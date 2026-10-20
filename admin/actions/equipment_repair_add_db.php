@@ -26,6 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("ไม่พบข้อมูลอุปกรณ์นี้ในระบบ");
         }
 
+        // ตรวจสอบว่ามีรายการค้างสถานะ 'กำลังซ่อม' อยู่แล้วหรือไม่ ป้องกันการส่งซ่อมซ้ำซ้อน
+        $stmt_check_repair = $conn->prepare("SELECT COUNT(*) FROM Equipment_repair WHERE product_id = :p_id AND eq_repair_status = 'กำลังซ่อม'");
+        $stmt_check_repair->execute([':p_id' => $product_id]);
+        if ($stmt_check_repair->fetchColumn() > 0) {
+            throw new Exception("อุปกรณ์นี้มีรายการที่กำลังอยู่ระหว่างการซ่อมแซมอยู่แล้ว กรุณาดำเนินการซ่อมเดิมให้เสร็จสิ้นก่อนส่งซ่อมเพิ่ม");
+        }
+
         if ($product['product_stock'] < $repair_qty) {
             throw new Exception("ไม่สามารถส่งซ่อมได้ เนื่องจากสต็อกของ '" . $product['product_name'] . "' มีไม่เพียงพอ");
         }
