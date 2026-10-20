@@ -346,24 +346,50 @@ try {
                         foreach($products as $prod): 
                             if($prod['product_type'] == 'สินค้าบริโภค'):
                                 $has_consumer = true;
+                                $prod_data_json = json_encode([
+                                    "id" => $prod["product_id"],
+                                    "name" => $prod["product_name"],
+                                    "brand" => $prod["product_brand"] ?? "",
+                                    "model" => $prod["product_model"] ?? "",
+                                    "size" => $prod["product_size"] ?? "",
+                                    "level" => $prod["product_level"] ?? "",
+                                    "price" => floatval($prod["product_price"]),
+                                    "stock" => intval($prod["product_stock"]),
+                                    "type" => $prod["product_type"],
+                                    "image" => !empty($prod["product_image"]) ? "uploads/products/" . $prod["product_image"] : ""
+                                ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
                         ?>
-                        <div class="addon-item-card">
-                            <div class="addon-item-thumb">
+                        <div class="addon-item-card" id="card_prod_<?php echo $prod['product_id']; ?>">
+                            <div class="addon-item-thumb addon-thumb-clickable" 
+                                 onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                 title="คลิกเพื่อดูรายละเอียด">
                                 <?php if(!empty($prod['product_image'])): ?>
                                     <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
                                 <?php else: ?>
                                     <i class="fas fa-tint fa-2x"></i>
                                 <?php endif; ?>
+                                <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
                             </div>
                             <div class="addon-item-details">
-                                <div class="addon-item-name"><?php echo htmlspecialchars($prod['product_name']); ?></div>
+                                <div class="addon-item-name-wrap">
+                                    <span class="addon-item-name addon-item-name-clickable" 
+                                          onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                          title="คลิกเพื่อดูรายละเอียด">
+                                        <?php echo htmlspecialchars($prod['product_name']); ?>
+                                    </span>
+                                </div>
                                 <div class="addon-item-meta">
                                     <?php if(!empty($prod['product_brand'])): ?>
-                                        <span>ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                        <span class="addon-meta-brand">ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
                                     <?php endif; ?>
-                                    <span>(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
+                                    <span class="addon-meta-stock">(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
                                 </div>
-                                <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                                <div class="addon-item-bottom">
+                                    <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                                    <button type="button" class="btn-addon-detail" onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'>
+                                        <i class="fas fa-info-circle"></i> ดูสเปก
+                                    </button>
+                                </div>
                             </div>
                             <div class="addon-stepper-control">
                                 <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
@@ -390,28 +416,74 @@ try {
                         foreach($products as $prod): 
                             if($prod['product_type'] == 'อุปกรณ์เช่า'):
                                 $has_rental = true;
+                                $prod_data_json = json_encode([
+                                    "id" => $prod["product_id"],
+                                    "name" => $prod["product_name"],
+                                    "brand" => $prod["product_brand"] ?? "",
+                                    "model" => $prod["product_model"] ?? "",
+                                    "size" => $prod["product_size"] ?? "",
+                                    "level" => $prod["product_level"] ?? "",
+                                    "price" => floatval($prod["product_price"]),
+                                    "stock" => intval($prod["product_stock"]),
+                                    "type" => $prod["product_type"],
+                                    "image" => !empty($prod["product_image"]) ? "uploads/products/" . $prod["product_image"] : ""
+                                ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
                         ?>
-                        <div class="addon-item-card">
-                            <div class="addon-item-thumb">
+                        <div class="addon-item-card" id="card_prod_<?php echo $prod['product_id']; ?>">
+                            <?php if (!empty($prod['product_level'])): ?>
+                                <div class="addon-card-level-tag">
+                                    <?php if ($prod['product_level'] === 'มือใหม่'): ?>
+                                        <span class="badge-racket-level level-beginner" title="ระดับมือใหม่ / ฝึกซ้อม">
+                                            <i class="fas fa-seedling"></i> มือใหม่
+                                        </span>
+                                    <?php elseif ($prod['product_level'] === 'มือโปร'): ?>
+                                        <span class="badge-racket-level level-pro" title="ระดับมือโปร / แข่งขัน">
+                                            <i class="fas fa-crown"></i> มือโปร
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="addon-item-thumb addon-thumb-clickable" 
+                                 onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                 title="คลิกเพื่อดูรายละเอียด">
                                 <?php if(!empty($prod['product_image'])): ?>
                                     <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
                                 <?php else: ?>
                                     <i class="fas fa-medal fa-2x"></i>
                                 <?php endif; ?>
+                                <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
                             </div>
+
                             <div class="addon-item-details">
-                                <div class="addon-item-name"><?php echo htmlspecialchars($prod['product_name']); ?></div>
+                                <div class="addon-item-name-wrap">
+                                    <span class="addon-item-name addon-item-name-clickable" 
+                                          onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                          title="คลิกเพื่อดูรายละเอียด">
+                                        <?php echo htmlspecialchars($prod['product_name']); ?>
+                                    </span>
+                                </div>
                                 <div class="addon-item-meta">
                                     <?php if(!empty($prod['product_brand'])): ?>
-                                        <span><?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                        <span class="addon-meta-brand"><?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                    <?php endif; ?>
+                                    <?php if(!empty($prod['product_model'])): ?>
+                                        <span class="addon-meta-model">(<?php echo htmlspecialchars($prod['product_model']); ?>)</span>
                                     <?php endif; ?>
                                     <?php if(!empty($prod['product_size'])): ?>
-                                        <span>ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?></span>
+                                        <span class="addon-meta-size">ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?></span>
                                     <?php endif; ?>
-                                    <span>(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
+                                    <span class="addon-meta-stock">(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
                                 </div>
-                                <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                                <div class="addon-item-bottom">
+                                    <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
+                                    <button type="button" class="btn-addon-detail" 
+                                            onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'>
+                                        <i class="fas fa-info-circle"></i> ดูสเปก
+                                    </button>
+                                </div>
                             </div>
+
                             <div class="addon-stepper-control">
                                 <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
                                 <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
@@ -558,6 +630,133 @@ try {
 
 
     <!-- เรียกใช้ JavaScript สำหรับควบคุม Wizard (ระบบจะเริ่มต้นอัตโนมัติเมื่อพบ .wizard-page-wrapper) -->
+    
+    <!-- ==========================================================================
+         Modal แสดงรายละเอียดอุปกรณ์และสเปก (Product Detail Modal)
+         Strict Separation of Concerns & Black-Gold Brand Theme
+         ========================================================================== -->
+    <div id="productDetailModal" class="product-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="productDetailModalTitle">
+        <div class="product-modal-card">
+            <!-- Modal Header -->
+            <div class="product-modal-header">
+                <h4 class="product-modal-title" id="productDetailModalTitle">
+                    <i class="fas fa-info-circle text-gold"></i> รายละเอียดอุปกรณ์และสเปก
+                </h4>
+                <button type="button" class="product-modal-close-btn" onclick="closeProductDetailModal()" aria-label="ปิดหน้าต่าง">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="product-modal-body">
+                <div class="product-modal-grid">
+                    <!-- Left: Large Image Box -->
+                    <div class="product-modal-image-box">
+                        <img id="detail_prod_image" src="" alt="" style="display: none;">
+                        <div id="detail_prod_placeholder" class="product-modal-placeholder">
+                            <i class="fas fa-table-tennis fa-3x text-gold"></i>
+                        </div>
+                    </div>
+
+                    <!-- Right: Specs & Info -->
+                    <div class="product-modal-info">
+                        <div class="product-badge-row">
+                            <span class="badge-prod-type" id="detail_prod_type_badge">อุปกรณ์เช่า</span>
+                            <span id="detail_prod_level_badge" class="badge-racket-level" style="display: none;"></span>
+                        </div>
+
+                        <h3 class="product-modal-name" id="detail_prod_name">-</h3>
+
+                        <div class="product-modal-spec-list">
+                            <div class="product-spec-item">
+                                <span class="product-spec-label">ยี่ห้อ:</span>
+                                <span class="product-spec-val" id="detail_prod_brand">-</span>
+                            </div>
+                            <div class="product-spec-item">
+                                <span class="product-spec-label">รุ่น:</span>
+                                <span class="product-spec-val text-gold" id="detail_prod_model">-</span>
+                            </div>
+                            <div class="product-spec-item" id="detail_prod_size_row" style="display: none;">
+                                <span class="product-spec-label">ไซส์:</span>
+                                <span class="product-spec-val" id="detail_prod_size">-</span>
+                            </div>
+                        </div>
+
+                        <div class="product-modal-price-box">
+                            <div>
+                                <span class="product-spec-label">อัตราค่าบริการ:</span>
+                                <div class="product-modal-price" id="detail_prod_price">0.00 ฿ / หน่วย</div>
+                            </div>
+                            <div class="product-modal-stock" id="detail_prod_stock">คงเหลือ 0 ชิ้น</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Callout Boxes: Playing Characteristics & Recommendations -->
+                <div id="detail_callout_beginner" class="product-feature-callout feature-beginner" style="display: none;">
+                    <div class="callout-header">
+                        <i class="fas fa-seedling text-success"></i>
+                        <span>ความเหมาะสม: ระดับมือใหม่ (Beginner / ฝึกซ้อม / เพื่อสุขภาพ)</span>
+                    </div>
+                    <ul class="callout-list">
+                        <li><strong>ความยืดหยุ่นของก้าน:</strong> ก้านยืดหยุ่นสูง (Flexible Shaft) ช่วยซับแรงกระแทก ตีง่าย สบายแขน</li>
+                        <li><strong>จุดเด่นในการเล่น:</strong> จุด Sweet Spot กว้าง เซฟแรง ตีลูกถึงหลังคอร์ทได้ง่ายโดยไม่ต้องออกแรงตบเยอะ</li>
+                        <li><strong>เหมาะสำหรับ:</strong> ผู้เริ่มต้นเล่นแบดมินตัน, ผู้เล่นออกกำลังกายทั่วไป, สุภาพสตรี และเยาวชน</li>
+                    </ul>
+                </div>
+
+                <div id="detail_callout_pro" class="product-feature-callout feature-pro" style="display: none;">
+                    <div class="callout-header">
+                        <i class="fas fa-crown text-gold"></i>
+                        <span>ความเหมาะสม: ระดับมือโปร (Advanced / แข่งขัน / สไตล์บุก)</span>
+                    </div>
+                    <ul class="callout-list">
+                        <li><strong>ความยืดหยุ่นของก้าน:</strong> ก้านแข็งปานกลาง-แข็ง (Medium-Stiff) คืนตัวไว คุมทิศทางลูกได้แม่นยำสูง</li>
+                        <li><strong>จุดเด่นในการเล่น:</strong> หัวหนัก (Head-Heavy) เพิ่มพลังตบ (Smash Power) สปีดลูกพุ่งเร็ว ตอบสนองเกมบุกหนักหน่วง</li>
+                        <li><strong>เหมาะสำหรับ:</strong> ผู้เล่นระดับกลางถึงระดับสูง, นักกีฬา, ผู้ที่มีทักษะการส่งแรงจากข้อมือได้คล่อง</li>
+                    </ul>
+                </div>
+
+                <div id="detail_callout_shoes" class="product-feature-callout feature-neutral" style="display: none;">
+                    <div class="callout-header">
+                        <i class="fas fa-shoe-prints text-gold"></i>
+                        <span>คุณสมบัติรองเท้ากีฬาแบดมินตันมาตรฐาน</span>
+                    </div>
+                    <ul class="callout-list">
+                        <li><strong>พื้นยาง Non-Marking:</strong> เกาะหนึบ ไม่ลื่นไถล ป้องกันรอยขีดข่วนบนพื้นยางคอร์ทมาตรฐาน</li>
+                        <li><strong>ระบบ Cushioning:</strong> ลดแรงกระแทกบริเวณส้นเท้า ถนอมข้อเท้าและหัวเข่าขณะเปลี่ยนทิศทางกะทันหัน</li>
+                    </ul>
+                </div>
+
+                <div id="detail_callout_general" class="product-feature-callout feature-neutral" style="display: none;">
+                    <div class="callout-header">
+                        <i class="fas fa-check-circle text-gold"></i>
+                        <span>สินค้าคุณภาพมาตรฐานสนามแบดมินตัน ที.เอส. ปัตตานี</span>
+                    </div>
+                    <ul class="callout-list">
+                        <li>สินค้าผ่านการคัดสรรคุณภาพและความสมบูรณ์พร้อมใช้งานสำหรับการลงคอร์ท</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Modal Footer (Stepper & Action) -->
+            <div class="product-modal-footer">
+                <div class="modal-stepper-wrap">
+                    <span class="modal-stepper-label">จำนวนที่ต้องการเช่า:</span>
+                    <div class="addon-stepper-control">
+                        <button type="button" class="btn-stepper-adj" onclick="adjustDetailModalQty(-1)">-</button>
+                        <input type="number" id="detail_modal_qty_input" class="addon-stepper-input" value="0" min="0" readonly>
+                        <button type="button" class="btn-stepper-adj" onclick="adjustDetailModalQty(1)">+</button>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-modal-done" onclick="closeProductDetailModal()">
+                    <i class="fas fa-check"></i> เรียบร้อย
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/member.js?v=<?php echo filemtime('assets/js/member.js'); ?>"></script>
 </body>
 </html>

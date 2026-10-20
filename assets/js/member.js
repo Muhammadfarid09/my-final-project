@@ -1281,6 +1281,160 @@ function onProductQtyChange(prodId) {
     calculateGrandTotal();
 }
 
+let currentDetailProdId = null;
+
+/**
+ * เปิดหน้าต่างดูรายละเอียดอุปกรณ์และสเปก (Product Detail Modal)
+ * @param {Object} data ข้อมูลสินค้าและคุณลักษณะอุปกรณ์
+ */
+function openProductDetailModal(data) {
+    if (!data) return;
+    const modal = document.getElementById('productDetailModal');
+    if (!modal) return;
+
+    currentDetailProdId = data.id;
+
+    // Image & Placeholder
+    const imgEl = document.getElementById('detail_prod_image');
+    const placeholderEl = document.getElementById('detail_prod_placeholder');
+    if (data.image && String(data.image).trim() !== '') {
+        if (imgEl) {
+            imgEl.src = data.image;
+            imgEl.alt = data.name || '';
+            imgEl.style.display = 'block';
+        }
+        if (placeholderEl) placeholderEl.style.display = 'none';
+    } else {
+        if (imgEl) imgEl.style.display = 'none';
+        if (placeholderEl) placeholderEl.style.display = 'flex';
+    }
+
+    // Name & Badges
+    const nameEl = document.getElementById('detail_prod_name');
+    const brandEl = document.getElementById('detail_prod_brand');
+    const modelEl = document.getElementById('detail_prod_model');
+    const sizeEl = document.getElementById('detail_prod_size');
+    const sizeRow = document.getElementById('detail_prod_size_row');
+    const priceEl = document.getElementById('detail_prod_price');
+    const stockEl = document.getElementById('detail_prod_stock');
+    const typeBadge = document.getElementById('detail_prod_type_badge');
+    const levelBadge = document.getElementById('detail_prod_level_badge');
+
+    if (nameEl) nameEl.textContent = data.name || '-';
+    if (brandEl) brandEl.textContent = data.brand || '-';
+    if (modelEl) modelEl.textContent = data.model || '-';
+    if (priceEl) priceEl.textContent = Number(data.price || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 }) + ' ฿ / หน่วย';
+    if (stockEl) stockEl.textContent = 'คงเหลือ ' + (data.stock || 0) + ' ชิ้น';
+
+    if (typeBadge) typeBadge.textContent = data.type || 'อุปกรณ์เช่า';
+
+    if (data.size && String(data.size).trim() !== '') {
+        if (sizeEl) sizeEl.textContent = data.size;
+        if (sizeRow) sizeRow.style.display = 'flex';
+    } else {
+        if (sizeRow) sizeRow.style.display = 'none';
+    }
+
+    // Callout Boxes
+    const calloutBeginner = document.getElementById('detail_callout_beginner');
+    const calloutPro = document.getElementById('detail_callout_pro');
+    const calloutShoes = document.getElementById('detail_callout_shoes');
+    const calloutGeneral = document.getElementById('detail_callout_general');
+
+    if (calloutBeginner) calloutBeginner.style.display = 'none';
+    if (calloutPro) calloutPro.style.display = 'none';
+    if (calloutShoes) calloutShoes.style.display = 'none';
+    if (calloutGeneral) calloutGeneral.style.display = 'none';
+
+    if (levelBadge) {
+        if (data.level === 'มือใหม่') {
+            levelBadge.className = 'badge-racket-level level-beginner';
+            levelBadge.innerHTML = '<i class="fas fa-seedling"></i> ระดับมือใหม่ (Beginner)';
+            levelBadge.style.display = 'inline-flex';
+            if (calloutBeginner) calloutBeginner.style.display = 'block';
+        } else if (data.level === 'มือโปร') {
+            levelBadge.className = 'badge-racket-level level-pro';
+            levelBadge.innerHTML = '<i class="fas fa-crown"></i> ระดับมือโปร (Pro & Advanced)';
+            levelBadge.style.display = 'inline-flex';
+            if (calloutPro) calloutPro.style.display = 'block';
+        } else {
+            levelBadge.style.display = 'none';
+            if (data.name && String(data.name).includes('รองเท้า')) {
+                if (calloutShoes) calloutShoes.style.display = 'block';
+            } else {
+                if (calloutGeneral) calloutGeneral.style.display = 'block';
+            }
+        }
+    }
+
+    // Sync stepper from card
+    const cardInput = document.getElementById('prod_qty_' + data.id);
+    const modalInput = document.getElementById('detail_modal_qty_input');
+    const currentQty = cardInput ? (parseInt(cardInput.value, 10) || 0) : 0;
+    if (modalInput) {
+        modalInput.value = currentQty;
+        modalInput.setAttribute('max', data.stock || 999);
+    }
+
+    modal.style.display = 'flex';
+}
+
+/**
+ * ปิดหน้าต่างดูรายละเอียดอุปกรณ์
+ */
+function closeProductDetailModal() {
+    const modal = document.getElementById('productDetailModal');
+    if (modal) modal.style.display = 'none';
+    currentDetailProdId = null;
+}
+
+/**
+ * ปรับจำนวนสินค้าจากภายใน Modal และซิงค์กับ Input ของ Step 4 ทันที
+ * @param {number} delta - เพิ่ม (+1) หรือลด (-1)
+ */
+function adjustDetailModalQty(delta) {
+    if (!currentDetailProdId) return;
+    const modalInput = document.getElementById('detail_modal_qty_input');
+    if (!modalInput) return;
+
+    let curVal = parseInt(modalInput.value, 10) || 0;
+    let max = parseInt(modalInput.getAttribute('max'), 10) || 999;
+    let newVal = curVal + delta;
+    if (newVal < 0) newVal = 0;
+    if (newVal > max) newVal = max;
+
+    modalInput.value = newVal;
+
+    // ซิงค์กับ Input ในการ์ดและคำนวณราคายอดรวมใหม่ทันที
+    const cardInput = document.getElementById('prod_qty_' + currentDetailProdId);
+    if (cardInput) {
+        cardInput.value = newVal;
+        if (typeof calculateGrandTotal === 'function') calculateGrandTotal();
+    }
+}
+
+// ผูก Event ปิด Modal ด้วย Escape และการคลิก Backdrop
+document.addEventListener('DOMContentLoaded', function() {
+    const prodModal = document.getElementById('productDetailModal');
+    if (prodModal) {
+        prodModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProductDetailModal();
+            }
+        });
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeProductDetailModal();
+    }
+});
+
+window.openProductDetailModal = openProductDetailModal;
+window.closeProductDetailModal = closeProductDetailModal;
+window.adjustDetailModalQty = adjustDetailModalQty;
+
 /* ==========================================================================
    หมวดที่ 6 (ต่อ): การคำนวณยอดสุทธิและใบแจกแจงค่าใช้จ่าย (Grand Total & Invoice Review)
    ========================================================================== */
