@@ -127,7 +127,7 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 8px;
+    gap: 6px;
     height: 100%;
 }
 
@@ -139,76 +139,62 @@
     flex-shrink: 0;
 }
 
-/* บล็อกช่องแท็บเมนู */
+/* บล็อกช่องแท็บเมนู (Modern Black & Gold Capsule Navigation) */
 .nav-link {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm, 6px);
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--radius-full, 9999px);
     background-color: transparent;
     color: var(--text-secondary, #A3A3A3);
     text-decoration: none;
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 0.1px;
-    transition: color 0.25s ease;
-    overflow: visible;
+    letter-spacing: 0.15px;
+    border: 1px solid transparent;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     flex-shrink: 0;
 }
 
 .nav-link i {
     font-size: 14px;
-    color: var(--text-secondary, #A3A3A3);
-    transition: color 0.25s ease;
-}
-
-
-/* เส้นใต้สีทอง ::after (ความหนา 3px สไลด์ขยายจากกึ่งกลาง) */
-.nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 3px;
-    background-color: var(--color-gold, #FFB91D);
-    border-radius: 3px 3px 0 0;
-    box-shadow: 0 0 10px rgba(255, 185, 29, 0.45);
-    transition: width 0.25s ease;
+    color: var(--text-muted, #737373);
+    transition: all 0.25s ease;
 }
 
 /* สถานะเมื่อเลื่อนเมาส์ชี้ (:hover) */
 .nav-link:hover {
-    color: var(--text-primary, #F5F5F5);
-    background-color: transparent;
+    color: #FFFFFF;
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
 }
 
 .nav-link:hover i {
     color: var(--color-gold, #FFB91D);
+    transform: scale(1.12);
 }
 
-.nav-link:hover::after {
-    width: calc(100% - 16px);
-}
-
-/* สถานะหน้าปัจจุบัน (.active) ขีดใต้ทองแสดงค้างไว้อย่างชัดเจน */
+/* สถานะหน้าปัจจุบัน (.active) - Luminous Gold Capsule */
 .nav-link.active {
     color: var(--color-gold, #FFB91D);
     font-weight: 600;
-    background-color: transparent;
+    background: linear-gradient(135deg, rgba(255, 185, 29, 0.16) 0%, rgba(255, 185, 29, 0.05) 100%);
+    border: 1px solid rgba(255, 185, 29, 0.35);
+    box-shadow: 0 2px 12px rgba(255, 185, 29, 0.16), inset 0 0 10px rgba(255, 185, 29, 0.06);
 }
 
 .nav-link.active i {
     color: var(--color-gold, #FFB91D);
 }
 
-.nav-link.active::after {
-    width: calc(100% - 16px);
+/* ยกเลิกเส้นใต้ลอยค้างเดิม เพื่อให้การแสดงผลเป็นระเบียบ เรียบหรู และทันสมัย */
+.nav-link::after {
+    display: none;
 }
 
 /* ซ่อนเมนูผู้ใช้มือถือบนจอเดสก์ท็อป */
@@ -288,8 +274,8 @@
 }
 
 .navbar-actions .dropbtn {
-    background: transparent;
-    border: 1px solid var(--border-color, #383838);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-full, 9999px);
     cursor: pointer;
     font-family: inherit;
@@ -298,9 +284,9 @@
     color: var(--text-primary, #F5F5F5);
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 7px 12px;
-    transition: all 0.2s ease;
+    gap: 8px;
+    padding: 7px 14px;
+    transition: all 0.25s ease;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -316,12 +302,13 @@
 
 .navbar-actions .dropbtn:hover,
 .navbar-actions .dropbtn.active {
-    border-color: var(--color-gold, #FFB91D);
+    border-color: rgba(255, 185, 29, 0.45);
+    background: rgba(255, 185, 29, 0.08);
     color: var(--color-gold, #FFB91D);
 }
 
 .navbar-actions .dropbtn.active {
-    background: rgba(255, 185, 29, 0.08);
+    background: rgba(255, 185, 29, 0.12);
 }
 
 .navbar-actions .dropbtn i.fa-user-circle {

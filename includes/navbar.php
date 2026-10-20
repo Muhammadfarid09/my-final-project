@@ -61,7 +61,7 @@ if (!isset($member_points) || !isset($member_level)) {
                 <li class="nav-item">
                     <a href="news.php" class="nav-link <?= $is_promotions ? 'active' : '' ?>">
                         <i class="fas fa-bullhorn"></i>
-                        <span>ข่าวสาร&โปรโมชัน</span>
+                        <span>ข่าวสารและโปรโมชัน</span>
                     </a>
                 </li>
                 <li class="nav-item">
