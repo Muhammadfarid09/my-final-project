@@ -1246,6 +1246,22 @@ function updateStep4NextButton() {
  * @param {number} delta - ค่าการเปลี่ยนแปลง (+1 สำหรับเพิ่ม, -1 สำหรับลด)
  * @element #prod_qty_[prodId]
  */
+/**
+ * อัปเดตสถานะ Highlight ของการ์ดอุปกรณ์/สินค้าเมื่อมีการเลือกจำนวน
+ * @param {string|number} prodId - รหัสสินค้า
+ * @param {number} val - จำนวนที่เลือก
+ */
+function updateCardActiveState(prodId, val) {
+    let card = document.getElementById('card_prod_' + prodId);
+    if (card) {
+        if (val > 0) {
+            card.classList.add('has-selected');
+        } else {
+            card.classList.remove('has-selected');
+        }
+    }
+}
+
 function adjustProductQty(prodId, delta) {
     let input = document.getElementById('prod_qty_' + prodId);
     if (!input) return;
@@ -1258,6 +1274,7 @@ function adjustProductQty(prodId, delta) {
     if (newVal > max) newVal = max;
 
     input.value = newVal;
+    updateCardActiveState(prodId, newVal);
     calculateGrandTotal();
 }
 
@@ -1278,6 +1295,7 @@ function onProductQtyChange(prodId) {
     if (val > max) val = max;
 
     input.value = val;
+    updateCardActiveState(prodId, val);
     calculateGrandTotal();
 }
 
@@ -1409,6 +1427,7 @@ function adjustDetailModalQty(delta) {
     const cardInput = document.getElementById('prod_qty_' + currentDetailProdId);
     if (cardInput) {
         cardInput.value = newVal;
+        updateCardActiveState(currentDetailProdId, newVal);
         if (typeof calculateGrandTotal === 'function') calculateGrandTotal();
     }
 }

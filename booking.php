@@ -360,41 +360,55 @@ try {
                                 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
                         ?>
                         <div class="addon-item-card" id="card_prod_<?php echo $prod['product_id']; ?>">
-                            <div class="addon-item-thumb addon-thumb-clickable" 
-                                 onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
-                                 title="คลิกเพื่อดูรายละเอียด">
-                                <?php if(!empty($prod['product_image'])): ?>
-                                    <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
-                                <?php else: ?>
-                                    <i class="fas fa-tint fa-2x"></i>
-                                <?php endif; ?>
-                                <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
-                            </div>
-                            <div class="addon-item-details">
-                                <div class="addon-item-name-wrap">
-                                    <span class="addon-item-name addon-item-name-clickable" 
-                                          onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
-                                          title="คลิกเพื่อดูรายละเอียด">
-                                        <?php echo htmlspecialchars($prod['product_name']); ?>
-                                    </span>
-                                </div>
-                                <div class="addon-item-meta">
-                                    <?php if(!empty($prod['product_brand'])): ?>
-                                        <span class="addon-meta-brand">ยี่ห้อ: <?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                            <div class="addon-card-header">
+                                <div class="addon-item-thumb addon-thumb-clickable" 
+                                     onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                     title="คลิกเพื่อดูรายละเอียด">
+                                    <?php if(!empty($prod['product_image'])): ?>
+                                        <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
+                                    <?php else: ?>
+                                        <i class="fas fa-tint fa-2x"></i>
                                     <?php endif; ?>
-                                    <span class="addon-meta-stock">(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
+                                    <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
                                 </div>
-                                <div class="addon-item-bottom">
-                                    <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
-                                    <button type="button" class="btn-addon-detail" onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'>
+                                <div class="addon-item-main-info">
+                                    <div class="addon-card-title-row">
+                                        <span class="addon-item-name addon-item-name-clickable" 
+                                              onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                              title="คลิกเพื่อดูรายละเอียด">
+                                            <?php echo htmlspecialchars($prod['product_name']); ?>
+                                        </span>
+                                    </div>
+                                    <div class="addon-card-meta-row">
+                                        <?php if(!empty($prod['product_brand'])): ?>
+                                            <span class="addon-meta-brand"><?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="addon-card-stock-row">
+                                        <span class="addon-stock-pill <?php echo $prod['product_stock'] <= 3 ? 'stock-low' : 'stock-available'; ?>">
+                                            <i class="fas fa-boxes"></i> คงเหลือ <?php echo $prod['product_stock']; ?> ชิ้น
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="addon-card-divider"></div>
+
+                            <div class="addon-card-actions">
+                                <div class="addon-card-pricing">
+                                    <div class="addon-price-group">
+                                        <span class="addon-price-val"><?php echo number_format($prod['product_price']); ?></span>
+                                        <span class="addon-price-unit">฿/หน่วย</span>
+                                    </div>
+                                    <button type="button" class="btn-addon-detail" onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)' title="คลิกเพื่อดูรายละเอียด">
                                         <i class="fas fa-info-circle"></i> ดูสเปก
                                     </button>
                                 </div>
-                            </div>
-                            <div class="addon-stepper-control">
-                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
-                                <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
-                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)">+</button>
+                                <div class="addon-stepper-control">
+                                    <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)" aria-label="ลดจำนวน">-</button>
+                                    <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
+                                    <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)" aria-label="เพิ่มจำนวน">+</button>
+                                </div>
                             </div>
                         </div>
                         <?php 
@@ -430,64 +444,66 @@ try {
                                 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
                         ?>
                         <div class="addon-item-card" id="card_prod_<?php echo $prod['product_id']; ?>">
-                            <?php if (!empty($prod['product_level'])): ?>
-                                <div class="addon-card-level-tag">
-                                    <?php if ($prod['product_level'] === 'มือใหม่'): ?>
-                                        <span class="badge-racket-level level-beginner" title="ระดับมือใหม่ / ฝึกซ้อม">
-                                            <i class="fas fa-seedling"></i> มือใหม่
-                                        </span>
-                                    <?php elseif ($prod['product_level'] === 'มือโปร'): ?>
-                                        <span class="badge-racket-level level-pro" title="ระดับมือโปร / แข่งขัน">
-                                            <i class="fas fa-crown"></i> มือโปร
-                                        </span>
+                            <div class="addon-card-header">
+                                <div class="addon-item-thumb addon-thumb-clickable" 
+                                     onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                     title="คลิกเพื่อดูสเปกและภาพขยาย">
+                                    <?php if(!empty($prod['product_image'])): ?>
+                                        <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
+                                    <?php else: ?>
+                                        <i class="fas fa-medal fa-2x"></i>
                                     <?php endif; ?>
+                                    <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
                                 </div>
-                            <?php endif; ?>
-
-                            <div class="addon-item-thumb addon-thumb-clickable" 
-                                 onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
-                                 title="คลิกเพื่อดูรายละเอียด">
-                                <?php if(!empty($prod['product_image'])): ?>
-                                    <img src="uploads/products/<?php echo htmlspecialchars($prod['product_image']); ?>" alt="<?php echo htmlspecialchars($prod['product_name']); ?>">
-                                <?php else: ?>
-                                    <i class="fas fa-medal fa-2x"></i>
-                                <?php endif; ?>
-                                <span class="thumb-zoom-hint"><i class="fas fa-search-plus"></i></span>
+                                <div class="addon-item-main-info">
+                                    <div class="addon-card-title-row">
+                                        <span class="addon-item-name addon-item-name-clickable" 
+                                              onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
+                                              title="คลิกเพื่อดูสเปก">
+                                            <?php echo htmlspecialchars($prod['product_name']); ?>
+                                        </span>
+                                        <?php if (!empty($prod['product_level'])): ?>
+                                            <span class="badge-racket-level <?php echo $prod['product_level'] === 'มือใหม่' ? 'level-beginner' : 'level-pro'; ?>" title="ระดับ<?php echo htmlspecialchars($prod['product_level']); ?>">
+                                                <i class="<?php echo $prod['product_level'] === 'มือใหม่' ? 'fas fa-seedling' : 'fas fa-crown'; ?>"></i> <?php echo htmlspecialchars($prod['product_level']); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="addon-card-meta-row">
+                                        <?php if(!empty($prod['product_brand'])): ?>
+                                            <span class="addon-meta-brand"><?php echo htmlspecialchars($prod['product_brand']); ?></span>
+                                        <?php endif; ?>
+                                        <?php if(!empty($prod['product_model'])): ?>
+                                            <span class="addon-meta-model"><?php echo htmlspecialchars($prod['product_model']); ?></span>
+                                        <?php endif; ?>
+                                        <?php if(!empty($prod['product_size'])): ?>
+                                            <span class="addon-meta-size">ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="addon-card-stock-row">
+                                        <span class="addon-stock-pill <?php echo $prod['product_stock'] <= 3 ? 'stock-low' : 'stock-available'; ?>">
+                                            <i class="fas fa-boxes"></i> คงเหลือ <?php echo $prod['product_stock']; ?> ชิ้น
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="addon-item-details">
-                                <div class="addon-item-name-wrap">
-                                    <span class="addon-item-name addon-item-name-clickable" 
-                                          onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'
-                                          title="คลิกเพื่อดูรายละเอียด">
-                                        <?php echo htmlspecialchars($prod['product_name']); ?>
-                                    </span>
-                                </div>
-                                <div class="addon-item-meta">
-                                    <?php if(!empty($prod['product_brand'])): ?>
-                                        <span class="addon-meta-brand"><?php echo htmlspecialchars($prod['product_brand']); ?></span>
-                                    <?php endif; ?>
-                                    <?php if(!empty($prod['product_model'])): ?>
-                                        <span class="addon-meta-model">(<?php echo htmlspecialchars($prod['product_model']); ?>)</span>
-                                    <?php endif; ?>
-                                    <?php if(!empty($prod['product_size'])): ?>
-                                        <span class="addon-meta-size">ไซส์: <?php echo htmlspecialchars($prod['product_size']); ?></span>
-                                    <?php endif; ?>
-                                    <span class="addon-meta-stock">(คงเหลือ <?php echo $prod['product_stock']; ?>)</span>
-                                </div>
-                                <div class="addon-item-bottom">
-                                    <div class="addon-item-price"><?php echo number_format($prod['product_price']); ?> ฿/หน่วย</div>
-                                    <button type="button" class="btn-addon-detail" 
-                                            onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)'>
+                            <div class="addon-card-divider"></div>
+
+                            <div class="addon-card-actions">
+                                <div class="addon-card-pricing">
+                                    <div class="addon-price-group">
+                                        <span class="addon-price-val"><?php echo number_format($prod['product_price']); ?></span>
+                                        <span class="addon-price-unit">฿/หน่วย</span>
+                                    </div>
+                                    <button type="button" class="btn-addon-detail" onclick='openProductDetailModal(<?php echo $prod_data_json; ?>)' title="คลิกเพื่อดูสเปก">
                                         <i class="fas fa-info-circle"></i> ดูสเปก
                                     </button>
                                 </div>
-                            </div>
-
-                            <div class="addon-stepper-control">
-                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)">-</button>
-                                <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
-                                <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)">+</button>
+                                <div class="addon-stepper-control">
+                                    <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, -1)" aria-label="ลดจำนวน">-</button>
+                                    <input type="number" name="products[<?php echo $prod['product_id']; ?>]" id="prod_qty_<?php echo $prod['product_id']; ?>" class="addon-stepper-input qty-input" value="0" min="0" max="<?php echo $prod['product_stock']; ?>" data-price="<?php echo $prod['product_price']; ?>" data-name="<?php echo htmlspecialchars($prod['product_name']); ?>" data-type="<?php echo $prod['product_type']; ?>" onchange="onProductQtyChange(<?php echo $prod['product_id']; ?>)">
+                                    <button type="button" class="btn-stepper-adj" onclick="adjustProductQty(<?php echo $prod['product_id']; ?>, 1)" aria-label="เพิ่มจำนวน">+</button>
+                                </div>
                             </div>
                         </div>
                         <?php 
