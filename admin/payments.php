@@ -22,7 +22,7 @@ try {
             JOIN Court c ON b.court_id = c.court_id
             LEFT JOIN Admin a ON p.admin_id = a.admin_id
             WHERE $status_filter
-            ORDER BY p.payment_transfer_time ASC"; // เรียงจากสลิปที่ส่งมาก่อนขึ้นก่อน
+            ORDER BY p.payment_transfer_time DESC, p.payment_id DESC"; // เรียงวันที่และเวลาล่าสุดขึ้นก่อนตามข้อกำหนด
 
     $stmt = $conn->query($sql);
     $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
