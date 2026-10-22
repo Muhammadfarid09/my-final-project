@@ -2,12 +2,14 @@
 require_once 'includes/auth_check.php';
 
 try {
-    // ดึงข้อมูลการยกเลิก เชื่อมกับข้อมูลการจอง ชื่อสมาชิก และข้อมูลการชำระเงิน
-    $sql = "SELECT c.*, b.booking_date, b.booking_start_time, b.booking_total_price, b.booking_status,
+    // ดึงข้อมูลการยกเลิก เชื่อมกับข้อมูลการจอง ชื่อสมาชิก สนาม และข้อมูลการชำระเงิน
+    $sql = "SELECT c.*, b.booking_date, b.booking_start_time, b.booking_end_time, b.booking_total_price, b.booking_status,
+                   ct.court_name,
                    m.member_name, m.member_phone, a.admin_name,
                    p.payment_slip_image, p.payment_status, p.payment_amount
             FROM CANCELLATION c
             JOIN BOOKING b ON c.booking_id = b.booking_id
+            LEFT JOIN COURT ct ON b.court_id = ct.court_id
             JOIN MEMBER m ON b.member_id = m.member_id
             LEFT JOIN ADMIN a ON c.admin_id = a.admin_id
             LEFT JOIN PAYMENT p ON b.booking_id = p.booking_id
@@ -15,8 +17,22 @@ try {
     $stmt = $conn->query($sql);
     $cancellations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // สรุปตัวเลขสถิติภาพรวม (KPI Summary)
+    $total_cancellations = count($cancellations);
+    $pending_refund_count = 0;
+    $refunded_count = 0;
+    $no_refund_count = 0;
+
     // คำนวณค่าปรับที่แนะนำ (อ้างอิงตามกฎการยกเลิก)
     foreach ($cancellations as &$row) {
+        if ($row['refund_status'] === 'รอดำเนินการ') {
+            $pending_refund_count++;
+        } elseif ($row['refund_status'] === 'คืนแล้ว') {
+            $refunded_count++;
+        } else {
+            $no_refund_count++;
+        }
+
         $booking_datetime = strtotime($row['booking_date'] . ' ' . $row['booking_start_time']);
         $cancel_datetime = strtotime($row['cancel_date']);
         $diff_hours = ($booking_datetime - $cancel_datetime) / 3600;
@@ -47,126 +63,191 @@ try {
 ?>
 <?php
 $page_title = 'จัดการการยกเลิกการจอง - Admin T.S. Pattani';
-$page_header = '<i class="fas fa-ban"></i> ระบบจัดการสิทธิ์และเงื่อนไขการยกเลิก';
+$page_header = '<i class="fas fa-ban"></i> ระบบพิจารณาและประวัติการยกเลิกการจอง';
 include 'includes/header.php';
 ?>
+
+<!-- กล่องสรุปสถานะการยกเลิก (KPI Summary Cards) -->
+<div class="stats-grid mb-25 stat-card-grid">
+    <div class="stat-card stat-card-box border-blue">
+        <div class="stat-card-title"><i class="fas fa-list-alt text-primary"></i> รายการยกเลิกทั้งหมด</div>
+        <div class="stat-card-num text-blue"><?php echo number_format($total_cancellations); ?> <span class="stat-card-unit">รายการ</span></div>
+    </div>
+    <div class="stat-card stat-card-box border-yellow">
+        <div class="stat-card-title"><i class="fas fa-hourglass-half text-warning"></i> รอพิจารณาคืนเงิน</div>
+        <div class="stat-card-num text-yellow"><?php echo number_format($pending_refund_count); ?> <span class="stat-card-unit">รายการ</span></div>
+    </div>
+    <div class="stat-card stat-card-box border-green">
+        <div class="stat-card-title"><i class="fas fa-check-circle text-success"></i> โอนเงินคืนแล้ว</div>
+        <div class="stat-card-num text-green"><?php echo number_format($refunded_count); ?> <span class="stat-card-unit">รายการ</span></div>
+    </div>
+    <div class="stat-card stat-card-box border-red">
+        <div class="stat-card-title"><i class="fas fa-ban text-danger"></i> ไม่ต้องคืนเงิน / ไม่อนุมัติ</div>
+        <div class="stat-card-num text-red"><?php echo number_format($no_refund_count); ?> <span class="stat-card-unit">รายการ</span></div>
+    </div>
+</div>
+
 <div class="admin-card">
     <div class="header-between mb-20">
-        <h4 class="m-0 text-dark-custom"><i class="fas fa-list"></i> ประวัติคำขอยกเลิกการจอง</h4>
+        <h4 class="m-0 text-dark-custom"><i class="fas fa-list"></i> ประวัติคำขอยกเลิกและการพิจารณาคืนเงิน</h4>
     </div>
 
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>รหัสจอง</th>
-                <th>รายละเอียดการจอง</th>
-                <th>เหตุผลการยกเลิก</th>
-                <th class="text-center">ผู้ยกเลิก</th>
-                <th class="text-center">สถานะคืนเงิน</th>
-                <th class="text-center">จัดการ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (count($cancellations) > 0): ?>
-                <?php foreach ($cancellations as $row): 
-                    $is_confirmed_payment = ($row['payment_status'] === 'ยืนยันแล้ว');
-                    $has_slip = (!empty($row['payment_slip_image']));
-                    $is_pending_refund = ($row['refund_status'] === 'รอดำเนินการ');
-                    $can_consider_refund = ($is_pending_refund && ($is_confirmed_payment || $has_slip));
-                ?>
+    <div class="table-responsive">
+        <table class="admin-table table-cancellations">
+            <thead>
                 <tr>
-                    <td><strong>#BK<?php echo $row['booking_id']; ?></strong></td>
-                    <td>
-                        <i class="far fa-user text-small-muted"></i> <strong><?php echo htmlspecialchars($row['member_name']); ?></strong><br>
-                        <?php if (!empty($row['member_phone'])): ?>
-                            <span class="text-small-muted"><i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($row['member_phone']); ?></span><br>
-                        <?php endif; ?>
-                        <i class="far fa-calendar-alt text-small-muted"></i> <?php echo date('d/m/Y', strtotime($row['booking_date'])); ?> 
-                        (<?php echo date('H:i', strtotime($row['booking_start_time'])); ?>)<br>
-                        <strong class="text-danger"><?php echo number_format($row['booking_total_price'], 2); ?> ฿</strong>
-
-                        <?php if (!empty($row['refund_account_no'])): ?>
-                            <div class="cancellation-refund-box">
-                                <strong class="text-success"><i class="fas fa-university"></i> <?php echo htmlspecialchars($row['refund_bank']); ?>:</strong><br>
-                                <span class="cancellation-account-no"><?php echo htmlspecialchars($row['refund_account_no']); ?></span><br>
-                                <span class="text-gray"><?php echo htmlspecialchars($row['refund_account_name']); ?></span>
+                    <th style="width: 18%;">รหัส &amp; ข้อมูลการจอง</th>
+                    <th style="width: 17%;">ผู้จอง</th>
+                    <th style="width: 22%;">บัญชีรับเงินคืน</th>
+                    <th style="width: 20%;">เหตุผล &amp; วันที่ยกเลิก</th>
+                    <th style="width: 12%;" class="text-center">สถานะคืนเงิน</th>
+                    <th style="width: 11%;" class="text-center">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (count($cancellations) > 0): ?>
+                    <?php foreach ($cancellations as $row): 
+                        $is_confirmed_payment = ($row['payment_status'] === 'ยืนยันแล้ว');
+                        $has_slip = (!empty($row['payment_slip_image']));
+                        $is_pending_refund = ($row['refund_status'] === 'รอดำเนินการ');
+                        $can_consider_refund = ($is_pending_refund && ($is_confirmed_payment || $has_slip));
+                    ?>
+                    <tr>
+                        <!-- 1. รหัส & ข้อมูลการจอง -->
+                        <td>
+                            <div class="bk-code-pill">#BK<?php echo $row['booking_id']; ?></div>
+                            <?php if (!empty($row['court_name'])): ?>
+                                <div class="bk-court-name"><i class="fas fa-table-tennis text-muted"></i> <?php echo htmlspecialchars($row['court_name']); ?></div>
+                            <?php endif; ?>
+                            <div class="text-small-muted mt-2">
+                                <i class="far fa-calendar-alt"></i> <?php echo date('d/m/Y', strtotime($row['booking_date'])); ?>
                             </div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($row['payment_slip_image'])): ?>
-                            <div class="cancellation-mt-5">
-                                <a href="../uploads/slips/<?php echo htmlspecialchars($row['payment_slip_image']); ?>" target="_blank" class="text-11 text-primary"><i class="fas fa-receipt"></i> สลิปที่โอนเข้ามา</a>
+                            <div class="text-small-muted">
+                                <i class="far fa-clock"></i> <?php echo date('H:i', strtotime($row['booking_start_time'])); ?><?php echo !empty($row['booking_end_time']) ? ' - ' . date('H:i', strtotime($row['booking_end_time'])) : ''; ?>
                             </div>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <span class="text-gray text-13"><?php echo htmlspecialchars($row['cancel_reason']); ?></span><br>
-                        <span class="text-small-muted"><?php echo date('d/m/Y H:i', strtotime($row['cancel_date'])); ?></span>
-                    </td>
-                    <td class="text-center">
-                        <?php if ($row['cancel_by'] == 'สมาชิก'): ?>
-                            <span class="badge badge-warning">ลูกค้า</span>
-                        <?php else: ?>
-                            <span class="badge badge-info">แอดมิน</span>
-                        <?php endif; ?>
-                    </td>
-                    <td class="text-center">
-                        <?php 
-                            if ($row['refund_status'] == 'รอดำเนินการ') {
-                                if ($is_confirmed_payment) {
-                                    echo '<span class="badge badge-warning"><i class="fas fa-hourglass-half"></i> รอพิจารณาคืนเงิน (จองแล้ว)</span>';
-                                } elseif ($has_slip) {
-                                    echo '<span class="badge badge-info"><i class="fas fa-receipt"></i> รอตรวจสลิป & คืนเงิน 100%</span>';
+                            <div class="bk-total-price mt-4">
+                                ยอดจอง: <strong><?php echo number_format($row['booking_total_price'], 2); ?> ฿</strong>
+                            </div>
+                        </td>
+
+                        <!-- 2. ข้อมูลผู้จอง -->
+                        <td>
+                            <div class="member-name-text">
+                                <i class="far fa-user text-muted"></i> <strong><?php echo htmlspecialchars($row['member_name']); ?></strong>
+                            </div>
+                            <?php if (!empty($row['member_phone'])): ?>
+                                <div class="text-small-muted mt-2">
+                                    <i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($row['member_phone']); ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php if (!empty($row['payment_slip_image'])): ?>
+                                <div class="mt-6">
+                                    <a href="../uploads/slips/<?php echo htmlspecialchars($row['payment_slip_image']); ?>" target="_blank" class="btn-slip-pill" title="คลิกดูภาพสลิปที่โอนเข้ามา">
+                                        <i class="fas fa-receipt"></i> สลิปโอนเข้า
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- 3. บัญชีรับเงินคืน -->
+                        <td>
+                            <?php if (!empty($row['refund_account_no'])): ?>
+                                <div class="cancellation-refund-box-modern">
+                                    <div class="refund-bank-tag">
+                                        <i class="fas fa-university"></i> <?php echo htmlspecialchars($row['refund_bank']); ?>
+                                    </div>
+                                    <div class="refund-acc-no">
+                                        <code><?php echo htmlspecialchars($row['refund_account_no']); ?></code>
+                                    </div>
+                                    <div class="refund-acc-holder text-small-muted" title="ชื่อเจ้าของบัญชี">
+                                        <i class="fas fa-user-check"></i> <?php echo htmlspecialchars($row['refund_account_name']); ?>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <span class="text-small-muted"><i class="fas fa-minus-circle"></i> ไม่มีบัญชีคืนเงิน</span>
+                            <?php endif; ?>
+                        </td>
+
+                        <!-- 4. เหตุผล & เวลาที่ยกเลิก -->
+                        <td>
+                            <div class="cancel-reason-text">
+                                <i class="fas fa-quote-left text-muted"></i> <?php echo htmlspecialchars($row['cancel_reason']); ?>
+                            </div>
+                            <div class="text-small-muted mt-4">
+                                <i class="far fa-clock"></i> <?php echo date('d/m/Y H:i', strtotime($row['cancel_date'])); ?>
+                            </div>
+                            <div class="mt-4">
+                                <?php if ($row['cancel_by'] == 'สมาชิก'): ?>
+                                    <span class="badge badge-warning"><i class="fas fa-user"></i> ลูกค้า</span>
+                                <?php else: ?>
+                                    <span class="badge badge-info"><i class="fas fa-user-shield"></i> แอดมิน</span>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+
+                        <!-- 5. สถานะการคืนเงิน -->
+                        <td class="text-center">
+                            <?php 
+                                if ($row['refund_status'] == 'รอดำเนินการ') {
+                                    if ($is_confirmed_payment) {
+                                        echo '<span class="badge badge-warning"><i class="fas fa-hourglass-half"></i> รอพิจารณาคืนเงิน</span><div class="text-11 text-warning mt-2 font-medium">(ชำระเงินแล้ว)</div>';
+                                    } elseif ($has_slip) {
+                                        echo '<span class="badge badge-info"><i class="fas fa-receipt"></i> รอตรวจสลิป</span><div class="text-11 text-info mt-2 font-medium">(คืน 100%)</div>';
+                                    } else {
+                                        echo '<span class="badge badge-secondary"><i class="fas fa-ban"></i> ไม่ต้องคืนเงิน</span><div class="text-11 text-muted mt-2 font-medium">(ยังไม่ชำระ)</div>';
+                                    }
+                                } elseif ($row['refund_status'] == 'คืนแล้ว') {
+                                    echo '<span class="badge badge-success"><i class="fas fa-check-circle"></i> โอนคืนแล้ว</span>';
+                                    if ($row['refund_point'] > 0) {
+                                        echo '<div class="text-11 text-success mt-2 font-medium">(+คืน ' . $row['refund_point'] . ' พอยท์)</div>';
+                                    }
                                 } else {
-                                    echo '<span class="badge badge-secondary"><i class="fas fa-ban"></i> ไม่ต้องคืนเงิน (ยังไม่จ่าย)</span>';
+                                    echo '<span class="badge badge-danger"><i class="fas fa-times-circle"></i> ไม่ต้องคืนเงิน</span>';
                                 }
-                            } elseif ($row['refund_status'] == 'คืนแล้ว') {
-                                echo '<span class="badge badge-success"><i class="fas fa-check"></i> โอนคืนแล้ว</span><br>';
-                                if ($row['refund_point'] > 0) {
-                                    echo '<span class="text-11 text-success">(+คืน ' . $row['refund_point'] . ' พอยท์)</span>';
-                                }
-                            } else {
-                                echo '<span class="badge badge-danger"><i class="fas fa-times"></i> ไม่ต้องคืนเงิน</span>';
-                            }
-                        ?>
-                    </td>
-                    <td class="text-center">
-                        <?php if ($can_consider_refund): ?>
-                            <!-- ปุ่มสำหรับเปิด Modal พิจารณาคืนเงิน (ทั้งรายการที่ชำระเงินแล้ว หรือแนบสลิปรอตรวจสอบ) -->
-                            <button class="btn-sm-info" onclick="openRefundModal(
-                                <?php echo $row['cancel_id']; ?>, 
-                                <?php echo $row['booking_id']; ?>, 
-                                <?php echo $row['booking_total_price']; ?>, 
-                                <?php echo $row['penalty_amount']; ?>, 
-                                <?php echo $row['suggested_refund']; ?>, 
-                                <?php echo $row['penalty_percent']; ?>,
-                                '<?php echo htmlspecialchars(addslashes($row['member_name'])); ?>',
-                                '<?php echo htmlspecialchars(addslashes($row['member_phone'] ?? '')); ?>',
-                                '<?php echo htmlspecialchars(addslashes($row['payment_slip_image'] ?? '')); ?>',
-                                '<?php echo htmlspecialchars(addslashes($row['refund_bank'] ?? '')); ?>',
-                                '<?php echo htmlspecialchars(addslashes($row['refund_account_no'] ?? '')); ?>',
-                                '<?php echo htmlspecialchars(addslashes($row['refund_account_name'] ?? '')); ?>'
-                            )">
-                                <i class="fas fa-hand-holding-usd"></i> พิจารณา
-                            </button>
-                        <?php elseif ($is_pending_refund && !$is_confirmed_payment && !$has_slip): ?>
-                            <span class="text-small-muted"><i class="fas fa-ban"></i> ไม่ต้องคืนเงิน</span>
-                        <?php else: ?>
-                            <span class="text-small-muted">ผู้บันทึก: <?php echo htmlspecialchars($row['admin_name'] ?? '-'); ?></span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="6" class="table-empty-state">
-                        <i class="fas fa-file-invoice empty-state-icon"></i><br>
-                        ยังไม่มีประวัติการยกเลิกการจอง
-                    </td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                            ?>
+                        </td>
+
+                        <!-- 6. จัดการ -->
+                        <td class="text-center">
+                            <?php if ($can_consider_refund): ?>
+                                <button type="button" class="btn-sm-info btn-consider-action" onclick="openRefundModal(
+                                    <?php echo $row['cancel_id']; ?>, 
+                                    <?php echo $row['booking_id']; ?>, 
+                                    <?php echo $row['booking_total_price']; ?>, 
+                                    <?php echo $row['penalty_amount']; ?>, 
+                                    <?php echo $row['suggested_refund']; ?>, 
+                                    <?php echo $row['penalty_percent']; ?>,
+                                    '<?php echo htmlspecialchars(addslashes($row['member_name'])); ?>',
+                                    '<?php echo htmlspecialchars(addslashes($row['member_phone'] ?? '')); ?>',
+                                    '<?php echo htmlspecialchars(addslashes($row['payment_slip_image'] ?? '')); ?>',
+                                    '<?php echo htmlspecialchars(addslashes($row['refund_bank'] ?? '')); ?>',
+                                    '<?php echo htmlspecialchars(addslashes($row['refund_account_no'] ?? '')); ?>',
+                                    '<?php echo htmlspecialchars(addslashes($row['refund_account_name'] ?? '')); ?>'
+                                )">
+                                    <i class="fas fa-hand-holding-usd"></i> พิจารณา
+                                </button>
+                            <?php elseif ($is_pending_refund && !$is_confirmed_payment && !$has_slip): ?>
+                                <span class="text-small-muted"><i class="fas fa-ban"></i> ไม่ต้องทำรายการ</span>
+                            <?php else: ?>
+                                <div class="text-small-muted text-12">
+                                    <i class="fas fa-user-check text-success"></i><br>
+                                    ผู้บันทึก:<br><strong><?php echo htmlspecialchars($row['admin_name'] ?? '-'); ?></strong>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="6" class="table-empty-state">
+                            <i class="fas fa-file-invoice empty-state-icon"></i><br>
+                            ยังไม่มีประวัติการยกเลิกการจอง
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 </main>
 </div>
@@ -188,6 +269,14 @@ include 'includes/header.php';
                     <i class="fas fa-money-check-alt text-primary"></i> ข้อมูลบัญชีรับเงินคืนของลูกค้า
                 </div>
                 <div class="modal-refund-row">
+                    <span><strong>ชื่อสมาชิก:</strong></span>
+                    <span id="modal_refund_member_name" class="font-bold text-dark">-</span>
+                </div>
+                <div class="modal-refund-row">
+                    <span><strong>เบอร์โทรสมาชิก:</strong></span>
+                    <span id="modal_refund_member_phone" class="text-gray">-</span>
+                </div>
+                <div class="modal-refund-row">
                     <span><strong>ธนาคาร/ช่องทาง:</strong></span>
                     <span id="modal_refund_bank" class="badge badge-info font-bold">-</span>
                 </div>
@@ -203,10 +292,6 @@ include 'includes/header.php';
                 <div class="modal-refund-row">
                     <span><strong>ชื่อเจ้าของบัญชี:</strong></span>
                     <span id="modal_refund_acc_name" class="font-bold text-dark">-</span>
-                </div>
-                <div class="modal-refund-row">
-                    <span><strong>เบอร์โทรสมาชิก:</strong></span>
-                    <span id="modal_refund_member_phone" class="text-gray">-</span>
                 </div>
                 <div class="modal-refund-slip-wrap">
                     <strong>สลิปหลักฐานต้นทาง:</strong> <span id="modal_refund_slip_link">-</span>
