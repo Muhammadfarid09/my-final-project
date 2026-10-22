@@ -36,6 +36,14 @@ try {
     $stmt_items->execute([':member_id' => $member_id]);
     $booking_items_grouped = $stmt_items->fetchAll(PDO::FETCH_GROUP|PDO::FETCH_ASSOC);
 
+    // คำนวณยอดรวมสุทธิทั้งหมดจากประวัติการจองทั้งหมด (เอายอดในอดีตมารวมกันตามข้อเสนอแนะกรรมการ)
+    $grand_total_spent = 0;
+    foreach ($bookings as $b) {
+        if ($b['booking_status'] !== 'ยกเลิก') {
+            $grand_total_spent += floatval($b['booking_total_price']);
+        }
+    }
+
 } catch(PDOException $e) {
     die("เกิดข้อผิดพลาด: " . $e->getMessage());
 }
@@ -61,8 +69,22 @@ try {
     <main class="history-wrapper">
         
         <div class="booking-header history-header">
-            <h2><i class="fas fa-history text-gold"></i> ประวัติการจองสนามและคำสั่งซื้อ</h2>
-            <p>ตรวจสอบสถานะการจองสนาม ดูสลิปการโอน หรือขอยกเลิกการจอง</p>
+            <div class="history-header-title-group">
+                <h2><i class="fas fa-history text-gold"></i> ประวัติการจองสนามและคำสั่งซื้อ</h2>
+                <p>ตรวจสอบสถานะการจองสนาม ดูสลิปการโอน หรือขอยกเลิกการจอง</p>
+            </div>
+            <?php if (!empty($bookings)): ?>
+            <div class="history-summary-stats">
+                <div class="history-stat-badge">
+                    <i class="fas fa-calendar-check text-gold"></i>
+                    <span>ประวัติทั้งหมด: <strong><?php echo count($bookings); ?></strong> รายการ</span>
+                </div>
+                <div class="history-stat-badge highlight-gold">
+                    <i class="fas fa-coins text-gold"></i>
+                    <span>ยอดรวมสุทธิทั้งหมด: <strong class="text-gold"><?php echo number_format($grand_total_spent, 2); ?> ฿</strong></span>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
@@ -245,6 +267,19 @@ try {
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
+                    <tfoot>
+                        <tr class="history-total-row">
+                            <td colspan="4" class="history-total-label">
+                                <i class="fas fa-coins text-gold"></i> ยอดรวมสุทธิทั้งหมด (Grand Total):
+                            </td>
+                            <td class="history-total-val">
+                                <?php echo number_format($grand_total_spent, 2); ?> ฿
+                            </td>
+                            <td colspan="2" class="history-total-meta">
+                                (รวม <?php echo count($bookings); ?> รายการ)
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             <?php endif; ?>
         </div>
