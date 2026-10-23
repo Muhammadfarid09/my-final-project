@@ -2679,6 +2679,29 @@ function openReceiptModal(data) {
     const modal = document.getElementById('receiptModal');
     if (!modal) return;
 
+    // 1. จัดการชื่อลูกค้า: ป้องกันชื่อซ้ำซ้อน เช่น Farid cheloh (Farid cheloh)
+    let formattedCustName = data.customer_name || 'ลูกค้าทั่วไป';
+    const dupMatch = formattedCustName.match(/^(.+?)\s*\(\1\)$/i);
+    if (dupMatch) {
+        formattedCustName = dupMatch[1];
+    }
+
+    // 2. จัดรูปแบบเบอร์โทรศัพท์ (3-3-4 pattern) ให้อ่านง่าย
+    let formattedPhone = data.customer_phone || '-';
+    const cleanDigits = String(formattedPhone).replace(/\D/g, '');
+    if (cleanDigits.length === 10) {
+        formattedPhone = cleanDigits.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+    } else if (cleanDigits.length === 9) {
+        formattedPhone = cleanDigits.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
+    }
+
+    // 3. ปรับชื่อสนามให้เป็นทางการ (เช่น courts 2 -> คอร์ท 2)
+    let formattedCourt = data.court || '-';
+    const courtMatch = String(formattedCourt).trim().match(/^courts?\s*(\d+)$/i);
+    if (courtMatch) {
+        formattedCourt = 'คอร์ท ' + courtMatch[1];
+    }
+
     // เติมข้อมูลหลักของเอกสาร
     const idText = document.getElementById('receipt_id_text');
     const createdAt = document.getElementById('receipt_created_at');
@@ -2687,14 +2710,17 @@ function openReceiptModal(data) {
     const courtName = document.getElementById('receipt_court_name');
     const bookingDate = document.getElementById('receipt_booking_date');
     const bookingTime = document.getElementById('receipt_booking_time');
+    const stampRef = document.getElementById('receipt_stamp_ref');
 
-    if (idText) idText.textContent = '#REC-BK' + String(data.id).padStart(4, '0');
+    const bookingIdPadded = String(data.id).padStart(4, '0');
+    if (idText) idText.textContent = '#REC-BK' + bookingIdPadded;
     if (createdAt) createdAt.textContent = data.created_at || '-';
-    if (customerName) customerName.textContent = data.customer_name || 'ลูกค้าทั่วไป';
-    if (customerPhone) customerPhone.textContent = data.customer_phone || '-';
-    if (courtName) courtName.textContent = data.court || '-';
+    if (customerName) customerName.textContent = formattedCustName;
+    if (customerPhone) customerPhone.textContent = formattedPhone;
+    if (courtName) courtName.textContent = formattedCourt;
     if (bookingDate) bookingDate.textContent = data.date || '-';
     if (bookingTime) bookingTime.textContent = (data.time ? data.time + ' น.' : '-');
+    if (stampRef) stampRef.textContent = 'REF: TS-BK' + bookingIdPadded + '-PAID';
 
     // เติมรายการในตารางแจกแจง
     const tbody = document.getElementById('receipt_items_body');
@@ -2707,7 +2733,7 @@ function openReceiptModal(data) {
         trCourt.innerHTML = `
             <td class="receipt-col-seq">${itemIndex++}</td>
             <td class="receipt-col-desc">
-                <strong>ค่าบริการสนาม: ${escapeReceiptHtml(data.court || '-')}</strong>
+                <strong>ค่าบริการสนาม: ${escapeReceiptHtml(formattedCourt)}</strong>
                 <div class="text-xs-muted">วันที่ ${escapeReceiptHtml(data.date || '-')} เวลา ${escapeReceiptHtml(data.time || '-')} น.</div>
             </td>
             <td class="receipt-col-qty">1 คอร์ท</td>
@@ -2945,4 +2971,3 @@ function closeNewsDetailModal() {
 window.openNewsDetailModal = openNewsDetailModal;
 window.closeNewsDetailModal = closeNewsDetailModal;
 
-

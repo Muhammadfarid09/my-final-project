@@ -56,7 +56,7 @@ try {
     <title>ประวัติการจอง - T.S. Pattani Badminton</title>
     
     <link rel="stylesheet" href="assets/css/global.css?v=1.0">
-    <link rel="stylesheet" href="assets/css/style.css?v=1.7">
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime('assets/css/style.css'); ?>">
     <link rel="stylesheet" href="assets/css/navbar.css?v=<?php echo filemtime('assets/css/navbar.css'); ?>">
     <link rel="stylesheet" href="assets/css/booking-history.css?v=<?php echo filemtime('assets/css/booking-history.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -219,18 +219,52 @@ try {
                                     <?php endif; ?>
 
                                     <?php if ($row['booking_status'] === 'จองแล้ว'): ?>
+                                        <?php
+                                            // 1. จัดการชื่อลูกค้า: ป้องกันการแสดงชื่อซ้ำ เช่น Farid cheloh (Farid cheloh)
+                                            $clean_member_name = trim($default_member_name ?? '');
+                                            $clean_nickname = trim($row['booking_nickname'] ?? '');
+                                            if (!empty($clean_nickname) && !empty($clean_member_name)) {
+                                                if (mb_strtolower($clean_nickname) === mb_strtolower($clean_member_name)) {
+                                                    $display_customer_name = $clean_member_name;
+                                                } else {
+                                                    $display_customer_name = $clean_member_name . " (" . $clean_nickname . ")";
+                                                }
+                                            } elseif (!empty($clean_nickname)) {
+                                                $display_customer_name = $clean_nickname;
+                                            } else {
+                                                $display_customer_name = !empty($clean_member_name) ? $clean_member_name : 'ลูกค้าทั่วไป';
+                                            }
+
+                                            // 2. จัดรูปแบบเบอร์โทรศัพท์ให้อ่านง่าย (3-3-4 pattern)
+                                            $raw_digits = preg_replace('/[^0-9]/', '', $default_member_phone ?? '');
+                                            if (strlen($raw_digits) === 10) {
+                                                $formatted_customer_phone = substr($raw_digits, 0, 3) . '-' . substr($raw_digits, 3, 3) . '-' . substr($raw_digits, 6, 4);
+                                            } elseif (strlen($raw_digits) === 9) {
+                                                $formatted_customer_phone = substr($raw_digits, 0, 2) . '-' . substr($raw_digits, 2, 3) . '-' . substr($raw_digits, 5, 4);
+                                            } else {
+                                                $formatted_customer_phone = !empty($default_member_phone) ? $default_member_phone : '-';
+                                            }
+
+                                            // 3. ปรับชื่อสนามให้เป็นทางการ (เช่น courts 2 -> คอร์ท 2)
+                                            $raw_court = trim($row['court_name'] ?? '');
+                                            if (preg_match('/^courts?\s*(\d+)$/i', $raw_court, $c_matches)) {
+                                                $display_court_name = 'คอร์ท ' . $c_matches[1];
+                                            } else {
+                                                $display_court_name = $raw_court ?: '-';
+                                            }
+                                        ?>
                                         <button type="button" class="btn-action-sm btn-view-receipt" 
                                                 onclick='openReceiptModal(<?php echo json_encode([
                                                     "id" => $row["booking_id"],
-                                                    "court" => $row["court_name"],
+                                                    "court" => $display_court_name,
                                                     "date" => date("d/m/Y", strtotime($row["booking_date"])),
                                                     "time" => substr($row["booking_start_time"], 0, 5) . " - " . substr($row["booking_end_time"], 0, 5),
                                                     "court_price" => number_format($row["booking_court_price"], 2),
                                                     "rental_price" => number_format($row["booking_rental_price"], 2),
                                                     "product_price" => number_format($row["booking_product_price"], 2),
                                                     "total_price" => number_format($row["booking_total_price"], 2),
-                                                    "customer_name" => !empty($row["booking_nickname"]) ? ($default_member_name ? $default_member_name . " (" . $row["booking_nickname"] . ")" : $row["booking_nickname"]) : $default_member_name,
-                                                    "customer_phone" => $default_member_phone,
+                                                    "customer_name" => $display_customer_name,
+                                                    "customer_phone" => $formatted_customer_phone,
                                                     "created_at" => date("d/m/Y H:i", strtotime($row["booking_created_at"])),
                                                     "items" => $booking_items_grouped[$row["booking_id"]] ?? []
                                                 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>)'>
@@ -410,7 +444,7 @@ try {
                         <p class="receipt-brand-eng">T.S. PATTANI BADMINTON COURT</p>
                         <p class="receipt-brand-contact">
                             <i class="fas fa-map-marker-alt"></i> ถนนหนองจิก ต.รูสะมิแล อ.เมือง จ.ปัตตานี 94000 &nbsp;|&nbsp;
-                            <i class="fas fa-phone-alt"></i> 073-xxx-xxxx
+                            <i class="fas fa-phone-alt"></i> 081-234-5678
                         </p>
                     </div>
                     <div class="receipt-badge-title">
@@ -434,7 +468,7 @@ try {
                         </div>
                         <div class="receipt-meta-row">
                             <span class="receipt-meta-label">ช่องทางชำระเงิน:</span>
-                            <span class="receipt-meta-value">โอนเงินผ่านธนาคาร / QR Code</span>
+                            <span class="receipt-meta-value"><i class="fas fa-qrcode text-gold"></i> พร้อมเพย์ / สแกน QR Code</span>
                         </div>
                     </div>
                     <div class="receipt-meta-col">
@@ -527,9 +561,10 @@ try {
                     </div>
                     <div class="receipt-note-right text-center">
                         <div class="receipt-stamp-box">
-                            <i class="fas fa-stamp text-gold"></i>
-                            <span>T.S. PATTANI</span>
-                            <small class="receipt-stamp-approved">VERIFIED & PAID</small>
+                            <i class="fas fa-shield-alt text-gold"></i>
+                            <span class="receipt-stamp-brand">T.S. PATTANI</span>
+                            <small class="receipt-stamp-approved"><i class="fas fa-check-circle"></i> VERIFIED & PAID</small>
+                            <span class="receipt-stamp-ref" id="receipt_stamp_ref">REF: TS-BK0000-PAID</span>
                         </div>
                     </div>
                 </div>
