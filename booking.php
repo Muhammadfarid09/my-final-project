@@ -174,10 +174,6 @@ try {
             <!-- ============================================== -->
             <div class="wizard-panel active" id="stepPanel1">
                 <div class="wizard-card">
-                    <div class="wizard-card-header">
-                        <h3><i class="fas fa-calendar-alt"></i> ขั้นตอนที่ 1: เลือกวันที่ต้องการใช้บริการ</h3>
-                        <p class="wizard-card-desc">คลิกเลือกวันที่จากปฏิทิน (วันที่ในอดีตถูกปิดใช้งาน) พร้อมตรวจสอบอัตราค่าบริการประจำวัน</p>
-                    </div>
 
                     <div class="calendar-picker-container">
                         <!-- ปุ่มทางลัด วันนี้ / พรุ่งนี้ -->
@@ -227,10 +223,6 @@ try {
             <!-- ============================================== -->
             <div class="wizard-panel" id="stepPanel2">
                 <div class="wizard-card">
-                    <div class="wizard-card-header">
-                        <h3><i class="fas fa-clock"></i> ขั้นตอนที่ 2: เลือกเวลาเริ่มต้น</h3>
-                        <p class="wizard-card-desc">คลิกเลือกช่วงเวลาเริ่มต้นที่ต้องการเข้าใช้งาน ระบบจะนำท่านเข้าสู่การเลือกสนามทันที</p>
-                    </div>
 
                     <div class="time-picker-wrapper">
                         <!-- กริดปุ่มช่วงเวลาเปิดทำการ -->
@@ -252,10 +244,6 @@ try {
             <!-- ============================================== -->
             <div class="wizard-panel" id="stepPanel3">
                 <div class="wizard-card step3-wrapper">
-                    <div class="wizard-card-header">
-                        <h3><i class="fas fa-map-marked-alt"></i> ขั้นตอนที่ 3: เลือกสนามแบดมินตันและชั่วโมงการเล่น</h3>
-                        <p class="wizard-card-desc">คลิกเลือกสนามที่ต้องการในชั่วโมงแรก และสามารถเลื่อนลงด้านล่างเพื่อเลือกชั่วโมงต่อเนื่องได้ทันที</p>
-                    </div>
 
                     <!-- ช่องกรอกชื่อเล่น / ชื่อก๊วน (PDPA Protection) -->
                     <div class="nickname-box">
@@ -315,10 +303,6 @@ try {
             <!-- ============================================== -->
             <div class="wizard-panel" id="stepPanel4">
                 <div class="wizard-card step4-wrapper">
-                    <div class="wizard-card-header">
-                        <h3><i class="fas fa-shopping-basket"></i> ขั้นตอนที่ 4: บริการเสริมและอุปกรณ์เช่า (ทางเลือกเสริม)</h3>
-                        <p class="wizard-card-desc">เลือกน้ำดื่ม ลูกแบด หรืออุปกรณ์เช่าตามต้องการ หรือกด "ข้ามขั้นตอนนี้" หากมีอุปกรณ์พร้อมแล้ว</p>
-                    </div>
 
                     <!-- แถบย่อสรุปข้อมูลสนาม วัน และเวลาที่เลือกไว้ -->
                     <div class="compact-selection-strip" id="step4SummaryStrip">
@@ -531,10 +515,6 @@ try {
             <!-- ============================================== -->
             <div class="wizard-panel" id="stepPanel5">
                 <div class="wizard-card step5-wrapper">
-                    <div class="wizard-card-header">
-                        <h3><i class="fas fa-receipt"></i> ขั้นตอนที่ 5: ตรวจสอบรายการและยืนยันการจอง</h3>
-                        <p class="wizard-card-desc">ตรวจสอบรายละเอียดการจอง ค่าสนาม และบริการเสริมทั้งหมดก่อนเข้าสู่ขั้นตอนการชำระเงิน</p>
-                    </div>
 
                     <div class="invoice-card">
                         <div class="invoice-header-row">
