@@ -5,7 +5,16 @@ $member_id = $_SESSION['member_id'];
 
 
 try {
-    $stmt = $conn->prepare("SELECT b.*, c.court_name, cn.cancel_id, cn.refund_status as cancel_refund_status 
+    $stmt = $conn->prepare("SELECT b.*, c.court_name, cn.cancel_id, cn.refund_status as cancel_refund_status,
+                                   (
+                                       SELECT a.admin_name 
+                                       FROM Payment p 
+                                       JOIN Admin a ON p.admin_id = a.admin_id 
+                                       WHERE p.booking_id = b.booking_id 
+                                         AND p.payment_status = 'ยืนยันแล้ว' 
+                                       ORDER BY p.payment_id DESC 
+                                       LIMIT 1
+                                   ) as cashier_admin_name
                             FROM BOOKING b 
                             JOIN COURT c ON b.court_id = c.court_id 
                             LEFT JOIN (
@@ -252,6 +261,14 @@ try {
                                             } else {
                                                 $display_court_name = $raw_court ?: '-';
                                             }
+
+                                            // 4. ผู้รับเงิน (Option 2: ดึงชื่อเจ้าหน้าที่แอดมินที่ตรวจสลิป ถ้าไม่มีให้เป็นชื่อสนาม)
+                                            $clean_cashier = trim($row['cashier_admin_name'] ?? '');
+                                            if (!empty($clean_cashier)) {
+                                                $display_cashier = $clean_cashier . " (เจ้าหน้าที่การเงิน)";
+                                            } else {
+                                                $display_cashier = "สนามแบดมินตัน ที.เอส. ปัตตานี";
+                                            }
                                         ?>
                                         <button type="button" class="btn-action-sm btn-view-receipt" 
                                                 onclick='openReceiptModal(<?php echo json_encode([
@@ -265,6 +282,7 @@ try {
                                                     "total_price" => number_format($row["booking_total_price"], 2),
                                                     "customer_name" => $display_customer_name,
                                                     "customer_phone" => $formatted_customer_phone,
+                                                    "cashier" => $display_cashier,
                                                     "created_at" => date("d/m/Y H:i", strtotime($row["booking_created_at"])),
                                                     "items" => $booking_items_grouped[$row["booking_id"]] ?? []
                                                 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>)'>
@@ -470,6 +488,10 @@ try {
                             <span class="receipt-meta-label">ช่องทางชำระเงิน:</span>
                             <span class="receipt-meta-value"><i class="fas fa-qrcode text-gold"></i> พร้อมเพย์ / สแกน QR Code</span>
                         </div>
+                        <div class="receipt-meta-row">
+                            <span class="receipt-meta-label">ผู้รับเงิน:</span>
+                            <span class="receipt-meta-value text-gold" id="receipt_cashier_name">สนามแบดมินตัน ที.เอส. ปัตตานี</span>
+                        </div>
                     </div>
                     <div class="receipt-meta-col">
                         <div class="receipt-meta-row">
@@ -565,6 +587,10 @@ try {
                             <span class="receipt-stamp-brand">T.S. PATTANI</span>
                             <small class="receipt-stamp-approved"><i class="fas fa-check-circle"></i> VERIFIED & PAID</small>
                             <span class="receipt-stamp-ref" id="receipt_stamp_ref">REF: TS-BK0000-PAID</span>
+                        </div>
+                        <div class="receipt-collector-sign">
+                            <div class="receipt-collector-name" id="receipt_collector_sign_name">สนามแบดมินตัน ที.เอส. ปัตตานี</div>
+                            <div class="receipt-collector-title">ผู้รับเงิน / ผู้มีอำนาจลงนาม</div>
                         </div>
                     </div>
                 </div>

@@ -2711,8 +2711,12 @@ function openReceiptModal(data) {
     const bookingDate = document.getElementById('receipt_booking_date');
     const bookingTime = document.getElementById('receipt_booking_time');
     const stampRef = document.getElementById('receipt_stamp_ref');
+    const cashierName = document.getElementById('receipt_cashier_name');
+    const collectorSignName = document.getElementById('receipt_collector_sign_name');
 
     const bookingIdPadded = String(data.id).padStart(4, '0');
+    const formattedCashier = data.cashier || 'สนามแบดมินตัน ที.เอส. ปัตตานี';
+
     if (idText) idText.textContent = '#REC-BK' + bookingIdPadded;
     if (createdAt) createdAt.textContent = data.created_at || '-';
     if (customerName) customerName.textContent = formattedCustName;
@@ -2721,6 +2725,8 @@ function openReceiptModal(data) {
     if (bookingDate) bookingDate.textContent = data.date || '-';
     if (bookingTime) bookingTime.textContent = (data.time ? data.time + ' น.' : '-');
     if (stampRef) stampRef.textContent = 'REF: TS-BK' + bookingIdPadded + '-PAID';
+    if (cashierName) cashierName.textContent = formattedCashier;
+    if (collectorSignName) collectorSignName.textContent = formattedCashier;
 
     // เติมรายการในตารางแจกแจง
     const tbody = document.getElementById('receipt_items_body');
