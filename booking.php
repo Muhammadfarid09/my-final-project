@@ -212,7 +212,7 @@ try {
 
                     <div class="wizard-nav-actions flex-end">
                         <button type="button" class="btn-wizard-next" id="btnStep1Next" onclick="goToStep(2)">
-                            ถัดไป: เลือกเวลาเริ่มต้น <i class="fas fa-arrow-right"></i>
+                            ถัดไป <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -250,12 +250,11 @@ try {
                         <label for="step3_nickname" class="nickname-label">
                             <i class="fas fa-user-tag text-success"></i> 
                             ชื่อเล่น / ชื่อก๊วนผู้จอง:
-                            <span class="pdpa-badge">PDPA</span>
+                            <span class="pdpa-badge">NAME</span>
                         </label>
                         <div class="nickname-input-group">
                             <input type="text" id="step3_nickname" class="nickname-control" maxlength="30" placeholder="เช่น ต้น, ก๊วนเพื่อนสุขใจ (ไม่เกิน 30 ตัวอักษร)" value="<?php echo $default_nickname; ?>" oninput="syncBookingNickname(this.value)">
                             <div class="nickname-hint">
-                                <i class="fas fa-shield-alt"></i> ระบบจะแสดงเฉพาะชื่อเล่นนี้บนการ์ดสนามเพื่อคุ้มครองความเป็นส่วนตัวตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล
                             </div>
                         </div>
                     </div>
@@ -278,21 +277,21 @@ try {
                         <div class="sticky-metrics-group">
                             <div class="sticky-metric-pill sticky-metric-total">
                                 <i class="fas fa-tag"></i>
-                                <span id="stickyTotalDisplay">[ Total 0 ฿ ]</span>
+                                <span id="stickyTotalDisplay"> Total 0 ฿ </span>
                             </div>
                             <div class="sticky-submetrics-row">
                                 <div class="sticky-metric-pill">
                                     <i class="fas fa-clock"></i>
-                                    <span id="stickyHoursDisplay">[ 0 Hour ]</span>
+                                    <span id="stickyHoursDisplay"> 0 Hour </span>
                                 </div>
                                 <div class="sticky-metric-pill">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    <span id="stickyCourtDisplay">[ ยังไม่ได้เลือกสนาม ]</span>
+                                    <span id="stickyCourtDisplay"> ยังไม่ได้เลือกสนาม </span>
                                 </div>
                             </div>
                         </div>
                         <button type="button" class="btn-sticky-next" id="btnStickyNext" disabled onclick="goToStep(4)">
-                            ต่อไป: บริการเสริม <i class="fas fa-arrow-right"></i>
+                            ถัดไป <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -504,7 +503,7 @@ try {
                             <i class="fas fa-arrow-left"></i> ย้อนกลับไปเลือกสนาม
                         </button>
                         <button type="button" class="btn-wizard-next" id="btnStep4Next" onclick="goToStep(5)">
-                            ถัดไป: ตรวจสอบรายการ <i class="fas fa-arrow-right"></i>
+                            ถัดไป <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
@@ -531,20 +530,20 @@ try {
                         <!-- รายละเอียดการจองสนาม -->
                         <div class="invoice-detail-block">
                             <div class="invoice-detail-row">
-                                <span>ชื่อเล่น / ชื่อก๊วนผู้จอง:</span>
+                                <span class="invoice-detail-label"><i class="fas fa-user-tag text-gold"></i> ชื่อผู้จอง / ชื่อก๊วน:</span>
                                 <strong id="invNickname">-</strong>
                             </div>
                             <div class="invoice-detail-row">
-                                <span>วันที่จอง:</span>
+                                <span class="invoice-detail-label"><i class="far fa-calendar-alt text-gold"></i> วันที่จอง:</span>
                                 <strong id="invDate">-</strong>
                             </div>
                             <div class="invoice-detail-row">
-                                <span>ช่วงเวลาที่เข้าเล่น:</span>
+                                <span class="invoice-detail-label"><i class="far fa-clock text-gold"></i> ช่วงเวลา:</span>
                                 <strong id="invTime">-</strong>
                             </div>
                             <div class="invoice-detail-row">
-                                <span>สนามที่จอง:</span>
-                                <strong id="invCourt">-</strong>
+                                <span class="invoice-detail-label"><i class="fas fa-table-tennis text-gold"></i> สนามที่จอง:</span>
+                                <strong id="invCourt" class="text-gold">-</strong>
                             </div>
                         </div>
 
@@ -552,10 +551,10 @@ try {
                         <table class="invoice-breakdown-table">
                             <thead>
                                 <tr>
-                                    <th>รายการ</th>
-                                    <th>จำนวน</th>
-                                    <th>อัตราค่าบริการ</th>
-                                    <th>รวม (บาท)</th>
+                                    <th class="inv-col-desc">รายการ</th>
+                                    <th class="inv-col-qty">จำนวน</th>
+                                    <th class="inv-col-rate">ราคา/หน่วย</th>
+                                    <th class="inv-col-total">รวม (฿)</th>
                                 </tr>
                             </thead>
                             <tbody id="invoiceTableBody">

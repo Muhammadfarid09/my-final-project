@@ -1286,14 +1286,18 @@
     padding: 24px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
+
 .invoice-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px dashed var(--border-color);
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px dashed rgba(255, 185, 29, 0.25);
     padding-bottom: 14px;
     margin-bottom: 16px;
 }
+
 .invoice-header-title {
     font-size: 18px;
     font-weight: 700;
@@ -1301,53 +1305,129 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
 }
+
+.invoice-header-title i {
+    font-size: 19px;
+}
+
 .invoice-detail-block {
-    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
 }
+
 .invoice-detail-row {
     display: flex;
     justify-content: space-between;
-    padding: 7px 0;
-    font-size: 13px;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13.5px;
     color: var(--text-secondary);
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    gap: 12px;
 }
+
+.invoice-detail-row:last-child {
+    border-bottom: none;
+}
+
+.invoice-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.invoice-detail-label i {
+    color: var(--color-gold);
+    width: 14px;
+    text-align: center;
+    font-size: 12.5px;
+}
+
 .invoice-detail-row strong {
     color: var(--text-primary);
+    text-align: right;
+    font-weight: 600;
 }
+
+/* ตารางแจกแจงรายการค่าใช้จ่าย */
 .invoice-breakdown-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
-    margin: 14px 0;
+    font-size: 13.5px;
+    margin: 16px 0;
+    table-layout: fixed;
 }
+
 .invoice-breakdown-table th {
     background: var(--bg-elevated);
     color: var(--text-secondary);
-    padding: 10px 12px;
-    text-align: left;
+    padding: 10px 14px;
     border-bottom: 1px solid var(--border-color);
     font-weight: 600;
 }
-.invoice-breakdown-table th:last-child {
-    text-align: right;
-}
+
 .invoice-breakdown-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
+    vertical-align: middle;
 }
-.invoice-breakdown-table td:last-child {
+
+.inv-col-desc {
+    width: 46%;
+    text-align: left;
+}
+
+.inv-col-qty {
+    width: 16%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.inv-col-rate {
+    width: 18%;
     text-align: right;
-    font-weight: 600;
+    white-space: nowrap;
+}
+
+.inv-col-total {
+    width: 20%;
+    text-align: right;
+    font-weight: 700;
     color: var(--color-gold);
+    white-space: nowrap;
+}
+
+.inv-item-name {
+    display: block;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.inv-item-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.inv-item-mobile-sub {
+    display: none;
 }
 
 /* ยอดชำระสุทธิ (Grand Total Price) */
 .invoice-total-strip {
     background: var(--bg-elevated);
-    border-radius: 10px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
     padding: 16px 20px;
     display: flex;
@@ -1355,25 +1435,28 @@
     align-items: center;
     margin-top: 18px;
 }
+
 .invoice-total-label {
-    font-size: 16px;
+    font-size: 15.5px;
     font-weight: 700;
     color: var(--text-primary);
 }
+
 .invoice-total-amount {
-    font-size: 30px;
+    font-size: 28px;
     font-weight: 800;
     color: var(--color-gold);
     letter-spacing: 0.5px;
+    white-space: nowrap;
     text-shadow: 0 0 20px rgba(255, 185, 29, 0.25);
 }
 
 /* คำเตือนล็อกสนาม 15 นาที */
 .payment-warning-strip {
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
     border-left: 4px solid var(--color-gold);
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 12px 14px;
     font-size: 13px;
     color: #fbbf24;
@@ -1381,6 +1464,157 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    line-height: 1.45;
+}
+
+/* ==========================================================================
+   Responsive Mobile Optimization for Step 5 Invoice Review (<= 576px)
+   Transforms rigid 4-col table into modern, spacious, high-clarity item cards
+   ========================================================================== */
+@media (max-width: 576px) {
+    .invoice-card {
+        padding: 16px 14px;
+        border-radius: 14px;
+    }
+
+    .invoice-header-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+    }
+
+    .invoice-header-title {
+        font-size: 15.5px;
+        white-space: nowrap;
+    }
+
+    .pdpa-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+        white-space: nowrap;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .invoice-detail-block {
+        padding: 10px 12px;
+        margin-bottom: 14px;
+    }
+
+    .invoice-detail-row {
+        padding: 7px 0;
+        font-size: 12.5px;
+        gap: 8px;
+    }
+
+    .invoice-detail-label {
+        font-size: 12px;
+    }
+
+    .invoice-detail-row strong {
+        font-size: 12.5px;
+    }
+
+    /* Modern Mobile Order Breakdown: 
+       Transforms rigid 4-col table into an airy, beautiful 2-part item row! */
+    .invoice-breakdown-table thead {
+        display: none;
+    }
+
+    .invoice-breakdown-table {
+        margin: 10px 0;
+        display: block;
+    }
+
+    .invoice-breakdown-table tbody {
+        display: block;
+    }
+
+    .invoice-breakdown-table tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        gap: 12px;
+    }
+
+    .invoice-breakdown-table tr:last-child {
+        border-bottom: none;
+    }
+
+    .inv-col-desc {
+        width: auto;
+        flex: 1;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .inv-item-name {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .inv-item-meta {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+    }
+
+    .inv-item-mobile-sub {
+        display: inline-block;
+        font-size: 11.5px;
+        color: #e2e8f0;
+        background: rgba(255, 185, 29, 0.08);
+        border: 1px solid rgba(255, 185, 29, 0.18);
+        padding: 2px 7px;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+
+    /* Hide redundant desktop-only columns on mobile */
+    .inv-col-qty,
+    .inv-col-rate {
+        display: none !important;
+    }
+
+    .inv-col-total {
+        width: auto;
+        flex-shrink: 0;
+        padding: 0 !important;
+        border: none !important;
+        font-size: 16px !important;
+        font-weight: 800;
+        color: var(--color-gold) !important;
+        text-align: right;
+        white-space: nowrap !important;
+    }
+
+    .invoice-total-strip {
+        padding: 12px 14px;
+        margin-top: 14px;
+    }
+
+    .invoice-total-label {
+        font-size: 13.5px;
+    }
+
+    .invoice-total-amount {
+        font-size: 22px;
+        letter-spacing: 0;
+    }
+
+    .payment-warning-strip {
+        padding: 10px 12px;
+        font-size: 12px;
+        gap: 10px;
+        margin: 14px 0;
+    }
 }
 
 /* Step 5 Navigation & Submit Actions Bar */

@@ -1502,6 +1502,20 @@ function calculateGrandTotal() {
 }
 
 /**
+ * ฟังก์ชันช่วยแปลงชื่อสนามให้อยู่ในรูปแบบภาษาไทยที่สุภาพและเป็นมาตรฐาน (เช่น courts 1 -> คอร์ท 1)
+ * @param {string} court - ชื่อสนามดิบจากฐานข้อมูล
+ * @returns {string} ชื่อสนามที่จัดรูปแบบแล้ว
+ */
+function formatCourtDisplayName(court) {
+    if (!court) return '-';
+    const match = String(court).trim().match(/^courts?\s*(\d+)$/i);
+    if (match) {
+        return 'คอร์ท ' + match[1];
+    }
+    return court;
+}
+
+/**
  * เรนเดอร์ใบแจ้งหนี้แจกแจงรายการค่าใช้จ่ายแบบละเอียด (Itemized Invoice Review - Step 5)
  * @description สร้างตาราง HTML รายการค่าใช้จ่ายแยกระหว่าง:
  *              1. ค่าบริการสนาม: แจกแจงตามชั่วโมงจริง แยกวันหยุด / กลางวัน / ค่ำ
@@ -1523,10 +1537,12 @@ function updateInvoiceReview() {
     let inputEnd = document.getElementById('input_end_time');
 
     let nick = wizardState.bookingNickname || 'ผู้ใช้งาน';
+    let courtDisplay = formatCourtDisplayName(wizardState.selectedCourtName);
+
     if (invNick) invNick.innerText = nick;
     if (invDate) invDate.innerText = `${formatDateThai(wizardState.selectedDate)}`;
-    if (invTime) invTime.innerText = `${inputStart ? inputStart.value : ''} - ${inputEnd ? inputEnd.value : ''} (${wizardState.selectedHours} ชั่วโมง)`;
-    if (invCourt) invCourt.innerText = wizardState.selectedCourtName || '-';
+    if (invTime) invTime.innerText = `${inputStart ? inputStart.value : ''} - ${inputEnd ? inputEnd.value : ''} (${wizardState.selectedHours} ชม.)`;
+    if (invCourt) invCourt.innerText = courtDisplay;
     if (invGrand) invGrand.innerText = wizardState.grandTotal.toLocaleString() + ' ฿';
 
     if (tableBody) {
@@ -1554,10 +1570,14 @@ function updateInvoiceReview() {
             let wkSubtotal = weekendSlots.reduce((sum, s) => sum + s.price, 0);
             html += `
                 <tr>
-                    <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">เสาร์ - อาทิตย์ (ทุกช่วงเวลา 200 ฿/ชม.)</small></td>
-                    <td>${weekendSlots.length} ชม.</td>
-                    <td>${wkRate.toLocaleString()} ฿</td>
-                    <td>${wkSubtotal.toLocaleString()} ฿</td>
+                    <td class="inv-col-desc">
+                        <strong class="inv-item-name">ค่าบริการสนาม (${courtDisplay})</strong>
+                        <div class="inv-item-meta">เสาร์ - อาทิตย์ (ทุกช่วงเวลา 200 ฿/ชม.)</div>
+                        <div class="inv-item-mobile-sub">${weekendSlots.length} ชม. &times; ${wkRate.toLocaleString()} ฿</div>
+                    </td>
+                    <td class="inv-col-qty">${weekendSlots.length} ชม.</td>
+                    <td class="inv-col-rate">${wkRate.toLocaleString()} ฿</td>
+                    <td class="inv-col-total">${wkSubtotal.toLocaleString()} ฿</td>
                 </tr>
             `;
         } else {
@@ -1566,10 +1586,14 @@ function updateInvoiceReview() {
                 let daySubtotal = daySlots.reduce((sum, s) => sum + s.price, 0);
                 html += `
                     <tr>
-                        <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">ช่วงกลางวัน (08:00 - 17:00 น.)</small></td>
-                        <td>${daySlots.length} ชม.</td>
-                        <td>${dayRate.toLocaleString()} ฿</td>
-                        <td>${daySubtotal.toLocaleString()} ฿</td>
+                        <td class="inv-col-desc">
+                            <strong class="inv-item-name">ค่าบริการสนาม (${courtDisplay})</strong>
+                            <div class="inv-item-meta">ช่วงกลางวัน (08:00 - 17:00 น.)</div>
+                            <div class="inv-item-mobile-sub">${daySlots.length} ชม. &times; ${dayRate.toLocaleString()} ฿</div>
+                        </td>
+                        <td class="inv-col-qty">${daySlots.length} ชม.</td>
+                        <td class="inv-col-rate">${dayRate.toLocaleString()} ฿</td>
+                        <td class="inv-col-total">${daySubtotal.toLocaleString()} ฿</td>
                     </tr>
                 `;
             }
@@ -1578,10 +1602,14 @@ function updateInvoiceReview() {
                 let eveSubtotal = eveSlots.reduce((sum, s) => sum + s.price, 0);
                 html += `
                     <tr>
-                        <td><strong>ค่าบริการสนาม (${wizardState.selectedCourtName})</strong><br><small class="text-muted">ช่วงเย็น (17:00 - 23:00 น.)</small></td>
-                        <td>${eveSlots.length} ชม.</td>
-                        <td>${eveRate.toLocaleString()} ฿</td>
-                        <td>${eveSubtotal.toLocaleString()} ฿</td>
+                        <td class="inv-col-desc">
+                            <strong class="inv-item-name">ค่าบริการสนาม (${courtDisplay})</strong>
+                            <div class="inv-item-meta">ช่วงเย็น (17:00 - 23:00 น.)</div>
+                            <div class="inv-item-mobile-sub">${eveSlots.length} ชม. &times; ${eveRate.toLocaleString()} ฿</div>
+                        </td>
+                        <td class="inv-col-qty">${eveSlots.length} ชม.</td>
+                        <td class="inv-col-rate">${eveRate.toLocaleString()} ฿</td>
+                        <td class="inv-col-total">${eveSubtotal.toLocaleString()} ฿</td>
                     </tr>
                 `;
             }
@@ -1599,10 +1627,14 @@ function updateInvoiceReview() {
 
                 html += `
                     <tr>
-                        <td>${name} <small class="text-muted">(${type})</small></td>
-                        <td>${qty} หน่วย</td>
-                        <td>${price.toLocaleString()} ฿</td>
-                        <td>${itemTotal.toLocaleString()} ฿</td>
+                        <td class="inv-col-desc">
+                            <strong class="inv-item-name">${name}</strong>
+                            <div class="inv-item-meta">ประเภท: ${type}</div>
+                            <div class="inv-item-mobile-sub">${qty} ชิ้น &times; ${price.toLocaleString()} ฿</div>
+                        </td>
+                        <td class="inv-col-qty">${qty} ชิ้น</td>
+                        <td class="inv-col-rate">${price.toLocaleString()} ฿</td>
+                        <td class="inv-col-total">${itemTotal.toLocaleString()} ฿</td>
                     </tr>
                 `;
             }
