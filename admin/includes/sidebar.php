@@ -25,6 +25,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
         <?php endif; ?>
         <li>
+            <a href="audit_logs.php" class="<?php echo ($current_page == 'audit_logs.php') ? 'active' : ''; ?>">
+                <i class="fas fa-shield-alt"></i> <span>ประวัติระบบ (Audit Log)</span>
+            </a>
+        </li>
+        <li>
             <a href="members.php" class="<?php echo ($current_page == 'members.php' || $current_page == 'member_edit.php') ? 'active' : ''; ?>">
                 <i class="fas fa-users"></i> <span>จัดการข้อมูลสมาชิก</span>
             </a>

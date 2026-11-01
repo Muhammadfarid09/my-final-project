@@ -122,6 +122,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // ยืนยันการเปลี่ยนแปลงทั้งหมดลงฐานข้อมูล
+                log_activity($conn, 'UPDATE_MEMBER', 'Member', $member_id, [
+            'name'   => $member_name,
+            'status' => $member_status,
+            'level'  => $new_level,
+            'points' => $new_points
+        ]);
+
         $conn->commit();
 
         $_SESSION['success'] = "อัปเดตข้อมูลของ " . htmlspecialchars($member_name) . " เรียบร้อยแล้ว";

@@ -2148,4 +2148,181 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
     });
-});
+});
+
+/* ==============================================================================
+   หมวดที่ 16: ระบบกระดิ่งแจ้งเตือนสลิปและการจองแบบเรียลไทม์ (Live Notification Hub)
+   ============================================================================== */
+(function() {
+    let lastPendingCount = null;
+    let soundEnabled = localStorage.getItem('ts_notif_sound') !== 'false';
+
+    function playChimeSound() {
+        if (!soundEnabled) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            const now = ctx.currentTime;
+
+            // โน้ตที่ 1: C5 (523.25 Hz)
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(523.25, now);
+            gain1.gain.setValueAtTime(0.15, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.start(now);
+            osc1.stop(now + 0.35);
+
+            // โน้ตที่ 2: E5 (659.25 Hz)
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(659.25, now + 0.12);
+            gain2.gain.setValueAtTime(0.15, now + 0.12);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.start(now + 0.12);
+            osc2.stop(now + 0.45);
+        } catch (e) {
+            console.warn('AudioContext notification chime warning:', e);
+        }
+    }
+
+    function updateSoundIcon() {
+        const icon = document.getElementById('notifSoundIcon');
+        if (icon) {
+            if (soundEnabled) {
+                icon.className = 'fas fa-volume-up text-gold';
+            } else {
+                icon.className = 'fas fa-volume-mute text-muted';
+            }
+        }
+    }
+
+    function checkNotifications() {
+        // ประหยัดทรัพยากร: ข้ามการตรวจสอบหากผู้ใช้ไม่ได้เปิดแท็บนี้อยู่
+        if (document.hidden) return;
+
+        const notifBadge = document.getElementById('notifBadge');
+        const notifItemsList = document.getElementById('notifItemsList');
+        if (!notifBadge) return;
+
+        // Path detection (admin vs root)
+        const endpoint = 'actions/get_notifications.php';
+
+        fetch(endpoint, { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status !== 'success') return;
+
+                const count = parseInt(data.total_pending) || 0;
+
+                // อัปเดต Badge ตัวเลข
+                if (count > 0) {
+                    notifBadge.textContent = count > 99 ? '99+' : count;
+                    notifBadge.classList.remove('d-none');
+                    notifBadge.classList.add('pulse');
+                } else {
+                    notifBadge.classList.add('d-none');
+                    notifBadge.classList.remove('pulse');
+                }
+
+                // แจ้งเตือนเมื่อมียอดใหม่เพิ่มขึ้นกว่าเดิม
+                if (lastPendingCount !== null && count > lastPendingCount) {
+                    playChimeSound();
+                    if (typeof Swal !== 'undefined') {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 4500,
+                            timerProgressBar: true
+                        });
+                        Toast.fire({
+                            icon: 'info',
+                            title: '🔔 มีรายการสลิปหรือคำขอใหม่เข้ามา!'
+                        });
+                    }
+                }
+                lastPendingCount = count;
+
+                // แสดงรายการในการ์ดดรอปดาวน์
+                if (notifItemsList) {
+                    if (data.items && data.items.length > 0) {
+                        let html = '';
+                        data.items.forEach(item => {
+                            const iconClass = item.type === 'payment' ? 'fas fa-file-invoice-dollar notif-icon-payment' : 'fas fa-ban notif-icon-cancellation';
+                            html += `
+                                <a href="${item.link}" class="notif-item">
+                                    <div class="notif-item-icon ${item.type === 'payment' ? 'notif-icon-payment' : 'notif-icon-cancellation'}">
+                                        <i class="${item.type === 'payment' ? 'fas fa-file-invoice-dollar' : 'fas fa-ban'}"></i>
+                                    </div>
+                                    <div class="notif-item-content">
+                                        <div class="notif-item-title">${item.title}</div>
+                                        <div class="notif-item-subtitle">${item.subtitle}</div>
+                                        <div class="notif-item-time"><i class="fas fa-clock mr-4"></i> ${item.time}</div>
+                                    </div>
+                                </a>
+                            `;
+                        });
+                        notifItemsList.innerHTML = html;
+                    } else {
+                        notifItemsList.innerHTML = `
+                            <div class="notif-empty">
+                                <i class="fas fa-check-circle"></i>
+                                <span>ไม่มีรายการรอตรวจสอบในขณะนี้</span>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(err => {
+                // Background polling errors should be silent
+                console.debug('Notification polling error:', err);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const bellBtn = document.getElementById('notifBellBtn');
+        const notifMenu = document.getElementById('notifDropdownMenu');
+        const soundToggle = document.getElementById('notifSoundToggle');
+
+        if (bellBtn && notifMenu) {
+            // เปิด/ปิดเมนู Dropdown
+            bellBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notifMenu.classList.toggle('show');
+            });
+
+            // ปิดเมนูเมื่อคลิกนอกพื้นที่
+            document.addEventListener('click', function(e) {
+                if (!notifMenu.contains(e.target) && !bellBtn.contains(e.target)) {
+                    notifMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // เปิด/ปิดเสียง
+        if (soundToggle) {
+            updateSoundIcon();
+            soundToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                soundEnabled = !soundEnabled;
+                localStorage.setItem('ts_notif_sound', soundEnabled ? 'true' : 'false');
+                updateSoundIcon();
+                if (soundEnabled) {
+                    playChimeSound();
+                }
+            });
+        }
+
+        // เริ่มต้นตรวจสอบทันทีเมื่อโหลดหน้าเสร็จ และตรวจซ้ำทุก 30 วินาที
+        checkNotifications();
+        setInterval(checkNotifications, 30000);
+    });
+})();

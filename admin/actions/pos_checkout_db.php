@@ -287,6 +287,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             award_member_points($conn, $active_member_id, $server_total_amount, ($last_booking_id > 0 ? $last_booking_id : null), 'ได้รับคะแนนจากการซื้อสินค้า/บริการหน้าร้าน (POS)');
         }
 
+                log_activity($conn, 'POS_CHECKOUT', 'POS', ($last_pos_id > 0 ? $last_pos_id : $last_booking_id), [
+            'total_amount'   => $server_total_amount,
+            'payment_method' => $payment_method,
+            'customer_phone' => $customer_phone,
+            'items_count'    => count($cart_items)
+        ]);
+
         $conn->commit();
 
         $_SESSION['success'] = "ชำระเงินและบันทึกรายการขายสำเร็จ! ยอดรวมทั้งสิ้น " . number_format($server_total_amount, 2) . " บาท";

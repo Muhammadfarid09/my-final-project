@@ -146,6 +146,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
         }
 
+                log_activity($conn, 'PROCESS_CANCELLATION', 'Cancellation', $cancel_id, [
+            'booking_id'    => $booking_id,
+            'refund_status' => $refund_status,
+            'refund_amount' => $refund_amount,
+            'refund_point'  => $refund_point
+        ]);
+
         $conn->commit();
         $_SESSION['success'] = "บันทึกผลการพิจารณาเรียบร้อยแล้ว! (ปลดล็อกสนาม คืนสต็อกอุปกรณ์ และปรับปรุงยอดบัญชีโอนคืนเรียบร้อย)";
 

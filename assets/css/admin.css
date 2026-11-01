@@ -3370,3 +3370,420 @@ body.receipt-body {
 #repairCauseGroup {
     display: none;
 }
+
+/* ==============================================================================
+   หมวดที่ 16: สไตล์สำหรับระบบ Audit Trail & Activity Logs
+   ============================================================================== */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.kpi-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+.kpi-blue { background: #EFF6FF; color: #2563EB; }
+.kpi-purple { background: #FAF5FF; color: #7C3AED; }
+.kpi-green { background: #ECFDF5; color: #10B981; }
+.kpi-orange { background: #FFFBEB; color: #D97706; }
+
+.kpi-info { flex: 1; min-width: 0; }
+.kpi-label { font-size: 12.5px; color: #64748B; font-weight: 500; display: block; margin-bottom: 4px; }
+.kpi-value { margin: 0; font-size: 22px; font-weight: 700; color: #0F172A; }
+.kpi-value small { font-size: 13px; font-weight: 400; color: #94A3B8; margin-left: 2px; }
+
+/* Audit Filter Bar */
+.audit-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+    background: #F8FAFC;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+}
+.audit-filter-bar .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1 1 160px;
+}
+.audit-filter-bar label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+}
+.audit-filter-bar .form-control-sm {
+    height: 38px;
+    padding: 6px 12px;
+    font-size: 13px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: #1E293B;
+    transition: border-color 0.15s;
+}
+.audit-filter-bar .form-control-sm:focus {
+    border-color: #0F172A;
+    outline: none;
+}
+.filter-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding-bottom: 1px;
+}
+.btn-filter-submit {
+    height: 38px;
+    padding: 0 16px;
+    background: #0F172A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+.btn-filter-submit:hover {
+    background: #1E293B;
+}
+.btn-filter-reset {
+    width: 38px;
+    height: 38px;
+    background: #E2E8F0;
+    color: #475569;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.btn-filter-reset:hover {
+    background: #CBD5E1;
+    color: #0F172A;
+}
+
+/* Entity & Details Chips */
+.entity-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #334155;
+}
+.ip-chip {
+    font-size: 12px;
+    color: #475569;
+}
+.ip-chip code {
+    background: #F1F5F9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11.5px;
+}
+
+.audit-details-preview {
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+.json-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+.json-pill {
+    display: inline-block;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    color: #475569;
+}
+.btn-view-details {
+    background: none;
+    border: 1px solid #CBD5E1;
+    padding: 2px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    color: #2563EB;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.btn-view-details:hover {
+    background: #EFF6FF;
+    border-color: #93C5FD;
+}
+
+/* Pagination */
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #F1F5F9;
+}
+.pagination-info { font-size: 13px; color: #64748B; }
+.pagination-pages { display: flex; gap: 4px; }
+.page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    border-radius: 6px;
+    color: #475569;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+.page-link:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #0F172A;
+}
+.page-active {
+    background: #0F172A !important;
+    border-color: #0F172A !important;
+    color: #FFFFFF !important;
+}
+
+/* ==============================================================================
+   หมวดที่ 17: สไตล์สำหรับระบบ Notification Hub & Bell Dropdown
+   ============================================================================== */
+.top-navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.notif-dropdown-wrapper {
+    position: relative;
+}
+.btn-notif-bell {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #475569;
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+}
+.btn-notif-bell:hover, .btn-notif-bell:focus {
+    background: #F1F5F9;
+    border-color: #CBD5E1;
+    color: #0F172A;
+    outline: none;
+}
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: #EF4444;
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+}
+.notif-badge.pulse {
+    animation: notifPulse 1.5s infinite;
+}
+@keyframes notifPulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Dropdown Menu */
+.notif-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 350px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    z-index: 1050;
+    display: none;
+    overflow: hidden;
+    animation: notifFadeIn 0.2s ease-out;
+}
+.notif-dropdown-menu.show {
+    display: block;
+}
+@keyframes notifFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+}
+.notif-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+}
+.notif-sound-btn {
+    background: none;
+    border: none;
+    color: #64748B;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s;
+}
+.notif-sound-btn:hover {
+    color: #0F172A;
+}
+
+.notif-items-list {
+    max-height: 320px;
+    overflow-y: auto;
+}
+.notif-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: #94A3B8;
+    font-size: 13.5px;
+}
+.notif-empty i {
+    font-size: 26px;
+    color: #10B981;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #F1F5F9;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+}
+.notif-item:hover {
+    background: #F8FAFC;
+}
+.notif-item:last-child {
+    border-bottom: none;
+}
+.notif-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.notif-icon-payment { background: #ECFDF5; color: #10B981; }
+.notif-icon-cancellation { background: #FEF2F2; color: #EF4444; }
+
+.notif-item-content {
+    flex: 1;
+    min-width: 0;
+}
+.notif-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0F172A;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-item-subtitle {
+    font-size: 12px;
+    color: #64748B;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.notif-item-time {
+    font-size: 11px;
+    color: #94A3B8;
+}
+
+.notif-dropdown-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #F8FAFC;
+    border-top: 1px solid #E2E8F0;
+    font-size: 12px;
+}
+.notif-dropdown-footer a {
+    color: #2563EB;
+    text-decoration: none;
+    font-weight: 600;
+}
+.notif-dropdown-footer a:hover {
+    text-decoration: underline;
+}

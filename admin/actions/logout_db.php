@@ -9,6 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ลบตัวแปร Session ทั้งหมดที่เกี่ยวข้องกับ Admin ออก
+require_once __DIR__ . '/../../config/config.php';
+if (isset($_SESSION['admin_id'])) {
+    log_activity($conn, 'ADMIN_LOGOUT', 'Admin', $_SESSION['admin_id'], 'ออกจากระบบ');
+}
 unset($_SESSION['admin_id']);
 unset($_SESSION['admin_name']);
 unset($_SESSION['admin_role']);

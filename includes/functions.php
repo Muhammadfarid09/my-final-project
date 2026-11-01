@@ -502,3 +502,87 @@ if (!function_exists('get_top_booking_members')) {
         return $results;
     }
 }
+
+
+// =========================================================================
+// 8. Enterprise Audit Trail & Activity Logging Engine
+// =========================================================================
+if (!function_exists('log_activity')) {
+    /**
+     * บันทึกประวัติการทำงานของระบบ (Enterprise Audit Trail Engine)
+     *
+     * @param PDO $conn ออบเจกต์การเชื่อมต่อฐานข้อมูล
+     * @param string $action ชื่องานหรือพฤติกรรม เช่น 'LOGIN', 'APPROVE_PAYMENT', 'REJECT_PAYMENT', 'POS_CHECKOUT', 'ADJUST_POINT'
+     * @param string $entityType ประเภทของเอนทิตี เช่น 'Payment', 'Booking', 'Member', 'Product', 'Court', 'POS'
+     * @param int|null $entityId รหัส ID ของเอนทิตีที่เกี่ยวข้อง
+     * @param string|array|null $details รายละเอียดเพิ่มเติม (หากเป็น array จะถูกแปลงเป็น JSON string อัตโนมัติ)
+     * @param string|null $actorType ประเภทผู้กระทำ 'Admin', 'Member', หรือ 'System' (หากเว้นว่างจะตรวจจับจาก Session อัตโนมัติ)
+     * @param int|null $actorId รหัสผู้กระทำ (หากเว้นว่างจะตรวจจับจาก Session อัตโนมัติ)
+     * @param string|null $actorName ชื่อผู้กระทำ (หากเว้นว่างจะตรวจจับจาก Session อัตโนมัติ)
+     * @return bool สำเร็จหรือไม่
+     */
+    function log_activity(
+        PDO $conn, 
+        string $action, 
+        string $entityType, 
+        ?int $entityId = null, 
+        $details = null, 
+        ?string $actorType = null, 
+        ?int $actorId = null, 
+        ?string $actorName = null
+    ): bool {
+        try {
+            // Auto-detect actor from Session if not specified
+            if (empty($actorType)) {
+                if (isset($_SESSION['admin_id'])) {
+                    $actorType = 'Admin';
+                    $actorId = $actorId ?? intval($_SESSION['admin_id']);
+                    $actorName = $actorName ?? ($_SESSION['admin_name'] ?? 'Admin');
+                } elseif (isset($_SESSION['member_id'])) {
+                    $actorType = 'Member';
+                    $actorId = $actorId ?? intval($_SESSION['member_id']);
+                    $actorName = $actorName ?? ($_SESSION['member_name'] ?? 'Member');
+                } else {
+                    $actorType = 'System';
+                    $actorId = null;
+                    $actorName = 'System Automated';
+                }
+            }
+
+            // Convert array details to clean JSON
+            if (is_array($details)) {
+                $details = json_encode($details, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            }
+
+            // Capture IP Address and User Agent
+            $ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+            if (strpos($ipAddress, ',') !== false) {
+                $ipParts = explode(',', $ipAddress);
+                $ipAddress = trim($ipParts[0]);
+            }
+            $userAgent = substr($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown', 0, 255);
+
+            $stmt = $conn->prepare("
+                INSERT INTO `Audit_Log` 
+                (`actor_type`, `actor_id`, `actor_name`, `action`, `entity_type`, `entity_id`, `details`, `ip_address`, `user_agent`, `created_at`) 
+                VALUES (:actor_type, :actor_id, :actor_name, :action, :entity_type, :entity_id, :details, :ip_address, :user_agent, NOW())
+            ");
+
+            return $stmt->execute([
+                ':actor_type'  => $actorType,
+                ':actor_id'    => $actorId,
+                ':actor_name'  => $actorName,
+                ':action'      => $action,
+                ':entity_type' => $entityType,
+                ':entity_id'   => $entityId,
+                ':details'     => $details,
+                ':ip_address'  => $ipAddress,
+                ':user_agent'  => $userAgent
+            ]);
+        } catch (Throwable $e) {
+            // Enterprise resilience: Audit logging must never block business transactions
+            error_log('Audit Log Failure: ' . $e->getMessage());
+            return false;
+        }
+    }
+}

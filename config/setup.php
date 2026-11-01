@@ -393,7 +393,32 @@ try {
     $conn->exec($sql_table_cancellation);
 
     // ==============================================================================
-    // 20. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
+    // 20. ตารางบันทึกประวัติการทำงานของระบบ (Audit_Log)
+    // ใช้สำหรับ: บันทึกประวัติการกระทำสำคัญ เช่น การอนุมัติสลิป แก้ไขแต้ม ปิดกะ หรือการล็อกอิน
+    // ==============================================================================
+    $sql_table_audit_log = "
+        CREATE TABLE IF NOT EXISTS `Audit_Log` (
+            `log_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `actor_type` ENUM('Admin', 'Member', 'System') NOT NULL DEFAULT 'System',
+            `actor_id` INT(11) DEFAULT NULL,
+            `actor_name` VARCHAR(100) DEFAULT NULL,
+            `action` VARCHAR(100) NOT NULL,
+            `entity_type` VARCHAR(50) NOT NULL,
+            `entity_id` INT(11) DEFAULT NULL,
+            `details` TEXT DEFAULT NULL,
+            `ip_address` VARCHAR(45) DEFAULT NULL,
+            `user_agent` VARCHAR(255) DEFAULT NULL,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_actor` (`actor_type`, `actor_id`),
+            INDEX `idx_action` (`action`),
+            INDEX `idx_entity` (`entity_type`, `entity_id`),
+            INDEX `idx_created_at` (`created_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $conn->exec($sql_table_audit_log);
+
+    // ==============================================================================
+    // 21. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
     // ==============================================================================
     $default_admin_name = "เจ้าของสนาม (Admin)";
     $default_admin_phone = "0993241657"; 
@@ -418,14 +443,14 @@ try {
     }
 
     // ==============================================================================
-    // 21. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
+    // 22. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
     // ==============================================================================
     if (php_sapi_name() === 'cli') {
-        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (19 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
+        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (20 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
     } else {
         echo "<div style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 24px; background: #ECFDF5; border: 1px solid #10B981; border-radius: 12px; color: #065F46; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;'>";
         echo "<h2 style='margin: 0 0 10px 0; font-size: 20px; color: #047857;'>🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จเรียบร้อยแล้ว!</h2>";
-        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 19 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
+        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 20 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
         echo "</div>";
     }
 

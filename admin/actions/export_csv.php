@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/auth_check.php';
 
 $type = isset($_GET['type']) ? $_GET['type'] : '';
 
-if (!in_array($type, ['revenue', 'members', 'bookings'])) {
+if (!in_array($type, ['revenue', 'members', 'bookings', 'audit_logs'])) {
     die("Invalid Export Type");
 }
 
@@ -90,6 +90,26 @@ try {
                 $time_str,
                 $row['booking_status'],
                 $row['booking_created_at']
+            ]);
+        }
+    }
+    elseif ($type === 'audit_logs') {
+        // หัวตาราง
+        fputcsv($output, ['ID', 'วันและเวลา', 'ประเภทผู้กระทำ', 'รหัสผู้กระทำ', 'ชื่อผู้กระทำ', 'กิจกรรม (Action)', 'เอนทิตี (Entity)', 'รหัสเอนทิตี', 'รายละเอียด', 'IP Address']);
+
+        $stmt = $conn->query("SELECT * FROM Audit_Log ORDER BY log_id DESC");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            fputcsv($output, [
+                $row['log_id'],
+                $row['created_at'],
+                $row['actor_type'],
+                $row['actor_id'] ?? '',
+                $row['actor_name'] ?? '',
+                $row['action'],
+                $row['entity_type'],
+                $row['entity_id'] ?? '',
+                $row['details'] ?? '',
+                $row['ip_address'] ?? ''
             ]);
         }
     }

@@ -126,6 +126,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // ยืนยันคำสั่งทั้งหมดลงฐานข้อมูล
+                // บันทึก Audit Log สำหรับการตรวจสอบสลิป
+        if ($action_status == 'ยืนยันแล้ว') {
+            log_activity($conn, 'APPROVE_PAYMENT', 'Payment', $payment_id, [
+                'booking_id' => $booking_id,
+                'member_id'  => $data['member_id'],
+                'amount'     => $data['booking_total_price']
+            ]);
+        } elseif ($action_status == 'ปฏิเสธ') {
+            log_activity($conn, 'REJECT_PAYMENT', 'Payment', $payment_id, [
+                'booking_id' => $booking_id,
+                'member_id'  => $data['member_id'],
+                'amount'     => $data['booking_total_price']
+            ]);
+        }
+
         $conn->commit();
 
     } catch(Exception $e) {

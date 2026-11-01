@@ -28,7 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['admin_role'] = $admin['admin_role'];
 
                 // 🟢 กำหนดข้อความแจ้งเตือนสีเขียว เมื่อล็อกอินสำเร็จ
-                $_SESSION['success'] = "เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ " . htmlspecialchars($admin['admin_name']);
+                                $_SESSION['success'] = "เข้าสู่ระบบสำเร็จ ยินดีต้อนรับคุณ " . htmlspecialchars($admin['admin_name']);
+                log_activity($conn, 'ADMIN_LOGIN', 'Admin', $admin['admin_id'], 'เข้าสู่ระบบสำเร็จผ่านเบอร์ ' . $phone, 'Admin', $admin['admin_id'], $admin['admin_name']);
 
                 // ล็อกอินสำเร็จ พากลับไปหน้า Dashboard ของแอดมิน
                 header("Location: ../index.php");

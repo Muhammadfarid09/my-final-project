@@ -17,14 +17,43 @@
 
     <div class="admin-layout">
         
-        <?php include 'includes/sidebar.php'; ?>
+        <?php include __DIR__ . '/sidebar.php'; ?>
 
         <main class="admin-content">
             <div class="top-navbar">
                 <h3><?php echo $page_header ?? '<i class="fas fa-tachometer-alt"></i> แดชบอร์ดภาพรวมระบบ'; ?></h3>
-                <div class="user-profile">
-                    <i class="fas fa-user-circle"></i> 
-                    <span><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></span>
+                
+                <div class="top-navbar-actions">
+                    <!-- Notification Hub Bell Dropdown -->
+                    <div class="notif-dropdown-wrapper">
+                        <button type="button" class="btn-notif-bell" id="notifBellBtn" title="การแจ้งเตือนสลิปและรายการจอง" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
+                            <span class="notif-badge d-none" id="notifBadge">0</span>
+                        </button>
+
+                        <div class="notif-dropdown-menu" id="notifDropdownMenu">
+                            <div class="notif-dropdown-header">
+                                <div class="notif-title"><i class="fas fa-bell text-gold mr-6"></i> การแจ้งเตือนล่าสุด</div>
+                                <button type="button" class="notif-sound-btn" id="notifSoundToggle" title="เปิด/ปิดเสียงแจ้งเตือน">
+                                    <i class="fas fa-volume-up" id="notifSoundIcon"></i>
+                                </button>
+                            </div>
+                            <div class="notif-items-list" id="notifItemsList">
+                                <div class="notif-empty">
+                                    <i class="fas fa-check-circle"></i> ไม่มีรายการรอตรวจสอบ
+                                </div>
+                            </div>
+                            <div class="notif-dropdown-footer">
+                                <a href="payments.php"><i class="fas fa-file-invoice-dollar mr-4"></i> ตรวจสอบสลิป</a>
+                                <a href="cancellations.php"><i class="fas fa-ban mr-4"></i> จัดการยกเลิก</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="user-profile">
+                        <i class="fas fa-user-circle"></i> 
+                        <span><?php echo htmlspecialchars($_SESSION['admin_name'] ?? 'Admin'); ?></span>
+                    </div>
                 </div>
             </div>
 
