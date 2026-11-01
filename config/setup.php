@@ -418,7 +418,24 @@ try {
     $conn->exec($sql_table_audit_log);
 
     // ==============================================================================
-    // 21. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
+    // 21. ตารางบันทึกการพยายามเข้าสู่ระบบเพื่อป้องกัน Brute-Force (Login_Attempts)
+    // ใช้สำหรับ: ตรวจจับและระงับการสุ่มรหัสผ่านเกิน 5 ครั้งใน 10 นาที
+    // ==============================================================================
+    $sql_table_login_attempts = "
+        CREATE TABLE IF NOT EXISTS `Login_Attempts` (
+            `attempt_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `identifier` VARCHAR(50) NOT NULL,
+            `ip_address` VARCHAR(45) NOT NULL,
+            `user_type` ENUM('Admin', 'Member') NOT NULL,
+            `attempted_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX `idx_identifier` (`identifier`, `user_type`, `attempted_at`),
+            INDEX `idx_ip` (`ip_address`, `attempted_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $conn->exec($sql_table_login_attempts);
+
+    // ==============================================================================
+    // 22. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
     // ==============================================================================
     $default_admin_name = "เจ้าของสนาม (Admin)";
     $default_admin_phone = "0993241657"; 
@@ -443,14 +460,14 @@ try {
     }
 
     // ==============================================================================
-    // 22. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
+    // 23. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
     // ==============================================================================
     if (php_sapi_name() === 'cli') {
-        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (20 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
+        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (21 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
     } else {
         echo "<div style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 24px; background: #ECFDF5; border: 1px solid #10B981; border-radius: 12px; color: #065F46; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;'>";
         echo "<h2 style='margin: 0 0 10px 0; font-size: 20px; color: #047857;'>🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จเรียบร้อยแล้ว!</h2>";
-        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 20 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
+        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 21 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
         echo "</div>";
     }
 

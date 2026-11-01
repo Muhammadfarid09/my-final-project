@@ -443,6 +443,27 @@ if (!function_exists('handle_secure_image_upload')) {
             throw new Exception("รูปแบบไฟล์รูปภาพไม่ถูกต้อง หรือไฟล์ถูกดัดแปลงนามสกุล");
         }
 
+        // 4. Magic Bytes & Image Integrity Verification (ตรวจสอบความสมบูรณ์และมิติของภาพจริง)
+        $image_info = @getimagesize($file['tmp_name']);
+        if ($image_info === false || empty($image_info[0]) || empty($image_info[1])) {
+            throw new Exception("ไฟล์ที่อัปโหลดไม่ใช่ไฟล์รูปภาพที่สมบูรณ์ หรือโครงสร้างไฟล์รูปภาพเสียหาย");
+        }
+
+        // 5. Anti-Polyglot & Malicious Script Injection Inspection (ป้องกันการฝัง Web-Shell ในรูปภาพ)
+        $file_sample = @file_get_contents($file['tmp_name'], false, null, 0, 8192);
+        if ($file_sample !== false) {
+            $dangerous_patterns = [
+                '<\?(?:php|=|\s)',
+                '<script[\s>]',
+                '(?:eval|base64_decode|passthru|shell_exec|system)\s*\('
+            ];
+            foreach ($dangerous_patterns as $pattern) {
+                if (preg_match('/' . $pattern . '/i', $file_sample)) {
+                    throw new Exception("ระบบตรวจพบลักษณะไฟล์ที่ไม่ปลอดภัย (Security Violation: Potential Script Injection)");
+                }
+            }
+        }
+
         if (!is_dir($targetFolder)) {
             mkdir($targetFolder, 0777, true);
         }
@@ -657,6 +678,190 @@ if (!function_exists('send_discord_alert')) {
         } catch (Throwable $e) {
             error_log("Discord Webhook Error: " . $e->getMessage());
             return false;
+        }
+    }
+}
+
+// =========================================================================
+// 10. Login Security & Brute-Force Throttling Engine
+// =========================================================================
+if (!function_exists('get_client_ip_address')) {
+    /**
+     * ดึง IP Address ของไคลเอนต์อย่างปลอดภัย
+     */
+    function get_client_ip_address(): string {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? ($_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+        if (strpos($ip, ',') !== false) {
+            $parts = explode(',', $ip);
+            $ip = trim($parts[0]);
+        }
+        return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '127.0.0.1';
+    }
+}
+
+if (!function_exists('check_login_throttle')) {
+    /**
+     * ตรวจสอบว่าบัญชีหรือ IP นี้ถูกระงับการเข้าสู่ระบบชั่วคราวหรือไม่ (Rate Limiting Check)
+     * - จำกัดความพยายามไม่เกิน 5 ครั้ง ภายใน 10 นาที
+     * - หากเกิน 5 ครั้ง จะระงับการเข้าสู่ระบบชั่วคราวเป็นเวลา 15 นาที นับจากครั้งล่าสุด
+     *
+     * @param PDO $conn การเชื่อมต่อฐานข้อมูล
+     * @param string $identifier เบอร์โทรศัพท์ หรือชื่อผู้ใช้
+     * @param string $userType 'Admin' หรือ 'Member'
+     * @param int $maxAttempts จำนวนครั้งสูงสุดที่อนุญาต (ค่าเริ่มต้น 5)
+     * @param int $decayMinutes ช่วงเวลานับรอบความล้มเหลว (ค่าเริ่มต้น 10 นาที)
+     * @param int $lockoutMinutes ระยะเวลาที่ระงับเมื่อเกินกำหนด (ค่าเริ่มต้น 15 นาที)
+     * @return array ['allowed' => bool, 'failed_count' => int, 'remaining_attempts' => int, 'remaining_seconds' => int, 'message' => string]
+     */
+    function check_login_throttle(PDO $conn, string $identifier, string $userType = 'Member', int $maxAttempts = 5, int $decayMinutes = 10, int $lockoutMinutes = 15): array {
+        $ip = get_client_ip_address();
+        
+        try {
+            $stmt = $conn->prepare("
+                SELECT COUNT(*) as failed_count, MAX(attempted_at) as last_attempt
+                FROM `Login_Attempts`
+                WHERE (identifier = :identifier OR ip_address = :ip)
+                  AND user_type = :user_type
+                  AND attempted_at >= DATE_SUB(NOW(), INTERVAL :lockout_window MINUTE)
+            ");
+            $stmt->execute([
+                ':identifier'     => $identifier,
+                ':ip'             => $ip,
+                ':user_type'      => $userType,
+                ':lockout_window' => $lockoutMinutes
+            ]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $failed_count = (int)($row['failed_count'] ?? 0);
+            $last_attempt = $row['last_attempt'] ?? null;
+
+            if ($failed_count >= $maxAttempts && $last_attempt) {
+                $last_ts = strtotime($last_attempt);
+                $lockout_end = $last_ts + ($lockoutMinutes * 60);
+                $remaining_seconds = $lockout_end - time();
+
+                if ($remaining_seconds > 0) {
+                    $remaining_minutes = max(1, (int)ceil($remaining_seconds / 60));
+                    return [
+                        'allowed'            => false,
+                        'failed_count'       => $failed_count,
+                        'remaining_attempts' => 0,
+                        'remaining_seconds'  => $remaining_seconds,
+                        'message'            => "คุณพยายามเข้าสู่ระบบผิดพลาดเกินกำหนด ระบบได้ระงับการเข้าใช้งานชั่วคราวเพื่อความปลอดภัย กรุณารออีกประมาณ {$remaining_minutes} นาที ก่อนลองใหม่อีกครั้ง"
+                    ];
+                }
+            }
+
+            return [
+                'allowed'            => true,
+                'failed_count'       => $failed_count,
+                'remaining_attempts' => max(0, $maxAttempts - $failed_count),
+                'remaining_seconds'  => 0,
+                'message'            => ''
+            ];
+        } catch (Throwable $e) {
+            error_log("Login Throttle Check Failure: " . $e->getMessage());
+            return ['allowed' => true, 'failed_count' => 0, 'remaining_attempts' => $maxAttempts, 'remaining_seconds' => 0, 'message' => ''];
+        }
+    }
+}
+
+if (!function_exists('record_login_failure')) {
+    /**
+     * บันทึกประวัติการล็อกอินล้มเหลวลงตาราง Login_Attempts และ Audit_Log
+     *
+     * @param PDO $conn การเชื่อมต่อฐานข้อมูล
+     * @param string $identifier เบอร์โทรศัพท์ หรือชื่อผู้ใช้
+     * @param string $userType 'Admin' หรือ 'Member'
+     * @param string $reason สาเหตุความล้มเหลว
+     * @return array ['failed_count' => int, 'remaining_attempts' => int, 'message' => string]
+     */
+    function record_login_failure(PDO $conn, string $identifier, string $userType = 'Member', string $reason = 'รหัสผ่านไม่ถูกต้อง'): array {
+        $ip = get_client_ip_address();
+        $maxAttempts = 5;
+        $lockoutMinutes = 15;
+
+        try {
+            // 1. บันทึกลง Login_Attempts
+            $stmt = $conn->prepare("
+                INSERT INTO `Login_Attempts` (`identifier`, `ip_address`, `user_type`, `attempted_at`)
+                VALUES (:identifier, :ip, :user_type, NOW())
+            ");
+            $stmt->execute([
+                ':identifier' => $identifier,
+                ':ip'         => $ip,
+                ':user_type'  => $userType
+            ]);
+
+            // 2. บันทึกลง Audit_Log เพื่อตรวจสอบย้อนหลัง
+            log_activity(
+                $conn,
+                'LOGIN_FAILED',
+                $userType,
+                null,
+                "พยายามเข้าสู่ระบบไม่สำเร็จ: {$identifier} ({$reason})",
+                $userType,
+                null,
+                $identifier
+            );
+
+            // 3. ตรวจสอบจำนวนครั้งสะสม
+            $check = check_login_throttle($conn, $identifier, $userType, $maxAttempts, 10, $lockoutMinutes);
+
+            if (!$check['allowed']) {
+                return [
+                    'failed_count'       => $check['failed_count'],
+                    'remaining_attempts' => 0,
+                    'message'            => $check['message']
+                ];
+            } else {
+                $rem = $check['remaining_attempts'];
+                $warning = "เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง";
+                if ($rem > 0 && $rem < $maxAttempts) {
+                    $warning .= " (คุณสามารถลองได้อีก {$rem} ครั้ง ก่อนระบบจะระงับการเข้าสู่ระบบ 15 นาที)";
+                }
+                return [
+                    'failed_count'       => $check['failed_count'],
+                    'remaining_attempts' => $rem,
+                    'message'            => $warning
+                ];
+            }
+        } catch (Throwable $e) {
+            error_log("Record Login Failure Error: " . $e->getMessage());
+            return [
+                'failed_count'       => 1,
+                'remaining_attempts' => 4,
+                'message'            => 'เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง'
+            ];
+        }
+    }
+}
+
+if (!function_exists('clear_login_throttle')) {
+    /**
+     * ล้างประวัติการพยายามล็อกอินผิดพลาดเมื่อเข้าสู่ระบบสำเร็จ
+     *
+     * @param PDO $conn การเชื่อมต่อฐานข้อมูล
+     * @param string $identifier เบอร์โทรศัพท์ หรือชื่อผู้ใช้
+     * @param string $userType 'Admin' หรือ 'Member'
+     */
+    function clear_login_throttle(PDO $conn, string $identifier, string $userType = 'Member'): void {
+        try {
+            $ip = get_client_ip_address();
+            $stmt = $conn->prepare("
+                DELETE FROM `Login_Attempts`
+                WHERE (identifier = :identifier OR ip_address = :ip)
+                  AND user_type = :user_type
+            ");
+            $stmt->execute([
+                ':identifier' => $identifier,
+                ':ip'         => $ip,
+                ':user_type'  => $userType
+            ]);
+
+            // Housekeeping: ลบประวัติเก่ากว่า 24 ชั่วโมง เพื่อให้ตารางมีขนาดกะทัดรัดเสมอ
+            $conn->query("DELETE FROM `Login_Attempts` WHERE attempted_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+        } catch (Throwable $e) {
+            error_log("Clear Login Throttle Error: " . $e->getMessage());
         }
     }
 }

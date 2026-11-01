@@ -1,0 +1,25 @@
+# ==============================================================================
+# T.S. Pattani Badminton System - Apache Security Configuration (.htaccess)
+# ==============================================================================
+
+# 1. Custom Error Pages (Prestige Gold / Dark Theme)
+ErrorDocument 404 /ts-pattani/404.php
+ErrorDocument 403 /ts-pattani/403.php
+ErrorDocument 500 /ts-pattani/500.php
+
+# 2. ป้องกัน Directory Browsing (ห้ามแสดงรายการโฟลเดอร์เมื่อไม่มี index.php)
+Options -Indexes
+
+# 3. มาตรฐานการเข้ารหัสตัวอักษร UTF-8
+AddDefaultCharset UTF-8
+
+# 4. ป้องกันการเข้าถึงไฟล์ระบบ ไฟล์ฐานข้อมูล และไฟล์คอนฟิกที่มีความละเอียดอ่อน
+<FilesMatch "(^\.|\.env|\.sql|\.log|\.bak|\.ini)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>

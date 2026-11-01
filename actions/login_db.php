@@ -18,6 +18,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             throw new Exception("กรุณากรอกเบอร์โทรศัพท์และรหัสผ่านให้ครบถ้วน");
         }
 
+        // 2.1 ตรวจสอบ Rate Limiting ป้องกัน Brute-Force โจมตีรหัสผ่าน
+        $throttle = check_login_throttle($conn, $member_phone, 'Member');
+        if (!$throttle['allowed']) {
+            throw new Exception($throttle['message']);
+        }
+
         // 3. ค้นหาข้อมูลสมาชิกจากเบอร์โทรศัพท์ด้วย Prepared Statement
         $stmt = $conn->prepare("SELECT * FROM Member WHERE member_phone = :phone");
         $stmt->execute([':phone' => $member_phone]);
@@ -34,6 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     throw new Exception("บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ");
                 }
 
+                // ปลดและล้างประวัติการพยายามล็อกอินผิดพลาด (เมื่อรหัสผ่านถูกต้อง)
+                clear_login_throttle($conn, $member_phone, 'Member');
+
                 // 7. Regenerate Session ID ป้องกัน Session Fixation
                 session_regenerate_id(true);
 
@@ -41,6 +50,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['member_id'] = $member['member_id'];
                 $_SESSION['member_name'] = $member['member_name'];
                 $_SESSION['member_phone'] = $member['member_phone'];
+
+                // บันทึกกิจกรรมการเข้าสู่ระบบสำเร็จ
+                log_activity($conn, 'MEMBER_LOGIN', 'Member', $member['member_id'], 'เข้าสู่ระบบสำเร็จผ่านเบอร์ ' . $member_phone, 'Member', $member['member_id'], $member['member_name']);
 
                 // 9. จัดการฟีเจอร์จดจำเบอร์โทรศัพท์ (Remember Me)
                 if ($remember_me) {
@@ -73,12 +85,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
 
             } else {
-                // รหัสผ่านผิด
-                throw new Exception("เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง");
+                // รหัสผ่านผิด บันทึกการพยายามเข้าสู่ระบบล้มเหลว
+                $fail = record_login_failure($conn, $member_phone, 'Member', 'รหัสผ่านสมาชิกไม่ถูกต้อง');
+                throw new Exception($fail['message']);
             }
         } else {
-            // ไม่พบเบอร์โทรนี้ในระบบ
-            throw new Exception("เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง");
+            // ไม่พบเบอร์โทรนี้ในระบบ บันทึกการพยายามเข้าสู่ระบบล้มเหลว
+            $fail = record_login_failure($conn, $member_phone, 'Member', 'ไม่พบเบอร์โทรศัพท์สมาชิกในระบบ');
+            throw new Exception($fail['message']);
         }
 
     } catch (Exception $e) {
