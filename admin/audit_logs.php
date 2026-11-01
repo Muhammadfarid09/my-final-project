@@ -97,124 +97,142 @@ try {
 include 'includes/header.php';
 ?>
 
-<!-- KPI Overview Grid -->
-<div class="kpi-grid mb-24">
-    <div class="kpi-card">
-        <div class="kpi-icon kpi-blue">
+<!-- KPI Stat Cards Overview (Aligned with TS-Pattani System Standards) -->
+<div class="dashboard-grid mb-24">
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #2563EB; background: #EFF6FF;">
             <i class="fas fa-list-alt"></i>
         </div>
-        <div class="kpi-info">
-            <span class="kpi-label">ประวัติทั้งหมด (Total Logs)</span>
-            <h3 class="kpi-value"><?php echo number_format($total_logs); ?> <small>รายการ</small></h3>
+        <div class="stat-info">
+            <p>ประวัติทั้งหมด</p>
+            <h3><?php echo number_format($total_logs); ?> <span class="stat-unit">รายการ</span></h3>
         </div>
     </div>
 
-    <div class="kpi-card">
-        <div class="kpi-icon kpi-purple">
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #7C3AED; background: #FAF5FF;">
             <i class="fas fa-user-shield"></i>
         </div>
-        <div class="kpi-info">
-            <span class="kpi-label">การกระทำโดยแอดมิน (Admin Actions)</span>
-            <h3 class="kpi-value"><?php echo number_format($admin_actions_count); ?> <small>ครั้ง</small></h3>
+        <div class="stat-info">
+            <p>ดำเนินการโดยแอดมิน</p>
+            <h3><?php echo number_format($admin_actions_count); ?> <span class="stat-unit">ครั้ง</span></h3>
         </div>
     </div>
 
-    <div class="kpi-card">
-        <div class="kpi-icon kpi-green">
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #059669; background: #ECFDF5;">
             <i class="fas fa-hand-holding-usd"></i>
         </div>
-        <div class="kpi-info">
-            <span class="kpi-label">ธุรกรรมการเงิน (Financial Logs)</span>
-            <h3 class="kpi-value"><?php echo number_format($fin_actions_count); ?> <small>รายการ</small></h3>
+        <div class="stat-info">
+            <p>ธุรกรรมการเงิน</p>
+            <h3><?php echo number_format($fin_actions_count); ?> <span class="stat-unit">รายการ</span></h3>
         </div>
     </div>
 
-    <div class="kpi-card">
-        <div class="kpi-icon kpi-orange">
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #D97706; background: #FFFBEB;">
             <i class="fas fa-calendar-day"></i>
         </div>
-        <div class="kpi-info">
-            <span class="kpi-label">บันทึกวันนี้ (Today's Logs)</span>
-            <h3 class="kpi-value"><?php echo number_format($today_actions_count); ?> <small>รายการ</small></h3>
+        <div class="stat-info">
+            <p>กิจกรรมวันนี้</p>
+            <h3><?php echo number_format($today_actions_count); ?> <span class="stat-unit">รายการ</span></h3>
         </div>
     </div>
 </div>
 
 <div class="admin-card">
-    <div class="card-header-flex">
-        <div class="header-left">
-            <h3 class="card-title">
+    <!-- Header with Title & Export Button -->
+    <div class="header-between mb-20">
+        <div>
+            <h4 class="m-0 text-dark-custom" style="font-size: 17.5px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-history text-gold"></i> ตรวจสอบประวัติกิจกรรมระบบ (Audit Log Trail)
-            </h3>
-            <p class="card-subtitle">
+            </h4>
+            <p class="text-muted font-13 mb-0 mt-4">
                 บันทึกความเปลี่ยนแปลงทุกขั้นตอนเพื่อความโปร่งใส ตรวจสอบย้อนหลังได้ (พบทั้งหมด <?php echo number_format($filtered_total); ?> รายการ)
             </p>
         </div>
-        <div class="header-right">
-            <a href="actions/export_csv.php?type=audit_logs" class="btn-admin btn-outline">
-                <i class="fas fa-file-csv mr-6"></i> ส่งออก Audit CSV
+        <div>
+            <a href="actions/export_csv.php?type=audit_logs" class="btn-export text-decor-none">
+                <i class="fas fa-file-csv icon-bookings"></i> ส่งออก Audit CSV
             </a>
         </div>
     </div>
 
-    <!-- Filter Bar -->
-    <form method="GET" action="audit_logs.php" class="audit-filter-bar mb-20">
-        <div class="filter-group">
-            <label><i class="fas fa-filter mr-4"></i> ประเภทกิจกรรม</label>
-            <select name="action" class="form-control-sm" onchange="this.form.submit()">
-                <option value="">-- กิจกรรมทั้งหมด --</option>
-                <?php foreach ($available_actions as $act): ?>
-                    <option value="<?php echo htmlspecialchars($act); ?>" <?php echo $filter_action === $act ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($act); ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+    <!-- Structured 2-Tier Filter Panel -->
+    <form method="GET" action="audit_logs.php" class="audit-filter-panel mb-24">
+        <!-- Row 1: Search Keyword & Core Dropdowns -->
+        <div class="filter-tier-primary">
+            <div class="filter-field-search">
+                <label for="filter_keyword"><i class="fas fa-search text-muted mr-4"></i> ค้นหาคำสำคัญ</label>
+                <div class="filter-input-wrap">
+                    <i class="fas fa-search filter-prefix-icon"></i>
+                    <input type="text" id="filter_keyword" name="keyword" class="filter-input-ctrl" 
+                           placeholder="ค้นหาชื่อผู้กระทำ, IP Address, หรือรายละเอียดข้อความ..." 
+                           value="<?php echo htmlspecialchars($filter_keyword); ?>">
+                </div>
+            </div>
+
+            <div class="filter-field-select">
+                <label for="filter_action"><i class="fas fa-filter text-muted mr-4"></i> ประเภทกิจกรรม</label>
+                <select id="filter_action" name="action" class="filter-input-ctrl" onchange="this.form.submit()">
+                    <option value="">-- กิจกรรมทั้งหมด --</option>
+                    <?php foreach ($available_actions as $act): ?>
+                        <option value="<?php echo htmlspecialchars($act); ?>" <?php echo $filter_action === $act ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($act); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="filter-field-select">
+                <label for="filter_actor_type"><i class="fas fa-user-tag text-muted mr-4"></i> ผู้กระทำ (Actor)</label>
+                <select id="filter_actor_type" name="actor_type" class="filter-input-ctrl" onchange="this.form.submit()">
+                    <option value="">-- ผู้กระทำทั้งหมด --</option>
+                    <option value="Admin" <?php echo $filter_actor_type === 'Admin' ? 'selected' : ''; ?>>แอดมิน (Admin)</option>
+                    <option value="Member" <?php echo $filter_actor_type === 'Member' ? 'selected' : ''; ?>>สมาชิก (Member)</option>
+                    <option value="System" <?php echo $filter_actor_type === 'System' ? 'selected' : ''; ?>>ระบบอัตโนมัติ (System)</option>
+                </select>
+            </div>
         </div>
 
-        <div class="filter-group">
-            <label><i class="fas fa-user-tag mr-4"></i> ผู้กระทำ (Actor)</label>
-            <select name="actor_type" class="form-control-sm" onchange="this.form.submit()">
-                <option value="">-- ผู้กระทำทั้งหมด --</option>
-                <option value="Admin" <?php echo $filter_actor_type === 'Admin' ? 'selected' : ''; ?>>แอดมิน (Admin)</option>
-                <option value="Member" <?php echo $filter_actor_type === 'Member' ? 'selected' : ''; ?>>สมาชิก (Member)</option>
-                <option value="System" <?php echo $filter_actor_type === 'System' ? 'selected' : ''; ?>>ระบบอัตโนมัติ (System)</option>
-            </select>
-        </div>
+        <!-- Row 2: Date Range Pickers & Action Buttons -->
+        <div class="filter-tier-secondary">
+            <div class="filter-date-range">
+                <div class="filter-date-item">
+                    <label for="filter_date_from"><i class="fas fa-calendar-alt text-muted mr-4"></i> ตั้งแต่วันที่</label>
+                    <input type="date" id="filter_date_from" name="date_from" class="filter-input-ctrl" 
+                           value="<?php echo htmlspecialchars($filter_date_from); ?>">
+                </div>
+                <div class="filter-date-separator">
+                    <span>ถึง</span>
+                </div>
+                <div class="filter-date-item">
+                    <label for="filter_date_to"><i class="fas fa-calendar-alt text-muted mr-4"></i> ถึงวันที่</label>
+                    <input type="date" id="filter_date_to" name="date_to" class="filter-input-ctrl" 
+                           value="<?php echo htmlspecialchars($filter_date_to); ?>">
+                </div>
+            </div>
 
-        <div class="filter-group">
-            <label><i class="fas fa-search mr-4"></i> ค้นหาคำสำคัญ</label>
-            <input type="text" name="keyword" class="form-control-sm" placeholder="ชื่อ, IP, หรือรายละเอียด..." value="<?php echo htmlspecialchars($filter_keyword); ?>">
-        </div>
-
-        <div class="filter-group">
-            <label><i class="fas fa-calendar mr-4"></i> ตั้งแต่วันที่</label>
-            <input type="date" name="date_from" class="form-control-sm" value="<?php echo htmlspecialchars($filter_date_from); ?>">
-        </div>
-
-        <div class="filter-group">
-            <label><i class="fas fa-calendar mr-4"></i> ถึงวันที่</label>
-            <input type="date" name="date_to" class="form-control-sm" value="<?php echo htmlspecialchars($filter_date_to); ?>">
-        </div>
-
-        <div class="filter-actions">
-            <button type="submit" class="btn-filter-submit">
-                <i class="fas fa-search"></i> ค้นหา
-            </button>
-            <?php if (!empty($filter_action) || !empty($filter_actor_type) || !empty($filter_keyword) || !empty($filter_date_from) || !empty($filter_date_to)): ?>
-                <a href="audit_logs.php" class="btn-filter-reset" title="ล้างตัวกรอง">
-                    <i class="fas fa-times"></i>
-                </a>
-            <?php endif; ?>
+            <div class="filter-action-group">
+                <button type="submit" class="btn-filter-apply">
+                    <i class="fas fa-search mr-6"></i> กรองข้อมูล
+                </button>
+                <?php if (!empty($filter_action) || !empty($filter_actor_type) || !empty($filter_keyword) || !empty($filter_date_from) || !empty($filter_date_to)): ?>
+                    <a href="audit_logs.php" class="btn-filter-clear" title="ล้างตัวกรองทั้งหมด">
+                        <i class="fas fa-redo-alt mr-6"></i> ล้างค่า
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </form>
 
-    <!-- Table -->
+    <!-- Audit Logs Table -->
     <div class="table-responsive">
-        <table class="admin-table">
+        <table class="admin-table table-audit-logs">
             <thead>
                 <tr>
-                    <th width="70">#ID</th>
-                    <th width="150">วันและเวลา</th>
+                    <th width="70" class="text-center">#ID</th>
+                    <th width="140">วันและเวลา</th>
                     <th width="170">ผู้ดำเนินการ (Actor)</th>
                     <th width="180">กิจกรรม (Action)</th>
                     <th width="140">เป้าหมาย (Entity)</th>
@@ -225,9 +243,17 @@ include 'includes/header.php';
             <tbody>
                 <?php if (empty($logs)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-40 text-muted">
-                            <i class="fas fa-clipboard-check fs-36 mb-10 d-block"></i>
-                            ไม่พบรายการประวัติการทำงานตามเงื่อนไขที่เลือก
+                        <td colspan="7" class="text-center py-40">
+                            <div class="table-empty-container">
+                                <div class="empty-icon-circle">
+                                    <i class="fas fa-search-minus"></i>
+                                </div>
+                                <h5 class="empty-title">ไม่พบรายการประวัติการทำงานตามเงื่อนไขที่เลือก</h5>
+                                <p class="empty-desc">ไม่มีข้อมูลที่ตรงกับตัวกรองที่คุณกำหนด ลองปรับเปลี่ยนเงื่อนไขหรือคลิกล้างตัวกรอง</p>
+                                <a href="audit_logs.php" class="btn-empty-reset">
+                                    <i class="fas fa-redo-alt mr-6"></i> ล้างตัวกรองทั้งหมด
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 <?php else: ?>
@@ -261,10 +287,10 @@ include 'includes/header.php';
                             elseif ($log['actor_type'] === 'Member') $actor_badge = 'badge-info';
                         ?>
                         <tr>
-                            <td><span class="text-muted">#<?php echo $log['log_id']; ?></span></td>
+                            <td class="text-center"><span class="text-small-muted font-weight-600">#<?php echo $log['log_id']; ?></span></td>
                             <td>
-                                <div class="font-weight-600"><?php echo date('d/m/Y', strtotime($log['created_at'])); ?></div>
-                                <small class="text-muted"><?php echo date('H:i:s น.', strtotime($log['created_at'])); ?></small>
+                                <div class="font-weight-600 text-dark"><?php echo date('d/m/Y', strtotime($log['created_at'])); ?></div>
+                                <small class="text-small-muted"><?php echo date('H:i:s น.', strtotime($log['created_at'])); ?></small>
                             </td>
                             <td>
                                 <div class="d-flex align-items-center gap-6">
@@ -272,11 +298,11 @@ include 'includes/header.php';
                                         <?php echo htmlspecialchars($log['actor_type']); ?>
                                     </span>
                                 </div>
-                                <div class="font-weight-600 mt-2">
+                                <div class="font-weight-600 text-dark mt-2">
                                     <?php echo htmlspecialchars($log['actor_name'] ?: 'N/A'); ?>
                                 </div>
                                 <?php if (!empty($log['actor_id'])): ?>
-                                    <small class="text-muted">ID: <?php echo $log['actor_id']; ?></small>
+                                    <small class="text-small-muted">ID: <?php echo $log['actor_id']; ?></small>
                                 <?php endif; ?>
                             </td>
                             <td>
@@ -289,7 +315,7 @@ include 'includes/header.php';
                                     <i class="fas fa-tag font-11 text-muted mr-4"></i>
                                     <strong><?php echo htmlspecialchars($log['entity_type']); ?></strong>
                                     <?php if (!empty($log['entity_id'])): ?>
-                                        #<?php echo $log['entity_id']; ?>
+                                        <span class="text-muted ml-2">#<?php echo $log['entity_id']; ?></span>
                                     <?php endif; ?>
                                 </span>
                             </td>
@@ -330,14 +356,14 @@ include 'includes/header.php';
                                     <i class="fas fa-network-wired font-11 mr-4 text-muted"></i>
                                     <code><?php echo htmlspecialchars($log['ip_address'] ?: '127.0.0.1'); ?></code>
                                 </div>
-                                <small class="text-muted d-block text-truncate mt-2" title="<?php echo htmlspecialchars($log['user_agent'] ?? ''); ?>" style="max-width: 140px;">
+                                <small class="text-small-muted d-block text-truncate mt-2" title="<?php echo htmlspecialchars($log['user_agent'] ?? ''); ?>" style="max-width: 140px;">
                                     <?php 
                                         $ua = $log['user_agent'] ?? '';
-                                        if (strpos($ua, 'Chrome') !== false) echo '<i class="fab fa-chrome"></i> Chrome';
-                                        elseif (strpos($ua, 'Firefox') !== false) echo '<i class="fab fa-firefox"></i> Firefox';
-                                        elseif (strpos($ua, 'Safari') !== false) echo '<i class="fab fa-safari"></i> Safari';
-                                        elseif (strpos($ua, 'Edge') !== false) echo '<i class="fab fa-edge"></i> Edge';
-                                        else echo '<i class="fas fa-globe"></i> Web Client';
+                                        if (strpos($ua, 'Chrome') !== false) echo '<i class="fab fa-chrome text-primary"></i> Chrome';
+                                        elseif (strpos($ua, 'Firefox') !== false) echo '<i class="fab fa-firefox text-orange"></i> Firefox';
+                                        elseif (strpos($ua, 'Safari') !== false) echo '<i class="fab fa-safari text-blue"></i> Safari';
+                                        elseif (strpos($ua, 'Edge') !== false) echo '<i class="fab fa-edge text-info"></i> Edge';
+                                        else echo '<i class="fas fa-globe text-muted"></i> Web Client';
                                     ?>
                                 </small>
                             </td>
