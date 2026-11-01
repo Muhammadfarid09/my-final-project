@@ -57,7 +57,7 @@
 | `index.php` | เพิ่มตรรกะดึงสถิติ, ปรับปุ่ม Guest Navbar (สมัคร/เข้าสู่ระบบ), ปรับ Hero Dual Actions และใส่ Dashboard 4 Cards |
 | `assets/css/style.css` | เพิ่มสไตล์คลาส `.hero-stats-dashboard`, `.stat-dashboard-card`, `.stat-number`, `.stat-badge-icon` |
 | `assets/css/responsive-mobile.css` | เพิ่ม Responsive Breakpoints (992px, 768px, 576px) สำหรับ Stats Dashboard |
-| `docs/2026-10-11_landing_stats_and_nav_redesign.md` | สร้างเอกสารบันทึกการทำงานประจำวันตามข้อกำหนด GEMINI.md |
+| `docs/2026-10-11_landing_stats_and_nav_redesign.md` | สร้างเอกสารบันทึกการทำงานประจำวันตามข้อกำหนด PROJECT_GUIDELINES.md |
 
 ---
 

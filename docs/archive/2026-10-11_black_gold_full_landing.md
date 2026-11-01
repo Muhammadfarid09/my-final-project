@@ -1,7 +1,7 @@
 # บันทึกการปรับปรุงระบบ (Daily Development Log)
 **วันที่:** 2026-10-11  
 **หัวข้อ:** การยกระดับส่วนล่างทั้งหมดของ Landing Page (index.php) สู่ธีม "Premium Black & Gold" 100%  
-**ผู้รับผิดชอบ:** Antigravity AI  
+**ผู้รับผิดชอบ:** ทีมพัฒนาระบบ (Development Team)  
 
 ---
 

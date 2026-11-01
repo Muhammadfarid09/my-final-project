@@ -1,6 +1,6 @@
 # เอกสารบันทึกการทำงาน: เพิ่ม 4-Phase Stepper และยกระดับ Booking Flow ตามมาตรฐาน HCI
 **วันที่:** 2026-10-05  
-**ผู้รับผิดชอบ:** AI Assistant (Antigravity) & ทีมพัฒนา T.S. Pattani Badminton  
+**ผู้รับผิดชอบ:** ทีมพัฒนาระบบ & ทีมพัฒนา T.S. Pattani Badminton  
 **เอกสารอ้างอิง:** [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) (Supplementary Rules ข้อ 2, 3, 5 และ Section 10)  
 **ไฟล์ที่เกี่ยวข้อง:**
 - [booking.php](file:///c:/xampp/htdocs/ts-pattani/booking.php)

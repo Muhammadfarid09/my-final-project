@@ -1,7 +1,7 @@
 # บันทึกการปรับปรุงระบบ (Daily Development Log)
 **วันที่:** 2026-10-11  
 **หัวข้อ:** การนำเข้าและแสดงผลภาพแบนเนอร์กราฟิกแบรนด์จริง (Official Brand Banner Cards) ในสไลเดอร์ Marquee (index.php)  
-**ผู้รับผิดชอบ:** Antigravity AI  
+**ผู้รับผิดชอบ:** ทีมพัฒนาระบบ (Development Team)  
 
 ---
 

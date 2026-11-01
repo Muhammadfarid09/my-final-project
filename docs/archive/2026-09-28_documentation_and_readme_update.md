@@ -1,7 +1,7 @@
 # บันทึกการดำเนินงาน: ปรับปรุงเอกสารโครงงานฉบับสมบูรณ์และจัดทำ README.md (2026-09-28)
 **วันที่:** 2026-09-28  
 **ระบบ:** T.S. Pattani Badminton Court Management System  
-**ผู้จัดทำ:** Antigravity AI Assistant
+**ผู้จัดทำ:** ทีมพัฒนาระบบ (Development Team)
 
 ---
 
@@ -42,7 +42,7 @@
 ```text
 ts-pattani/
 ├── README.md                      <-- เอกสารหลักหน้าบ้านสำหรับ GitHub (ภาพรวม, ติดตั้ง, บัญชีทดสอบ)
-├── GEMINI.md                      <-- กฎควบคุมการทำงานของ AI Assistant และมาตรฐานการบันทึกงาน
+├── PROJECT_GUIDELINES.md                      <-- กฎควบคุมการทำงานของ AI Assistant และมาตรฐานการบันทึกงาน
 └── docs/
     ├── CHANGELOG.md               <-- ประวัติการพัฒนาและปรับปรุงระบบภาพรวมทั้งหมด (Master Changelog)
     ├── USER_SCOPE_AUDIT_RESULT.md <-- ตารางเทียบขอบเขต 1.3 กับโค้ดจริง (Traceability Matrix)

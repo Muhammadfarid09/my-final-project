@@ -1,7 +1,7 @@
 # บันทึกการพัฒนาหน้าเข้าสู่ระบบแบบ Book Split-Screen Layout (login.php)
 
 **วันที่:** 2026-10-11  
-**ผู้พัฒนา:** Antigravity AI Pair Programmer  
+**ผู้พัฒนา:** ทีมพัฒนาระบบ (Development Team)  
 **เอกสารอ้างอิง:** [PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md), [ADDITIONAL_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/ADDITIONAL_RULES.md)
 
 ---

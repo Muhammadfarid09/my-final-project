@@ -1,6 +1,6 @@
 # เอกสารบันทึกการทำงาน: ยกระดับ Action Confirmation Modal ฝั่งผู้ดูแลระบบ (Admin)
 **วันที่:** 2026-10-05  
-**ผู้รับผิดชอบ:** AI Assistant (Antigravity) & ทีมพัฒนา T.S. Pattani Badminton  
+**ผู้รับผิดชอบ:** ทีมพัฒนาระบบ & ทีมพัฒนา T.S. Pattani Badminton  
 **เอกสารอ้างอิง:** [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) (Supplementary Rules ข้อ 5 และ Section 15)  
 **ไฟล์ที่เกี่ยวข้อง:**
 - [assets/css/admin.css](file:///c:/xampp/htdocs/ts-pattani/assets/css/admin.css)

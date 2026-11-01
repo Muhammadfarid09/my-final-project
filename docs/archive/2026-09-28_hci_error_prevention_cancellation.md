@@ -1,7 +1,7 @@
 # บันทึกการดำเนินงาน: ปรับปรุงสถานะการจองตามหลัก HCI Error Prevention (2026-09-28)
 **วันที่:** 2026-09-28  
 **ระบบ:** T.S. Pattani Badminton Court Management System  
-**ผู้จัดทำ:** Antigravity AI Assistant
+**ผู้จัดทำ:** ทีมพัฒนาระบบ (Development Team)
 
 ---
 

@@ -1,6 +1,6 @@
 # เอกสารบันทึกการทำงาน: ปรับปรุงระบบแนบสลิปชำระเงินตามมาตรฐาน HCI (Payment Slip UX Improvements)
 **วันที่:** 2026-10-05  
-**ผู้รับผิดชอบ:** AI Assistant (Antigravity) & ทีมพัฒนา T.S. Pattani Badminton  
+**ผู้รับผิดชอบ:** ทีมพัฒนาระบบ & ทีมพัฒนา T.S. Pattani Badminton  
 **เอกสารอ้างอิง:** [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) (Supplementary Rules ข้อ 3, 4, 6 และ Section 12)  
 **ไฟล์ที่เกี่ยวข้อง:**
 - [payment.php](file:///c:/xampp/htdocs/ts-pattani/payment.php)

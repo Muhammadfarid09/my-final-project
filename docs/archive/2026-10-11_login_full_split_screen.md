@@ -57,7 +57,7 @@
 | `login.php` | ปรับโครงสร้างหน้าเป็น Full Split-Screen 50/50 เต็มจอ 100vh พร้อม Utility Bar และ Floating Card |
 | `assets/css/style.css` | เพิ่มสไตล์คลาสสำหรับ Full Split-Screen Layout, Visual Panel, Form Panel และ Gold CTA |
 | `assets/css/responsive-mobile.css` | เพิ่มกฎ Media Query สำหรับจอมือถือ (<= 768px) ซ่อนฝั่งซ้ายและขยายฝั่งขวาเต็ม 100% |
-| `docs/2026-10-11_login_full_split_screen.md` | บันทึกเอกสารสรุปผลประจำวันตามข้อกำหนด GEMINI.md |
+| `docs/2026-10-11_login_full_split_screen.md` | บันทึกเอกสารสรุปผลประจำวันตามข้อกำหนด PROJECT_GUIDELINES.md |
 
 ---
 

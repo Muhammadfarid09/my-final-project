@@ -17,7 +17,7 @@
      - ข้อที่ 4: JavaScript Safety & Event Integrity (ห้ามผูก Event ซ้ำซ้อน, ป้องกัน Double Submission, Scope Isolation ด้วย IIFE)
      - ข้อที่ 5: Backend Logic & Session Integrity (Unified Auth Check, Input Sanitization)
      - ข้อที่ 6: AI Operational Protocol (วางแผนและวิเคราะห์ผลกระทบก่อนลงมือ, ห้ามแอบเปลี่ยนโค้ดโดยไม่แจ้ง)
-2. **แก้ไขไฟล์ [`GEMINI.md`](file:///c:/xampp/htdocs/ts-pattani/GEMINI.md):**
+2. **แก้ไขไฟล์ [`PROJECT_GUIDELINES.md`](file:///c:/xampp/htdocs/ts-pattani/PROJECT_GUIDELINES.md):**
    - เพิ่มหมวด "🛡️ กฎเหล็กและข้อจำกัดการปฏิบัติงาน (System Rules & Strict Operational Constraints)"
    - เชื่อมโยง [`docs/ADDITIONAL_RULES.md`](file:///c:/xampp/htdocs/ts-pattani/docs/ADDITIONAL_RULES.md) เข้าเป็นกฎหลักที่ต้องปฏิบัติตามอย่างเคร่งครัดควบคู่กับ [`docs/PROJECT_HCI_RULES.md`](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) โดยคงกฎการตั้งชื่อไฟล์, การบันทึกรายวัน, การรายงาน 4 ส่วน และขั้นตอน 6 สเต็ปของ HCI เดิมไว้อย่างครบถ้วน 100%
 
@@ -27,7 +27,7 @@
 
 ### 2.1 โครงสร้างลำดับชั้นของกฎ (Rule Hierarchy & Governance)
 ```
-[GEMINI.md] (Master Guidelines & Operational Standards)
+[PROJECT_GUIDELINES.md] (Master Guidelines & Operational Standards)
    ├── กฎการตั้งชื่อไฟล์และการจัดเก็บเอกสารรายวัน (docs/YYYY-MM-DD_...)
    ├── โครงสร้างการรายงานผลการทำงาน 4 ส่วนบังคับ
    ├── มาตรฐานการออกแบบ UI/UX ตามหลัก HCI (docs/PROJECT_HCI_RULES.md)
@@ -52,7 +52,7 @@
 
 1. **การตรวจสอบความถูกต้องของเอกสาร:**
    - ตรวจสอบไฟล์ [`docs/ADDITIONAL_RULES.md`](file:///c:/xampp/htdocs/ts-pattani/docs/ADDITIONAL_RULES.md) เนื้อหากฎเหล็กครบทั้ง 6 ข้อ
-   - ตรวจสอบไฟล์ [`GEMINI.md`](file:///c:/xampp/htdocs/ts-pattani/GEMINI.md) มีการอ้างอิงลิงก์และสรุปย่ออย่างชัดเจน
+   - ตรวจสอบไฟล์ [`PROJECT_GUIDELINES.md`](file:///c:/xampp/htdocs/ts-pattani/PROJECT_GUIDELINES.md) มีการอ้างอิงลิงก์และสรุปย่ออย่างชัดเจน
 2. **การนำไปปฏิบัติในทุกคำสั่งถัดไป (Enforcement):**
    - ทุกครั้งก่อนเริ่มเขียนโค้ด AI จะต้องตรวจสอบความซ้ำซ้อนตามหลัก DRY
    - สรุปแผนและไฟล์ที่จะแก้ไขพร้อมผลกระทบให้ผู้ใช้ทราบก่อนลงมือ (Plan & Impact Analysis First)
@@ -64,7 +64,7 @@
 ## 4. ปัญหาที่เจอหรือแก้อะไรบ้าง (Issues Encountered & Resolved)
 
 1. **การป้องกันไม่ให้กฎใหม่ไปลบล้างกฎเดิม (Preserving Existing Rule Integrity):**
-   - *วิธีแก้:* ไม่ลบส่วนใดๆ ใน `GEMINI.md` ออก แต่ใช้วิธีต่อเติมส่วน "กฎเหล็กและข้อจำกัดการปฏิบัติงาน" และลิงก์ไปยัง `docs/ADDITIONAL_RULES.md` โดยตรง
+   - *วิธีแก้:* ไม่ลบส่วนใดๆ ใน `PROJECT_GUIDELINES.md` ออก แต่ใช้วิธีต่อเติมส่วน "กฎเหล็กและข้อจำกัดการปฏิบัติงาน" และลิงก์ไปยัง `docs/ADDITIONAL_RULES.md` โดยตรง
 2. **การอ้างอิงเส้นทางไฟล์ (File Path Links):**
-   - *วิธีแก้:* ใช้ลิงก์รูปแบบ GitHub Markdown link พร้อม `file:///` scheme ตามมาตรฐาน Antigravity เพื่อให้ผู้ใช้สามารถคลิกเปิดเอกสารได้ทันทีจากแชตหรือตัวแก้ไขโค้ด
+   - *วิธีแก้:* ใช้ลิงก์รูปแบบ GitHub Markdown link พร้อม `file:///` scheme ตามมาตรฐาน System Development Tools เพื่อให้ผู้ใช้สามารถคลิกเปิดเอกสารได้ทันทีจากแชตหรือตัวแก้ไขโค้ด
 

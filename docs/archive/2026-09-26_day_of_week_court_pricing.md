@@ -1,7 +1,7 @@
 # บันทึกการพัฒนาระบบ: ระบบคำนวณราคาค่าสนามตามวันในสัปดาห์ (Day-of-Week Dynamic Pricing)
 **วันที่:** 2026-09-26  
 **ระบบ:** T.S. Pattani Badminton Court Management System  
-**ผู้จัดทำ:** Antigravity AI Assistant
+**ผู้จัดทำ:** ทีมพัฒนาระบบ (Development Team)
 
 ---
 

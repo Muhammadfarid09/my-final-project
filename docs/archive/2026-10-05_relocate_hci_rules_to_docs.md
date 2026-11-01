@@ -1,7 +1,7 @@
 # บันทึกการดำเนินงาน: ย้ายเอกสาร PROJECT_HCI_RULES.md เข้าสู่โฟลเดอร์ docs/ (2026-10-05)
 **วันที่:** 2026-10-05  
 **ระบบ:** T.S. Pattani Badminton Court Management System  
-**ผู้จัดทำ:** Antigravity AI Assistant
+**ผู้จัดทำ:** ทีมพัฒนาระบบ (Development Team)
 
 ---
 
@@ -15,7 +15,7 @@
    - การใช้คำสั่ง `git mv` ช่วยรักษาประวัติการแก้ไข (Git History / Blame) ไว้อย่างสมบูรณ์
 2. **[README.md](file:///c:/xampp/htdocs/ts-pattani/README.md):**
    - อัปเดตผังโครงสร้างไดเรกทอรีของโปรเจกต์ (Project Structure Tree) ในบรรทัดโฟลเดอร์ `docs/` ให้ระบุถึง [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) ไว้อย่างชัดเจน
-3. **[GEMINI.md](file:///c:/xampp/htdocs/ts-pattani/GEMINI.md):**
+3. **[PROJECT_GUIDELINES.md](file:///c:/xampp/htdocs/ts-pattani/PROJECT_GUIDELINES.md):**
    - เพิ่มหมวดหมู่ **"🎨 มาตรฐานการออกแบบ UI/UX ตามหลัก HCI"** กำหนดให้ AI Assistant ยึดถือกฎใน [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md) และต้องปฏิบัติตามกระบวนการ 6 ขั้นตอน (*Understand → Analyze → Propose → Confirm → Modify → Verify*) อย่างเคร่งครัด
 
 ---
@@ -26,7 +26,7 @@
 ```text
 ts-pattani/
 ├── README.md                      <-- หน้าแรกของ GitHub (ภาพรวม, ติดตั้ง, บัญชีทดสอบ)
-├── GEMINI.md                      <-- กฎระบบควบคุม AI Assistant (อ้างอิงไปยัง docs/PROJECT_HCI_RULES.md)
+├── PROJECT_GUIDELINES.md                      <-- กฎระบบควบคุม AI Assistant (อ้างอิงไปยัง docs/PROJECT_HCI_RULES.md)
 ├── docs/                          <-- ศูนย์รวมเอกสาร สเปก และบันทึกทั้งหมด
 │   ├── PROJECT_HCI_RULES.md       <-- กฎการออกแบบ UI/UX, Heuristics และ Workflow (ย้ายมาที่นี่)
 │   ├── USER_SCOPE_AUDIT_RESULT.md <-- ผลการตรวจขอบเขต 1.3
@@ -37,7 +37,7 @@ ts-pattani/
 └── assets/                        # ไฟล์ CSS / JS / Images
 ```
 
-* **Root Directory สะอาด:** มีเฉพาะไฟล์ที่จำเป็นต่อเครื่องมือภายนอก (GitHub อ่าน `README.md`, Antigravity อ่าน `GEMINI.md`)
+* **Root Directory สะอาด:** มีเฉพาะไฟล์ที่จำเป็นต่อเครื่องมือภายนอก (GitHub อ่าน `README.md`, System Development Tools อ่าน `PROJECT_GUIDELINES.md`)
 * **Docs Directory ครบถ้วน:** เอกสารเชิงเทคนิคและการออกแบบทั้งหมดถูกรวมไว้ในที่เดียว อ่านง่าย ค้นหาง่าย สำหรับการทำเล่มโครงงาน
 
 ---
@@ -47,7 +47,7 @@ ts-pattani/
 1. **การเข้าถึงเอกสาร HCI:**
    - สามารถเปิดอ่านไฟล์ได้โดยตรงที่: [docs/PROJECT_HCI_RULES.md](file:///c:/xampp/htdocs/ts-pattani/docs/PROJECT_HCI_RULES.md)
 2. **การตรวจสอบลิงก์ในเอกสาร:**
-   - ในหน้าแรกของ [README.md](file:///c:/xampp/htdocs/ts-pattani/README.md) และ [GEMINI.md](file:///c:/xampp/htdocs/ts-pattani/GEMINI.md) จะมีลิงก์อ้างอิงชี้มาที่ `docs/PROJECT_HCI_RULES.md` อย่างถูกต้อง
+   - ในหน้าแรกของ [README.md](file:///c:/xampp/htdocs/ts-pattani/README.md) และ [PROJECT_GUIDELINES.md](file:///c:/xampp/htdocs/ts-pattani/PROJECT_GUIDELINES.md) จะมีลิงก์อ้างอิงชี้มาที่ `docs/PROJECT_HCI_RULES.md` อย่างถูกต้อง
 
 ---
 
@@ -56,4 +56,4 @@ ts-pattani/
 * **ความต้องการเดิม:** ผู้ใช้ต้องการย้ายไฟล์ `PROJECT_HCI_RULES.md` ไปไว้ในโฟลเดอร์ `docs/` เพื่อไม่ให้ Root Directory มีไฟล์กระจัดกระจาย
 * **วิธีการแก้ไข:**
   - ย้ายไฟล์ด้วย `git mv` เพื่อไม่ให้สูญเสียประวัติการ Commit
-  - อัปเดต Path การอ้างอิงใน `README.md` และ `GEMINI.md` ทันที ป้องกันการเกิด Broken Link
+  - อัปเดต Path การอ้างอิงใน `README.md` และ `PROJECT_GUIDELINES.md` ทันที ป้องกันการเกิด Broken Link

@@ -45,7 +45,7 @@
 | `index.php` | **แก้ไข** - ปรับลูป Marquee ให้เรียกใช้ ASICS ทั้ง Loop 1 และ Loop 2 พร้อมเพิ่ม `loading="lazy"` |
 | `assets/css/style.css` | **แก้ไข** - ขยายขนาดการ์ดเป็น 60px, ปรับรัศมีขอบมน, เงาแสงสีทอง, Hover Lift และระยะ Track Gap |
 | `assets/css/responsive-mobile.css` | **แก้ไข** - ปรับขนาดการ์ดบนหน้าจอมือถือเป็น 46px และปรับระยะห่างให้สมดุล |
-| `docs/2026-10-11_brand_marquee_redesign.md` | **สร้างใหม่** - บันทึกเอกสารสรุปผลประจำวันตามข้อกำหนด GEMINI.md |
+| `docs/2026-10-11_brand_marquee_redesign.md` | **สร้างใหม่** - บันทึกเอกสารสรุปผลประจำวันตามข้อกำหนด PROJECT_GUIDELINES.md |
 
 ---
 

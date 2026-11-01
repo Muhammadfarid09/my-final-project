@@ -1,7 +1,7 @@
 # ADMIN SCOPE AUDIT RESULT
 **โครงการ:** ระบบจัดการสนามแบดมินตัน T.S. Pattani
 **วันที่ตรวจสอบ:** 18 กันยายน 2026
-**ตรวจสอบโดย:** Antigravity AI Assistant
+**ตรวจสอบโดย:** ทีมตรวจสอบคุณภาพระบบ (Quality Assurance Team)
 
 ---
 

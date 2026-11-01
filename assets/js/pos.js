@@ -4,7 +4,7 @@
  * File: assets/js/pos.js
  * Description: โมดูลจัดการระบบขายหน้าร้าน (POS) เฉพาะทางสำหรับการเปิดสนาม Walk-in
  *              คำนวณอัตราค่าบริการตามช่วงเวลา (Peak/Off-peak/Standard) และจัดการตะกร้าสินค้า
- * Author: Antigravity AI & T.S. Pattani Team
+ * Author: Muhammadfarid (Developer) & T.S. Pattani Team
  * License: Educational & Commercial Use for T.S. Pattani Badminton Court
  * ==============================================================================
  */

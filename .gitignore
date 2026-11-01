@@ -5,3 +5,16 @@ uploads/slips/*
 # Ignore news uploads
 uploads/news/*
 !uploads/news/.gitkeep
+
+# Local Rules & Sensitive Config (Keep on local machine only)
+GEMINI.md
+
+# Local Development Utilities
+start_tunnel.bat
+
+# Temporary Files, Logs & Scratch
+sess_*
+*.log
+scratch/
+.DS_Store
+Thumbs.db

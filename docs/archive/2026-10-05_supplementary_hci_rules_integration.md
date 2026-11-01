@@ -1,7 +1,7 @@
 # บันทึกการดำเนินงาน: บันทึกและผสานรวม Supplementary HCI Rules (2026-10-05)
 **วันที่:** 2026-10-05  
 **ระบบ:** T.S. Pattani Badminton Court Management System  
-**ผู้จัดทำ:** Antigravity AI Assistant
+**ผู้จัดทำ:** ทีมพัฒนาระบบ (Development Team)
 
 ---
 
@@ -34,7 +34,7 @@
 ```text
 ts-pattani/
 ├── PROJECT_HCI_RULES.md           <-- กฎกลางด้าน HCI, UX/UI, Heuristics และ Workflow ทั้งหมด
-├── GEMINI.md                      <-- กฎควบคุมการทำงานของ AI Assistant และมาตรฐานรายงานประจำวัน 4 ส่วน
+├── PROJECT_GUIDELINES.md                      <-- กฎควบคุมการทำงานของ AI Assistant และมาตรฐานรายงานประจำวัน 4 ส่วน
 ├── README.md                      <-- เอกสารแนะนำและคู่มือการติดตั้งโครงการ
 └── docs/
     └── 2026-10-05_supplementary_hci_rules_integration.md <-- บันทึกประจำวันฉบับนี้

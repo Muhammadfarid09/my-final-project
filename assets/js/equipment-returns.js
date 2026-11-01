@@ -4,7 +4,7 @@
  * File: assets/js/equipment-returns.js
  * Description: โมดูลเฉพาะทางสำหรับระบบตรวจรับคืนอุปกรณ์กีฬา (Equipment Return)
  *              คำนวณค่าปรับเกินกำหนด/ชำรุด/สูญหาย และยืนยันการรับคืนผ่าน SweetAlert2
- * Author: Antigravity AI & T.S. Pattani Team
+ * Author: Muhammadfarid (Developer) & T.S. Pattani Team
  * License: Educational & Commercial Use for T.S. Pattani Badminton Court
  * ==============================================================================
  */

@@ -88,11 +88,12 @@ git clone https://github.com/Muhammadfarid09/my-final-project.git ts-pattani
 
 ### 3. ติดตั้งฐานข้อมูลและสร้างบัญชีผู้ดูแลระบบเริ่มต้น (Database Setup & Seed Admin)
 1. เปิดโปรแกรม **XAMPP Control Panel** และกด Start บริการ **Apache** และ **MySQL**
-2. เปิดเบราว์เซอร์แล้วเข้าไปที่ URL ด้านล่างนี้เพื่อรันสคริปต์สร้างฐานข้อมูล 19 ตาราง พร้อมบันทึกบัญชีแอดมินเริ่มต้นอัตโนมัติในขั้นตอนเดียว:
+2. **วิธีที่ 1 (อัตโนมัติผ่านเว็บ):** เปิดเบราว์เซอร์แล้วเข้าไปที่ URL ด้านล่างนี้เพื่อรันสคริปต์สร้างฐานข้อมูล 22 ตาราง พร้อมบันทึกบัญชีแอดมินเริ่มต้นอัตโนมัติ:
    ```text
    http://localhost/ts-pattani/config/setup.php
    ```
    *(หรือสามารถรันผ่าน Command Line: `C:\xampp\php\php.exe C:\xampp\htdocs\ts-pattani\config\setup.php`)*
+3. **วิธีที่ 2 (ผ่าน phpMyAdmin):** สร้างฐานข้อมูลชื่อ `ts_pattani_db` (Collation: `utf8mb4_unicode_ci`) แล้วกด Import ไฟล์ `database/ts_pattani_db.sql` เข้าสู่ระบบ
 
 ---
 
@@ -100,14 +101,14 @@ git clone https://github.com/Muhammadfarid09/my-final-project.git ts-pattani
 
 ### 1. บัญชีผู้ดูแลระบบ (Admin)
 * **หน้าเข้าสู่ระบบ:** [http://localhost/ts-pattani/admin/login.php](http://localhost/ts-pattani/admin/login.php)
-* **เบอร์โทรศัพท์:** `0993241657`
+* **เบอร์โทรศัพท์:** `0812345678`
 * **รหัสผ่าน:** `admin1234`
-* **สิทธิ์:** Super Admin (เข้าถึงได้ทุกเมนูหลังบ้าน)
+* **สิทธิ์:** Super Admin (เจ้าของสนาม - เข้าถึงได้ทุกเมนูหลังบ้าน)
 
 ### 2. บัญชีสมาชิกตัวอย่าง (Member)
 * **หน้าเข้าสู่ระบบ:** [http://localhost/ts-pattani/login.php](http://localhost/ts-pattani/login.php)
-* **เบอร์โทรศัพท์:** `0993241657` *(หรือสามารถกด "สมัครสมาชิกใหม่" ได้ทันทีที่หน้าเว็บ)*
-* **รหัสผ่าน:** บัญชีที่ลงทะเบียน หรือทดสอบระบบกู้คืนรหัสผ่านด้วยตนเองผ่าน `forgot_password.php`
+* **เบอร์โทรศัพท์:** `0812345678` *(หรือสามารถกด "สมัครสมาชิกใหม่" ได้ทันทีที่หน้าเว็บ)*
+* **รหัสผ่าน:** `admin1234`
 
 ---
 
@@ -124,29 +125,39 @@ ts-pattani/
 │   └── ...
 │
 ├── admin/                    # หน้าจอและระบบหลังบ้านของผู้ดูแลระบบ
-│   ├── actions/              # สคริปต์ประมวลผลฝั่งแอดมิน
+│   ├── actions/              # สคริปต์ประมวลผลฝั่งแอดมิน (POS Closeout, Repairs, ฯลฯ)
 │   ├── includes/             # ส่วนประกอบ UI หลังบ้าน (Sidebar, Header, Auth Check)
 │   ├── index.php             # แดชบอร์ดสรุปรายรับและกราฟสถิติวิเคราะห์ข้อมูล
+│   ├── audit_logs.php        # ระบบตรวจสอบย้อนหลัง Enterprise Audit Trail
 │   ├── pos.php               # จุดขายหน้าร้าน & เปิดสนาม Walk-in
+│   ├── pos_closeout.php      # ระบบปิดกะการเงิน ตรวจนับเงินสดในลิ้นชัก
+│   ├── pos_zreport.php       # รายงานสรุปปิดกะสิ้นวันมาตรฐาน 80mm Z-Report
 │   ├── equipment_returns.php # ตรวจรับคืนอุปกรณ์เช่าและคำนวณค่าปรับ
 │   ├── cancellations.php     # ตรวจสอบและพิจารณาคืนเงินจากการยกเลิก
 │   └── ...
 │
 ├── assets/                   # ไฟล์ Static Assets
-│   ├── css/                  # สไตล์ชีท (global.css, admin.css, style.css)
-│   └── js/                   # สคริปต์หน้าบ้าน (member.js, admin.js)
+│   ├── css/                  # สไตล์ชีท (global.css, admin.css, home.css, pwa-install.css)
+│   ├── js/                   # สคริปต์หน้าบ้าน (member.js, admin.js, pwa-handler.js)
+│   └── img/                  # โลโก้, รูปอุปกรณ์, และไอคอนแอป PWA (192x192, 512x512)
 │
 ├── config/                   # การตั้งค่าฐานข้อมูลและสคริปต์เริ่มต้นระบบ
 │   ├── config.php            # การเชื่อมต่อฐานข้อมูล PDO
-│   └── setup.php             # สคริปต์ติดตั้งตารางฐานข้อมูลครบ 19 ตารางและบันทึกแอดมินเริ่มต้น
+│   └── setup.php             # สคริปต์ติดตั้งตารางฐานข้อมูลครบ 22 ตารางและบันทึกแอดมินเริ่มต้น
 │
-├── docs/                     # เอกสารการพัฒนาระบบ, บันทึกรายวัน และกฎการออกแบบ UI/UX (PROJECT_HCI_RULES.md)
+├── database/                 # คลังสคีมาฐานข้อมูล
+│   └── ts_pattani_db.sql     # สคีมาและข้อมูลตัวอย่างสมบูรณ์ครบ 22 ตาราง พร้อม Import
+│
+├── docs/                     # เอกสารวิชาการ, บันทึกการปฏิบัติงานรายวัน และคู่มือ HCI
 ├── uploads/                  # โฟลเดอร์จัดเก็บไฟล์อัปโหลด (สลิป, รูปข่าว, รูปสินค้า)
 ├── booking.php               # หน้าจอจองสนามแบบ One-stop พร้อม Time-slot Matrix
-├── booking_history.php       # ประวัติการจองและติดตามสถานะ
+├── booking_history.php       # ประวัติการจองและติดตามสถานะ พร้อม E-Receipt
 ├── chat.php                  # หน้าจอแชทสนทนากับแอดมิน
 ├── profile.php               # หน้าโปรไฟล์ส่วนตัวและประวัติคะแนนสะสม
 ├── rewards.php               # แคตตาล็อกแลกของรางวัล
+├── manifest.json             # ไฟล์คอนฟิกเว็บแอปพลิเคชันก้าวหน้า (PWA Web App Manifest)
+├── sw.js                     # Service Worker แคชความเร็วสูงและรองรับ Offline Stale-While-Revalidate
+├── 404.php / 403.php / 500.php # หน้าจอแจ้งเตือนข้อผิดพลาดมาตรฐานความปลอดภัย
 └── README.md                 # เอกสารแนะนำและคู่มือการใช้งานโครงงาน
 ```
 
