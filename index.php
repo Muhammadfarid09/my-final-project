@@ -70,6 +70,17 @@ try {
     <link rel="stylesheet" href="assets/css/home.css?v=<?php echo filemtime('assets/css/home.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- PWA Web App Manifest & Standards (Must be in head) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="T.S. Badminton">
+    <link rel="apple-touch-icon" href="assets/img/icons/icon-192x192.png">
+    <link rel="stylesheet" href="assets/css/pwa-install.css?v=1793517755">
+    <script src="assets/js/pwa-handler.js?v=1793517755" defer></script>
 </head>
 <body class="page-body">
     
@@ -99,7 +110,7 @@ try {
                     <div class="home-hero-actions">
                         <a href="booking.php" class="home-btn-primary">
                             <i class="fas fa-calendar-check"></i>
-                            <span>จองสนาม</span>
+                            <span>จองสนามทันที</span>
                         </a>
                         <?php if (isset($_SESSION['member_id'])): ?>
                             <a href="profile.php" class="home-btn-secondary">
@@ -117,6 +128,7 @@ try {
                         <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> เช็คคอร์ทว่างเรียลไทม์</span>
                         <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> ล็อกคิวอัตโนมัติ</span>
                         <span class="hero-trust-item"><i class="fas fa-check-circle text-gold"></i> สะสมแต้มทุกการเล่น</span>
+                        <span class="hero-trust-item hero-trust-pwa" onclick="triggerPwaInstall()" title="ติดตั้งเป็นแอปพลิเคชันบนมือถือ"><i class="fas fa-mobile-screen-button text-gold"></i> ติดตั้งแอปมือถือ</span>
                     </div>
                 </div>
             </div>

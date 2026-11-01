@@ -31,6 +31,16 @@ $initial_news_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
     <link rel="stylesheet" href="assets/css/news.css?v=<?php echo file_exists('assets/css/news.css') ? filemtime('assets/css/news.css') : time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- PWA Web App Manifest & Standards -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="T.S. Badminton">
+    <link rel="apple-touch-icon" href="assets/img/icons/icon-192x192.png">
+    <link rel="stylesheet" href="assets/css/pwa-install.css?v=1.0">
+    <script src="assets/js/pwa-handler.js?v=1.0" defer></script>
 </head>
 <body class="page-body">
 

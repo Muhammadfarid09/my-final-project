@@ -79,6 +79,16 @@ try {
     <link rel="stylesheet" href="assets/css/rewards.css?v=<?php echo filemtime('assets/css/rewards.css'); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PWA Web App Manifest & Standards -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="T.S. Badminton">
+    <link rel="apple-touch-icon" href="assets/img/icons/icon-192x192.png">
+    <link rel="stylesheet" href="assets/css/pwa-install.css?v=1.0">
+    <script src="assets/js/pwa-handler.js?v=1.0" defer></script>
 </head>
 <body class="page-body">
 

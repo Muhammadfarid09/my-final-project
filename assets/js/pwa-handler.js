@@ -141,4 +141,32 @@
             }, 100);
         }, 3000);
     }
+
+    // 7. Global Trigger Function สำหรับการกดจากปุ่มในหน้าเว็บ
+    window.triggerPwaInstall = function () {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function (choiceResult) {
+                if (choiceResult.outcome === 'accepted') {
+                    hideBanner();
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            showBanner();
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) {
+                banner.classList.add('pwa-show');
+            }
+            if (isIos) {
+                const iosGuide = document.getElementById('pwaIosGuide');
+                const btnInstall = document.getElementById('btnPwaInstall');
+                if (iosGuide && btnInstall) {
+                    btnInstall.style.display = 'none';
+                    iosGuide.style.display = 'block';
+                }
+            }
+        }
+    };
 })();
+

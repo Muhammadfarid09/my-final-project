@@ -83,6 +83,7 @@ if (!isset($member_points) || !isset($member_level)) {
                     </a>
                 </li>
 
+
                 <!-- รายการสำหรับจอมือถือ (Drawer Actions) -->
                 <li class="mobile-actions-item">
                     <?php if (isset($_SESSION['member_id'])): ?>
@@ -135,6 +136,7 @@ if (!isset($member_points) || !isset($member_level)) {
                         <a href="actions/logout.php" class="text-danger"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</a>
                     </div>
                 </div>
+                
                 <a href="booking.php" class="btn-nav-cta">
                     <i class="fas fa-calendar-plus"></i>
                     <span>จองสนาม</span>

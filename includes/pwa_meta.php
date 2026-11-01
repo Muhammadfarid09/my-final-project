@@ -15,3 +15,4 @@ $pwa_base = (strpos($_SERVER['PHP_SELF'], '/admin/') !== false) ? '../' : '';
 <link rel="apple-touch-icon" href="<?php echo $pwa_base; ?>assets/img/icons/icon-192x192.png">
 <link rel="stylesheet" href="<?php echo $pwa_base; ?>assets/css/pwa-install.css?v=<?php echo file_exists(__DIR__ . '/../assets/css/pwa-install.css') ? filemtime(__DIR__ . '/../assets/css/pwa-install.css') : '1.0'; ?>">
 <script src="<?php echo $pwa_base; ?>assets/js/pwa-handler.js?v=<?php echo file_exists(__DIR__ . '/../assets/js/pwa-handler.js') ? filemtime(__DIR__ . '/../assets/js/pwa-handler.js') : '1.0'; ?>" defer></script>
+
