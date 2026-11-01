@@ -54,6 +54,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':member_id' => $member_id
         ]);
 
+        // ส่งการแจ้งเตือนสลิปใหม่เข้า Discord Webhook
+        try {
+            $stmt_notif = $conn->prepare("
+                SELECT b.booking_date, b.booking_start_time, b.booking_end_time, c.court_name, m.member_name, m.member_phone
+                FROM Booking b
+                JOIN Court c ON b.court_id = c.court_id
+                JOIN Member m ON b.member_id = m.member_id
+                WHERE b.booking_id = :b_id
+            ");
+            $stmt_notif->execute([':b_id' => $booking_id]);
+            $notif_data = $stmt_notif->fetch(PDO::FETCH_ASSOC);
+
+            if ($notif_data) {
+                $time_str = date('H:i', strtotime($notif_data['booking_start_time'])) . ' - ' . date('H:i', strtotime($notif_data['booking_end_time'])) . ' น.';
+                send_discord_alert(
+                    '🏸 [รายการจองใหม่] แนบสลิปโอนเงินรอตรวจสอบ!',
+                    'มีลูกค้าทำรายการจองสนามและแนบสลิปหลักฐานการโอนเงินเข้ามาในระบบ กรุณาตรวจสอบและอนุมัติการจอง',
+                    [
+                        ['name' => '👤 ผู้จอง', 'value' => $notif_data['member_name'] . ' (' . $notif_data['member_phone'] . ')', 'inline' => true],
+                        ['name' => '🏟️ สนาม', 'value' => $notif_data['court_name'], 'inline' => true],
+                        ['name' => '📅 วันและเวลา', 'value' => date('d/m/Y', strtotime($notif_data['booking_date'])) . ' (' . $time_str . ')', 'inline' => false],
+                        ['name' => '💰 ยอดเงินที่โอน', 'value' => number_format($booking_total_price, 2) . ' ฿', 'inline' => true],
+                        ['name' => '🔗 รหัสการจอง', 'value' => '#' . $booking_id, 'inline' => true]
+                    ],
+                    16759069 // สีทอง Gold #FFAE1D
+                );
+            }
+        } catch (Throwable $notif_err) {
+            error_log("Discord notification error: " . $notif_err->getMessage());
+        }
         // สำเร็จ พาไปหน้าประวัติการจองหรือหน้าแรก พร้อมข้อความแจ้งเตือน
         $_SESSION['success'] = "อัปโหลดสลิปสำเร็จ! รอผู้ดูแลระบบตรวจสอบและอนุมัติการจอง";
         header("Location: ../booking_history.php");

@@ -146,6 +146,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
 
             $conn->commit();
+
+            // ส่งแจ้งเตือนคำขอยกเลิกเข้า Discord Webhook
+            try {
+                send_discord_alert(
+                    '⚠️ [คำขอยกเลิกการจอง] มีลูกค้าขอยกเลิกและขอเงินคืน',
+                    'มีสมาชิกร้องขอยกเลิกการจองสนาม กรุณาตรวจสอบข้อมูลและพิจารณาคืนเงินในระบบหลังบ้าน',
+                    [
+                        ['name' => '👤 สมาชิก', 'value' => ($_SESSION['member_name'] ?? 'Member') . ' (ID: ' . $member_id . ')', 'inline' => true],
+                        ['name' => '🔗 รหัสการจอง', 'value' => '#' . $booking_id, 'inline' => true],
+                        ['name' => '📝 เหตุผล', 'value' => $cancel_reason, 'inline' => false],
+                        ['name' => '🏦 ธนาคารรับเงินคืน', 'value' => ($refund_bank ?: 'พร้อมเพย์') . ' (' . $refund_account_no . ')', 'inline' => true],
+                        ['name' => 'ชื่อบัญชี', 'value' => $refund_account_name, 'inline' => true]
+                    ],
+                    15746887 // สีแดง Red
+                );
+            } catch (Throwable $notif_err) {
+                error_log("Discord notification error: " . $notif_err->getMessage());
+            }
             $_SESSION['success'] = "ส่งคำขอยกเลิกการจองเรียบร้อยแล้ว! รายการของคุณอยู่ในคิวพิจารณาของผู้ดูแลระบบ (แอดมินจะพิจารณาโอนเงินคืนตามเงื่อนไขเวลา)";
         } else {
             throw new Exception("สถานะการจองไม่ถูกต้อง ไม่สามารถดำเนินการได้");

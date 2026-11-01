@@ -586,3 +586,77 @@ if (!function_exists('log_activity')) {
         }
     }
 }
+
+
+// =========================================================================
+// 9. Discord Webhook Notification Engine
+// =========================================================================
+if (!function_exists('send_discord_alert')) {
+    /**
+     * ส่งการแจ้งเตือนแบบ Rich Embeds ไปยัง Discord Webhook
+     *
+     * @param string $title หัวข้อการแจ้งเตือน
+     * @param string $description รายละเอียดสรุป
+     * @param array $fields ข้อมูลแบบตาราง Key-Value (Array of ['name' => '...', 'value' => '...', 'inline' => true/false])
+     * @param int $color รหัสสีตัวเลข Hex to Decimal (ทอง: 16759069, เขียว: 1097601, แดง: 15746887)
+     * @param string|null $imageUrl URL รูปภาพประกอบ (ถ้ามี)
+     * @return bool
+     */
+    function send_discord_alert(string $title, string $description, array $fields = [], int $color = 16759069, ?string $imageUrl = null): bool {
+        $webhook_url = defined('DISCORD_WEBHOOK_URL') ? DISCORD_WEBHOOK_URL : '';
+        if (empty($webhook_url)) return false;
+
+        try {
+            $embed = [
+                'title'       => $title,
+                'description' => $description,
+                'color'       => $color,
+                'fields'      => $fields,
+                'footer'      => [
+                    'text' => 'T.S. Badminton Pattani System • ' . date('d/m/Y H:i:s น.')
+                ],
+                'timestamp'   => date('c')
+            ];
+
+            if (!empty($imageUrl)) {
+                $embed['thumbnail'] = ['url' => $imageUrl];
+            }
+
+            $payload = json_encode([
+                'username'   => 'T.S. Badminton Bot',
+                'avatar_url' => 'https://cdn-icons-png.flaticon.com/512/2964/2964514.png',
+                'embeds'     => [$embed]
+            ], JSON_UNESCAPED_UNICODE);
+
+            if (function_exists('curl_init')) {
+                $ch = curl_init($webhook_url);
+                curl_setopt_array($ch, [
+                    CURLOPT_HTTPHEADER      => ['Content-Type: application/json; charset=utf-8'],
+                    CURLOPT_POST            => 1,
+                    CURLOPT_POSTFIELDS      => $payload,
+                    CURLOPT_RETURNTRANSFER  => true,
+                    CURLOPT_SSL_VERIFYPEER  => false,
+                    CURLOPT_TIMEOUT         => 4
+                ]);
+                curl_exec($ch);
+                curl_close($ch);
+            } else {
+                $ctx = stream_context_create([
+                    'http' => [
+                        'method'  => 'POST',
+                        'header'  => "Content-Type: application/json; charset=utf-8\r\n",
+                        'content' => $payload,
+                        'timeout' => 4
+                    ],
+                    'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]
+                ]);
+                @file_get_contents($webhook_url, false, $ctx);
+            }
+
+            return true;
+        } catch (Throwable $e) {
+            error_log("Discord Webhook Error: " . $e->getMessage());
+            return false;
+        }
+    }
+}
