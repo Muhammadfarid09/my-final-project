@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="<?php echo get_csrf_token(); ?>">
     <?php if (isset($extra_head)) echo $extra_head; ?>
+    <!-- ผนวกระบบ Progressive Web App (PWA) สำหรับแอดมิน -->
+    <?php include_once __DIR__ . '/../../includes/pwa_meta.php'; ?>
 </head>
 <body>
 

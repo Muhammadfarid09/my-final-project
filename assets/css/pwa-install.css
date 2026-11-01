@@ -1,0 +1,171 @@
+/**
+ * T.S. Pattani Badminton - Custom PWA Install Prompt Banner
+ * Theme: Midnight Slate & Prestige Gold
+ * Strictly conforms to PROJECT_HCI_RULES and ADDITIONAL_RULES (Zero inline styles, zero !important)
+ */
+
+.pwa-install-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    width: calc(100% - 32px);
+    max-width: 480px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(212, 175, 55, 0.4);
+    border-radius: 18px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 25px rgba(212, 175, 55, 0.15);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+    font-family: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #f8fafc;
+    box-sizing: border-box;
+}
+
+.pwa-install-banner.pwa-show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pwa-banner-left {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.pwa-app-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.pwa-banner-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.pwa-banner-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pwa-banner-desc {
+    font-size: 0.775rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pwa-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.btn-pwa-install {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.15rem;
+    background: linear-gradient(135deg, #d4af37 0%, #b89628 100%);
+    color: #0f172a;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
+    white-space: nowrap;
+}
+
+.btn-pwa-install:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, #e5be42 0%, #c4a132 100%);
+    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.45);
+}
+
+.btn-pwa-dismiss {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-pwa-dismiss:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+/* iOS Safari Guide Tooltip */
+.pwa-ios-guide {
+    display: none;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.775rem;
+    color: #fbbf24;
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+.pwa-ios-guide i {
+    margin: 0 3px;
+    color: #60a5fa;
+}
+
+@media (max-width: 480px) {
+    .pwa-install-banner {
+        bottom: 16px;
+        padding: 0.85rem 1rem;
+    }
+
+    .pwa-app-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .pwa-banner-title {
+        font-size: 0.875rem;
+    }
+
+    .btn-pwa-install {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.8rem;
+    }
+}

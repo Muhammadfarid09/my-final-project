@@ -285,3 +285,6 @@ if (!isset($member_points) || !isset($member_level)) {
 
 <!-- ผนวก Mobile Bottom Navigation Bar ส่วนกลาง -->
 <?php include_once __DIR__ . '/bottom_nav.php'; ?>
+
+<!-- ผนวกระบบ Progressive Web App (PWA) -->
+<?php include_once __DIR__ . '/pwa_meta.php'; ?>
