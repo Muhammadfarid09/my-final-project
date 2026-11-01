@@ -171,7 +171,7 @@ $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? 
 
                     <!-- 2. เบอร์โทรศัพท์ -->
                     <div class="form-group-dark">
-                        <label for="member_phone" class="form-label-dark">เบอร์โทรศัพท์ (ใช้เข้าสู่ระบบ) <span class="text-danger">*</span></label>
+                        <label for="member_phone" class="form-label-dark">เบอร์โทรศัพท์<span class="text-danger">*</span></label>
                         <div class="input-group-dark">
                             <i class="fas fa-phone input-icon-dark"></i>
                             <input type="tel" id="member_phone" name="member_phone" class="form-control-dark" placeholder="08X-XXX-XXXX" maxlength="10" inputmode="tel" autocomplete="tel" required>

@@ -115,7 +115,7 @@ if (isset($_SESSION['admin_id'])) {
                     <!-- เบอร์โทรศัพท์สำหรับแอดมิน -->
                     <div class="form-group">
                         <label for="phone" class="form-label">
-                            <i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์ (ผู้ดูแลระบบ)
+                            <i class="fas fa-phone-alt"></i> เบอร์โทรศัพท์
                         </label>
                         <div class="input-with-icon">
                             <i class="fas fa-mobile-alt input-icon"></i>
