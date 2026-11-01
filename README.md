@@ -1,8 +1,10 @@
 # 🏸 เว็บแอปพลิเคชันระบบจัดการสนามแบดมินตัน T.S. Pattani
 ### (T.S. Pattani Badminton Court Management System)
 
+[![Release](https://img.shields.io/badge/Release-v2.0.0--enterprise-brightgreen?style=flat&logo=github)](https://github.com/Muhammadfarid09/my-final-project/releases)
+[![PWA](https://img.shields.io/badge/PWA-Ready-orange?style=flat&logo=pwa)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 [![PHP Version](https://img.shields.io/badge/PHP-8.x-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
-[![Database](https://img.shields.io/badge/MySQL-Database-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Database](https://img.shields.io/badge/MySQL-22%20Tables-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Web Server](https://img.shields.io/badge/Server-Apache%20%2F%20XAMPP-FB7A24?style=flat&logo=apache&logoColor=white)](https://www.apachefriends.org/)
 [![Frontend](https://img.shields.io/badge/Frontend-HTML5%20%7C%20CSS3%20%7C%20JS-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/)
 [![UI Library](https://img.shields.io/badge/UI-Bootstrap%205-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
