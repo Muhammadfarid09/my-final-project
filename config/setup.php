@@ -196,6 +196,7 @@ try {
             `revenue_total_amount` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
             `revenue_date` DATE NOT NULL,
             `revenue_type` ENUM('ออนไลน์', 'หน้าร้าน') NOT NULL,
+            `revenue_payment_method` ENUM('เงินสด', 'โอนเงิน') NOT NULL DEFAULT 'เงินสด',
             FOREIGN KEY (`payment_id`) REFERENCES `Payment`(`payment_id`) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ";
@@ -326,6 +327,7 @@ try {
             `pos_quantity` INT(11) NOT NULL,
             `pos_total_price` DECIMAL(8,2) NOT NULL,
             `pos_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `pos_payment_method` VARCHAR(20) NOT NULL DEFAULT 'cash',
             FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE RESTRICT,
             FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE RESTRICT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -435,7 +437,41 @@ try {
     $conn->exec($sql_table_login_attempts);
 
     // ==============================================================================
-    // 22. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
+    // 22. ตารางบันทึกการปิดกะการเงินและสรุปยอดสิ้นวัน (Shift_Closeout)
+    // ใช้สำหรับ: บันทึกประวัติการปิดกะ POS, การตรวจนับเงินสดในลิ้นชัก และออกรายงาน Z-Report
+    // ==============================================================================
+    $sql_table_shift_closeout = "
+        CREATE TABLE IF NOT EXISTS `Shift_Closeout` (
+            `shift_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            `shift_code` VARCHAR(35) NOT NULL UNIQUE,
+            `admin_id` INT(11) NOT NULL,
+            `shift_date` DATE NOT NULL,
+            `opened_at` DATETIME NOT NULL,
+            `closed_at` DATETIME NOT NULL,
+            `opening_cash_float` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `pos_cash_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `pos_qr_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `online_transfer_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `court_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `rental_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `product_sales` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `total_revenue` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `expected_cash` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `actual_cash` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `cash_difference` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+            `total_transactions` INT(11) NOT NULL DEFAULT 0,
+            `notes` TEXT DEFAULT NULL,
+            `status` ENUM('ปิดกะแล้ว', 'ยกเลิก') NOT NULL DEFAULT 'ปิดกะแล้ว',
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE RESTRICT,
+            INDEX `idx_shift_date` (`shift_date`),
+            INDEX `idx_admin_id` (`admin_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ";
+    $conn->exec($sql_table_shift_closeout);
+
+    // ==============================================================================
+    // 23. บันทึกบัญชีผู้ดูแลระบบ (Admin) เริ่มต้น (Seed Initial Administrator)
     // ==============================================================================
     $default_admin_name = "เจ้าของสนาม (Admin)";
     $default_admin_phone = "0993241657"; 
@@ -460,14 +496,14 @@ try {
     }
 
     // ==============================================================================
-    // 23. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
+    // 24. แสดงผลลัพธ์สรุปสั้นๆ กระชับ (Clean Single Summary Output)
     // ==============================================================================
     if (php_sapi_name() === 'cli') {
-        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (21 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
+        echo "🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จ (22 ตารางครบถ้วน พร้อมบัญชี Admin เริ่มต้น)\n";
     } else {
         echo "<div style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif; max-width: 600px; margin: 40px auto; padding: 24px; background: #ECFDF5; border: 1px solid #10B981; border-radius: 12px; color: #065F46; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;'>";
         echo "<h2 style='margin: 0 0 10px 0; font-size: 20px; color: #047857;'>🎉 ติดตั้งฐานข้อมูล 'ts_pattani_db' สำเร็จเรียบร้อยแล้ว!</h2>";
-        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 21 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
+        echo "<p style='margin: 0; font-size: 14.5px; color: #065F46;'>โครงสร้างฐานข้อมูลครบถ้วนทั้ง 22 ตาราง พร้อมบันทึกบัญชีผู้ดูแลระบบเริ่มต้นเรียบร้อยแล้ว</p>";
         echo "</div>";
     }
 

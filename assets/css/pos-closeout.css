@@ -1,0 +1,360 @@
+/**
+ * T.S. Pattani Badminton - POS Shift Closeout & Z-Report Stylesheet
+ * Strictly conforms to PROJECT_HCI_RULES and ADDITIONAL_RULES (Zero inline styles, zero !important)
+ */
+
+/* ==========================================================================
+   1. Closeout Layout & Container
+   ========================================================================== */
+.closeout-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.closeout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .closeout-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   2. Department Breakdown List
+   ========================================================================== */
+.dept-breakdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dept-breakdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.dept-breakdown-item:last-child {
+    border-bottom: none;
+}
+
+.dept-item-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.dept-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.dept-icon-court {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.dept-icon-rental {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.dept-icon-product {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.dept-item-title {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.dept-item-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.dept-item-amount {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   3. Cash Reconciliation Panel (การตรวจนับเงินสดในลิ้นชัก)
+   ========================================================================== */
+.cash-reconcile-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.reconcile-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.reconcile-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reconcile-field {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    text-align: right;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.reconcile-field:focus {
+    background: #ffffff;
+    border-color: #d4af37;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.reconcile-field[readonly] {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+/* Difference Badge / Box */
+.difference-box {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+}
+
+.diff-balanced {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.diff-short {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.diff-over {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.diff-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.diff-amount {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   4. Thermal Z-Report Styling (80mm POS Slip Standard)
+   ========================================================================== */
+.zreport-wrapper {
+    max-width: 440px;
+    margin: 2rem auto;
+    background: #ffffff;
+    padding: 2.25rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    font-family: 'Courier New', Courier, monospace;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+}
+
+.zreport-header {
+    text-align: center;
+    border-bottom: 2px dashed #94a3b8;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.zreport-title {
+    font-family: 'Prompt', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: 0.02em;
+}
+
+.zreport-subtitle {
+    font-family: 'Prompt', sans-serif;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0 0 0.5rem;
+}
+
+.zreport-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #0f172a;
+    color: #d4af37;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    margin-top: 0.35rem;
+}
+
+.zreport-meta-table {
+    width: 100%;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.zreport-meta-table td {
+    padding: 0.2rem 0;
+}
+
+.zreport-meta-label {
+    color: #64748b;
+}
+
+.zreport-meta-val {
+    text-align: right;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.zreport-divider {
+    border: none;
+    border-top: 1px dashed #cbd5e1;
+    margin: 1rem 0;
+}
+
+.zreport-divider-double {
+    border: none;
+    border-top: 2px dashed #475569;
+    margin: 1.25rem 0;
+}
+
+.zreport-section-title {
+    font-family: 'Prompt', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0.75rem 0 0.5rem;
+    text-transform: uppercase;
+}
+
+.zreport-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    padding: 0.25rem 0;
+}
+
+.zreport-line-bold {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 0.4rem 0;
+    color: #0f172a;
+}
+
+.zreport-signatures {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    font-family: 'Prompt', sans-serif;
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+.zreport-sig-line {
+    text-align: center;
+    border-bottom: 1px dotted #94a3b8;
+    height: 1.75rem;
+    margin-bottom: 0.35rem;
+}
+
+.zreport-footer-notes {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 1.5rem;
+    font-family: 'Prompt', sans-serif;
+}
+
+/* ==========================================================================
+   5. Print Specific Media Queries
+   ========================================================================== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .zreport-wrapper,
+    .zreport-wrapper * {
+        visibility: visible;
+    }
+
+    .zreport-wrapper {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        max-width: 80mm !important;
+        margin: 0 !important;
+        padding: 10px !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}

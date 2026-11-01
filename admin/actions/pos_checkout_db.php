@@ -209,17 +209,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 throw new Exception("สินค้า/อุปกรณ์ '{$prod['product_name']}' สต็อกคงเหลือไม่พอ (เหลือ {$cur_stock} ชิ้น)");
             }
 
-            // บันทึกประวัติการขายลง Pos_sale
+            // บันทึกประวัติการขายลง Pos_sale (พร้อมวิธีชำระเงิน cash หรือ qr)
             $sql_pos = "
-                INSERT INTO Pos_sale (admin_id, product_id, pos_quantity, pos_total_price, pos_date) 
-                VALUES (:admin, :product, :qty, :price, NOW())
+                INSERT INTO Pos_sale (admin_id, product_id, pos_quantity, pos_total_price, pos_date, pos_payment_method) 
+                VALUES (:admin, :product, :qty, :price, NOW(), :pay_method)
             ";
             $stmt_pos = $conn->prepare($sql_pos);
             $stmt_pos->execute([
                 ':admin' => $admin_id,
                 ':product' => $product_id,
                 ':qty' => $qty,
-                ':price' => $item_total_price
+                ':price' => $item_total_price,
+                ':pay_method' => $payment_method
             ]);
             $last_pos_id = $conn->lastInsertId();
 
@@ -265,19 +266,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // ========================================================
         $server_total_amount = $revenue_court + $revenue_rental + $revenue_product;
 
-        // 3.1 บันทึกรายรับลงตาราง Revenue
+        // 3.1 บันทึกรายรับลงตาราง Revenue (แยกช่องทาง เงินสด vs โอนเงิน)
         $sql_revenue = "
             INSERT INTO Revenue 
-            (payment_id, revenue_court_amount, revenue_rental_amount, revenue_product_amount, revenue_total_amount, revenue_date, revenue_type) 
+            (payment_id, revenue_court_amount, revenue_rental_amount, revenue_product_amount, revenue_total_amount, revenue_date, revenue_type, revenue_payment_method) 
             VALUES 
-            (NULL, :court, :rental, :product, :total, CURDATE(), 'หน้าร้าน')
+            (NULL, :court, :rental, :product, :total, CURDATE(), 'หน้าร้าน', :pay_method)
         ";
         $stmt_revenue = $conn->prepare($sql_revenue);
         $stmt_revenue->execute([
             ':court' => $revenue_court,
             ':rental' => $revenue_rental,
             ':product' => $revenue_product,
-            ':total' => $server_total_amount
+            ':total' => $server_total_amount,
+            ':pay_method' => ($payment_method === 'qr' ? 'โอนเงิน' : 'เงินสด')
         ]);
 
         // ========================================================

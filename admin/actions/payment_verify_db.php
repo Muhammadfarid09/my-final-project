@@ -67,9 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ";
             $conn->prepare($sql_rental_active)->execute([':b_id' => $booking_id]);
 
-            // 4. บันทึกรายรับลงตาราง Revenue (แยกหมวดหมู่ชัดเจน)
-            $sql_rev = "INSERT INTO Revenue (payment_id, revenue_court_amount, revenue_rental_amount, revenue_product_amount, revenue_total_amount, revenue_date, revenue_type) 
-                        VALUES (:p_id, :court, :rental, :product, :total, CURDATE(), 'ออนไลน์')";
+            // 4. บันทึกรายรับลงตาราง Revenue (แยกหมวดหมู่ชัดเจน พร้อมระบุวิธีชำระเงินโอน)
+            $sql_rev = "INSERT INTO Revenue (payment_id, revenue_court_amount, revenue_rental_amount, revenue_product_amount, revenue_total_amount, revenue_date, revenue_type, revenue_payment_method) 
+                        VALUES (:p_id, :court, :rental, :product, :total, CURDATE(), 'ออนไลน์', 'โอนเงิน')";
             $conn->prepare($sql_rev)->execute([
                 ':p_id' => $payment_id,
                 ':court' => $data['booking_court_price'],

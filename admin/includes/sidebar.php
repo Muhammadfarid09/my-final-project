@@ -100,6 +100,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <i class="fas fa-receipt"></i> <span>ประวัติขายหน้าร้าน (บิล)</span>
             </a>
         </li>
+        <li>
+            <a href="pos_closeout.php" class="<?php echo ($current_page == 'pos_closeout.php' || $current_page == 'pos_zreport.php') ? 'active' : ''; ?>">
+                <i class="fas fa-calculator"></i> <span>ปิดกะการเงิน (Z-Report)</span>
+            </a>
+        </li>
         
         <li class="menu-label">สื่อสาร & ประชาสัมพันธ์</li>
         <li>
