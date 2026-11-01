@@ -2,7 +2,7 @@
    T.S. Pattani - Member / Frontend JavaScript Controller
    มาตรฐานการจัดการสคริปต์ฝั่งผู้ใช้งาน (Strict Mode & HCI Design Standard)
    --------------------------------------------------------------------------
-   สารบัญโครงสร้างระบบ 13 หมวดหมู่ (System Architecture Table of Contents):
+   สารบัญโครงสร้างระบบ 14 หมวดหมู่ (System Architecture Table of Contents):
    1. ระบบนำทางและเมนูมือถือ (Navigation & Drawer Menu)
    2. ระบบแจ้งเตือนสากล (Global Alert System)
    3. ระบบปฏิทินและเลือกวันจอง (Calendar & Date Picker - Wizard Step 1)
@@ -16,6 +16,7 @@
    11. ระบบฟอร์มยืนยันตัวตนและความปลอดภัย (Auth & Security Forms - register.php & login.php)
    12. ระบบประวัติการจองและขอยกเลิก (Booking History & Cancellation - booking_history.php)
    13. ระบบข่าวสารและโปรโมชัน (Promotions & Announcements - promotions.php)
+   14. ระบบแอนิเมชันตัวเลขวิ่งบนหน้าแรก (Homepage Stats Count-Up Animation - index.php)
    ========================================================================== */
 
 /* ==========================================================================
@@ -3008,4 +3009,95 @@ function closeNewsDetailModal() {
 
 window.openNewsDetailModal = openNewsDetailModal;
 window.closeNewsDetailModal = closeNewsDetailModal;
+
+/* ==========================================================================
+   หมวดที่ 14: ระบบแอนิเมชันตัวเลขวิ่งบนหน้าแรก (Homepage Stats Count-Up Animation)
+   ========================================================================== */
+
+/**
+ * แอนิเมชันตัวเลขวิ่งสำหรับ Live Stats Dashboard บนหน้าแรก
+ * @description ทำให้ตัวเลขสถิติใน .home-stats-unified-card วิ่งจาก 0 ถึงเป้าหมายอย่างนุ่มนวล
+ *              โดยใช้ requestAnimationFrame และ Easing Function (easeOutQuart)
+ *              พร้อมตรวจจับเมื่อผู้ใช้เลื่อนจอมาเห็น (IntersectionObserver)
+ */
+function initStatsCounterAnimation() {
+    const counterElements = document.querySelectorAll('.stat-counter');
+    if (!counterElements || counterElements.length === 0) return;
+
+    // ตรวจสอบความต้องการของผู้ใช้กรณีเปิดโหมดลดการเคลื่อนไหว (prefers-reduced-motion)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const animateCounter = (el) => {
+        const target = parseInt(el.getAttribute('data-target'), 10) || 0;
+        const suffix = el.getAttribute('data-suffix') || '';
+        const duration = 1600; // ระยะเวลาแอนิเมชัน 1.6 วินาที
+
+        if (prefersReducedMotion || target <= 0) {
+            el.textContent = target.toLocaleString('en-US') + suffix;
+            el.classList.add('counter-settled');
+            return;
+        }
+
+        // เริ่มต้นนับจาก 0
+        el.textContent = '0' + suffix;
+
+        let startTime = null;
+
+        const step = (currentTime) => {
+            if (!startTime) startTime = currentTime;
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Easing: easeOutQuart (1 - (1 - progress)^4) เพื่อการเคลื่อนไหวที่นุ่มนวลและชะลอตอนจบ
+            const easeProgress = 1 - Math.pow(1 - progress, 4);
+            const currentVal = Math.floor(easeProgress * target);
+
+            el.textContent = currentVal.toLocaleString('en-US') + suffix;
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                el.textContent = target.toLocaleString('en-US') + suffix;
+                el.classList.add('counter-settled');
+            }
+        };
+
+        requestAnimationFrame(step);
+    };
+
+    // ใช้ IntersectionObserver ตรวจจับเมื่อเลื่อนจอมาเห็นการ์ดสถิติ
+    const container = document.querySelector('.home-stats-unified-card');
+    if ('IntersectionObserver' in window && container) {
+        let hasAnimated = false;
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !hasAnimated) {
+                    hasAnimated = true;
+                    counterElements.forEach((el, index) => {
+                        // หน่วงเวลาเล็กน้อยระหว่างแต่ละช่อง (Stagger effect: 0ms, 80ms, 160ms, 240ms)
+                        setTimeout(() => animateCounter(el), index * 80);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px 0px -20px 0px'
+        });
+        observer.observe(container);
+    } else {
+        // Fallback กรณีเบราว์เซอร์เก่าไม่รองรับ IntersectionObserver
+        counterElements.forEach((el, index) => {
+            setTimeout(() => animateCounter(el), index * 80);
+        });
+    }
+}
+
+// ผูกการทำงานเมื่อ DOM พร้อมใช้งาน
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStatsCounterAnimation);
+} else {
+    initStatsCounterAnimation();
+}
+
 

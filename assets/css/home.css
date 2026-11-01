@@ -349,6 +349,29 @@
     letter-spacing: -0.3px;
 }
 
+/* แอนิเมชันตัวเลขวิ่ง (Count-Up Animation) พร้อม Tabular Numbers ป้องกันตัวเลขสั่น */
+.stat-counter {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    will-change: transform;
+}
+
+.stat-counter.counter-settled {
+    animation: counterPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes counterPop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 /* หัวข้อสถิติ */
 .home-stat-title {
     font-size: 14.5px;

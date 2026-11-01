@@ -46,6 +46,7 @@ try {
 }
 
 $booking_stat_display = '500+';
+$total_stat = 500;
 try {
     $stmt_book_count = $conn->query("SELECT COUNT(*) FROM booking WHERE booking_status = 'จองแล้ว'");
     $actual_bookings = $stmt_book_count->fetchColumn();
@@ -53,6 +54,7 @@ try {
     $booking_stat_display = number_format($total_stat) . '+';
 } catch (PDOException $e) {
     $booking_stat_display = '500+';
+    $total_stat = 500;
 }
 ?>
 <!DOCTYPE html>
@@ -145,7 +147,7 @@ try {
                         <div class="home-stat-icon-wrapper">
                             <i class="fas fa-bolt"></i>
                         </div>
-                        <div class="home-stat-number"><?php echo htmlspecialchars($court_count); ?></div>
+                        <div class="home-stat-number stat-counter" data-target="<?php echo intval($court_count); ?>" data-suffix=""><?php echo htmlspecialchars($court_count); ?></div>
                         <div class="home-stat-title">คอร์ทมาตรฐาน BWF</div>
                         <p class="home-stat-desc">พื้นยาง 5 ชั้น ไฟ Anti-Glare</p>
                     </div>
@@ -155,7 +157,7 @@ try {
                         <div class="home-stat-icon-wrapper">
                             <i class="fas fa-calendar-check"></i>
                         </div>
-                        <div class="home-stat-number"><?php echo htmlspecialchars($booking_stat_display); ?></div>
+                        <div class="home-stat-number stat-counter" data-target="<?php echo intval($total_stat); ?>" data-suffix="+"><?php echo htmlspecialchars($booking_stat_display); ?></div>
                         <div class="home-stat-title">แมตช์ที่จองสำเร็จ</div>
                         <p class="home-stat-desc">ล็อกคิวอัตโนมัติเรียลไทม์</p>
                     </div>
@@ -165,7 +167,7 @@ try {
                         <div class="home-stat-icon-wrapper">
                             <i class="fas fa-heart"></i>
                         </div>
-                        <div class="home-stat-number">100%</div>
+                        <div class="home-stat-number stat-counter" data-target="100" data-suffix="%">100%</div>
                         <div class="home-stat-title">มาตรฐานความพึงพอใจ</div>
                         <p class="home-stat-desc">ผู้เล่นไว้วางใจสูงสุดในปัตตานี</p>
                     </div>
@@ -175,7 +177,7 @@ try {
                         <div class="home-stat-icon-wrapper">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="home-stat-number">24 ชม.</div>
+                        <div class="home-stat-number stat-counter" data-target="24" data-suffix=" ชม.">24 ชม.</div>
                         <div class="home-stat-title">ระบบบริการครบวงจร</div>
                         <p class="home-stat-desc">จองออนไลน์ตลอด 24 ชั่วโมง</p>
                     </div>
