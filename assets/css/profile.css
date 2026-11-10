@@ -31,22 +31,169 @@
 .profile-user-info {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 22px;
+}
+
+/* กรอบรูปโปรไฟล์สมาชิกพร้อมปุ่มอัปโหลดรูป */
+.profile-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 86px;
+    height: 86px;
     border-radius: var(--radius-full, 9999px);
     background: var(--bg-primary, #090909);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 38px;
     color: var(--color-gold, #FFB91D);
-    border: 2px solid var(--color-gold, #FFB91D);
-    box-shadow: 0 0 15px rgba(255, 185, 29, 0.25);
+    border: 2.5px solid var(--color-gold, #FFB91D);
+    box-shadow: 0 0 20px rgba(255, 185, 29, 0.28);
     flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-avatar .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+}
+
+.profile-avatar .avatar-fallback-icon {
+    font-size: 38px;
+    color: var(--color-gold, #FFB91D);
+}
+
+/* ปุ่มกล้องถ่ายรูปสำหรับเลือกเปลี่ยนรูปโปรไฟล์ */
+.avatar-edit-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 30px;
+    height: 30px;
+    background: var(--color-gold, #FFB91D);
+    color: #090909;
+    border: 2px solid var(--bg-surface, #191919);
+    border-radius: var(--radius-full, 9999px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+}
+
+.avatar-edit-badge:hover {
+    background: #FFC742;
+    transform: scale(1.12);
+}
+
+/* ปุ่มลบรูปโปรไฟล์ (คืนค่ารูปเริ่มต้น) */
+.btn-avatar-delete {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background: rgba(239, 68, 68, 0.9);
+    color: #FFFFFF;
+    border: 2px solid var(--bg-surface, #191919);
+    border-radius: var(--radius-full, 9999px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    z-index: 3;
+    padding: 0;
+}
+
+.btn-avatar-delete:hover {
+    background: #DC2626;
+    transform: scale(1.15);
+}
+
+/* ฟอร์มและอินพุตซ่อน */
+.avatar-form-hidden {
+    display: none;
+}
+.avatar-input-hidden {
+    display: none;
+}
+
+/* แถบยืนยันบันทึกรูปโปรไฟล์ (พรีวิว) */
+.avatar-confirm-bar {
+    display: none;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 14px;
+    background: rgba(255, 185, 29, 0.12);
+    border: 1px solid rgba(255, 185, 29, 0.35);
+    border-radius: var(--radius-md, 10px);
+}
+
+.avatar-confirm-bar.show {
+    display: inline-flex;
+    animation: fadeInDown 0.3s ease;
+}
+
+.avatar-confirm-text {
+    font-size: 12.5px;
+    color: var(--color-gold, #FFB91D);
+    font-weight: 600;
+}
+
+.btn-avatar-save {
+    background: linear-gradient(180deg, #FFB91D 0%, #E9A812 100%);
+    color: #090909;
+    border: none;
+    border-radius: var(--radius-full, 9999px);
+    padding: 5px 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(255, 185, 29, 0.3);
+}
+
+.btn-avatar-save:hover {
+    background: linear-gradient(180deg, #FFC742 0%, #E9A812 100%);
+    transform: translateY(-1px);
+}
+
+.btn-avatar-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary, #F5F5F5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full, 9999px);
+    padding: 5px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-avatar-cancel:hover {
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .profile-details h2 {
@@ -129,37 +276,7 @@
 
 .profile-header-side {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 12px;
-}
-
-.profile-header-actions {
-    display: flex;
     align-items: center;
-}
-
-.btn-profile-logout {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 16px;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.35);
-    color: #f87171;
-    border-radius: var(--radius-md, 8px);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.btn-profile-logout:hover {
-    background: rgba(239, 68, 68, 0.25);
-    border-color: #ef4444;
-    color: #fca5a5;
-    transform: translateY(-1px);
 }
 
 /* ==========================================================================
@@ -355,6 +472,39 @@
     gap: 12px;
 }
 
+/* ส่วนจัดการเซสชันและออกจากระบบด้านล่างการ์ด */
+.profile-session-box {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.btn-session-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.28);
+    border-radius: var(--radius-md, 10px);
+    color: #F87171;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.btn-session-logout:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    color: #FCA5A5;
+    transform: translateY(-1px);
+}
+
 /* ==========================================================================
    5. กล่องแจ้งเตือน (Dark Theme Feedback Alerts)
    ========================================================================== */
@@ -520,15 +670,6 @@
     .profile-stats-group {
         width: 100%;
         justify-content: space-around;
-        box-sizing: border-box;
-    }
-    .profile-header-actions {
-        width: 100%;
-    }
-    .btn-profile-logout {
-        width: 100%;
-        justify-content: center;
-        padding: 10px 16px;
         box-sizing: border-box;
     }
 }

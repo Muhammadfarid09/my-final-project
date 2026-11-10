@@ -103,9 +103,37 @@ $member_lastname = $name_parts[1] ?? '';
         <!-- การ์ดส่วนหัวข้อมูลสมาชิก -->
         <div class="profile-header-card">
             <div class="profile-user-info">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar" id="avatarPreviewContainer">
+                        <?php if (!empty($member['member_avatar']) && file_exists(__DIR__ . '/' . $member['member_avatar'])): ?>
+                            <img src="<?php echo htmlspecialchars($member['member_avatar']); ?>?v=<?php echo filemtime(__DIR__ . '/' . $member['member_avatar']); ?>" alt="<?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?>" class="avatar-img" id="avatarImgPreview">
+                        <?php else: ?>
+                            <i class="fas fa-user avatar-fallback-icon" id="avatarFallbackIcon"></i>
+                        <?php endif; ?>
+                    </div>
+                    <label for="avatarInput" class="avatar-edit-badge" title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์" aria-label="เปลี่ยนรูปโปรไฟล์">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <?php if (!empty($member['member_avatar'])): ?>
+                        <button type="button" class="btn-avatar-delete" title="ลบรูปโปรไฟล์ (คืนค่ารูปเริ่มต้น)" aria-label="ลบรูปโปรไฟล์" onclick="confirmDeleteAvatar()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    <?php endif; ?>
+
+                    <!-- ฟอร์มอัปโหลดรูปโปรไฟล์ที่ซ่อนไว้ -->
+                    <form id="avatarUploadForm" action="actions/profile_edit_db.php" method="POST" enctype="multipart/form-data" class="avatar-form-hidden">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="update_avatar">
+                        <input type="file" id="avatarInput" name="member_avatar" accept="image/jpeg,image/png,image/webp" class="avatar-input-hidden" onchange="previewSelectedAvatar(this)">
+                    </form>
+
+                    <!-- ฟอร์มลบรูปโปรไฟล์ที่ซ่อนไว้ -->
+                    <form id="avatarDeleteForm" action="actions/profile_edit_db.php" method="POST" class="avatar-form-hidden">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="delete_avatar">
+                    </form>
                 </div>
+
                 <div class="profile-details">
                     <h2>
                         <?php echo htmlspecialchars($member['member_name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -117,6 +145,17 @@ $member_lastname = $name_parts[1] ?? '';
                         <i class="fas fa-phone-alt"></i> <?php echo htmlspecialchars($member['member_phone'], ENT_QUOTES, 'UTF-8'); ?> 
                         &bull; สมาชิกตั้งแต่ <?php echo date('d/m/Y', strtotime($member['member_created_at'])); ?>
                     </p>
+
+                    <!-- แถบยืนยันบันทึกรูปโปรไฟล์ (แสดงขึ้นมาเมื่อเลือกรูปใหม่) -->
+                    <div id="avatarConfirmBar" class="avatar-confirm-bar">
+                        <span class="avatar-confirm-text">เลือกรูปภาพแล้ว:</span>
+                        <button type="button" class="btn-avatar-save" id="btnSaveAvatar" onclick="submitAvatarForm()">
+                            <i class="fas fa-check"></i> บันทึกรูปใหม่
+                        </button>
+                        <button type="button" class="btn-avatar-cancel" onclick="cancelAvatarSelection()">
+                            <i class="fas fa-times"></i> ยกเลิก
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -130,11 +169,6 @@ $member_lastname = $name_parts[1] ?? '';
                         <div class="stat-value"><?php echo number_format($member['point_total_earned']); ?></div>
                         <div class="stat-label">พอยท์สะสมตลอดชีพ</div>
                     </div>
-                </div>
-                <div class="profile-header-actions">
-                    <a href="actions/logout.php" class="btn-profile-logout" onclick="return confirm('คุณต้องการออกจากระบบหรือไม่?');">
-                        <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
-                    </a>
                 </div>
             </div>
         </div>
@@ -258,6 +292,13 @@ $member_lastname = $name_parts[1] ?? '';
                         </a>
                         <a href="rewards.php" class="btn-profile-submit btn-profile-outline">
                             <i class="fas fa-gift"></i> แลกของรางวัล
+                        </a>
+                    </div>
+
+                    <!-- ส่วนจัดการเซสชันและความปลอดภัย (Sign out) ตามหลัก HCI -->
+                    <div class="profile-session-box">
+                        <a href="actions/logout.php" class="btn-session-logout" onclick="return confirm('คุณต้องการออกจากระบบหรือไม่?');">
+                            <i class="fas fa-sign-out-alt"></i> ออกจากระบบจากอุปกรณ์นี้
                         </a>
                     </div>
                 </div>

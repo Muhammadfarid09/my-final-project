@@ -3100,4 +3100,114 @@ if (document.readyState === 'loading') {
     initStatsCounterAnimation();
 }
 
+/* ==========================================================================
+   หมวดที่ 15: ระบบจัดการรูปโปรไฟล์สมาชิก (Member Avatar Upload & Preview - profile.php)
+   ========================================================================== */
+
+/**
+ * ตัวแปรเก็บ HTML ดั้งเดิมของกรอบรูปโปรไฟล์เพื่อใช้กู้คืนเมื่อกดยกเลิก
+ */
+let originalAvatarContainerHtml = null;
+
+/**
+ * พรีวิวรูปโปรไฟล์ที่ผู้ใช้เลือกทันที (Instant Client Preview)
+ * @param {HTMLInputElement} input ช่อง input file
+ */
+function previewSelectedAvatar(input) {
+    if (!input || !input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+
+    // ตรวจสอบประเภทไฟล์
+    if (!allowedTypes.includes(file.type)) {
+        alert('รูปแบบไฟล์ไม่ถูกต้อง รองรับเฉพาะไฟล์ .jpg, .jpeg, .png หรือ .webp เท่านั้น');
+        input.value = '';
+        return;
+    }
+
+    // ตรวจสอบขนาดไฟล์
+    if (file.size > maxSize) {
+        alert('ขนาดไฟล์รูปภาพใหญ่เกินไป (ต้องไม่เกิน 2MB)');
+        input.value = '';
+        return;
+    }
+
+    const container = document.getElementById('avatarPreviewContainer');
+    if (!container) return;
+
+    // บันทึกสถานะ HTML เดิมไว้สำหรับการยกเลิก
+    if (originalAvatarContainerHtml === null) {
+        originalAvatarContainerHtml = container.innerHTML;
+    }
+
+    // อ่านและสร้าง Data URL สำหรับพรีวิว
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        container.innerHTML = '<img src="' + e.target.result + '" alt="Avatar Preview" class="avatar-img" id="avatarImgPreview">';
+        const confirmBar = document.getElementById('avatarConfirmBar');
+        if (confirmBar) {
+            confirmBar.classList.add('show');
+        }
+    };
+    reader.onerror = function() {
+        alert('เกิดข้อผิดพลาดในการอ่านไฟล์รูปภาพ กรุณาลองใหม่อีกครั้ง');
+        input.value = '';
+    };
+    reader.readAsDataURL(file);
+}
+
+/**
+ * ยกเลิกการเลือกรูปภาพและกู้คืนรูปโปรไฟล์เดิม
+ */
+function cancelAvatarSelection() {
+    const input = document.getElementById('avatarInput');
+    if (input) input.value = '';
+
+    const container = document.getElementById('avatarPreviewContainer');
+    if (container && originalAvatarContainerHtml !== null) {
+        container.innerHTML = originalAvatarContainerHtml;
+        originalAvatarContainerHtml = null;
+    }
+
+    const confirmBar = document.getElementById('avatarConfirmBar');
+    if (confirmBar) {
+        confirmBar.classList.remove('show');
+    }
+}
+
+/**
+ * ส่งฟอร์มอัปเดตรูปโปรไฟล์ พร้อมสถานะโหลดป้องกันการกดย้ำ (Anti-Double Submit)
+ */
+function submitAvatarForm() {
+    const form = document.getElementById('avatarUploadForm');
+    const input = document.getElementById('avatarInput');
+    const saveBtn = document.getElementById('btnSaveAvatar');
+
+    if (!form || !input || !input.files || !input.files[0]) {
+        alert('กรุณาเลือกรูปภาพก่อนกดบันทึก');
+        return;
+    }
+
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+    }
+
+    form.submit();
+}
+
+/**
+ * ยืนยันการลบรูปโปรไฟล์และส่งฟอร์มลบ
+ */
+function confirmDeleteAvatar() {
+    if (confirm('คุณต้องการลบรูปโปรไฟล์และกลับไปใช้รูปเริ่มต้นหรือไม่?')) {
+        const deleteForm = document.getElementById('avatarDeleteForm');
+        if (deleteForm) {
+            deleteForm.submit();
+        }
+    }
+}
+
 

@@ -30,6 +30,18 @@ if (!isset($member_points) || !isset($member_level)) {
         }
     }
 }
+
+// ตรวจสอบและดึงรูปโปรไฟล์สมาชิก (รองรับทั้ง Session ใหม่และเซสชันเดิม)
+if (isset($_SESSION['member_id']) && !isset($_SESSION['member_avatar']) && isset($conn)) {
+    try {
+        $stmt_av = $conn->prepare("SELECT member_avatar FROM Member WHERE member_id = :mid");
+        $stmt_av->execute([':mid' => $_SESSION['member_id']]);
+        $_SESSION['member_avatar'] = $stmt_av->fetchColumn() ?: null;
+    } catch (PDOException $e) {
+        $_SESSION['member_avatar'] = null;
+    }
+}
+$member_avatar = $_SESSION['member_avatar'] ?? null;
 ?>
 
 <!-- ==========================================================================
@@ -89,7 +101,11 @@ if (!isset($member_points) || !isset($member_level)) {
                     <?php if (isset($_SESSION['member_id'])): ?>
                         <div class="mobile-user-card">
                             <div class="mobile-user-header">
-                                <i class="fas fa-user-circle"></i>
+                                <?php if (!empty($member_avatar) && file_exists(__DIR__ . '/../' . $member_avatar)): ?>
+                                    <img src="<?= htmlspecialchars($member_avatar) ?>?v=<?= filemtime(__DIR__ . '/../' . $member_avatar) ?>" alt="<?= htmlspecialchars($_SESSION['member_name'] ?? '') ?>" class="drawer-avatar-img">
+                                <?php else: ?>
+                                    <i class="fas fa-user-circle"></i>
+                                <?php endif; ?>
                                 <div class="mobile-user-meta">
                                     <span class="mobile-user-name"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
                                     <span class="badge-level level-<?= strtolower($member_level) ?>"><?= htmlspecialchars($member_level) ?></span>
@@ -121,7 +137,11 @@ if (!isset($member_points) || !isset($member_level)) {
                 <!-- ล็อกอินแล้ว: แสดง User Dropdown และปุ่มจองสนาม -->
                 <div class="user-dropdown">
                     <button type="button" class="dropbtn <?= ($is_profile || $is_booking_history) ? 'active' : '' ?>" onclick="toggleDropdown()">
-                        <i class="fas fa-user-circle"></i>
+                        <?php if (!empty($member_avatar) && file_exists(__DIR__ . '/../' . $member_avatar)): ?>
+                            <img src="<?= htmlspecialchars($member_avatar) ?>?v=<?= filemtime(__DIR__ . '/../' . $member_avatar) ?>" alt="<?= htmlspecialchars($_SESSION['member_name'] ?? '') ?>" class="navbar-avatar-img">
+                        <?php else: ?>
+                            <i class="fas fa-user-circle"></i>
+                        <?php endif; ?>
                         <span class="user-name"><?= htmlspecialchars($_SESSION['member_name'] ?? '') ?></span>
                         <span class="badge-level level-<?= strtolower($member_level) ?>"><?= htmlspecialchars($member_level) ?></span>
                         <i class="fas fa-caret-down"></i>
@@ -160,7 +180,11 @@ if (!isset($member_points) || !isset($member_level)) {
             <!-- เมื่อล็อกอินแล้ว: แสดงปุ่มโปรไฟล์ย่อ (Mini Profile Pill) แทน Hamburger Menu เพื่อลดความซ้ำซ้อนกับ Bottom Nav -->
             <a href="profile.php" class="mobile-top-user-pill" aria-label="โปรไฟล์ของฉัน">
                 <div class="user-pill-avatar">
-                    <i class="fas fa-user-circle"></i>
+                    <?php if (!empty($member_avatar) && file_exists(__DIR__ . '/../' . $member_avatar)): ?>
+                        <img src="<?= htmlspecialchars($member_avatar) ?>?v=<?= filemtime(__DIR__ . '/../' . $member_avatar) ?>" alt="Avatar" class="navbar-avatar-img">
+                    <?php else: ?>
+                        <i class="fas fa-user-circle"></i>
+                    <?php endif; ?>
                 </div>
                 <div class="user-pill-info">
                     <span class="user-pill-name"><?= htmlspecialchars(mb_substr($_SESSION['member_name'] ?? 'สมาชิก', 0, 10)) ?></span>

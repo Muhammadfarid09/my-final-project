@@ -332,6 +332,7 @@ CREATE TABLE `member` (
   `member_password` varchar(255) NOT NULL,
   `member_age` int(3) DEFAULT NULL,
   `member_occupation` varchar(100) DEFAULT NULL,
+  `member_avatar` varchar(255) DEFAULT NULL,
   `member_status` enum('ปกติ','ระงับสิทธิ์') DEFAULT 'ปกติ',
   `member_created_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`member_id`),

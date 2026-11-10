@@ -50,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['member_id'] = $member['member_id'];
                 $_SESSION['member_name'] = $member['member_name'];
                 $_SESSION['member_phone'] = $member['member_phone'];
+                $_SESSION['member_avatar'] = $member['member_avatar'] ?? null;
 
                 // บันทึกกิจกรรมการเข้าสู่ระบบสำเร็จ
                 log_activity($conn, 'MEMBER_LOGIN', 'Member', $member['member_id'], 'เข้าสู่ระบบสำเร็จผ่านเบอร์ ' . $member_phone, 'Member', $member['member_id'], $member['member_name']);
