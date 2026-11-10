@@ -3377,44 +3377,187 @@ body.receipt-body {
    ============================================================================== */
 
 /* 2-Tier Filter Panel */
+/* ==============================================================================
+   Audit Log Filter Panel - Balanced 4-Column Responsive Grid
+   ============================================================================== */
 .audit-filter-panel {
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 18px 20px;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-/* Tier 1: Search & Core Dropdowns */
-.filter-tier-primary {
-    display: flex;
-    flex-wrap: wrap;
+.audit-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    margin-bottom: 14px;
+    align-items: flex-end;
 }
-.filter-field-search {
-    flex: 2 1 280px;
+
+/* Col 1-2 (Row 1): Search spans 2 columns (50%) */
+.filter-col-search {
+    grid-column: span 2;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
-.filter-field-select {
-    flex: 1 1 180px;
+
+/* Col 3 & 4 (Row 1): Select dropdowns (25% each) */
+.filter-col-select {
+    grid-column: span 1;
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
-.audit-filter-panel label {
+
+/* Col 1 & 2 (Row 2): Date inputs (25% each) */
+.filter-col-date {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Col 3 (Row 2): Quick Presets Chips (25%) */
+.filter-col-presets {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-preset-chips {
+    display: flex;
+    gap: 6px;
+    height: 42px;
+    align-items: center;
+}
+
+.preset-chip {
+    flex: 1;
+    height: 42px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding: 0 4px;
+}
+
+.preset-chip:hover {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.12);
+}
+
+/* Col 4 (Row 2): Action Buttons (25%) */
+.filter-col-actions {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-label-spacer {
+    user-select: none;
+    line-height: 1;
+}
+
+.filter-action-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    height: 42px;
+}
+
+.btn-filter-apply {
+    flex: 1.25;
+    height: 42px;
+    padding: 0 16px;
+    background: #0F172A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    white-space: nowrap;
+}
+
+.btn-filter-apply:hover {
+    background: #1E293B;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-filter-clear {
+    flex: 1;
+    height: 42px;
+    padding: 0 12px;
+    background: #FFFFFF;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn-filter-clear:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: #94A3B8;
+}
+
+.btn-filter-clear-muted {
+    color: #94A3B8;
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+}
+
+.btn-filter-clear-muted:hover {
+    color: #475569;
+    background: #FFFFFF;
+    border-color: #CBD5E1;
+}
+
+.audit-filter-panel label,
+.filter-label {
     font-size: 12.5px;
     font-weight: 600;
     color: #475569;
     display: flex;
     align-items: center;
 }
+
 .filter-input-wrap {
     position: relative;
     display: flex;
     align-items: center;
 }
+
 .filter-prefix-icon {
     position: absolute;
     left: 14px;
@@ -3422,9 +3565,11 @@ body.receipt-body {
     font-size: 14px;
     pointer-events: none;
 }
+
 .filter-input-wrap .filter-input-ctrl {
     padding-left: 38px;
 }
+
 .filter-input-ctrl {
     width: 100%;
     height: 42px;
@@ -3438,84 +3583,48 @@ body.receipt-body {
     transition: all 0.15s ease;
     box-sizing: border-box;
 }
+
 .filter-input-ctrl:focus {
     border-color: #0F172A;
     box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
 }
 
-/* Tier 2: Date Range Pickers & Buttons */
-.filter-tier-secondary {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
-    padding-top: 14px;
-    border-top: 1px dashed #E2E8F0;
+/* Responsive Grid Breakpoints */
+@media (max-width: 1100px) {
+    .audit-filter-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .filter-col-search {
+        grid-column: span 2;
+    }
+    .filter-col-select {
+        grid-column: span 1;
+    }
+    .filter-col-date {
+        grid-column: span 1;
+    }
+    .filter-col-presets {
+        grid-column: span 1;
+    }
+    .filter-col-actions {
+        grid-column: span 1;
+    }
 }
-.filter-date-range {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.filter-date-item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 180px;
-}
-.filter-date-separator {
-    padding-bottom: 10px;
-    font-size: 13px;
-    color: #94A3B8;
-    font-weight: 500;
-}
-.filter-action-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-.btn-filter-apply {
-    height: 42px;
-    padding: 0 20px;
-    background: #0F172A;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 8px;
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.15s ease;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-.btn-filter-apply:hover {
-    background: #1E293B;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-.btn-filter-clear {
-    height: 42px;
-    padding: 0 16px;
-    background: #FFFFFF;
-    color: #475569;
-    border: 1px solid #CBD5E1;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    transition: all 0.15s ease;
-}
-.btn-filter-clear:hover {
-    background: #F1F5F9;
-    color: #0F172A;
-    border-color: #94A3B8;
+
+@media (max-width: 640px) {
+    .audit-filter-grid {
+        grid-template-columns: 1fr;
+    }
+    .filter-col-search,
+    .filter-col-select,
+    .filter-col-date,
+    .filter-col-presets,
+    .filter-col-actions {
+        grid-column: span 1;
+    }
+    .filter-label-spacer {
+        display: none;
+    }
 }
 
 /* Empty State Container */

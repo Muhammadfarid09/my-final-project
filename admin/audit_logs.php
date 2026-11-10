@@ -158,12 +158,14 @@ include 'includes/header.php';
         </div>
     </div>
 
-    <!-- Structured 2-Tier Filter Panel -->
-    <form method="GET" action="audit_logs.php" class="audit-filter-panel mb-24">
-        <!-- Row 1: Search Keyword & Core Dropdowns -->
-        <div class="filter-tier-primary">
-            <div class="filter-field-search">
-                <label for="filter_keyword"><i class="fas fa-search text-muted mr-4"></i> ค้นหาคำสำคัญ</label>
+    <!-- Structured 4-Column Balanced Filter Panel -->
+    <form method="GET" action="audit_logs.php" class="audit-filter-panel mb-24" id="auditFilterForm">
+        <div class="audit-filter-grid">
+            <!-- Col 1-2 (Row 1): ค้นหาคำสำคัญ (Spans 2 columns / 50%) -->
+            <div class="filter-col-search">
+                <label for="filter_keyword" class="filter-label">
+                    <i class="fas fa-search text-muted mr-4"></i> ค้นหาคำสำคัญ
+                </label>
                 <div class="filter-input-wrap">
                     <i class="fas fa-search filter-prefix-icon"></i>
                     <input type="text" id="filter_keyword" name="keyword" class="filter-input-ctrl" 
@@ -172,8 +174,11 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <div class="filter-field-select">
-                <label for="filter_action"><i class="fas fa-filter text-muted mr-4"></i> ประเภทกิจกรรม</label>
+            <!-- Col 3 (Row 1): ประเภทกิจกรรม (25%) -->
+            <div class="filter-col-select">
+                <label for="filter_action" class="filter-label">
+                    <i class="fas fa-filter text-muted mr-4"></i> ประเภทกิจกรรม
+                </label>
                 <select id="filter_action" name="action" class="filter-input-ctrl" onchange="this.form.submit()">
                     <option value="">-- กิจกรรมทั้งหมด --</option>
                     <?php foreach ($available_actions as $act): ?>
@@ -184,8 +189,11 @@ include 'includes/header.php';
                 </select>
             </div>
 
-            <div class="filter-field-select">
-                <label for="filter_actor_type"><i class="fas fa-user-tag text-muted mr-4"></i> ผู้กระทำ (Actor)</label>
+            <!-- Col 4 (Row 1): ผู้กระทำ (Actor) (25%) -->
+            <div class="filter-col-select">
+                <label for="filter_actor_type" class="filter-label">
+                    <i class="fas fa-user-tag text-muted mr-4"></i> ผู้กระทำ (Actor)
+                </label>
                 <select id="filter_actor_type" name="actor_type" class="filter-input-ctrl" onchange="this.form.submit()">
                     <option value="">-- ผู้กระทำทั้งหมด --</option>
                     <option value="Admin" <?php echo $filter_actor_type === 'Admin' ? 'selected' : ''; ?>>แอดมิน (Admin)</option>
@@ -193,35 +201,54 @@ include 'includes/header.php';
                     <option value="System" <?php echo $filter_actor_type === 'System' ? 'selected' : ''; ?>>ระบบอัตโนมัติ (System)</option>
                 </select>
             </div>
-        </div>
 
-        <!-- Row 2: Date Range Pickers & Action Buttons -->
-        <div class="filter-tier-secondary">
-            <div class="filter-date-range">
-                <div class="filter-date-item">
-                    <label for="filter_date_from"><i class="fas fa-calendar-alt text-muted mr-4"></i> ตั้งแต่วันที่</label>
-                    <input type="date" id="filter_date_from" name="date_from" class="filter-input-ctrl" 
-                           value="<?php echo htmlspecialchars($filter_date_from); ?>">
-                </div>
-                <div class="filter-date-separator">
-                    <span>ถึง</span>
-                </div>
-                <div class="filter-date-item">
-                    <label for="filter_date_to"><i class="fas fa-calendar-alt text-muted mr-4"></i> ถึงวันที่</label>
-                    <input type="date" id="filter_date_to" name="date_to" class="filter-input-ctrl" 
-                           value="<?php echo htmlspecialchars($filter_date_to); ?>">
+            <!-- Col 1 (Row 2): ตั้งแต่วันที่ (25%) -->
+            <div class="filter-col-date">
+                <label for="filter_date_from" class="filter-label">
+                    <i class="fas fa-calendar-alt text-muted mr-4"></i> ตั้งแต่วันที่
+                </label>
+                <input type="date" id="filter_date_from" name="date_from" class="filter-input-ctrl" 
+                       value="<?php echo htmlspecialchars($filter_date_from); ?>">
+            </div>
+
+            <!-- Col 2 (Row 2): ถึงวันที่ (25%) -->
+            <div class="filter-col-date">
+                <label for="filter_date_to" class="filter-label">
+                    <i class="fas fa-calendar-check text-muted mr-4"></i> ถึงวันที่
+                </label>
+                <input type="date" id="filter_date_to" name="date_to" class="filter-input-ctrl" 
+                       value="<?php echo htmlspecialchars($filter_date_to); ?>">
+            </div>
+
+            <!-- Col 3 (Row 2): ช่วงเวลาด่วน (Quick Presets) (25%) -->
+            <div class="filter-col-presets">
+                <label class="filter-label">
+                    <i class="fas fa-bolt text-muted mr-4"></i> ช่วงเวลาด่วน
+                </label>
+                <div class="filter-preset-chips">
+                    <button type="button" class="preset-chip" onclick="setAuditDateRange('today')">วันนี้</button>
+                    <button type="button" class="preset-chip" onclick="setAuditDateRange('7days')">7 วันล่าสุด</button>
+                    <button type="button" class="preset-chip" onclick="setAuditDateRange('month')">เดือนนี้</button>
                 </div>
             </div>
 
-            <div class="filter-action-group">
-                <button type="submit" class="btn-filter-apply">
-                    <i class="fas fa-search mr-6"></i> กรองข้อมูล
-                </button>
-                <?php if (!empty($filter_action) || !empty($filter_actor_type) || !empty($filter_keyword) || !empty($filter_date_from) || !empty($filter_date_to)): ?>
-                    <a href="audit_logs.php" class="btn-filter-clear" title="ล้างตัวกรองทั้งหมด">
-                        <i class="fas fa-redo-alt mr-6"></i> ล้างค่า
-                    </a>
-                <?php endif; ?>
+            <!-- Col 4 (Row 2): ปุ่มดำเนินการ (Action Buttons) (25%) -->
+            <div class="filter-col-actions">
+                <label class="filter-label filter-label-spacer">&nbsp;</label>
+                <div class="filter-action-group">
+                    <button type="submit" class="btn-filter-apply">
+                        <i class="fas fa-search"></i> กรองข้อมูล
+                    </button>
+                    <?php if (!empty($filter_action) || !empty($filter_actor_type) || !empty($filter_keyword) || !empty($filter_date_from) || !empty($filter_date_to)): ?>
+                        <a href="audit_logs.php" class="btn-filter-clear" title="ล้างตัวกรองทั้งหมด">
+                            <i class="fas fa-redo-alt"></i> ล้างค่า
+                        </a>
+                    <?php else: ?>
+                        <a href="audit_logs.php" class="btn-filter-clear btn-filter-clear-muted" title="รีเซ็ต">
+                            <i class="fas fa-sync-alt"></i> รีเซ็ต
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </form>
@@ -404,6 +431,37 @@ include 'includes/header.php';
 
 <!-- Modal Detail Script -->
 <script>
+// Quick Date Range Presets
+function setAuditDateRange(range) {
+    const today = new Date();
+    const formatDate = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const fromInput = document.getElementById('filter_date_from');
+    const toInput = document.getElementById('filter_date_to');
+    if (!fromInput || !toInput) return;
+
+    toInput.value = formatDate(today);
+
+    if (range === 'today') {
+        fromInput.value = formatDate(today);
+    } else if (range === '7days') {
+        const past7 = new Date();
+        past7.setDate(today.getDate() - 6);
+        fromInput.value = formatDate(past7);
+    } else if (range === 'month') {
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        fromInput.value = formatDate(firstDay);
+    }
+
+    const form = document.getElementById('auditFilterForm');
+    if (form) form.submit();
+}
+
 function showAuditModal(btn) {
     const rawJson = btn.getAttribute('data-json');
     const action = btn.getAttribute('data-action');
