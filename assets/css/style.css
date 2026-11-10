@@ -488,7 +488,7 @@ body.bg-register {
 /* Podium Rank 3 (Bronze - Right) */
 .podium-rank-3 {
     order: 3;
-    border-top: 4px solid #d97706;
+    border-top: 4px solid #b08d57;
 }
 
 .podium-avatar-wrap {
@@ -518,7 +518,7 @@ body.bg-register {
 .podium-rank-3 .podium-avatar-wrap {
     background: var(--bg-elevated);
     color: #f59e0b;
-    border: 3px solid #d97706;
+    border: 3px solid #b08d57;
 }
 .podium-rank-badge {
     position: absolute;

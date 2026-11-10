@@ -505,13 +505,14 @@ if (!function_exists('get_top_booking_members')) {
         try {
             $sql = "SELECT m.member_id, m.member_name, m.member_phone, m.member_avatar, 
                            IFNULL(p.member_level, 'Bronze') as member_level, 
+                           IFNULL(p.point_balance, 0) as point_balance,
                            IFNULL(p.point_total_earned, 0) as point_total_earned,
                            COUNT(b.booking_id) as booking_count 
                     FROM Member m 
                     LEFT JOIN Point p ON m.member_id = p.member_id
                     JOIN Booking b ON m.member_id = b.member_id 
                     WHERE b.booking_status = :status 
-                    GROUP BY m.member_id, m.member_name, m.member_phone, m.member_avatar, p.member_level, p.point_total_earned
+                    GROUP BY m.member_id, m.member_name, m.member_phone, m.member_avatar, p.member_level, p.point_balance, p.point_total_earned
                     ORDER BY booking_count DESC, point_total_earned DESC, m.member_id ASC
                     LIMIT :limit";
             $stmt = $conn->prepare($sql);

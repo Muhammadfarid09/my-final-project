@@ -292,7 +292,10 @@ try {
                             </div>
                             <div class="podium-player-name"><?php echo htmlspecialchars($rank2_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></div>
                             <div class="podium-stat-pill pill-silver">
-                                <strong><?= intval($rank2_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                <i class="fas fa-coins"></i> <strong><?= number_format($rank2_player['point_total_earned'] ?? 0) ?></strong> พอยท์
+                            </div>
+                            <div class="podium-match-sub">
+                                เล่นแล้ว <strong><?= intval($rank2_player['booking_count'] ?? 0) ?></strong> แมตช์
                             </div>
                         </div>
                         <div class="podium-step-block block-silver">
@@ -318,7 +321,10 @@ try {
                             </div>
                             <div class="podium-player-name name-gold"><?php echo htmlspecialchars($rank1_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></div>
                             <div class="podium-stat-pill pill-gold">
-                                <strong><?= intval($rank1_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                <i class="fas fa-coins text-gold"></i> <strong><?= number_format($rank1_player['point_total_earned'] ?? 0) ?></strong> พอยท์
+                            </div>
+                            <div class="podium-match-sub">
+                                เล่นแล้ว <strong><?= intval($rank1_player['booking_count'] ?? 0) ?></strong> แมตช์
                             </div>
                         </div>
                         <div class="podium-step-block block-gold">
@@ -341,7 +347,10 @@ try {
                             </div>
                             <div class="podium-player-name"><?php echo htmlspecialchars($rank3_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></div>
                             <div class="podium-stat-pill pill-bronze">
-                                <strong><?= intval($rank3_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                <i class="fas fa-coins"></i> <strong><?= number_format($rank3_player['point_total_earned'] ?? 0) ?></strong> พอยท์
+                            </div>
+                            <div class="podium-match-sub">
+                                เล่นแล้ว <strong><?= intval($rank3_player['booking_count'] ?? 0) ?></strong> แมตช์
                             </div>
                         </div>
                         <div class="podium-step-block block-bronze">
