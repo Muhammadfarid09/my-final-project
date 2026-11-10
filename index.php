@@ -261,6 +261,147 @@ try {
         </section>
 
         <!-- ============================================== -->
+        <!-- ทำเนียบผู้เล่นยอดเยี่ยมประจำสนาม (Top 3 Active Players Podium: 2 - 1 - 3) -->
+        <!-- ============================================== -->
+        <section class="home-podium-section" id="leaderboard">
+            <div class="home-container">
+                
+                <!-- หัวข้อเซกชัน -->
+                <div class="home-podium-header">
+                    <div class="home-podium-tag">
+                        <span class="home-podium-tag-line"></span>
+                        <span class="home-podium-tag-text"><i class="fas fa-trophy text-gold"></i> TOP PLAYERS & HALL OF FAME</span>
+                        <span class="home-podium-tag-line"></span>
+                    </div>
+                    <h2 class="home-podium-title">ทำเนียบผู้เล่นยอดเยี่ยมประจำสนาม</h2>
+                    <p class="home-podium-desc">ขอขอบคุณสมาชิกผู้รักกีฬาแบดมินตันที่เข้าใช้บริการสนามบ่อยที่สุดในระบบ T.S. Badminton Pattani</p>
+                </div>
+
+                <!-- แท่นรับรางวัลสไตล์โอลิมปิก (Podium 2 ซ้าย - 1 กลาง - 3 ขวา) -->
+                <div class="podium-stage-wrapper">
+                    <div class="podium-stage">
+                        
+                        <!-- 🥈 อันดับ 2: ฝั่งซ้าย (Silver Podium) -->
+                        <div class="podium-column podium-rank-2">
+                            <div class="podium-card-content">
+                                <div class="podium-medal-badge badge-silver">
+                                    <i class="fas fa-medal"></i>
+                                    <span>อันดับ 2</span>
+                                </div>
+                                <div class="podium-avatar-wrap avatar-silver">
+                                    <?php if (!empty($rank2_player['member_avatar']) && file_exists(__DIR__ . '/' . $rank2_player['member_avatar'])): ?>
+                                        <img src="<?php echo htmlspecialchars($rank2_player['member_avatar']); ?>" alt="<?php echo htmlspecialchars($rank2_player['member_name'] ?? ''); ?>" class="podium-avatar-img">
+                                    <?php else: ?>
+                                        <div class="podium-avatar-fallback"><i class="fas fa-user"></i></div>
+                                    <?php endif; ?>
+                                </div>
+                                <h3 class="podium-player-name"><?php echo htmlspecialchars($rank2_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></h3>
+                                <?php if (!empty($rank2_player)): ?>
+                                    <span class="podium-tier-pill tier-<?= strtolower($rank2_player['member_level'] ?? 'bronze') ?>">
+                                        <i class="fas fa-crown"></i> <?= htmlspecialchars($rank2_player['member_level'] ?? 'Bronze') ?>
+                                    </span>
+                                    <div class="podium-player-matches">
+                                        <strong><?= intval($rank2_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                    </div>
+                                <?php else: ?>
+                                    <div class="podium-player-matches text-muted-custom">ว่าง</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="podium-pillar pillar-silver">
+                                <div class="podium-pillar-num">2</div>
+                                <div class="podium-pillar-label">SILVER</div>
+                            </div>
+                        </div>
+
+                        <!-- 🥇 อันดับ 1: ตรงกลาง สูงสุด (Gold Champion Podium) -->
+                        <div class="podium-column podium-rank-1">
+                            <div class="podium-card-content">
+                                <!-- มงกุฎทองคำลอยเหนืออันดับ 1 -->
+                                <div class="podium-floating-crown">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="podium-medal-badge badge-gold">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>อันดับ 1 CHAMPION</span>
+                                </div>
+                                <div class="podium-avatar-wrap avatar-gold">
+                                    <?php if (!empty($rank1_player['member_avatar']) && file_exists(__DIR__ . '/' . $rank1_player['member_avatar'])): ?>
+                                        <img src="<?php echo htmlspecialchars($rank1_player['member_avatar']); ?>" alt="<?php echo htmlspecialchars($rank1_player['member_name'] ?? ''); ?>" class="podium-avatar-img">
+                                    <?php else: ?>
+                                        <div class="podium-avatar-fallback"><i class="fas fa-user"></i></div>
+                                    <?php endif; ?>
+                                </div>
+                                <h3 class="podium-player-name"><?php echo htmlspecialchars($rank1_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></h3>
+                                <?php if (!empty($rank1_player)): ?>
+                                    <span class="podium-tier-pill tier-<?= strtolower($rank1_player['member_level'] ?? 'gold') ?>">
+                                        <i class="fas fa-crown"></i> <?= htmlspecialchars($rank1_player['member_level'] ?? 'Gold') ?>
+                                    </span>
+                                    <div class="podium-player-matches">
+                                        <strong><?= intval($rank1_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                    </div>
+                                <?php else: ?>
+                                    <div class="podium-player-matches text-muted-custom">ว่าง</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="podium-pillar pillar-gold">
+                                <div class="podium-pillar-num">1</div>
+                                <div class="podium-pillar-label">CHAMPION</div>
+                            </div>
+                        </div>
+
+                        <!-- 🥉 อันดับ 3: ฝั่งขวา (Bronze Podium) -->
+                        <div class="podium-column podium-rank-3">
+                            <div class="podium-card-content">
+                                <div class="podium-medal-badge badge-bronze">
+                                    <i class="fas fa-medal"></i>
+                                    <span>อันดับ 3</span>
+                                </div>
+                                <div class="podium-avatar-wrap avatar-bronze">
+                                    <?php if (!empty($rank3_player['member_avatar']) && file_exists(__DIR__ . '/' . $rank3_player['member_avatar'])): ?>
+                                        <img src="<?php echo htmlspecialchars($rank3_player['member_avatar']); ?>" alt="<?php echo htmlspecialchars($rank3_player['member_name'] ?? ''); ?>" class="podium-avatar-img">
+                                    <?php else: ?>
+                                        <div class="podium-avatar-fallback"><i class="fas fa-user"></i></div>
+                                    <?php endif; ?>
+                                </div>
+                                <h3 class="podium-player-name"><?php echo htmlspecialchars($rank3_player['member_name'] ?? 'รอผู้ท้าชิง'); ?></h3>
+                                <?php if (!empty($rank3_player)): ?>
+                                    <span class="podium-tier-pill tier-<?= strtolower($rank3_player['member_level'] ?? 'bronze') ?>">
+                                        <i class="fas fa-crown"></i> <?= htmlspecialchars($rank3_player['member_level'] ?? 'Bronze') ?>
+                                    </span>
+                                    <div class="podium-player-matches">
+                                        <strong><?= intval($rank3_player['booking_count'] ?? 0) ?></strong> แมตช์
+                                    </div>
+                                <?php else: ?>
+                                    <div class="podium-player-matches text-muted-custom">ว่าง</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="podium-pillar pillar-bronze">
+                                <div class="podium-pillar-num">3</div>
+                                <div class="podium-pillar-label">BRONZE</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- แถบเชิญชวนร่วมสนุก (Call to Action) ด้านล่างโพเดียม -->
+                <div class="home-podium-cta">
+                    <div class="podium-cta-box">
+                        <div class="podium-cta-text">
+                            <i class="fas fa-fire text-gold"></i>
+                            <span>อยากติดอันดับทำเนียบผู้เล่นยอดเยี่ยม? จองคอร์ทและสะสมสถิติการเล่นได้แล้ววันนี้!</span>
+                        </div>
+                        <a href="booking.php" class="btn-podium-cta">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>จองสนามเลย</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================== -->
         <!-- 4. สิ่งอำนวยความสะดวก/จุดเด่นสนาม (Key Amenities - Clean Theme) -->
         <!-- ============================================== -->
         <section class="home-amenities-section" id="amenities">

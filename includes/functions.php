@@ -498,18 +498,21 @@ if (!function_exists('mask_phone_number')) {
 
 if (!function_exists('get_top_booking_members')) {
     /**
-     * ดึงข้อมูล 3 อันดับสมาชิกที่จองสำเร็จสูงสุดจากฐานข้อมูลจริง
+     * ดึงข้อมูลอันดับสมาชิกที่จองสำเร็จสูงสุดจากฐานข้อมูลจริง (Top Players Leaderboard)
      */
     function get_top_booking_members(PDO $conn, int $limit = 3): array {
         $results = [];
         try {
-            $sql = "SELECT m.member_id, m.member_name, m.member_phone, IFNULL(p.member_level, 'Bronze') as member_level, COUNT(b.booking_id) as booking_count 
+            $sql = "SELECT m.member_id, m.member_name, m.member_phone, m.member_avatar, 
+                           IFNULL(p.member_level, 'Bronze') as member_level, 
+                           IFNULL(p.point_total_earned, 0) as point_total_earned,
+                           COUNT(b.booking_id) as booking_count 
                     FROM Member m 
                     LEFT JOIN Point p ON m.member_id = p.member_id
                     JOIN Booking b ON m.member_id = b.member_id 
                     WHERE b.booking_status = :status 
-                    GROUP BY m.member_id 
-                    ORDER BY booking_count DESC 
+                    GROUP BY m.member_id, m.member_name, m.member_phone, m.member_avatar, p.member_level, p.point_total_earned
+                    ORDER BY booking_count DESC, point_total_earned DESC, m.member_id ASC
                     LIMIT :limit";
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(':status', STATUS_BOOKING_CONFIRMED, PDO::PARAM_STR);
