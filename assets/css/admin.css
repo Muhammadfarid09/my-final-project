@@ -3548,26 +3548,27 @@ body.receipt-body {
     font-size: 12.5px;
     font-weight: 600;
     color: #475569;
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    gap: 6px;
 }
 
 .filter-input-wrap {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
 }
 
 .filter-prefix-icon {
     position: absolute;
     left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
     color: #94A3B8;
     font-size: 14px;
     pointer-events: none;
-}
-
-.filter-input-wrap .filter-input-ctrl {
-    padding-left: 38px;
+    z-index: 2;
 }
 
 .filter-input-ctrl {
@@ -3582,6 +3583,17 @@ body.receipt-body {
     outline: none;
     transition: all 0.15s ease;
     box-sizing: border-box;
+}
+
+/* Ensure Search Input has ample padding to prevent icon overlap (High specificity without !important) */
+.admin-card .audit-filter-panel .filter-input-wrap input[type="text"].filter-input-ctrl,
+.audit-filter-panel .filter-input-wrap input.filter-input-ctrl {
+    padding-left: 40px;
+}
+
+.filter-input-ctrl::placeholder {
+    color: #94A3B8;
+    font-size: 13px;
 }
 
 .filter-input-ctrl:focus {

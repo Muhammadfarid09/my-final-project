@@ -164,7 +164,7 @@ include 'includes/header.php';
             <!-- Col 1-2 (Row 1): ค้นหาคำสำคัญ (Spans 2 columns / 50%) -->
             <div class="filter-col-search">
                 <label for="filter_keyword" class="filter-label">
-                    <i class="fas fa-search text-muted mr-4"></i> ค้นหาคำสำคัญ
+                    <i class="fas fa-search text-muted"></i> ค้นหาคำสำคัญ
                 </label>
                 <div class="filter-input-wrap">
                     <i class="fas fa-search filter-prefix-icon"></i>
@@ -177,7 +177,7 @@ include 'includes/header.php';
             <!-- Col 3 (Row 1): ประเภทกิจกรรม (25%) -->
             <div class="filter-col-select">
                 <label for="filter_action" class="filter-label">
-                    <i class="fas fa-filter text-muted mr-4"></i> ประเภทกิจกรรม
+                    <i class="fas fa-filter text-muted"></i> ประเภทกิจกรรม
                 </label>
                 <select id="filter_action" name="action" class="filter-input-ctrl" onchange="this.form.submit()">
                     <option value="">-- กิจกรรมทั้งหมด --</option>
@@ -192,7 +192,7 @@ include 'includes/header.php';
             <!-- Col 4 (Row 1): ผู้กระทำ (Actor) (25%) -->
             <div class="filter-col-select">
                 <label for="filter_actor_type" class="filter-label">
-                    <i class="fas fa-user-tag text-muted mr-4"></i> ผู้กระทำ (Actor)
+                    <i class="fas fa-user-tag text-muted"></i> ผู้กระทำ (Actor)
                 </label>
                 <select id="filter_actor_type" name="actor_type" class="filter-input-ctrl" onchange="this.form.submit()">
                     <option value="">-- ผู้กระทำทั้งหมด --</option>
@@ -205,7 +205,7 @@ include 'includes/header.php';
             <!-- Col 1 (Row 2): ตั้งแต่วันที่ (25%) -->
             <div class="filter-col-date">
                 <label for="filter_date_from" class="filter-label">
-                    <i class="fas fa-calendar-alt text-muted mr-4"></i> ตั้งแต่วันที่
+                    <i class="fas fa-calendar-alt text-muted"></i> ตั้งแต่วันที่
                 </label>
                 <input type="date" id="filter_date_from" name="date_from" class="filter-input-ctrl" 
                        value="<?php echo htmlspecialchars($filter_date_from); ?>">
@@ -214,7 +214,7 @@ include 'includes/header.php';
             <!-- Col 2 (Row 2): ถึงวันที่ (25%) -->
             <div class="filter-col-date">
                 <label for="filter_date_to" class="filter-label">
-                    <i class="fas fa-calendar-check text-muted mr-4"></i> ถึงวันที่
+                    <i class="fas fa-calendar-check text-muted"></i> ถึงวันที่
                 </label>
                 <input type="date" id="filter_date_to" name="date_to" class="filter-input-ctrl" 
                        value="<?php echo htmlspecialchars($filter_date_to); ?>">
@@ -223,7 +223,7 @@ include 'includes/header.php';
             <!-- Col 3 (Row 2): ช่วงเวลาด่วน (Quick Presets) (25%) -->
             <div class="filter-col-presets">
                 <label class="filter-label">
-                    <i class="fas fa-bolt text-muted mr-4"></i> ช่วงเวลาด่วน
+                    <i class="fas fa-bolt text-muted"></i> ช่วงเวลาด่วน
                 </label>
                 <div class="filter-preset-chips">
                     <button type="button" class="preset-chip" onclick="setAuditDateRange('today')">วันนี้</button>
