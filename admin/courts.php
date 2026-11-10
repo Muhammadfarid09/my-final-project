@@ -18,14 +18,11 @@ include 'includes/header.php';
     <h4 class="section-header"><i class="fas fa-plus"></i> เพิ่มสนามแบดมินตันใหม่</h4>
     <form action="actions/court_add_db.php" method="POST" id="addCourtForm" onsubmit="return handleAddCourtSubmit(event)">
         <?php echo csrf_field(); ?>
-        <div class="form-row-4">
-            <div class="form-group">
+        <!-- โซนที่ 1: ข้อมูลสนามและเวลาเปิด-ปิดทำการ -->
+        <div class="court-form-info-grid">
+            <div class="form-group court-name-group">
                 <label>ชื่อสนาม <span class="text-danger">*</span></label>
                 <input type="text" name="court_name" class="form-control" placeholder="เช่น สนามที่ 1" required>
-            </div>
-            <div class="form-group">
-                <label>ราคาช่วงเย็น จ.-ศ. (17:00-23:00) (฿) <span class="text-danger">*</span></label>
-                <input type="number" step="0.01" name="court_price_per_hour" class="form-control" placeholder="เช่น 180.00" required>
             </div>
             <div class="form-group">
                 <label>เวลาเปิดสนาม</label>
@@ -37,18 +34,36 @@ include 'includes/header.php';
             </div>
         </div>
         
-        <div class="form-row-2 form-box-highlight">
-            <div class="form-group">
-                <label class="text-danger">ราคาวันหยุด ส.-อา. ทุกช่วงเวลา/ชม. (฿) (Weekend)</label>
-                <input type="number" step="0.01" name="court_peak_price" class="form-control" placeholder="เช่น 200.00">
+        <!-- โซนที่ 2: โครงสร้างราคาค่าเช่าสนาม (3 คอลัมน์สมดุล) -->
+        <div class="court-pricing-box">
+            <div class="court-pricing-header">
+                <i class="fas fa-tags text-muted"></i> กำหนดโครงสร้างราคาค่าเช่าสนาม (บาท/ชั่วโมง)
             </div>
-            <div class="form-group">
-                <label class="text-success">ราคากลางวัน จ.-ศ. (08:00-17:00)/ชม. (฿) (Daytime)</label>
-                <input type="number" step="0.01" name="court_offpeak_price" class="form-control" placeholder="เช่น 150.00">
+            <div class="form-row-3">
+                <div class="form-group mb-0">
+                    <label class="text-success"><i class="fas fa-sun text-warning mr-6"></i> ราคากลางวัน จ.-ศ. (08:00-17:00)</label>
+                    <input type="number" step="0.01" min="0" name="court_offpeak_price" class="form-control" placeholder="เช่น 150.00">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="text-dark-custom font-weight-600"><i class="fas fa-moon text-primary mr-6"></i> ราคาช่วงเย็น จ.-ศ. (17:00-23:00) <span class="text-danger">*</span></label>
+                    <input type="number" step="0.01" min="0" name="court_price_per_hour" class="form-control" placeholder="เช่น 180.00" required>
+                </div>
+                <div class="form-group mb-0">
+                    <label class="text-danger"><i class="fas fa-star text-gold mr-6"></i> ราคาวันหยุด ส.-อา. ทุกช่วงเวลา</label>
+                    <input type="number" step="0.01" min="0" name="court_peak_price" class="form-control" placeholder="เช่น 200.00">
+                </div>
             </div>
         </div>
 
-        <button type="submit" class="btn-submit w-100"><i class="fas fa-save"></i> บันทึกข้อมูลสนาม</button>
+        <!-- แถบปุ่มดำเนินการ (ชิดขวา สง่างาม สมดุล) -->
+        <div class="court-form-actions">
+            <button type="reset" class="btn-cancel">
+                <i class="fas fa-redo-alt mr-6"></i> ล้างข้อมูล
+            </button>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save mr-6"></i> บันทึกข้อมูลสนาม
+            </button>
+        </div>
     </form>
 </div>
 
@@ -177,25 +192,19 @@ include 'includes/header.php';
 
 <!-- Modal สำหรับแก้ไขข้อมูลสนาม -->
 <div id="courtEditModal" class="modal-overlay">
-    <div class="modal-content">
+    <div class="modal-content modal-content-lg">
         <h4 class="modal-header"><i class="fas fa-edit"></i> แก้ไขข้อมูลสนาม</h4>
         
         <form action="actions/court_edit_db.php" method="POST" id="courtEditForm" onsubmit="return handleCourtEditSubmit(event)">
             <?php echo csrf_field(); ?>
             <input type="hidden" name="court_id" id="edit_court_id">
             
-            <div class="form-row-2">
-                <div class="form-group">
+            <!-- โซนที่ 1: ข้อมูลสนามและเวลาเปิด-ปิดทำการ -->
+            <div class="court-form-info-grid">
+                <div class="form-group court-name-group">
                     <label>ชื่อสนาม <span class="text-danger">*</span></label>
                     <input type="text" name="court_name" id="edit_court_name" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>ราคาช่วงเย็น จ.-ศ. (17:00-23:00) (฿) <span class="text-danger">*</span></label>
-                    <input type="number" step="0.01" name="court_price_per_hour" id="edit_court_price" class="form-control" required>
-                </div>
-            </div>
-
-            <div class="form-row-2">
                 <div class="form-group">
                     <label>เวลาเปิดสนาม</label>
                     <input type="time" name="court_open_time" id="edit_open_time" class="form-control">
@@ -206,14 +215,24 @@ include 'includes/header.php';
                 </div>
             </div>
             
-            <div class="form-row-2 form-box-highlight">
-                <div class="form-group">
-                    <label class="text-danger">ราคาวันหยุด ส.-อา. ทุกช่วงเวลา/ชม. (฿) (Weekend)</label>
-                    <input type="number" step="0.01" name="court_peak_price" id="edit_peak_price" class="form-control">
+            <!-- โซนที่ 2: โครงสร้างราคาค่าเช่าสนาม (3 คอลัมน์สมดุล) -->
+            <div class="court-pricing-box">
+                <div class="court-pricing-header">
+                    <i class="fas fa-tags text-muted"></i> กำหนดโครงสร้างราคาค่าเช่าสนาม (บาท/ชั่วโมง)
                 </div>
-                <div class="form-group">
-                    <label class="text-success">ราคากลางวัน จ.-ศ. (08:00-17:00)/ชม. (฿) (Daytime)</label>
-                    <input type="number" step="0.01" name="court_offpeak_price" id="edit_offpeak_price" class="form-control">
+                <div class="form-row-3">
+                    <div class="form-group mb-0">
+                        <label class="text-success"><i class="fas fa-sun text-warning mr-6"></i> ราคากลางวัน จ.-ศ. (08:00-17:00)</label>
+                        <input type="number" step="0.01" min="0" name="court_offpeak_price" id="edit_offpeak_price" class="form-control">
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="text-dark-custom font-weight-600"><i class="fas fa-moon text-primary mr-6"></i> ราคาช่วงเย็น จ.-ศ. (17:00-23:00) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" min="0" name="court_price_per_hour" id="edit_court_price" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label class="text-danger"><i class="fas fa-star text-gold mr-6"></i> ราคาวันหยุด ส.-อา. ทุกช่วงเวลา</label>
+                        <input type="number" step="0.01" min="0" name="court_peak_price" id="edit_peak_price" class="form-control">
+                    </div>
                 </div>
             </div>
 
