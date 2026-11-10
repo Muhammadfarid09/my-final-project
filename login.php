@@ -61,7 +61,7 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                 <div class="visual-panel-top">
                     <div class="visual-badge-capsule">
                         <i class="fas fa-shuttlecock text-gold"></i>
-                        <span>🏸 T.S. Pattani Badminton Booking Portal</span>
+                        <span>T.S. Pattani Badminton Portal</span>
                     </div>
                 </div>
 
@@ -143,10 +143,10 @@ $registered_flash = isset($_GET['registered']) && $_GET['registered'] == '1';
                 <div class="login-card-header">
                     <div class="login-brand-tag">
                         <i class="fas fa-shuttlecock text-gold"></i>
-                        <span>T.S. BADMINTON PATTANI</span>
+                        <span>MEMBER LOGIN</span>
                     </div>
                     <h2 class="login-card-title">เข้าสู่ระบบสมาชิก</h2>
-                    <p class="login-card-desc">ยินดีต้อนรับกลับมา! กรุณากรอกเบอร์โทรศัพท์เพื่อเข้าใช้งาน</p>
+                    <p class="login-card-desc">กรุณากรอกเบอร์โทรศัพท์และรหัสผ่านเพื่อเข้าใช้งาน</p>
                 </div>
 
                 <!-- พื้นที่แสดงแจ้งเตือน Error ฝั่ง Client-side (JS Validation) -->

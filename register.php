@@ -48,7 +48,7 @@ $redirect_target = htmlspecialchars($_GET['redirect'] ?? ($_POST['redirect'] ?? 
                 <div class="visual-panel-top">
                     <div class="visual-badge-capsule">
                         <i class="fas fa-id-card text-gold"></i>
-                        <span>🏸 T.S. Pattani Membership Portal</span>
+                        <span>T.S. Pattani Membership Portal</span>
                     </div>
                 </div>
 
